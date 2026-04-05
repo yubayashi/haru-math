@@ -1078,5 +1078,325 @@
   </div>
 </div>
 
+<!-- ============ INTERACTIVE LAYER ============ -->
+<style>
+  .i-input {
+    border: none;
+    border-bottom: 2px solid #e74c3c;
+    background: #fff8f0;
+    font-family: 'Nunito', sans-serif;
+    font-size: inherit;
+    font-weight: 700;
+    color: #2d2d2d;
+    text-align: center;
+    padding: 2px 4px;
+    border-radius: 4px 4px 0 0;
+    transition: border-color 0.2s, background 0.2s;
+    outline: none;
+  }
+  .i-input:focus { border-bottom-color: #3498db; background: #eef6ff; }
+  .i-input.filled { background: #e8f8e8; border-bottom-color: #27ae60; }
+  .i-input-sm { width: 45px; }
+  .i-input-md { width: 90px; }
+  .i-input-lg { width: 180px; }
+
+  .i-textarea {
+    width: 100%;
+    min-height: 60px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    background: #fff8f0;
+    color: #2d2d2d;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .i-textarea:focus { border-color: #3498db; background: #eef6ff; }
+  .i-textarea.filled { border-color: #27ae60; background: #e8f8e8; }
+
+  .compare-circle.interactive {
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: 900;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    transition: transform 0.15s;
+  }
+  .compare-circle.interactive:hover { transform: scale(1.2); }
+  .compare-circle.interactive.filled { color: #27ae60; }
+
+  .vf-choice.interactive { cursor: pointer; user-select: none; transition: all 0.15s; }
+  .vf-choice.interactive:hover { transform: scale(1.05); }
+  .vf-choice.interactive.selected {
+    background: #e74c3c;
+    color: #fff;
+    border-color: #e74c3c;
+    font-weight: 900;
+  }
+
+  .submit-section {
+    text-align: center;
+    margin: 30px auto;
+    padding: 24px;
+    max-width: 400px;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #eee;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #e74c3c, #f39c12, #27ae60);
+    border-radius: 6px;
+    transition: width 0.3s;
+  }
+  .progress-text { font-size: 13px; color: #888; margin-bottom: 16px; }
+  .submit-btn {
+    display: inline-block;
+    padding: 14px 48px;
+    font-size: 18px;
+    font-weight: 900;
+    font-family: 'Nunito', sans-serif;
+    color: #fff;
+    background: linear-gradient(135deg, #e74c3c, #e67e22);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 15px rgba(231,76,60,0.3);
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(231,76,60,0.4); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .submit-success {
+    display: none;
+    margin-top: 16px;
+    padding: 16px;
+    background: #e8f8e8;
+    border-radius: 12px;
+    color: #27ae60;
+    font-weight: 700;
+  }
+
+  @media print {
+    .i-input, .i-textarea { border: none; background: none; }
+    .submit-section { display: none; }
+  }
+</style>
+
+<div class="submit-section" id="submitSection">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="progress-text" id="progressText">0 / 0 入力済み</div>
+  <button class="submit-btn" id="submitBtn" onclick="submitAnswers()">&#x1F680; 送信する！</button>
+  <div class="submit-success" id="submitSuccess">&#x2705; 送信完了！ パパに届いたよ！</div>
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxjQNbzEH300DZ92XmmNjrJc1gNZrjVNFcl5vMcTcwf2tnoStG9jwKe-aJ3DqD_55VGpA/exec';
+const LESSON_ID = 'missao_matematica_01';
+
+document.addEventListener('DOMContentLoaded', () => {
+  // 1) Name & Date blanks
+  document.querySelectorAll('.name-line .blank').forEach((el, i) => {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'i-input i-input-lg';
+    input.dataset.field = i === 0 ? 'name' : 'date';
+    input.placeholder = i === 0 ? 'ハル' : '';
+    if (i === 1) input.value = new Date().toISOString().slice(0, 10);
+    input.addEventListener('input', refresh);
+    el.replaceWith(input);
+  });
+
+  // 2) Compare circles -> clickable toggle
+  document.querySelectorAll('.compare-circle').forEach((el, i) => {
+    el.classList.add('interactive');
+    el.dataset.field = 'compare_' + i;
+    el.dataset.value = '';
+    el.textContent = '?';
+    el.addEventListener('click', () => {
+      const cycle = ['?', '<', '>', '='];
+      const cur = cycle.indexOf(el.dataset.value || '?');
+      el.dataset.value = cycle[(cur + 1) % cycle.length];
+      el.textContent = el.dataset.value;
+      el.classList.toggle('filled', el.dataset.value !== '?');
+      refresh();
+    });
+  });
+
+  // 3) VF choices -> clickable
+  document.querySelectorAll('.vf-choices').forEach((container, qi) => {
+    container.dataset.field = 'vf_' + qi;
+    container.querySelectorAll('.vf-choice').forEach(ch => {
+      ch.classList.add('interactive');
+      ch.addEventListener('click', () => {
+        container.querySelectorAll('.vf-choice').forEach(c => c.classList.remove('selected'));
+        ch.classList.add('selected');
+        container.dataset.value = ch.textContent.trim().charAt(0);
+        refresh();
+      });
+    });
+  });
+
+  // 4) answer-blank spans -> input
+  document.querySelectorAll('.answer-blank').forEach((el, i) => {
+    const input = document.createElement('input');
+    input.type = 'text';
+    const wide = (el.style.maxWidth && parseInt(el.style.maxWidth) > 100) || el.style.display === 'block';
+    input.className = 'i-input ' + (wide ? 'i-input-lg' : 'i-input-md');
+    input.dataset.field = 'blank_' + i;
+    input.addEventListener('input', refresh);
+    el.replaceWith(input);
+  });
+
+  // 5) Inline ___ in answer rows (not in templates or vocab)
+  document.querySelectorAll('.answer-row').forEach(row => {
+    row.childNodes.forEach(node => {
+      if (node.nodeType === 1 && node.tagName === 'SPAN' && !node.classList.contains('answer-label') && !node.classList.contains('i-input')) {
+        const html = node.innerHTML;
+        if (!html.includes('___') || node.closest('.explain-template') || node.closest('.vocab-table')) return;
+        const qNum = (node.closest('.problem') || {}).querySelector && node.closest('.problem').querySelector('.problem-number');
+        const qId = qNum ? qNum.textContent.trim() : 'x';
+        let c = 0;
+        node.innerHTML = html.replace(/___/g, () => {
+          c++;
+          return '<input type="text" class="i-input i-input-sm" data-field="q' + qId + '_fill_' + c + '" oninput="refresh()">';
+        });
+      }
+    });
+  });
+
+  // 6) Explain lines -> textarea
+  document.querySelectorAll('.explain-box').forEach((box, i) => {
+    const lines = box.querySelectorAll('.explain-line');
+    if (lines.length === 0) return;
+    const textarea = document.createElement('textarea');
+    textarea.className = 'i-textarea';
+    textarea.dataset.field = 'explain_' + i;
+    textarea.placeholder = 'Escreve aqui... / ここに書こう...';
+    textarea.addEventListener('input', refresh);
+    lines[0].replaceWith(textarea);
+    for (let j = 1; j < lines.length; j++) lines[j].remove();
+  });
+
+  loadFromStorage();
+  refresh();
+});
+
+function refresh() {
+  saveToStorage();
+  updateProgress();
+}
+
+function updateProgress() {
+  const inputs = document.querySelectorAll('.i-input, .i-textarea');
+  const compares = document.querySelectorAll('.compare-circle.interactive');
+  const vfs = document.querySelectorAll('.vf-choices');
+  let filled = 0, total = 0;
+
+  inputs.forEach(el => {
+    // skip name/date
+    if (el.dataset.field === 'name' || el.dataset.field === 'date') return;
+    total++;
+    const has = !!(el.value && el.value.trim());
+    if (has) filled++;
+    el.classList.toggle('filled', has);
+  });
+  compares.forEach(el => { total++; if (el.dataset.value && el.dataset.value !== '?') filled++; });
+  vfs.forEach(el => { total++; if (el.dataset.value) filled++; });
+
+  const pct = total > 0 ? Math.round((filled / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = filled + ' / ' + total + ' 入力済み';
+}
+
+function collectAnswers() {
+  const a = {};
+  document.querySelectorAll('.i-input, .i-textarea').forEach(el => {
+    if (el.dataset.field) a[el.dataset.field] = el.value || '';
+  });
+  document.querySelectorAll('.compare-circle.interactive').forEach(el => {
+    if (el.dataset.field) a[el.dataset.field] = el.dataset.value || '';
+  });
+  document.querySelectorAll('.vf-choices').forEach(el => {
+    if (el.dataset.field) a[el.dataset.field] = el.dataset.value || '';
+  });
+  return a;
+}
+
+function saveToStorage() {
+  try { localStorage.setItem(LESSON_ID, JSON.stringify(collectAnswers())); } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    const s = JSON.parse(localStorage.getItem(LESSON_ID));
+    if (!s) return;
+    document.querySelectorAll('.i-input, .i-textarea').forEach(el => {
+      if (el.dataset.field && s[el.dataset.field]) el.value = s[el.dataset.field];
+    });
+    document.querySelectorAll('.compare-circle.interactive').forEach(el => {
+      if (el.dataset.field && s[el.dataset.field]) {
+        el.dataset.value = s[el.dataset.field];
+        el.textContent = s[el.dataset.field];
+        el.classList.toggle('filled', s[el.dataset.field] !== '?');
+      }
+    });
+    document.querySelectorAll('.vf-choices').forEach(ct => {
+      if (ct.dataset.field && s[ct.dataset.field]) {
+        ct.dataset.value = s[ct.dataset.field];
+        ct.querySelectorAll('.vf-choice').forEach(ch => {
+          ch.classList.toggle('selected', ch.textContent.trim().charAt(0) === s[ct.dataset.field]);
+        });
+      }
+    });
+  } catch(e) {}
+}
+
+async function submitAnswers() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+
+  const payload = {
+    lesson: LESSON_ID,
+    timestamp: new Date().toISOString(),
+    answers: collectAnswers()
+  };
+
+  try {
+    if (GAS_URL && GAS_URL !== '__GAS_URL__') {
+      await fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      document.getElementById('submitSuccess').style.display = 'block';
+      btn.textContent = '送信済み ✓';
+    } else {
+      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+      alert('回答をクリップボードにコピーしました（GAS URL未設定）');
+      btn.disabled = false;
+      btn.textContent = '\u{1F680} 送信する！';
+    }
+  } catch (err) {
+    alert('エラーが発生しました。もう一度試してください。');
+    btn.disabled = false;
+    btn.textContent = '\u{1F680} 送信する！';
+  }
+}
+</script>
+
 </body>
 </html>
