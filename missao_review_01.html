@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missão Matemática #1 — Revisão</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Nunito', sans-serif; color: #2d2d2d; background: #f5f5f5; font-size: 14px; line-height: 1.6; padding: 20px; }
+  .page { max-width: 700px; margin: 0 auto; }
+
+  h1 { text-align: center; font-size: 24px; font-weight: 900; color: #e74c3c; margin-bottom: 4px; }
+  .subtitle { text-align: center; color: #888; font-size: 13px; margin-bottom: 24px; }
+
+  .section { background: #fff; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .section-header { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 900; margin-bottom: 14px; }
+  .badge { display: inline-block; padding: 3px 12px; border-radius: 10px; color: #fff; font-size: 11px; font-weight: 700; }
+  .badge-red { background: #e74c3c; }
+  .badge-blue { background: #3498db; }
+  .badge-green { background: #27ae60; }
+
+  .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-weight: 700; margin: 0 3px; line-height: 1.1; }
+  .frac .num { border-bottom: 2px solid #333; padding: 0 4px 2px; font-size: 15px; }
+  .frac .den { padding: 2px 4px 0; font-size: 15px; }
+
+  .wrong-right { display: flex; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
+  .wr-box { flex: 1; min-width: 140px; border-radius: 10px; padding: 12px; text-align: center; font-size: 15px; font-weight: 700; }
+  .wr-wrong { background: #ffeaea; border: 2px solid #e74c3c; }
+  .wr-right { background: #eafff0; border: 2px solid #27ae60; }
+  .wr-label { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+  .wr-label.red { color: #e74c3c; }
+  .wr-label.green { color: #27ae60; }
+
+  .step-box { background: #f0f7ff; border: 2px solid #3498db; border-radius: 10px; padding: 14px; margin: 12px 0; }
+  .step-title { font-weight: 900; color: #2980b9; font-size: 13px; margin-bottom: 8px; }
+  .step { margin: 4px 0; font-size: 13px; }
+  .step b { color: #e74c3c; }
+
+  .practice { background: #fffbea; border: 2px dashed #f39c12; border-radius: 10px; padding: 14px; margin-top: 14px; }
+  .practice-title { font-weight: 900; color: #e67e22; font-size: 13px; margin-bottom: 8px; }
+  .practice-q { margin: 8px 0; font-size: 14px; }
+  .blank { display: inline-block; width: 50px; border-bottom: 2px solid #999; margin: 0 4px; }
+
+  .tip { background: #f9f0ff; border-left: 4px solid #8e44ad; padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 13px; }
+  .tip b { color: #8e44ad; }
+
+  .arrow { color: #e74c3c; font-weight: 900; font-size: 18px; }
+  .math { font-size: 16px; font-weight: 700; text-align: center; margin: 8px 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>🔄 Missão #1 — Revisão</h1>
+<p class="subtitle">間違えたところを復習しよう！ / Vamos revisar os erros!</p>
+
+<!-- ===== 1. 通分 ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="badge badge-red">最重要</span>
+    通分（Denominador Comum）
+  </div>
+
+  <p>テストで一番多かったミス。通分は<b>分母をそろえる</b>こと。</p>
+  <p style="color:#888; font-size:12px;">O erro mais frequente. "Tsuubun" = encontrar o denominador comum.</p>
+
+  <!-- 例題: Q3 2/3 vs 3/5 -->
+  <div class="step-box">
+    <div class="step-title">📖 例: Q3 —
+      <span class="frac"><span class="num">2</span><span class="den">3</span></span> と
+      <span class="frac"><span class="num">3</span><span class="den">5</span></span> を比べる
+    </div>
+    <div class="step"><b>Step 1:</b> 分母の最小公倍数（MMC）を出す → 3 と 5 の MMC = <b>15</b></div>
+    <div class="step"><b>Step 2:</b>
+      <span class="frac"><span class="num">2</span><span class="den">3</span></span>
+      = <span class="frac"><span class="num">2 × 5</span><span class="den">3 × 5</span></span>
+      = <span class="frac"><span class="num">10</span><span class="den">15</span></span>
+    </div>
+    <div class="step"><b>Step 3:</b>
+      <span class="frac"><span class="num">3</span><span class="den">5</span></span>
+      = <span class="frac"><span class="num">3 × 3</span><span class="den">5 × 3</span></span>
+      = <span class="frac"><span class="num">9</span><span class="den">15</span></span>
+    </div>
+    <div class="step"><b>Step 4:</b> 10 > 9 だから
+      <span class="frac"><span class="num">2</span><span class="den">3</span></span>
+      <span class="arrow">></span>
+      <span class="frac"><span class="num">3</span><span class="den">5</span></span> ✅
+    </div>
+  </div>
+
+  <div class="tip"><b>💡 コツ:</b> 分母どうしを掛ければ必ず共通の分母になる（3×5=15）。慣れたらMMCを使おう。</div>
+
+  <div class="practice">
+    <div class="practice-title">✏️ やってみよう</div>
+    <div class="practice-q">①
+      <span class="frac"><span class="num">2</span><span class="den">3</span></span> =
+      <span class="frac"><span class="num"><span class="blank"></span></span><span class="den">12</span></span>
+      &nbsp;&nbsp;
+      <span class="frac"><span class="num">3</span><span class="den">4</span></span> =
+      <span class="frac"><span class="num"><span class="blank"></span></span><span class="den">12</span></span>
+      &nbsp;&nbsp; どっちが大きい？ <span class="blank"></span>
+    </div>
+    <div class="practice-q">②
+      <span class="frac"><span class="num">5</span><span class="den">6</span></span> =
+      <span class="frac"><span class="num"><span class="blank"></span></span><span class="den">18</span></span>
+      &nbsp;&nbsp;
+      <span class="frac"><span class="num">7</span><span class="den">9</span></span> =
+      <span class="frac"><span class="num"><span class="blank"></span></span><span class="den">18</span></span>
+      &nbsp;&nbsp; どっちが大きい？ <span class="blank"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 2. 小数変換 ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="badge badge-blue">重要</span>
+    分数 → 小数（Fração → Decimal）
+  </div>
+
+  <p>やり方はシンプル：<b>分子 ÷ 分母 = 小数</b></p>
+  <p style="color:#888; font-size:12px;">Numerador ÷ Denominador = Decimal</p>
+
+  <div class="wrong-right">
+    <div class="wr-box wr-wrong">
+      <div class="wr-label red">❌ ハルの答え</div>
+      <span class="frac"><span class="num">1</span><span class="den">2</span></span> = 0.02<br>
+      <span class="frac"><span class="num">3</span><span class="den">4</span></span> = 0.34
+    </div>
+    <div class="wr-box wr-right">
+      <div class="wr-label green">✅ 正しい答え</div>
+      <span class="frac"><span class="num">1</span><span class="den">2</span></span> = 1÷2 = <b>0.5</b><br>
+      <span class="frac"><span class="num">3</span><span class="den">4</span></span> = 3÷4 = <b>0.75</b>
+    </div>
+  </div>
+
+  <div class="tip"><b>💡 まず覚えよう（5つだけ！）:</b><br>
+    <span class="frac"><span class="num">1</span><span class="den">2</span></span> = 0.5 &nbsp;|&nbsp;
+    <span class="frac"><span class="num">1</span><span class="den">4</span></span> = 0.25 &nbsp;|&nbsp;
+    <span class="frac"><span class="num">3</span><span class="den">4</span></span> = 0.75 &nbsp;|&nbsp;
+    <span class="frac"><span class="num">1</span><span class="den">5</span></span> = 0.2 &nbsp;|&nbsp;
+    <span class="frac"><span class="num">2</span><span class="den">5</span></span> = 0.4
+  </div>
+
+  <div class="practice">
+    <div class="practice-title">✏️ やってみよう</div>
+    <div class="practice-q">①
+      <span class="frac"><span class="num">3</span><span class="den">10</span></span> = 3 ÷ 10 = <span class="blank"></span>
+    </div>
+    <div class="practice-q">②
+      <span class="frac"><span class="num">2</span><span class="den">5</span></span> = 2 ÷ 5 = <span class="blank"></span>
+    </div>
+    <div class="practice-q">③
+      <span class="frac"><span class="num">7</span><span class="den">10</span></span> = <span class="blank"></span> &nbsp; → &nbsp; <span class="blank"></span>%
+    </div>
+  </div>
+</div>
+
+<!-- ===== 3. 分子と分母の向き ===== -->
+<div class="section">
+  <div class="section-header">
+    <span class="badge badge-green">注意</span>
+    分子と分母の向き（Numerador e Denominador）
+  </div>
+
+  <p>Q11で分子と分母が逆になっていたよ。</p>
+
+  <div class="wrong-right">
+    <div class="wr-box wr-wrong">
+      <div class="wr-label red">❌ ハルの答え</div>
+      犬: <span class="frac"><span class="num">25</span><span class="den">10</span></span>
+    </div>
+    <div class="wr-box wr-right">
+      <div class="wr-label green">✅ 正しい答え</div>
+      犬: <span class="frac"><span class="num">10</span><span class="den">25</span></span>
+    </div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-title">📖 覚え方</div>
+    <div class="math" style="font-size: 18px;">
+      <span class="frac" style="font-size:18px"><span class="num">🎯 その数（parte）</span><span class="den">🎪 全体（todo）</span></span>
+    </div>
+    <div class="step">25匹のうち犬が10匹 →
+      <span class="frac"><span class="num">10 ← 犬</span><span class="den">25 ← 全体</span></span>
+    </div>
+  </div>
+
+  <div class="practice">
+    <div class="practice-title">✏️ やってみよう</div>
+    <div class="practice-q">クラス30人のうち、12人がサッカー好き。分数で書くと？</div>
+    <div class="practice-q" style="text-align:center; font-size:18px; margin-top:4px;">
+      <span class="frac"><span class="num"><span class="blank"></span></span><span class="den"><span class="blank"></span></span></span>
+      &nbsp; = &nbsp; <span class="blank" style="width:40px;"></span>%
+    </div>
+  </div>
+</div>
+
+<!-- Score -->
+<div style="text-align:center; padding: 16px; color: #888; font-size: 13px;">
+  Missão #1 Score: 17/79 — 次はもっと上を目指そう！💪<br>
+  <span style="font-size:11px;">Próxima vez vai ser melhor!</span>
+</div>
+
+</div>
+</body>
+</html>
