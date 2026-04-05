@@ -1205,7 +1205,37 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxjQNbzEH300DZ92XmmNjrJc1gNZrjVNFcl5vMcTcwf2tnoStG9jwKe-aJ3DqD_55VGpA/exec';
 const LESSON_ID = 'missao_matematica_01';
 
+// ===== FIELD NAME MAPPINGS (DOM order) =====
+const COMPARE_NAMES = ['q1_compare','q2_compare','q3_compare','q4_compare'];
+const VF_NAMES = ['q12_vf','q13_vf','q14_vf','q15_vf'];
+const BLANK_NAMES = [
+  'q5_order','q6_order','q7_order',
+  'q8a_decimal','q8a_pct','q8b_decimal','q8b_pct','q8c_decimal','q8c_pct','q8d_decimal','q8d_pct',
+  'q9a','q9b','q9c','q9d',
+  'q10_fraction','q10_pct',
+  'q11_dog_frac','q11_dog_pct','q11_cat_frac','q11_cat_pct','q11_other_frac','q11_other_pct',
+  'q12_correct',
+  'q14_yakubun',
+  'q16a_shiki','q16a_answer','q16b_shiki','q16b_yakubun','q16c_most','q16c_least',
+  'q17a_convert','q17b_convert','q17c_convert','q17_most',
+  'q18a_shiki','q18a_answer','q18b_shiki','q18b_answer','q18c_shiki','q18c_count','q18c_pct'
+];
+const EXPLAIN_NAMES = ['q3_explain','q6_explain','q10_explain','q12_explain','q13_explain','q14_explain','q15_explain','q17_explain'];
+// Inline ___: global counter across all spans in DOM order
+const INLINE_NAMES = [
+  'q2_tsuubun_num','q2_tsuubun_den',
+  'q3_tsuubun_num1','q3_tsuubun_den1','q3_tsuubun_num2','q3_tsuubun_den2',
+  'q4_tsuubun_num1','q4_tsuubun_den1','q4_tsuubun_num2','q4_tsuubun_den2',
+  'q5_tsuubun_1','q5_tsuubun_2','q5_tsuubun_3',
+  'q6_tsuubun_num1','q6_tsuubun_den1','q6_tsuubun_num2','q6_tsuubun_den2','q6_tsuubun_num3','q6_tsuubun_den3',
+  'q7_tsuubun_1','q7_tsuubun_2','q7_tsuubun_3',
+  'q13_tsuubun_num1','q13_tsuubun_den1','q13_tsuubun_num2','q13_tsuubun_den2',
+  'q17a_pct','q17b_pct'
+];
+
 document.addEventListener('DOMContentLoaded', () => {
+  let blankIdx = 0, inlineIdx = 0;
+
   // 1) Name & Date blanks
   document.querySelectorAll('.name-line .blank').forEach((el, i) => {
     const input = document.createElement('input');
@@ -1221,7 +1251,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2) Compare circles -> clickable toggle
   document.querySelectorAll('.compare-circle').forEach((el, i) => {
     el.classList.add('interactive');
-    el.dataset.field = 'compare_' + i;
+    el.dataset.field = COMPARE_NAMES[i] || 'compare_' + i;
     el.dataset.value = '';
     el.textContent = '?';
     el.addEventListener('click', () => {
@@ -1236,7 +1266,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 3) VF choices -> clickable
   document.querySelectorAll('.vf-choices').forEach((container, qi) => {
-    container.dataset.field = 'vf_' + qi;
+    container.dataset.field = VF_NAMES[qi] || 'vf_' + qi;
     container.querySelectorAll('.vf-choice').forEach(ch => {
       ch.classList.add('interactive');
       ch.addEventListener('click', () => {
@@ -1248,41 +1278,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4) answer-blank spans -> input
-  document.querySelectorAll('.answer-blank').forEach((el, i) => {
+  // 4) answer-blank spans -> input (named from BLANK_NAMES)
+  document.querySelectorAll('.answer-blank').forEach((el) => {
     const input = document.createElement('input');
     input.type = 'text';
     const wide = (el.style.maxWidth && parseInt(el.style.maxWidth) > 100) || el.style.display === 'block';
     input.className = 'i-input ' + (wide ? 'i-input-lg' : 'i-input-md');
-    input.dataset.field = 'blank_' + i;
+    input.dataset.field = BLANK_NAMES[blankIdx] || 'blank_' + blankIdx;
+    blankIdx++;
     input.addEventListener('input', refresh);
     el.replaceWith(input);
   });
 
-  // 5) Inline ___ in answer rows (not in templates or vocab)
+  // 5) Inline ___ in answer rows (named from INLINE_NAMES)
   document.querySelectorAll('.answer-row').forEach(row => {
     row.childNodes.forEach(node => {
       if (node.nodeType === 1 && node.tagName === 'SPAN' && !node.classList.contains('answer-label') && !node.classList.contains('i-input')) {
         const html = node.innerHTML;
         if (!html.includes('___') || node.closest('.explain-template') || node.closest('.vocab-table')) return;
-        const qNum = (node.closest('.problem') || {}).querySelector && node.closest('.problem').querySelector('.problem-number');
-        const qId = qNum ? qNum.textContent.trim() : 'x';
-        let c = 0;
         node.innerHTML = html.replace(/___/g, () => {
-          c++;
-          return '<input type="text" class="i-input i-input-sm" data-field="q' + qId + '_fill_' + c + '" oninput="refresh()">';
+          const name = INLINE_NAMES[inlineIdx] || 'inline_' + inlineIdx;
+          inlineIdx++;
+          return '<input type="text" class="i-input i-input-sm" data-field="' + name + '" oninput="refresh()">';
         });
       }
     });
   });
 
-  // 6) Explain lines -> textarea
-  document.querySelectorAll('.explain-box').forEach((box, i) => {
+  // 6) Explain lines -> textarea (named from EXPLAIN_NAMES)
+  let explainIdx = 0;
+  document.querySelectorAll('.explain-box').forEach((box) => {
     const lines = box.querySelectorAll('.explain-line');
     if (lines.length === 0) return;
     const textarea = document.createElement('textarea');
     textarea.className = 'i-textarea';
-    textarea.dataset.field = 'explain_' + i;
+    textarea.dataset.field = EXPLAIN_NAMES[explainIdx] || 'explain_' + explainIdx;
+    explainIdx++;
     textarea.placeholder = 'Escreve aqui... / ここに書こう...';
     textarea.addEventListener('input', refresh);
     lines[0].replaceWith(textarea);
