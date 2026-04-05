@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missão #1 — 模範解答</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', -apple-system, 'Segoe UI', Arial, sans-serif;
+    color: #2d2d2d; background: #fff; font-size: 14px; line-height: 1.7;
+  }
+  @media print {
+    body { font-size: 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { page-break-after: always; break-after: page; }
+    .page:last-child { page-break-after: avoid; }
+  }
+  .page {
+    max-width: 210mm; min-height: 280mm;
+    margin: 0 auto 20px; padding: 16mm 14mm; background: #fff;
+  }
+  h1 {
+    text-align: center; font-size: 24px; font-weight: 900;
+    background: linear-gradient(135deg, #e74c3c, #e67e22);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 4px;
+  }
+  .page-subtitle {
+    text-align: center; font-size: 13px; color: #888; margin-bottom: 16px;
+  }
+  .stage-title {
+    display: flex; align-items: center; gap: 8px;
+    margin: 20px 0 10px; padding: 8px 12px; border-radius: 10px;
+    font-weight: 900; font-size: 15px; color: #fff;
+  }
+  .st1 { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a5c3a; }
+  .st2 { background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: #4a2874; }
+  .st3 { background: linear-gradient(135deg, #fbc2eb, #f68084); color: #7a2a3a; }
+  .st4 { background: linear-gradient(135deg, #ff9a9e, #fad0c4); color: #7a2a2a; }
+  .st5 { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
+
+  .q-card {
+    border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 12px 14px; margin: 8px 0; background: #fafafa;
+  }
+  .q-num {
+    display: inline-block; background: #e74c3c; color: #fff;
+    min-width: 26px; height: 26px; padding: 0 7px; border-radius: 13px;
+    font-weight: 900; font-size: 12px; text-align: center; line-height: 26px;
+    margin-right: 6px;
+  }
+  .q-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+
+  .answer-box {
+    background: #eafaf1; border: 2px solid #27ae60; border-radius: 8px;
+    padding: 10px 12px; margin: 6px 0;
+  }
+  .answer-label { font-weight: 900; color: #27ae60; font-size: 12px; margin-bottom: 4px; }
+
+  .think-box {
+    background: #fff8e1; border: 2px solid #f9a825; border-radius: 8px;
+    padding: 10px 12px; margin: 6px 0;
+  }
+  .think-label { font-weight: 900; color: #f57f17; font-size: 12px; margin-bottom: 4px; }
+
+  .pt-box {
+    background: #e8f4fd; border: 2px solid #2980b9; border-radius: 8px;
+    padding: 10px 12px; margin: 6px 0;
+  }
+  .pt-label { font-weight: 900; color: #2980b9; font-size: 12px; margin-bottom: 4px; }
+
+  .step { margin: 3px 0; font-size: 13px; }
+  .step-num {
+    display: inline-block; background: #f0f0f0; color: #666;
+    width: 20px; height: 20px; border-radius: 10px; text-align: center;
+    font-size: 11px; font-weight: 900; line-height: 20px; margin-right: 4px;
+  }
+  .big-answer { font-size: 18px; font-weight: 900; color: #27ae60; }
+  .wrong { color: #e74c3c; text-decoration: line-through; }
+  .right { color: #27ae60; font-weight: 900; }
+
+  .key-point {
+    background: #fce4ec; border-left: 4px solid #e74c3c;
+    padding: 8px 12px; margin: 8px 0; border-radius: 0 8px 8px 0;
+    font-size: 13px;
+  }
+  .key-point strong { color: #c0392b; }
+
+  hr.sep { border: none; border-top: 1px dashed #ddd; margin: 12px 0; }
+</style>
+</head>
+<body>
+
+<!-- ===== PAGE 1 ===== -->
+<div class="page">
+  <h1>Missão Matemática #1 — 模範解答</h1>
+  <div class="page-subtitle">答え合わせ用 / 考え方をいっしょに確認しよう</div>
+
+  <div class="stage-title st1">Stage 1: 通分して比べよう</div>
+
+  <div class="key-point">
+    <strong>大事なルール:</strong> 分母(denominador)がちがう分数は、<strong>通分して分母をそろえてから</strong>分子(numerador)を比べる！
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">1</span>4/6 と 9/6</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step">分母が同じ（6）だから、分子を比べるだけ！ 4 と 9 → 4 < 9</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div class="big-answer">4/6 &lt; 9/6</div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">2</span>3/4 と 5/8</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><span class="step-num">1</span>分母をそろえる: 4 と 8 → 共通の分母は <strong>8</strong></div>
+      <div class="step"><span class="step-num">2</span>3/4 = (3×2)/(4×2) = <strong>6/8</strong></div>
+      <div class="step"><span class="step-num">3</span>6/8 と 5/8 → 分子を比べる: 6 > 5</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div>通分: 3/4 = <strong>6</strong>/8　　5/8 = <strong>5</strong>/8</div>
+      <div class="big-answer">3/4 &gt; 5/8</div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">3</span>2/3 と 3/5</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><span class="step-num">1</span>分母をそろえる: 3 と 5 → 共通の分母は <strong>15</strong>（3×5）</div>
+      <div class="step"><span class="step-num">2</span>2/3 = (2×5)/(3×5) = <strong>10/15</strong></div>
+      <div class="step"><span class="step-num">3</span>3/5 = (3×3)/(5×3) = <strong>9/15</strong></div>
+      <div class="step"><span class="step-num">4</span>10/15 と 9/15 → 10 > 9</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div>通分: 2/3 = <strong>10/15</strong>　　3/5 = <strong>9/15</strong></div>
+      <div class="big-answer">2/3 &gt; 3/5</div>
+    </div>
+    <div class="pt-box">
+      <div class="pt-label">ポルトガル語の書き方</div>
+      <div style="font-size:13px;">Reduzi ao mesmo denominador: 2/3 = 10/15 e 3/5 = 9/15. Como 10 > 9, então 2/3 > 3/5.</div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">4</span>5/6 と 7/9</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><span class="step-num">1</span>分母をそろえる: 6 と 9 → 共通の分母は <strong>18</strong>（6×3=18、9×2=18）</div>
+      <div class="step"><span class="step-num">2</span>5/6 = (5×3)/(6×3) = <strong>15/18</strong></div>
+      <div class="step"><span class="step-num">3</span>7/9 = (7×2)/(9×2) = <strong>14/18</strong></div>
+      <div class="step"><span class="step-num">4</span>15 > 14</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div>通分: 5/6 = <strong>15/18</strong>　　7/9 = <strong>14/18</strong></div>
+      <div class="big-answer">5/6 &gt; 7/9</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE 2 ===== -->
+<div class="page">
+  <div class="stage-title st2">Stage 2: 順番にならべよう</div>
+
+  <div class="key-point">
+    <strong>大事なルール:</strong> 3つ以上の分数を比べるときも、まず全部を<strong>同じ分母に通分</strong>してから分子を比べる！
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">5</span>1/2, 2/3, 1/6 を小さい順に</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><span class="step-num">1</span>分母 2, 3, 6 → 共通の分母は <strong>6</strong></div>
+      <div class="step"><span class="step-num">2</span>1/2 = <strong>3/6</strong>　　2/3 = <strong>4/6</strong>　　1/6 = <strong>1/6</strong></div>
+      <div class="step"><span class="step-num">3</span>分子を比べる: 1 < 3 < 4</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え（小さい順 / ordem crescente）</div>
+      <div class="big-answer">1/6 &lt; 1/2 &lt; 2/3</div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">6</span>3/4, 5/8, 1/2 を小さい順に</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><span class="step-num">1</span>分母 4, 8, 2 → 共通の分母は <strong>8</strong></div>
+      <div class="step"><span class="step-num">2</span>3/4 = <strong>6/8</strong>　　5/8 = <strong>5/8</strong>　　1/2 = <strong>4/8</strong></div>
+      <div class="step"><span class="step-num">3</span>分子を比べる: 4 < 5 < 6</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え（小さい順 / ordem crescente）</div>
+      <div class="big-answer">1/2 &lt; 5/8 &lt; 3/4</div>
+    </div>
+    <div class="pt-box">
+      <div class="pt-label">ポルトガル語の書き方</div>
+      <div style="font-size:13px;">Reduzi ao mesmo denominador 8: 3/4 = 6/8, 5/8 = 5/8, 1/2 = 4/8. Ordem crescente: 1/2 &lt; 5/8 &lt; 3/4.</div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">7</span>5/4, 13/6, 5/3 を大きい順に</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><span class="step-num">1</span>分母 4, 6, 3 → 共通の分母は <strong>12</strong></div>
+      <div class="step"><span class="step-num">2</span>5/4 = (5×3)/(4×3) = <strong>15/12</strong></div>
+      <div class="step"><span class="step-num">3</span>13/6 = (13×2)/(6×2) = <strong>26/12</strong></div>
+      <div class="step"><span class="step-num">4</span>5/3 = (5×4)/(3×4) = <strong>20/12</strong></div>
+      <div class="step"><span class="step-num">5</span>分子を比べる: 26 > 20 > 15</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え（大きい順 / ordem decrescente）</div>
+      <div class="big-answer">13/6 &gt; 5/3 &gt; 5/4</div>
+    </div>
+  </div>
+
+  <div class="key-point">
+    <strong>ポイント:</strong> 1より大きい分数（仮分数 = fração imprópria）でも、やり方は同じ！ 通分して分子を比べるだけ。
+  </div>
+</div>
+
+<!-- ===== PAGE 3 ===== -->
+<div class="page">
+  <div class="stage-title st3">Stage 3: 変換マスター</div>
+
+  <div class="key-point">
+    <strong>変換のコツ:</strong><br>
+    fração → decimal = <strong>分子 ÷ 分母</strong><br>
+    decimal → % = <strong>× 100</strong><br>
+    % → fração = <strong>数字/100</strong> にしてから約分
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">8</span>分数 → 小数 → %</div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div style="display:grid; grid-template-columns: auto auto auto; gap:4px 20px; font-size:14px;">
+        <div>(a) 1/2</div><div>= <strong>0,5</strong></div><div>= <strong>50%</strong></div>
+        <div>(b) 3/4</div><div>= <strong>0,75</strong></div><div>= <strong>75%</strong></div>
+        <div>(c) 2/5</div><div>= <strong>0,4</strong></div><div>= <strong>40%</strong></div>
+        <div>(d) 3/10</div><div>= <strong>0,3</strong></div><div>= <strong>30%</strong></div>
+      </div>
+    </div>
+    <div class="think-box">
+      <div class="think-label">考え方（例: 2/5）</div>
+      <div class="step"><span class="step-num">1</span>2 ÷ 5 = 0,4（分子÷分母）</div>
+      <div class="step"><span class="step-num">2</span>0,4 × 100 = 40%</div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">9</span>小数・% → 分数</div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div style="display:grid; grid-template-columns: auto auto auto; gap:4px 16px; font-size:14px;">
+        <div>(a) 0,5</div><div>= 5/10</div><div>= <strong>1/2</strong></div>
+        <div>(b) 0,25</div><div>= 25/100</div><div>= <strong>1/4</strong></div>
+        <div>(c) 75%</div><div>= 75/100</div><div>= <strong>3/4</strong></div>
+        <div>(d) 20%</div><div>= 20/100</div><div>= <strong>1/5</strong></div>
+      </div>
+    </div>
+    <div class="think-box">
+      <div class="think-label">考え方（例: 75%）</div>
+      <div class="step"><span class="step-num">1</span>75% = 75/100</div>
+      <div class="step"><span class="step-num">2</span>75と100はどちらも25で割れる → 75÷25 = 3、100÷25 = 4</div>
+      <div class="step"><span class="step-num">3</span>75/100 = <strong>3/4</strong></div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">10</span>0,05 → 分数と%</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><span class="step-num">1</span>0,05 → 小数点以下2桁 → 5/100</div>
+      <div class="step"><span class="step-num">2</span>約分: 5÷5 = 1、100÷5 = 20 → <strong>1/20</strong></div>
+      <div class="step"><span class="step-num">3</span>% : 0,05 × 100 = <strong>5%</strong></div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div class="big-answer">fração: 1/20　　percentagem: 5%</div>
+    </div>
+    <div class="pt-box">
+      <div class="pt-label">ポルトガル語の書き方</div>
+      <div style="font-size:13px;">0,05 tem 2 casas decimais, por isso a fração é 5/100. Simplificando: 5/100 = 1/20. Em percentagem: 0,05 × 100 = 5%.</div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">11</span>25人のアンケート</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><span class="step-num">1</span>犬: 10人/25人 = 10/25。約分: ÷5 → <strong>2/5</strong></div>
+      <div class="step"><span class="step-num">2</span>% にするには: 2÷5 = 0,4 → 0,4×100 = <strong>40%</strong></div>
+      <div class="step"><span class="step-num">3</span>猫: 8/25。% : 8÷25 = 0,32 → <strong>32%</strong></div>
+      <div class="step"><span class="step-num">4</span>その他: 7/25。% : 7÷25 = 0,28 → <strong>28%</strong></div>
+      <div class="step" style="color:#888; font-size:12px;">確認: 40% + 32% + 28% = 100% OK!</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div style="font-size:14px;">
+        犬: <strong>10/25 = 2/5 = 40%</strong><br>
+        猫: <strong>8/25 = 32%</strong><br>
+        その他: <strong>7/25 = 28%</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE 4 ===== -->
+<div class="page">
+  <div class="stage-title st4">Stage 4: V ou F?</div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">12</span>「1/4 を小数にすると 0,4」</div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div class="big-answer">F (Falso) &#x2014; 正しくは 0,25</div>
+    </div>
+    <div class="think-box">
+      <div class="think-label">考え方 &#x2014; よくあるまちがい！</div>
+      <div class="step">1/4 は「1 ÷ 4」= <strong>0,25</strong></div>
+      <div class="step"><span class="wrong">0,4</span> は 4/10 = 2/5。ぜんぜんちがう数！</div>
+      <div class="step" style="margin-top:4px;">覚え方: 1/4 = 25セント = <strong>0,25</strong></div>
+    </div>
+    <div class="pt-box">
+      <div class="pt-label">ポルトガル語の書き方</div>
+      <div style="font-size:13px;">É Falso porque 1/4 significa 1 ÷ 4 = 0,25. Não é 0,4.</div>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">13</span>「2/3 は 5/8 より大きい」</div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div class="big-answer">V (Verdadeiro)</div>
+    </div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><span class="step-num">1</span>通分: 3と8の共通の分母 = <strong>24</strong></div>
+      <div class="step"><span class="step-num">2</span>2/3 = (2×8)/(3×8) = <strong>16/24</strong></div>
+      <div class="step"><span class="step-num">3</span>5/8 = (5×3)/(8×3) = <strong>15/24</strong></div>
+      <div class="step"><span class="step-num">4</span>16 > 15 だから、2/3 > 5/8 → <strong>正しい！</strong></div>
+    </div>
+    <div class="pt-box">
+      <div class="pt-label">ポルトガル語の書き方</div>
+      <div style="font-size:13px;">Reduzi ao mesmo denominador: 2/3 = 16/24 e 5/8 = 15/24. Como 16 > 15, 2/3 é maior que 5/8.</div>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">14</span>「50% = 5/10、これ以上約分できない」</div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div class="big-answer">F (Falso) &#x2014; 5/10 = 1/2 に約分できる</div>
+    </div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step">5と10はどちらも <strong>5</strong> で割れる:</div>
+      <div class="step">5 ÷ 5 = 1、10 ÷ 5 = 2 → 5/10 = <strong>1/2</strong></div>
+    </div>
+    <div class="pt-box">
+      <div class="pt-label">ポルトガル語の書き方</div>
+      <div style="font-size:13px;">É Falso porque 5 e 10 são ambos divisíveis por 5. Simplificando: 5 ÷ 5 = 1 e 10 ÷ 5 = 2, por isso 5/10 = 1/2.</div>
+    </div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">15</span>「13/22 は 13/5 より大きい」</div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div class="big-answer">F (Falso) &#x2014; 13/22 は 13/5 より小さい</div>
+    </div>
+    <div class="think-box">
+      <div class="think-label">考え方 &#x2014; テストで間違えたポイント！</div>
+      <div class="step" style="font-size:15px; margin-bottom:6px;">
+        &#x1F355; ピザで考えよう:
+      </div>
+      <div class="step">13/22 = ピザを<strong>22人</strong>で分けて13切れもらう → 1人分が小さい</div>
+      <div class="step">13/5 = ピザを<strong>5人</strong>で分けて13切れもらう → 1人分が大きい（2枚以上！）</div>
+      <div class="step" style="margin-top:6px;">
+        <strong>ルール: 分子が同じとき、分母が大きいほうが小さい！</strong><br>
+        22 > 5 だから、13/22 &lt; 13/5
+      </div>
+    </div>
+    <div class="pt-box">
+      <div class="pt-label">ポルトガル語の書き方</div>
+      <div style="font-size:13px;">Os numeradores são iguais (13). Quanto maior o denominador, menor é a fração. Como 22 > 5, 13/22 é menor que 13/5.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE 5 ===== -->
+<div class="page">
+  <div class="stage-title st5">Stage 5: ボス戦</div>
+
+  <!-- Q16 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">16</span>ケーキの分配</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><strong>(a) みんなで何分のいくつ食べた？</strong></div>
+      <div class="step" style="margin-left:20px;">お父さん 2/8 + お母さん 3/8 + ハル 1/8 + お兄ちゃん 1/8</div>
+      <div class="step" style="margin-left:20px;">= (2+3+1+1)/8 = <strong>7/8</strong></div>
+      <div class="step" style="margin-top:8px;"><strong>(b) 残りは？</strong></div>
+      <div class="step" style="margin-left:20px;">8/8 - 7/8 = <strong>1/8</strong>（これ以上約分できない）</div>
+      <div class="step" style="margin-top:8px;"><strong>(c) 一番多い・一番少ない？</strong></div>
+      <div class="step" style="margin-left:20px;">分母が全部同じ（8）だから分子を比べるだけ: 3 > 2 > 1 = 1</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div>(a) 式: 2/8 + 3/8 + 1/8 + 1/8 = <strong>7/8</strong></div>
+      <div>(b) 式: 8/8 - 7/8 = <strong>1/8</strong></div>
+      <div>(c) 一番多い: <strong>お母さん（3/8）</strong>　一番少ない: <strong>ハルとお兄ちゃん（1/8）</strong></div>
+    </div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">17</span>3つの箱 &#x2014; 分数・小数・%を比べる</div>
+    <div class="think-box">
+      <div class="think-label">考え方 &#x2014; 全部を%にそろえる</div>
+      <div class="step"><span class="step-num">1</span>A: 3/5 = 3÷5 = 0,6 = <strong>60%</strong></div>
+      <div class="step"><span class="step-num">2</span>B: 0,55 = 0,55×100 = <strong>55%</strong></div>
+      <div class="step"><span class="step-num">3</span>C: <strong>65%</strong>（そのまま）</div>
+      <div class="step"><span class="step-num">4</span>65% > 60% > 55%</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div>A = 60%、B = 55%、C = 65%</div>
+      <div class="big-answer">一番多い: 箱C（65%）</div>
+    </div>
+    <div class="pt-box">
+      <div class="pt-label">ポルトガル語の書き方</div>
+      <div style="font-size:13px;">Converti tudo para percentagem: A = 60%, B = 55%, C = 65%. Como 65% > 60% > 55%, a caixa com mais doces é C.</div>
+    </div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="q-card">
+    <div class="q-title"><span class="q-num">18</span>200個のチョコレート</div>
+    <div class="think-box">
+      <div class="think-label">考え方</div>
+      <div class="step"><strong>(a) ミルクチョコ（1/4）</strong></div>
+      <div class="step" style="margin-left:20px;">200 × 1/4 = 200 ÷ 4 = <strong>50個</strong></div>
+      <div class="step" style="margin-top:8px;"><strong>(b) ホワイトチョコ（30%）</strong></div>
+      <div class="step" style="margin-left:20px;">200 × 30/100 = 200 × 0,3 = <strong>60個</strong></div>
+      <div class="step" style="margin-top:8px;"><strong>(c) ダークチョコ（残り）</strong></div>
+      <div class="step" style="margin-left:20px;">個数: 200 - 50 - 60 = <strong>90個</strong></div>
+      <div class="step" style="margin-left:20px;">%: 1/4 = 25% だから → 100% - 25% - 30% = <strong>45%</strong></div>
+      <div class="step" style="color:#888; font-size:12px; margin-top:4px;">確認: 200 × 0,45 = 90個 OK!</div>
+    </div>
+    <div class="answer-box">
+      <div class="answer-label">答え</div>
+      <div>(a) 式: 200 ÷ 4 = <strong>50個</strong></div>
+      <div>(b) 式: 200 × 0,3 = <strong>60個</strong></div>
+      <div>(c) 式: 200 - 50 - 60 = <strong>90個</strong>　　100% - 25% - 30% = <strong>45%</strong></div>
+    </div>
+    <div class="pt-box">
+      <div class="pt-label">ポルトガル語の書き方</div>
+      <div style="font-size:13px;">Primeiro, calculei 1/4 de 200 = 50. Depois, calculei 30% de 200 = 60. Por fim, para saber a percentagem do resto, fiz 100% - 25% - 30% = 45%.</div>
+    </div>
+  </div>
+
+  <hr class="sep">
+
+  <div class="key-point" style="text-align:center; background:#e8f5e9; border-color:#27ae60;">
+    <strong style="color:#27ae60; font-size:16px;">テストで "Bom" をとるための3つのルール</strong><br><br>
+    <div style="text-align:left; max-width:400px; margin:0 auto; font-size:14px;">
+      <strong>1.</strong> 分母がちがう分数 → <strong>まず通分！</strong>そこから比べる<br>
+      <strong>2.</strong> 1/4 = <strong>0,25</strong>（0,4じゃない！）。暗記しておこう<br>
+      <strong>3.</strong> 分子が同じとき → <strong>分母が大きいほうが小さい</strong>（ピザで考える）
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:16px; font-size:20px;">
+    &#x1F389; Muito bem! &#x1F389;
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missão Matemática #1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', -apple-system, 'Segoe UI', Arial, sans-serif;
+    color: #2d2d2d;
+    background: #fff;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  @media print {
+    body { font-size: 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { page-break-after: always; break-after: page; }
+    .page:last-child { page-break-after: avoid; }
+  }
+
+  .page {
+    max-width: 210mm;
+    min-height: 280mm;
+    margin: 0 auto 20px;
+    padding: 18mm 15mm;
+    background: #fff;
+    position: relative;
+  }
+
+  /* ===== COVER ===== */
+  .cover {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 260mm;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #e74c3c, #f39c12);
+    color: #fff;
+    padding: 6px 24px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+
+  .cover h1 {
+    font-size: 34px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #e74c3c, #e67e22);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .cover .subtitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 32px;
+  }
+
+  .cover-illustration { font-size: 56px; margin: 20px 0; line-height: 1.4; }
+
+  .cover-info {
+    margin-top: 24px;
+    padding: 16px 28px;
+    background: #f8f9fa;
+    border-radius: 16px;
+    font-size: 14px;
+    color: #666;
+    text-align: left;
+  }
+
+  .cover-info strong { color: #333; }
+
+  .name-line { margin-top: 24px; font-size: 16px; }
+
+  .name-line .blank {
+    display: inline-block;
+    width: 200px;
+    border-bottom: 2px solid #333;
+    margin-left: 8px;
+  }
+
+  /* ===== MAP ===== */
+  .map-container {
+    background: #fff5f0;
+    border: 3px solid #e74c3c;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 12px 0;
+  }
+
+  .map-path {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .map-stage { text-align: center; flex: 1; min-width: 80px; }
+  .map-icon { font-size: 28px; display: block; margin-bottom: 2px; }
+  .map-label { font-size: 10px; font-weight: 700; color: #e74c3c; }
+  .map-arrow { font-size: 18px; color: #e74c3c; }
+
+  /* ===== SECTION HEADERS ===== */
+  .stage-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 24px 0 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 900;
+    font-size: 16px;
+  }
+
+  .stage-header .emoji { font-size: 24px; }
+
+  .stage-1 { background: linear-gradient(135deg, #43e97b, #38f9d7); color: #1a5c3a; }
+  .stage-2 { background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: #4a2874; }
+  .stage-3 { background: linear-gradient(135deg, #fbc2eb, #f68084); color: #7a2a3a; }
+  .stage-4 { background: linear-gradient(135deg, #ff9a9e, #fad0c4); color: #7a2a2a; }
+  .stage-5 { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
+
+  .stage-desc { font-size: 13px; color: #666; margin-bottom: 14px; padding-left: 4px; }
+
+  /* ===== REFERENCE CARD ===== */
+  .ref-card {
+    border: 3px solid #e74c3c;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 14px 0;
+    background: #fff8f6;
+  }
+
+  .ref-card h3 { text-align: center; color: #e74c3c; font-size: 15px; margin-bottom: 10px; }
+
+  .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .ref-item {
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .ref-item .ref-big { font-size: 16px; font-weight: 900; color: #333; }
+  .ref-item .ref-sub { font-size: 11px; color: #888; margin-top: 2px; }
+
+  .ref-full {
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    grid-column: 1 / -1;
+  }
+
+  .ref-full .ref-big { font-size: 16px; font-weight: 900; color: #333; }
+  .ref-full .ref-sub { font-size: 11px; color: #888; margin-top: 2px; }
+
+  /* ===== VOCAB TABLE ===== */
+  .vocab-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0; }
+  .vocab-table th { background: #e74c3c; color: #fff; padding: 6px 10px; text-align: left; font-weight: 700; }
+  .vocab-table td { padding: 5px 10px; border-bottom: 1px solid #eee; }
+  .vocab-table tr:nth-child(even) td { background: #fff8f6; }
+
+  /* ===== PROBLEM BOXES ===== */
+  .problem {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 10px 0;
+    background: #fafafa;
+    position: relative;
+  }
+
+  .problem-number {
+    position: absolute; top: -10px; left: 12px;
+    background: #e74c3c; color: #fff;
+    min-width: 28px; height: 28px; padding: 0 8px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 13px;
+  }
+
+  .problem-text { margin-bottom: 10px; padding-top: 4px; font-size: 14px; line-height: 1.7; }
+
+  .highlight { background: #fff3cd; padding: 1px 6px; border-radius: 4px; font-weight: 700; }
+
+  .skill-tag {
+    display: inline-block; background: #f0f0f0; color: #888;
+    padding: 1px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; margin-left: 4px;
+  }
+
+  /* Answer areas */
+  .answer-area { background: #fff; border: 2px dashed #ccc; border-radius: 8px; padding: 12px; }
+
+  .answer-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; }
+
+  .answer-label { font-weight: 700; color: #e74c3c; white-space: nowrap; min-width: 80px; }
+
+  .answer-blank { flex: 1; border-bottom: 2px solid #ccc; min-height: 24px; }
+
+  .explain-box {
+    background: #fff5f0; border: 2px solid #f5b7a1;
+    border-radius: 8px; padding: 10px 12px; margin-top: 8px;
+  }
+
+  .explain-label { font-size: 11px; font-weight: 700; color: #c0392b; margin-bottom: 4px; }
+
+  .explain-template { font-size: 12px; color: #999; font-style: italic; margin-bottom: 4px; }
+
+  .explain-line { border-bottom: 1.5px solid #f5b7a1; min-height: 22px; margin: 4px 0; }
+
+  /* Mistake / V-F */
+  .mistake-box {
+    background: #fff5f5; border: 2px solid #e74c3c;
+    border-radius: 12px; padding: 14px; margin: 8px 0;
+  }
+
+  .mistake-header {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 700; color: #c0392b; margin-bottom: 6px; font-size: 13px;
+  }
+
+  .mistake-work {
+    background: #fff; border: 1px solid #ddd; border-radius: 8px;
+    padding: 10px; font-size: 16px; font-weight: 700; text-align: center; margin: 6px 0;
+  }
+
+  .vf-choices { display: flex; gap: 16px; margin: 8px 0; justify-content: center; }
+
+  .vf-choice {
+    border: 2px solid #ddd; border-radius: 10px;
+    padding: 6px 20px; font-weight: 700; font-size: 14px; text-align: center; background: #fff;
+  }
+
+  /* Fraction display */
+  .frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    font-weight: 700;
+    margin: 0 4px;
+    line-height: 1.1;
+  }
+  .frac .num { border-bottom: 2px solid #333; padding: 0 4px 2px; font-size: 15px; }
+  .frac .den { padding: 2px 4px 0; font-size: 15px; }
+
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px;
+    align-items: center;
+    margin: 8px 0;
+  }
+
+  .compare-box {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 900;
+    background: #fff;
+  }
+
+  .compare-circle {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e74c3c;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 900;
+    color: #e74c3c;
+    margin: 0 auto;
+  }
+
+  .order-boxes {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+  }
+
+  .order-box {
+    width: 60px;
+    height: 40px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    background: #fff;
+  }
+
+  .order-sign {
+    font-size: 20px;
+    font-weight: 900;
+    color: #e74c3c;
+  }
+
+  .visual-bar {
+    display: flex; height: 20px; border-radius: 4px; overflow: hidden;
+    border: 2px solid #ddd; margin: 6px auto 0; width: 90%;
+  }
+
+  .visual-bar .filled { background: linear-gradient(135deg, #e74c3c, #e67e22); }
+  .visual-bar .empty { background: #f0f0f0; }
+
+  .section-rule { border: none; border-top: 2px dashed #e0e0e0; margin: 16px 0; }
+
+  .footer-msg {
+    text-align: center; font-size: 12px; color: #999;
+    margin-top: 20px; padding-top: 12px; border-top: 1px solid #eee;
+  }
+
+  .hint-box {
+    background: #fffde7; border: 2px solid #f9a825;
+    border-radius: 8px; padding: 8px 12px; margin: 8px 0;
+    font-size: 12px;
+  }
+  .hint-box .hint-label { font-weight: 700; color: #f57f17; }
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 1: COVER ============ -->
+<div class="page cover">
+  <div class="cover-badge">MISSÃO MATEMÁTICA #1</div>
+  <h1>算数ミッション #1</h1>
+  <div class="subtitle">Frações — 比べる・並べる・変換する</div>
+
+  <div class="cover-illustration">
+    &#x1F355; &#x2696;&#xFE0F; &#x1F4CA; &#x1F3C6;
+  </div>
+
+  <p style="font-size: 15px; color: #555; max-width: 420px; margin: 0 auto;">
+    分数(fração)を自由にあつかえるようになろう！<br>
+    通分して比べる・順番にならべる・小数や%に変換する<br>
+    5つのステージをクリアして、分数マスターを目指せ
+  </p>
+
+  <div class="cover-info">
+    <strong>&#x1F4D6; ルール:</strong><br>
+    &#x2022; 「式(conta)」を必ず書こう<br>
+    &#x2022; 答えは文(resposta completa)で書こう<br>
+    &#x2022; &#x1F4AC; マークがあったら「なぜそうなるか」をポルトガル語で説明しよう<br>
+    &#x2022; 困ったら2ページ目の「分数の武器」カードを見てOK！
+  </div>
+
+  <div class="name-line">
+    名前 (Nome): <span class="blank"></span>
+  </div>
+  <div class="name-line" style="margin-top: 10px;">
+    日付 (Data): <span class="blank" style="width: 140px;"></span>
+  </div>
+</div>
+
+<!-- ============ PAGE 2: REFERENCE + STAGE 1 ============ -->
+<div class="page">
+
+  <!-- ADVENTURE MAP -->
+  <div class="map-container">
+    <div style="text-align: center; font-weight: 900; color: #e74c3c; margin-bottom: 8px; font-size: 13px;">
+      &#x1F5FA; 冒険マップ (Mapa da Aventura)
+    </div>
+    <div class="map-path">
+      <div class="map-stage">
+        <span class="map-icon">&#x2696;&#xFE0F;</span>
+        <span class="map-label">Stage 1<br>通分で比較</span>
+      </div>
+      <span class="map-arrow">&#x27A1;</span>
+      <div class="map-stage">
+        <span class="map-icon">&#x1F522;</span>
+        <span class="map-label">Stage 2<br>並べ替え</span>
+      </div>
+      <span class="map-arrow">&#x27A1;</span>
+      <div class="map-stage">
+        <span class="map-icon">&#x1F504;</span>
+        <span class="map-label">Stage 3<br>変換</span>
+      </div>
+      <span class="map-arrow">&#x27A1;</span>
+      <div class="map-stage">
+        <span class="map-icon">&#x1F50D;</span>
+        <span class="map-label">Stage 4<br>V ou F</span>
+      </div>
+      <span class="map-arrow">&#x27A1;</span>
+      <div class="map-stage">
+        <span class="map-icon">&#x1F3C6;</span>
+        <span class="map-label">Stage 5<br>ボス戦</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERENCE CARD -->
+  <div class="ref-card">
+    <h3>&#x1F4D6; 分数の武器カード (Armas das Frações) &#x2014; 困ったらここを見てOK！</h3>
+
+    <div class="ref-grid">
+      <div class="ref-item">
+        <div class="ref-big">通分 (mesmo denominador)</div>
+        <div class="ref-sub">分母をそろえると比べられる！</div>
+        <div style="font-size:13px; margin-top:6px; color:#555;">
+          例: 2/3 と 3/4 → 8/12 と 9/12
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-big">約分 (simplificar)</div>
+        <div class="ref-sub">分子と分母を同じ数でわる</div>
+        <div style="font-size:13px; margin-top:6px; color:#555;">
+          例: 6/10 → (÷2) → 3/5
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-big">fração → decimal</div>
+        <div class="ref-sub">分子 ÷ 分母</div>
+        <div style="font-size:13px; margin-top:6px; color:#555;">
+          例: 3/4 = 3 ÷ 4 = 0,75
+        </div>
+      </div>
+      <div class="ref-item">
+        <div class="ref-big">decimal → %</div>
+        <div class="ref-sub">× 100</div>
+        <div style="font-size:13px; margin-top:6px; color:#555;">
+          例: 0,75 × 100 = 75%
+        </div>
+      </div>
+      <div class="ref-full">
+        <div class="ref-big">よく使う分数 &#x2194; 小数 &#x2194; %</div>
+        <div style="display:flex; justify-content:space-around; margin-top:6px; font-size:13px; flex-wrap:wrap; gap:4px;">
+          <span>1/2 = 0,5 = 50%</span>
+          <span>1/4 = 0,25 = 25%</span>
+          <span>3/4 = 0,75 = 75%</span>
+          <span>1/5 = 0,2 = 20%</span>
+          <span>1/10 = 0,1 = 10%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOCAB TABLE -->
+  <table class="vocab-table">
+    <tr>
+      <th>日本語</th>
+      <th>Português</th>
+      <th>テストでの使い方</th>
+    </tr>
+    <tr><td>通分する</td><td><strong>reduzir ao mesmo denominador</strong></td><td>Reduzi ao mesmo denominador</td></tr>
+    <tr><td>約分する</td><td><strong>simplificar</strong></td><td>Simplifica a fração</td></tr>
+    <tr><td>分子 / 分母</td><td><strong>numerador / denominador</strong></td><td>O numerador é ___, o denominador é ___</td></tr>
+    <tr><td>小数</td><td><strong>número decimal</strong></td><td>Escreve na forma decimal</td></tr>
+    <tr><td>百分率</td><td><strong>percentagem</strong></td><td>Escreve em percentagem</td></tr>
+    <tr><td>大きい / 小さい</td><td><strong>maior / menor</strong></td><td>A fração maior é ___</td></tr>
+    <tr><td>昇順(小→大)</td><td><strong>ordem crescente</strong></td><td>Ordena por ordem crescente</td></tr>
+    <tr><td>説明しなさい</td><td><strong>Explica como pensaste</strong></td><td>&#x2190; テストに必ず出る！</td></tr>
+  </table>
+
+  <!-- STAGE 1 -->
+  <div class="stage-header stage-1">
+    <span class="emoji">&#x2696;&#xFE0F;</span>
+    Stage 1: 通分して比べよう (Comparação de frações)
+  </div>
+  <p class="stage-desc">
+    分母(denominador)がちがう分数は、そのままでは比べられない。<br>
+    通分して分母をそろえてから、分子(numerador)を比べよう！
+  </p>
+
+  <!-- Q1 -->
+  <div class="problem">
+    <div class="problem-number">1</div>
+    <div class="problem-text">
+      <span class="highlight">4/6</span> と <span class="highlight">9/6</span>　どちらが大きい？ <, >, = を書きなさい。
+      <span class="skill-tag">同じ分母</span>
+    </div>
+    <div class="hint-box">
+      <span class="hint-label">&#x1F4A1; ヒント:</span> 分母が同じときは、分子(numerador)が大きいほうが大きい！
+    </div>
+    <div class="answer-area">
+      <div class="compare-grid">
+        <div class="compare-box">4/6</div>
+        <div class="compare-circle"></div>
+        <div class="compare-box">9/6</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="problem">
+    <div class="problem-number">2</div>
+    <div class="problem-text">
+      <span class="highlight">3/4</span> と <span class="highlight">5/8</span>　どちらが大きい？
+      <span class="skill-tag">通分が必要</span>
+    </div>
+    <div class="hint-box">
+      <span class="hint-label">&#x1F4A1; ヒント:</span> 4と8の共通の分母は？ 4 × __ = 8 だから…
+    </div>
+    <div class="answer-area">
+      <div class="answer-row">
+        <span class="answer-label">通分:</span>
+        <span style="font-size:14px;">3/4 = ___/8　　　5/8 = ___/8</span>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-box">3/4</div>
+        <div class="compare-circle"></div>
+        <div class="compare-box">5/8</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="problem">
+    <div class="problem-number">3</div>
+    <div class="problem-text">
+      <span class="highlight">2/3</span> と <span class="highlight">3/5</span>　どちらが大きい？
+      <span class="skill-tag">通分が必要</span>
+    </div>
+    <div class="answer-area">
+      <div class="answer-row">
+        <span class="answer-label">通分:</span>
+        <span style="font-size:14px;">2/3 = ___/___　　　3/5 = ___/___</span>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-box">2/3</div>
+        <div class="compare-circle"></div>
+        <div class="compare-box">3/5</div>
+      </div>
+      <div class="explain-box">
+        <div class="explain-label">&#x1F4AC; Explica como pensaste. &#x2014; ポルトガル語で書こう！</div>
+        <div class="explain-template">Reduzi ao mesmo denominador: 2/3 = ___/___ e 3/5 = ___/___. Como ___ > ___, então ___.</div>
+        <div class="explain-template" style="color:#aaa; font-size:11px;">（日本語: 通分すると 2/3 = ___/___ と 3/5 = ___/___。___ > ___ だから___。）</div>
+        <div class="explain-line"></div>
+        <div class="explain-line"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 3: STAGE 1 (cont) + STAGE 2 ============ -->
+<div class="page">
+
+  <!-- Q4 -->
+  <div class="problem">
+    <div class="problem-number">4</div>
+    <div class="problem-text">
+      <span class="highlight">5/6</span> と <span class="highlight">7/9</span>　どちらが大きい？
+      <span class="skill-tag">通分が必要</span>
+    </div>
+    <div class="answer-area">
+      <div class="answer-row">
+        <span class="answer-label">通分:</span>
+        <span style="font-size:14px;">5/6 = ___/___　　　7/9 = ___/___</span>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-box">5/6</div>
+        <div class="compare-circle"></div>
+        <div class="compare-box">7/9</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-rule">
+
+  <!-- STAGE 2 -->
+  <div class="stage-header stage-2">
+    <span class="emoji">&#x1F522;</span>
+    Stage 2: 順番にならべよう (Ordenação de frações)
+  </div>
+  <p class="stage-desc">
+    3つ以上の分数を小さい順(ordem crescente)にならべよう。<br>
+    全部を同じ分母に通分してから、分子を比べるのがコツ！
+  </p>
+
+  <!-- Q5 -->
+  <div class="problem">
+    <div class="problem-number">5</div>
+    <div class="problem-text">
+      次の分数を<strong>小さい順(ordem crescente)</strong>にならべなさい。<br><br>
+      <span class="highlight">1/2</span>　　<span class="highlight">2/3</span>　　<span class="highlight">1/6</span>
+      <span class="skill-tag">通分 → 並べ替え</span>
+    </div>
+    <div class="hint-box">
+      <span class="hint-label">&#x1F4A1; ヒント:</span> 2、3、6の共通の分母は <strong>6</strong> だよ
+    </div>
+    <div class="answer-area">
+      <div class="answer-row">
+        <span class="answer-label">通分:</span>
+        <span style="font-size:14px;">1/2 = ___/6　　2/3 = ___/6　　1/6 = ___/6</span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">小さい順:</span>
+        <span class="answer-blank"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="problem">
+    <div class="problem-number">6</div>
+    <div class="problem-text">
+      次の分数を<strong>小さい順(ordem crescente)</strong>にならべなさい。<br><br>
+      <span class="highlight">3/4</span>　　<span class="highlight">5/8</span>　　<span class="highlight">1/2</span>
+      <span class="skill-tag">通分 → 並べ替え</span>
+    </div>
+    <div class="answer-area">
+      <div class="answer-row">
+        <span class="answer-label">通分:</span>
+        <span style="font-size:14px;">3/4 = ___/___　　5/8 = ___/___　　1/2 = ___/___</span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">小さい順:</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="explain-box">
+        <div class="explain-label">&#x1F4AC; Explica como pensaste. &#x2014; ポルトガル語で書こう！</div>
+        <div class="explain-template">Reduzi ao mesmo denominador ___: 3/4 = ___/___, 5/8 = ___/___, 1/2 = ___/___. Ordem crescente: ___ &lt; ___ &lt; ___.</div>
+        <div class="explain-template" style="color:#aaa; font-size:11px;">（日本語: 分母を___にそろえた: 3/4 = ___/___、5/8 = ___/___、1/2 = ___/___。小さい順: ___ &lt; ___ &lt; ___。）</div>
+        <div class="explain-line"></div>
+        <div class="explain-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="problem">
+    <div class="problem-number">7</div>
+    <div class="problem-text">
+      次の分数を<strong>大きい順(ordem decrescente)</strong>にならべなさい。<br><br>
+      <span class="highlight">5/4</span>　　<span class="highlight">13/6</span>　　<span class="highlight">5/3</span>
+      <span class="skill-tag">仮分数 (fração imprópria)</span>
+    </div>
+    <div class="hint-box">
+      <span class="hint-label">&#x1F4A1; ヒント:</span> 4、6、3の共通の分母は <strong>12</strong>。1より大きい分数（仮分数）も同じやり方でOK！
+    </div>
+    <div class="answer-area">
+      <div class="answer-row">
+        <span class="answer-label">通分:</span>
+        <span style="font-size:14px;">5/4 = ___/12　　13/6 = ___/12　　5/3 = ___/12</span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">大きい順:</span>
+        <span class="answer-blank"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 4: STAGE 3 ============ -->
+<div class="page">
+
+  <div class="stage-header stage-3">
+    <span class="emoji">&#x1F504;</span>
+    Stage 3: 変換マスター (Conversão: fração &#x2194; decimal &#x2194; %)
+  </div>
+  <p class="stage-desc">
+    分数を小数や百分率に変えよう。逆方向もできるかな？
+  </p>
+
+  <!-- Q8 -->
+  <div class="problem">
+    <div class="problem-number">8</div>
+    <div class="problem-text">
+      次の分数を小数(decimal)と百分率(percentagem)で書きなさい。
+      <span class="skill-tag">fração → decimal → %</span>
+    </div>
+    <div class="answer-area">
+      <div class="answer-row" style="font-size:15px;">
+        <span style="min-width:100px;">(a) 1/2 =</span>
+        <span>decimal: <span class="answer-blank" style="max-width:70px; display:inline-block;"></span></span>
+        <span>% : <span class="answer-blank" style="max-width:70px; display:inline-block;"></span></span>
+      </div>
+      <div class="answer-row" style="font-size:15px;">
+        <span style="min-width:100px;">(b) 3/4 =</span>
+        <span>decimal: <span class="answer-blank" style="max-width:70px; display:inline-block;"></span></span>
+        <span>% : <span class="answer-blank" style="max-width:70px; display:inline-block;"></span></span>
+      </div>
+      <div class="answer-row" style="font-size:15px;">
+        <span style="min-width:100px;">(c) 2/5 =</span>
+        <span>decimal: <span class="answer-blank" style="max-width:70px; display:inline-block;"></span></span>
+        <span>% : <span class="answer-blank" style="max-width:70px; display:inline-block;"></span></span>
+      </div>
+      <div class="answer-row" style="font-size:15px;">
+        <span style="min-width:100px;">(d) 3/10 =</span>
+        <span>decimal: <span class="answer-blank" style="max-width:70px; display:inline-block;"></span></span>
+        <span>% : <span class="answer-blank" style="max-width:70px; display:inline-block;"></span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="problem">
+    <div class="problem-number">9</div>
+    <div class="problem-text">
+      逆方向！ 小数や百分率を分数(fração)に変えなさい。できるだけ約分(simplificar)しよう。
+      <span class="skill-tag">decimal / % → fração</span>
+    </div>
+    <div class="answer-area">
+      <div class="answer-row" style="font-size:15px;">
+        <span style="min-width:120px;">(a) 0,5 =</span>
+        <span class="answer-blank" style="max-width:80px;"></span>
+      </div>
+      <div class="answer-row" style="font-size:15px;">
+        <span style="min-width:120px;">(b) 0,25 =</span>
+        <span class="answer-blank" style="max-width:80px;"></span>
+      </div>
+      <div class="answer-row" style="font-size:15px;">
+        <span style="min-width:120px;">(c) 75% =</span>
+        <span class="answer-blank" style="max-width:80px;"></span>
+      </div>
+      <div class="answer-row" style="font-size:15px;">
+        <span style="min-width:120px;">(d) 20% =</span>
+        <span class="answer-blank" style="max-width:80px;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="problem">
+    <div class="problem-number">10</div>
+    <div class="problem-text">
+      <span class="highlight">0,05</span> を分数(fração)と百分率(percentagem)で書きなさい。
+      <span class="skill-tag">decimal → fração, %</span>
+    </div>
+    <div class="answer-area">
+      <div class="answer-row">
+        <span class="answer-label">fração:</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">percentagem:</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="explain-box">
+        <div class="explain-label">&#x1F4AC; Explica como pensaste. &#x2014; ポルトガル語で書こう！</div>
+        <div class="explain-template">0,05 tem ___ casas decimais, por isso a fração é ___/___. Simplificando: ___. Em percentagem: ___ × 100 = ___%.</div>
+        <div class="explain-template" style="color:#aaa; font-size:11px;">（日本語: 0,05は小数点以下___桁だから、分数は___/___。約分すると___。百分率は___ × 100 = ___%。）</div>
+        <div class="explain-line"></div>
+        <div class="explain-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="problem">
+    <div class="problem-number">11</div>
+    <div class="problem-text">
+      クラス(turma)の25人にアンケートをとった。<br>
+      犬が好きな人は <span class="highlight">10人</span>、猫が好きな人は <span class="highlight">8人</span>、その他は7人。<br>
+      それぞれ全体の何分のいくつ(fração)？ 百分率(percentagem)でも書こう。
+      <span class="skill-tag">個数 → fração → %</span>
+    </div>
+    <div class="answer-area">
+      <div style="display:grid; grid-template-columns: auto 1fr 1fr; gap:6px; font-size:13px;">
+        <div style="font-weight:700;"></div>
+        <div style="font-weight:700; color:#e74c3c; text-align:center;">fração</div>
+        <div style="font-weight:700; color:#e74c3c; text-align:center;">percentagem</div>
+        <div>犬 (cão):</div>
+        <div><span class="answer-blank" style="display:block;"></span></div>
+        <div><span class="answer-blank" style="display:block;"></span></div>
+        <div>猫 (gato):</div>
+        <div><span class="answer-blank" style="display:block;"></span></div>
+        <div><span class="answer-blank" style="display:block;"></span></div>
+        <div>その他 (outros):</div>
+        <div><span class="answer-blank" style="display:block;"></span></div>
+        <div><span class="answer-blank" style="display:block;"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 5: STAGE 4 ============ -->
+<div class="page">
+
+  <div class="stage-header stage-4">
+    <span class="emoji">&#x1F50D;</span>
+    Stage 4: Verdadeiro ou Falso? (正しい？ 間違い？)
+  </div>
+  <p class="stage-desc">
+    テストによく出る形式！ 正しいか間違いかを判断して、<strong>理由(justificação)</strong>を書こう。
+  </p>
+
+  <!-- Q12 -->
+  <div class="problem">
+    <div class="problem-number">12</div>
+    <div class="mistake-box">
+      <div class="mistake-header">&#x1F4DD; 次の文は正しい(V)？間違い(F)？</div>
+      <div class="mistake-work">
+        「1/4 を小数(decimal)にすると <strong>0,4</strong> になる」
+      </div>
+    </div>
+    <div class="answer-area">
+      <div class="vf-choices">
+        <div class="vf-choice">V (Verdadeiro)</div>
+        <div class="vf-choice">F (Falso)</div>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">正しい答え:</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="explain-box">
+        <div class="explain-label">&#x1F4AC; Justifica a tua resposta. &#x2014; ポルトガル語で書こう！</div>
+        <div class="explain-template">É ___ porque 1/4 significa 1 ÷ 4 = ___. Não é 0,4.</div>
+        <div class="explain-template" style="color:#aaa; font-size:11px;">（日本語: ___。1/4は 1 ÷ 4 = ___ だから、0,4ではない。）</div>
+        <div class="explain-line"></div>
+        <div class="explain-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="problem">
+    <div class="problem-number">13</div>
+    <div class="mistake-box">
+      <div class="mistake-header">&#x1F4DD; 次の文は正しい(V)？間違い(F)？</div>
+      <div class="mistake-work">
+        「 2/3 は 5/8 より大きい」
+      </div>
+    </div>
+    <div class="answer-area">
+      <div class="vf-choices">
+        <div class="vf-choice">V (Verdadeiro)</div>
+        <div class="vf-choice">F (Falso)</div>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">通分:</span>
+        <span style="font-size:14px;">2/3 = ___/___　　5/8 = ___/___</span>
+      </div>
+      <div class="explain-box">
+        <div class="explain-label">&#x1F4AC; Justifica. &#x2014; ポルトガル語で書こう！</div>
+        <div class="explain-template">Reduzi ao mesmo denominador: 2/3 = ___/___ e 5/8 = ___/___. Como ___ > ___, 2/3 é ___ que 5/8.</div>
+        <div class="explain-line"></div>
+        <div class="explain-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="problem">
+    <div class="problem-number">14</div>
+    <div class="mistake-box">
+      <div class="mistake-header">&#x1F4DD; 次の文は正しい(V)？間違い(F)？</div>
+      <div class="mistake-work">
+        「50% を分数(fração)にすると 5/10。<br>これ以上約分(simplificar)できない」
+      </div>
+    </div>
+    <div class="answer-area">
+      <div class="vf-choices">
+        <div class="vf-choice">V (Verdadeiro)</div>
+        <div class="vf-choice">F (Falso)</div>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">約分:</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="explain-box">
+        <div class="explain-label">&#x1F4AC; Justifica. &#x2014; ポルトガル語で書こう！</div>
+        <div class="explain-template">É ___ porque 5 e 10 são ambos divisíveis por ___. 5/10 = ___/___.</div>
+        <div class="explain-template" style="color:#aaa; font-size:11px;">（日本語: ___。5と10はどちらも___で割れるから、5/10 = ___/___。）</div>
+        <div class="explain-line"></div>
+        <div class="explain-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="problem">
+    <div class="problem-number">15</div>
+    <div class="mistake-box">
+      <div class="mistake-header">&#x1F4DD; 次の文は正しい(V)？間違い(F)？</div>
+      <div class="mistake-work">
+        「 13/22 は 13/5 より大きい」
+      </div>
+    </div>
+    <div class="hint-box">
+      <span class="hint-label">&#x1F4A1; ヒント:</span> 分子(numerador)が同じとき、分母(denominador)が大きいほうが小さい！ ピザを何人で分けるか考えてみて。
+    </div>
+    <div class="answer-area">
+      <div class="vf-choices">
+        <div class="vf-choice">V (Verdadeiro)</div>
+        <div class="vf-choice">F (Falso)</div>
+      </div>
+      <div class="explain-box">
+        <div class="explain-label">&#x1F4AC; Justifica. &#x2014; ポルトガル語で書こう！</div>
+        <div class="explain-template">Os numeradores são iguais (___). Quanto maior o denominador, ___ é a fração. Como 22 > 5, 13/22 é ___ que 13/5.</div>
+        <div class="explain-template" style="color:#aaa; font-size:11px;">（日本語: 分子は同じ（___）。分母が大きいほど、分数は___。22 > 5 だから、13/22 は 13/5 より___。）</div>
+        <div class="explain-line"></div>
+        <div class="explain-line"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 6: STAGE 5 (BOSS) ============ -->
+<div class="page">
+
+  <div class="stage-header stage-5">
+    <span class="emoji">&#x1F3C6;</span>
+    Stage 5: ボス戦 (Desafio final)
+  </div>
+  <p class="stage-desc">
+    通分・変換・比較、ぜんぶ使おう！ 式(conta)と答えの文(resposta completa)を忘れずに。
+  </p>
+
+  <!-- Q16 -->
+  <div class="problem">
+    <div class="problem-number">16</div>
+    <div class="problem-text">
+      お母さんがケーキを焼いた。<br>
+      お父さんが <span class="highlight">2/8</span>、お母さんが <span class="highlight">3/8</span>、<br>
+      ハルが <span class="highlight">1/8</span>、お兄ちゃんもハルと同じ量を食べた。
+    </div>
+    <div class="answer-area">
+      <p style="font-weight:700; font-size:13px; margin-bottom:8px;">
+        (a) みんなで合わせて何分のいくつ(que fração)食べた？
+      </p>
+      <div class="answer-row">
+        <span class="answer-label">式 (conta):</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">resposta:</span>
+        <span class="answer-blank"></span>
+      </div>
+
+      <hr class="section-rule" style="margin:10px 0;">
+
+      <p style="font-weight:700; font-size:13px; margin-bottom:8px;">
+        (b) 残り(resto)は何分のいくつ？ 約分(simplificar)もしよう。
+      </p>
+      <div class="answer-row">
+        <span class="answer-label">式 (conta):</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">約分:</span>
+        <span class="answer-blank"></span>
+      </div>
+
+      <hr class="section-rule" style="margin:10px 0;">
+
+      <p style="font-weight:700; font-size:13px; margin-bottom:8px;">
+        (c) 一番多く食べたのはだれ？ 一番少なかったのはだれ？
+      </p>
+      <div class="answer-row">
+        <span class="answer-label">一番多い:</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">一番少ない:</span>
+        <span class="answer-blank"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="problem">
+    <div class="problem-number">17</div>
+    <div class="problem-text">
+      3つの箱にお菓子(doces)が入っている。いちばん多く入っている箱はどれ？<br><br>
+      箱A: 全体の <span class="highlight">3/5</span> にお菓子が入っている<br>
+      箱B: 全体の <span class="highlight">0,55</span> にお菓子が入っている<br>
+      箱C: 全体の <span class="highlight">65%</span> にお菓子が入っている
+    </div>
+    <div class="answer-area">
+      <p style="font-weight:700; font-size:13px; margin-bottom:8px;">全部を同じ形にそろえて比べよう (Converte para a mesma forma.)</p>
+      <div class="answer-row">
+        <span class="answer-label">A: 3/5 =</span>
+        <span class="answer-blank" style="max-width:100px;"></span>
+        <span>= ___%</span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">B: 0,55 =</span>
+        <span class="answer-blank" style="max-width:100px;"></span>
+        <span>= ___%</span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">C: 65% =</span>
+        <span class="answer-blank" style="max-width:100px;"></span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">一番多い:</span>
+        <span class="answer-blank" style="max-width:180px;"></span>
+      </div>
+      <div class="explain-box">
+        <div class="explain-label">&#x1F4AC; Explica passo a passo. &#x2014; ポルトガル語で書こう！</div>
+        <div class="explain-template">Converti tudo para percentagem: A = ___%, B = ___%, C = ___%. Como ___% > ___% > ___%, a caixa com mais doces é ___.</div>
+        <div class="explain-template" style="color:#aaa; font-size:11px;">（日本語: 全部を%にした: A = ___%、B = ___%、C = ___%。___% > ___% > ___% だから、一番多いのは箱___。）</div>
+        <div class="explain-line"></div>
+        <div class="explain-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="problem">
+    <div class="problem-number">18</div>
+    <div class="problem-text">
+      200個のチョコレートが入った箱がある。<br>
+      <span class="highlight">1/4</span> がミルクチョコ、<span class="highlight">30%</span> がホワイトチョコ。<br>
+      残り(resto)はダークチョコ。
+    </div>
+    <div class="answer-area">
+      <p style="font-weight:700; font-size:13px; margin-bottom:8px;">
+        (a) ミルクチョコは何個(quantos)？
+      </p>
+      <div class="answer-row">
+        <span class="answer-label">式 (conta):</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">resposta:</span>
+        <span class="answer-blank"></span>
+      </div>
+
+      <hr class="section-rule" style="margin:10px 0;">
+
+      <p style="font-weight:700; font-size:13px; margin-bottom:8px;">
+        (b) ホワイトチョコは何個？
+      </p>
+      <div class="answer-row">
+        <span class="answer-label">式 (conta):</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">resposta:</span>
+        <span class="answer-blank"></span>
+      </div>
+
+      <hr class="section-rule" style="margin:10px 0;">
+
+      <p style="font-weight:700; font-size:13px; margin-bottom:8px;">
+        (c) ダークチョコは何個？ 全体の何%？
+      </p>
+      <div class="answer-row">
+        <span class="answer-label">式 (conta):</span>
+        <span class="answer-blank"></span>
+      </div>
+      <div class="answer-row">
+        <span class="answer-label">個数:</span>
+        <span class="answer-blank" style="max-width:120px;"></span>
+        <span style="margin-left:8px;">percentagem:</span>
+        <span class="answer-blank" style="max-width:120px;"></span>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 28px;">
+    <div style="font-size: 24px;">&#x1F389; Missão completa! &#x1F389;</div>
+  </div>
+
+  <div class="footer-msg">
+    Missão Matemática #1 &#x2014; Frações: 比べる・並べる・変換する<br>
+    全問できたら、分数マスター認定！
+  </div>
+</div>
+
+</body>
+</html>
