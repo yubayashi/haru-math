@@ -611,43 +611,98 @@ function buildGrid(id, filledCount) {
 buildGrid('grid-intro', 50);
 buildGrid('grid-hundredth', 1);
 
-// === Practice ===
-let answered = {};
-let correctCount = 0;
+// === Practice with tracking ===
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz8mMJIkEbLaE75FMxNIqrzrTU9kSH-6SB9q1WEw7JWe7K3XjTNLdKN1pLJfyb48MK5/exec';
+
+// Track each question: { attempts: 0, correct: false, answer: '', result: '' }
+let tracking = {};
+let totalCorrect = 0;
 const totalQ = 5;
+let submitted = false;
 
 function check(id, accepted, explanation) {
+  if (submitted) return;
   const input = document.getElementById(id);
   const fb = document.getElementById(id + '-fb');
   const val = input.value.trim().replace(/\s/g, '');
   if (!val) return;
 
+  // Init tracking for this question
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '' };
+  const t = tracking[id];
+
+  // Already correct — do nothing
+  if (t.correct) return;
+
+  t.attempts++;
+  t.answer = val;
+
   const ok = accepted.some(a => val.toLowerCase() === a.toLowerCase());
   if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+    totalCorrect++;
     input.className = 'correct';
+    input.disabled = true;
     fb.className = 'feedback correct';
-    fb.textContent = '⭕ そう！ ' + explanation;
-    if (!answered[id]) { correctCount++; answered[id] = true; }
+    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
   } else {
+    t.result = 'wrong';
     input.className = 'wrong';
     fb.className = 'feedback wrong';
-    fb.textContent = '❌ 正解は ' + accepted[0] + ' → ' + explanation;
-    if (!answered[id]) { answered[id] = true; }
+    fb.textContent = '❌ ちがう。もう一度やってみよう！';
+    // Clear input for retry
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1200);
   }
 
-  if (Object.keys(answered).length === totalQ) {
-    const box = document.getElementById('result-box');
-    box.style.display = 'block';
-    document.getElementById('result-score').textContent = correctCount + ' / ' + totalQ;
-    const msg = document.getElementById('result-msg');
-    if (correctCount === totalQ) {
-      msg.textContent = 'Perfeito! 全問正解！ 次のレッスンに進もう！';
-    } else if (correctCount >= 3) {
-      msg.textContent = 'Bom! 間違えたところをもう一度上の解説で確認しよう。';
-    } else {
-      msg.textContent = '上の解説をもう一度読んで、やり直してみよう！';
-    }
+  // Check if all questions have been answered correctly
+  const correctIds = Object.keys(tracking).filter(k => tracking[k].correct);
+  if (correctIds.length === totalQ) {
+    showResult();
+    sendToSheet();
   }
+}
+
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + totalQ + ' 一発正解';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === totalQ) {
+    msg.textContent = 'Perfeito! 💯 全問一発正解！ 次のレッスンに進もう！';
+  } else if (firstCount >= 3) {
+    msg.textContent = 'Bom! ' + (totalQ - firstCount) + '問やり直したけど、全部できたね！';
+  } else {
+    msg.textContent = 'もう一度上の解説を読んで、明日もう1回やってみよう！';
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer,
+      attempts: t.attempts,
+      result: t.result  // "first" or "retry"
+    };
+  }
+
+  const payload = {
+    lesson: 'lesson_01_kijunchi',
+    timestamp: new Date().toISOString(),
+    answers: answers
+  };
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
 }
 
 document.querySelectorAll('.practice-q input').forEach(input => {
