@@ -17,7 +17,6 @@
   }
   .page { max-width: 640px; margin: 0 auto; }
 
-  /* Header */
   .header { text-align: center; padding: 20px 0 12px; }
   .header .badge {
     display: inline-block;
@@ -28,7 +27,6 @@
   .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
   .header .sub { font-size: 13px; color: #888; }
 
-  /* Section card */
   .card {
     background: #fff; border-radius: 16px; padding: 20px 22px;
     margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -39,7 +37,6 @@
   }
   .card p { margin-bottom: 10px; }
 
-  /* Fraction */
   .frac {
     display: inline-flex; flex-direction: column; align-items: center;
     vertical-align: middle; font-weight: 900; margin: 0 4px; line-height: 1.1;
@@ -47,90 +44,95 @@
   .frac .num { border-bottom: 2.5px solid #2c3e50; padding: 0 6px 2px; }
   .frac .den { padding: 2px 6px 0; }
 
-  /* Equation display */
   .equation {
     text-align: center; font-size: 22px; font-weight: 900;
     margin: 14px 0; color: #2c3e50;
     background: #f8f9fa; border-radius: 10px; padding: 12px;
   }
 
-  /* Bar visualization */
+  /* ===== Bar — rounded with clear boundary ===== */
   .bar-section { margin: 16px 0; }
-  .bar-heading {
-    font-size: 13px; font-weight: 700; color: #2980b9;
-    margin-bottom: 6px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .bar-heading .tag {
+  .bar-tag {
+    display: inline-block;
     background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 6px;
-    padding: 1px 8px; font-size: 11px;
+    padding: 2px 10px; font-size: 12px; font-weight: 700; color: #2980b9;
+    margin-bottom: 6px;
   }
-  .bar {
-    display: flex; border-radius: 8px; overflow: hidden;
-    height: 40px; border: 2px solid #bbb;
+  .bar-wrap {
+    background: #e8e8e8; border-radius: 22px; padding: 4px;
+    display: flex; overflow: hidden;
   }
   .bar-cell {
-    flex: 1; border-right: 1px solid rgba(0,0,0,0.1);
+    flex: 1; height: 36px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; color: #fff;
+    font-size: 12px; font-weight: 800;
+    margin: 0 1px;
   }
-  .bar-cell:last-child { border-right: none; }
-  .bar-cell.filled { background: #3498db; }
-  .bar-cell.empty { background: #ecf0f1; color: #bbb; }
+  .bar-cell:first-child { border-radius: 18px 0 0 18px; margin-left: 0; }
+  .bar-cell:last-child { border-radius: 0 18px 18px 0; margin-right: 0; }
+  .bar-cell.filled { background: #3498db; color: #fff; }
+  .bar-cell.empty { background: #f0f0f0; color: #aaa; }
   .bar-caption {
-    text-align: center; font-size: 13px; color: #888; margin-top: 4px;
+    text-align: center; font-size: 13px; color: #777; margin-top: 6px;
   }
 
-  /* 100-grid with quadrant support */
+  /* ===== 100-grid — rounded cells, clear quadrant borders ===== */
   .grid-section { margin: 16px 0; }
-  .grid-heading {
-    font-size: 13px; font-weight: 700; color: #2980b9;
-    margin-bottom: 6px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .grid-heading .tag {
+  .grid-tag {
+    display: inline-block;
     background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 6px;
-    padding: 1px 8px; font-size: 11px;
+    padding: 2px 10px; font-size: 12px; font-weight: 700; color: #2980b9;
+    margin-bottom: 6px;
+  }
+  .grid-outer {
+    max-width: 320px; margin: 0 auto;
+    background: #e0e0e0; border-radius: 10px; padding: 4px;
   }
   .grid-100 {
     display: grid; grid-template-columns: repeat(10, 1fr);
-    gap: 2px; max-width: 300px; margin: 8px auto;
-    border: 2px solid #bbb; border-radius: 6px; padding: 3px;
-    background: #bbb;
+    gap: 2px;
   }
   .grid-cell {
-    aspect-ratio: 1; border-radius: 2px;
+    aspect-ratio: 1; border-radius: 3px;
   }
   .grid-cell.filled { background: #3498db; }
-  .grid-cell.empty { background: #ecf0f1; }
-  /* quadrant dividers */
-  .grid-100.quadrant {
-    gap: 0;
-    background: #fff;
-    padding: 0;
+  .grid-cell.empty { background: #f0f0f0; }
+
+  /* Quadrant grid — 4 separate 5x5 blocks with gap between them */
+  .quadrant-wrap {
+    max-width: 320px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
   }
-  .grid-100.quadrant .grid-cell {
-    border: 1px solid #ddd;
-    border-radius: 0;
+  .quadrant-block {
+    background: #e0e0e0; border-radius: 8px; padding: 3px;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
   }
-  .grid-100.quadrant .grid-cell.v-border { border-right: 3px solid #e74c3c; }
-  .grid-100.quadrant .grid-cell.h-border { border-bottom: 3px solid #e74c3c; }
+  .quadrant-block .qcell {
+    aspect-ratio: 1; border-radius: 2px;
+  }
+  .quadrant-block .qcell.filled { background: #3498db; }
+  .quadrant-block .qcell.empty { background: #f0f0f0; }
+  .quadrant-block.filled-block { background: rgba(52,152,219,0.2); }
+
   .grid-caption {
-    text-align: center; font-size: 13px; color: #888; margin-top: 6px;
+    text-align: center; font-size: 13px; color: #777; margin-top: 8px;
+    max-width: 320px; margin-left: auto; margin-right: auto;
   }
 
   /* Circle intro */
   .circle-demo {
-    display: flex; justify-content: center; gap: 24px;
+    display: flex; justify-content: center; gap: 28px;
     margin: 16px 0; flex-wrap: wrap;
   }
   .circle-item { text-align: center; }
-  .circle-item svg { width: 80px; height: 80px; }
-  .circle-item .label { font-size: 14px; font-weight: 900; margin-top: 4px; }
+  .circle-item svg { width: 90px; height: 90px; }
+  .circle-item .label { font-size: 15px; font-weight: 900; margin-top: 6px; }
 
-  .transition { text-align: center; font-size: 20px; color: #3498db; margin: 12px 0; font-weight: 700; }
+  .transition { text-align: center; font-size: 18px; color: #3498db; margin: 14px 0; font-weight: 700; }
 
-  /* Tip / callout */
   .tip {
     background: #f0f7ff; border-left: 4px solid #3498db;
     padding: 12px 14px; border-radius: 0 10px 10px 0;
@@ -144,7 +146,6 @@
   }
   .callout-green b { color: #27ae60; }
 
-  /* Vocab */
   .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
   .vocab-chip {
     background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
@@ -152,11 +153,8 @@
   }
   .vocab-chip .pt { font-weight: 700; color: #2980b9; }
 
-  /* Summary table */
   .summary-table { width: 100%; border-collapse: collapse; text-align: center; font-weight: 700; font-size: 16px; }
-  .summary-table thead td {
-    background: #3498db; color: #fff; padding: 10px 8px;
-  }
+  .summary-table thead td { background: #3498db; color: #fff; padding: 10px 8px; }
   .summary-table thead td:first-child { border-radius: 10px 0 0 0; }
   .summary-table thead td:last-child { border-radius: 0 10px 0 0; }
   .summary-table tbody td { padding: 10px 8px; }
@@ -164,7 +162,6 @@
   .summary-table tbody tr:last-child td:first-child { border-radius: 0 0 0 10px; }
   .summary-table tbody tr:last-child td:last-child { border-radius: 0 0 10px 0; }
 
-  /* Practice */
   .practice-q {
     background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
     padding: 16px; margin: 12px 0; position: relative;
@@ -195,7 +192,6 @@
   .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
   .feedback.correct { color: #27ae60; }
   .feedback.wrong { color: #e74c3c; }
-
   .result-box {
     text-align: center; padding: 20px; background: #f0f7ff;
     border-radius: 12px; margin-top: 16px; display: none;
@@ -207,7 +203,6 @@
 <body>
 <div class="page">
 
-  <!-- ===== Header ===== -->
   <div class="header">
     <div class="badge">LIÇÃO 1 / 4</div>
     <h1>🎯 基準値 5セット</h1>
@@ -224,26 +219,31 @@
 
     <div class="circle-demo">
       <div class="circle-item">
-        <svg viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="36" fill="#ecf0f1" stroke="#ddd" stroke-width="2"/>
-          <path d="M40,40 L40,4 A36,36 0 0,1 76,40 Z" fill="#3498db"/>
-          <path d="M40,40 L76,40 A36,36 0 0,1 40,76 Z" fill="#3498db"/>
+        <svg viewBox="0 0 90 90">
+          <circle cx="45" cy="45" r="40" fill="#ecf0f1" stroke="#ccc" stroke-width="2"/>
+          <!-- 1/2: right half filled -->
+          <path d="M45,5 A40,40 0 0,1 45,85 Z" fill="#3498db"/>
+          <line x1="45" y1="5" x2="45" y2="85" stroke="#fff" stroke-width="2"/>
         </svg>
         <div class="label"><span class="frac"><span class="num">1</span><span class="den">2</span></span></div>
       </div>
       <div class="circle-item">
-        <svg viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="36" fill="#ecf0f1" stroke="#ddd" stroke-width="2"/>
-          <path d="M40,40 L40,4 A36,36 0 0,1 76,40 Z" fill="#3498db"/>
+        <svg viewBox="0 0 90 90">
+          <circle cx="45" cy="45" r="40" fill="#ecf0f1" stroke="#ccc" stroke-width="2"/>
+          <!-- 1/4: top-right quarter -->
+          <path d="M45,45 L45,5 A40,40 0 0,1 85,45 Z" fill="#3498db"/>
+          <line x1="45" y1="5" x2="45" y2="85" stroke="#fff" stroke-width="2"/>
+          <line x1="5" y1="45" x2="85" y2="45" stroke="#fff" stroke-width="2"/>
         </svg>
         <div class="label"><span class="frac"><span class="num">1</span><span class="den">4</span></span></div>
       </div>
       <div class="circle-item">
-        <svg viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="36" fill="#ecf0f1" stroke="#ddd" stroke-width="2"/>
-          <path d="M40,40 L40,4 A36,36 0 0,1 76,40 Z" fill="#3498db"/>
-          <path d="M40,40 L76,40 A36,36 0 0,1 40,76 Z" fill="#3498db"/>
-          <path d="M40,40 L40,76 A36,36 0 0,0 4,40 Z" fill="#3498db"/>
+        <svg viewBox="0 0 90 90">
+          <circle cx="45" cy="45" r="40" fill="#3498db" stroke="#ccc" stroke-width="2"/>
+          <!-- 3/4: all except bottom-left quarter -->
+          <path d="M45,45 L5,45 A40,40 0 0,1 45,85 Z" fill="#ecf0f1"/>
+          <line x1="45" y1="5" x2="45" y2="85" stroke="#fff" stroke-width="2"/>
+          <line x1="5" y1="45" x2="85" y2="45" stroke="#fff" stroke-width="2"/>
         </svg>
         <div class="label"><span class="frac"><span class="num">3</span><span class="den">4</span></span></div>
       </div>
@@ -251,14 +251,20 @@
 
     <p>でも、丸いピザだと <span class="frac"><span class="num">3</span><span class="den">10</span></span> みたいな数はうまく描けない。<br>
     だから、これからは<b>バー（帯）</b>を使って考えよう。</p>
+  </div>
 
-    <div class="transition">↓ 丸をバーに変えると… ↓</div>
+  <!-- ===== バーの説明 ===== -->
+  <div class="card">
+    <div class="card-title">📊 2つの道具: バーとグリッド</div>
+
+    <p>このレッスンでは、2つの道具を使うよ。</p>
+
+    <p><b>① 10マスのバー</b><br>
+    全体を10個に分けた帯。1マスが <b>0.1</b> を表す。</p>
 
     <div class="bar-section">
-      <div class="bar-heading">
-        <span class="tag">10マスのバー</span> 全体を10個に分けたもの
-      </div>
-      <div class="bar">
+      <span class="bar-tag">10マスのバー</span>
+      <div class="bar-wrap">
         <div class="bar-cell filled">1</div>
         <div class="bar-cell filled">2</div>
         <div class="bar-cell filled">3</div>
@@ -270,26 +276,43 @@
         <div class="bar-cell empty">9</div>
         <div class="bar-cell empty">10</div>
       </div>
-      <div class="bar-caption">↑ 10マスのうち5マス塗った = <span class="frac"><span class="num">1</span><span class="den">2</span></span></div>
+      <div class="bar-caption">↑ 5マス塗った = 0.5 = <span class="frac"><span class="num">1</span><span class="den">2</span></span></div>
     </div>
 
-    <p><b>ルール:</b> 塗ったマスの数がそのまま小数になる。<br>
-    5マス塗った → <b>0.5</b>。 1マス塗った → <b>0.1</b>。<br>
-    このバーをこれからずっと使うよ。</p>
+    <p><b>② 10×10のグリッド（100マス）</b><br>
+    全体を100個に分けたもの。1マスが <b>0.01</b> を表す。<br>
+    10マスでは分けにくい数（1/4 など）のときに使うよ。</p>
+
+    <div class="grid-section">
+      <span class="grid-tag">10×10 = 100マスのグリッド</span>
+      <div class="grid-outer">
+        <div class="grid-100" id="grid-intro"></div>
+      </div>
+      <div class="grid-caption">↑ 50マス塗った = 0.50 = <span class="frac"><span class="num">1</span><span class="den">2</span></span> = 50%</div>
+    </div>
+
+    <div class="tip">
+      <b>💡 大事なルール:</b><br>
+      ・10マスのバー → 塗ったマスの数がそのまま<b>小数の十の位</b>になる<br>
+      ・100マスのグリッド → 塗ったマスの数がそのまま<b>%</b>になる<br>
+      この2つを頭に入れて、次に進もう！
+    </div>
   </div>
 
   <!-- ===== 基準値 1: 1/2 ===== -->
   <div class="card">
     <div class="card-title">① 1/2 = 0.5 = 50%</div>
 
-    <p>まずは一番よく使う数。<b>半分</b>。<br>
+    <p>それじゃあ、5つの基準値を1つずつ見ていこう。<br>
+    最初は一番よく使う数。<b>半分</b>。<br>
     ポルトガル語では <b>metade</b>（メターデ）だね。</p>
 
+    <p><b>バーで見ると:</b><br>
+    10マスの半分は5マス。だから 1/2 = <b>0.5</b>。</p>
+
     <div class="bar-section">
-      <div class="bar-heading">
-        <span class="tag">10マスのバー</span>
-      </div>
-      <div class="bar">
+      <span class="bar-tag">10マスのバー</span>
+      <div class="bar-wrap">
         <div class="bar-cell filled">1</div>
         <div class="bar-cell filled">2</div>
         <div class="bar-cell filled">3</div>
@@ -301,15 +324,11 @@
         <div class="bar-cell empty"></div>
         <div class="bar-cell empty"></div>
       </div>
-      <div class="bar-caption">10マスのうち5マス → <b>0.5</b></div>
     </div>
 
-    <p>10マスのバーの<b>ちょうど半分</b>は5マス。<br>
-    だから 1/2 = <b>0.5</b>。</p>
-
-    <p>じゃあ、% はどうやって出すの？<br>
-    <b>%（パーセント）は「100のうちいくつ」</b>という意味。<br>
-    100マスあったら、半分は50マスだよね。だから <b>50%</b>。</p>
+    <p><b>%で考えると:</b><br>
+    %（パーセント）は「100のうちいくつ」という意味。<br>
+    100マスの半分は50マスだから → <b>50%</b>。</p>
 
     <div class="equation">
       <span class="frac"><span class="num">1</span><span class="den">2</span></span>
@@ -317,8 +336,7 @@
     </div>
 
     <div class="tip">
-      <b>💡 覚え方:</b> 半分 = 5割 = 0.5 = 50%。<br>
-      「半分」って聞いたら、0.5と50%がセットで出てくるようにしよう。
+      <b>💡 覚え方:</b> 「半分」って聞いたら → 0.5 → 50%。この3つはセット！
     </div>
   </div>
 
@@ -329,18 +347,18 @@
     <p>次は<b>4分の1</b>。ポルトガル語では <b>um quarto</b>（ウン・クアルト）。</p>
 
     <p>10マスのバーだと、1/4はぴったり分けられない（10÷4 = 2.5になっちゃう）。<br>
-    だから、もっと細かい <b>100マスのグリッド（10×10）</b>で見てみよう。</p>
+    こういう時は <b>100マスのグリッド</b>を使おう。</p>
+
+    <p>100マスを4等分すると、1ブロック = <b>25マス</b>（5×5）。<br>
+    下のグリッドを見て。4つのブロックに分かれてるのが分かるかな？</p>
 
     <div class="grid-section">
-      <div class="grid-heading">
-        <span class="tag">10×10 = 100マスのグリッド</span>
-      </div>
-      <div class="grid-100 quadrant" id="grid-quarter"></div>
-      <div class="grid-caption">赤い線で4つに分けた。青い部分が <span class="frac"><span class="num">1</span><span class="den">4</span></span> = 25マス</div>
+      <span class="grid-tag">10×10 = 100マスのグリッド</span>
+      <div class="quadrant-wrap" id="quad-quarter"></div>
+      <div class="grid-caption">4ブロックのうち<b>1つ</b>（左上の25マス）が <span class="frac"><span class="num">1</span><span class="den">4</span></span></div>
     </div>
 
-    <p>100マスを4つに分けると、1つのブロックは<b>25マス</b>（5×5）。<br>
-    100マスのうち25マスだから → <b>0.25</b> → <b>25%</b>。</p>
+    <p>100マスのうち25マス → 小数だと <b>0.25</b> → パーセントだと <b>25%</b>。</p>
 
     <div class="equation">
       <span class="frac"><span class="num">1</span><span class="den">4</span></span>
@@ -348,8 +366,8 @@
     </div>
 
     <div class="tip">
-      <b>💡 覚え方:</b> 4つに分けた1つ = 25%。<br>
-      25円玉4枚で100円、と同じ考え方！
+      <b>💡 覚え方:</b> 4つに分けた1つ = 25。<br>
+      100 ÷ 4 = 25 だから、1/4 は必ず25%！
     </div>
   </div>
 
@@ -358,18 +376,17 @@
     <div class="card-title">③ 3/4 = 0.75 = 75%</div>
 
     <p>さっき 1/4 = 25マスだったよね。<br>
-    じゃあ <b>3/4</b> は？ → 25マス × 3 = <b>75マス</b>！</p>
+    じゃあ <span class="frac"><span class="num">3</span><span class="den">4</span></span> は？<br>
+    → 4ブロックのうち<b>3ブロック</b>を塗る = 25 × 3 = <b>75マス</b>！</p>
 
     <div class="grid-section">
-      <div class="grid-heading">
-        <span class="tag">10×10 = 100マスのグリッド</span>
-      </div>
-      <div class="grid-100 quadrant" id="grid-three-quarter"></div>
-      <div class="grid-caption">4ブロックのうち3ブロック（75マス）が <span class="frac"><span class="num">3</span><span class="den">4</span></span></div>
+      <span class="grid-tag">10×10 = 100マスのグリッド</span>
+      <div class="quadrant-wrap" id="quad-three-quarter"></div>
+      <div class="grid-caption">4ブロックのうち<b>3つ</b>が塗ってある。右下の1つだけ空き。</div>
     </div>
 
-    <p>4つのブロックのうち<b>3つ</b>を塗った。<br>
-    ほとんど全部だけど、右下のブロック1つだけ空いてるね。</p>
+    <p>ほとんど全部だけど、1ブロックだけ空いてるね。<br>
+    100マスのうち75マス → <b>0.75</b> → <b>75%</b>。</p>
 
     <div class="equation">
       <span class="frac"><span class="num">3</span><span class="den">4</span></span>
@@ -378,9 +395,9 @@
 
     <div class="callout-green">
       <b>✅ 1/4と3/4はセットで覚えよう:</b><br>
-      <span class="frac"><span class="num">1</span><span class="den">4</span></span> = 25% → <span class="frac"><span class="num">3</span><span class="den">4</span></span> = 25% × 3 = 75%<br>
-      <span class="frac"><span class="num">1</span><span class="den">4</span></span> = 0.25 → <span class="frac"><span class="num">3</span><span class="den">4</span></span> = 0.25 × 3 = 0.75<br>
-      1/4が分かれば3/4も分かる！
+      1/4 = 25% → 3/4 = 25% × 3 = <b>75%</b><br>
+      1/4 = 0.25 → 3/4 = 0.25 × 3 = <b>0.75</b><br>
+      1/4が分かれば、3/4も自動的に分かる！
     </div>
   </div>
 
@@ -388,13 +405,11 @@
   <div class="card">
     <div class="card-title">④ 1/10 = 0.1 = 10%</div>
 
-    <p>ここはすごく簡単。<b>10マスのバーの1マス</b>。それだけ！</p>
+    <p>ここはすごく簡単。<b>10マスのバーの1マスだけ</b>。</p>
 
     <div class="bar-section">
-      <div class="bar-heading">
-        <span class="tag">10マスのバー</span>
-      </div>
-      <div class="bar">
+      <span class="bar-tag">10マスのバー</span>
+      <div class="bar-wrap">
         <div class="bar-cell filled">1</div>
         <div class="bar-cell empty">2</div>
         <div class="bar-cell empty">3</div>
@@ -406,7 +421,6 @@
         <div class="bar-cell empty">9</div>
         <div class="bar-cell empty">10</div>
       </div>
-      <div class="bar-caption">10マスのうち1マスだけ → <b>0.1</b></div>
     </div>
 
     <p>バーの1マスが <b>0.1</b>。<br>
@@ -418,7 +432,8 @@
     </div>
 
     <div class="tip">
-      <b>💡 ポイント:</b> 10マスのバーでは、<b>マスの数 = 小数</b>。<br>
+      <b>💡 これが一番使えるルール:</b><br>
+      10マスのバーでは、<b>塗ったマスの数がそのまま小数</b>になる。<br>
       1マス → 0.1、3マス → 0.3、7マス → 0.7。<br>
       この仕組みは次のレッスンでもっと使うよ！
     </div>
@@ -431,15 +446,15 @@
     <p>最後は一番小さい数。<b>100マスのうちたった1マス</b>。</p>
 
     <div class="grid-section">
-      <div class="grid-heading">
-        <span class="tag">10×10 = 100マスのグリッド</span>
+      <span class="grid-tag">10×10 = 100マスのグリッド</span>
+      <div class="grid-outer">
+        <div class="grid-100" id="grid-hundredth"></div>
       </div>
-      <div class="grid-100" id="grid-hundredth"></div>
-      <div class="grid-caption">100マスのうち、左上の1マスだけ → <b>0.01</b></div>
+      <div class="grid-caption">100マスのうち左上の<b>1マスだけ</b>。すごく小さい！</div>
     </div>
 
-    <p>すごく小さいね。これが <b>1%</b>。<br>
-    「100個のうちの1個」と考えれば分かりやすい。</p>
+    <p>100マスのうち1マスだから → <b>0.01</b> → <b>1%</b>。<br>
+    「100個のうちの1個」だと思えば分かりやすいね。</p>
 
     <div class="equation">
       <span class="frac"><span class="num">1</span><span class="den">100</span></span>
@@ -447,9 +462,9 @@
     </div>
 
     <div class="tip">
-      <b>💡 バーとグリッドの関係:</b><br>
-      10マスのバーの <b>1マス = 0.1</b><br>
-      100マスのグリッドの <b>1マス = 0.01</b><br>
+      <b>💡 バーとグリッドの関係を思い出そう:</b><br>
+      10マスのバーの <b>1マス = 0.1</b>（大きめ）<br>
+      100マスのグリッドの <b>1マス = 0.01</b>（すごく小さい）<br>
       グリッドの方が10倍細かい！
     </div>
   </div>
@@ -459,7 +474,7 @@
     <div class="card-title">📋 まとめ — この5つを覚えよう！</div>
 
     <p>分数、小数、%は<b>全部同じ数の違う書き方</b>。<br>
-    この5セットが頭に入っていれば、テストでも日常でもすぐ使える。</p>
+    この5セットが頭に入っていれば、テストでも日常でもすぐ使えるよ。</p>
 
     <table class="summary-table">
       <thead>
@@ -569,27 +584,28 @@
 </div>
 
 <script>
-// === Build 100-grid with quadrant borders (5×5 blocks) ===
-function buildQuadrantGrid(id, filledBlocks) {
-  // filledBlocks: array of block indices (0=top-left, 1=top-right, 2=bottom-left, 3=bottom-right)
-  const grid = document.getElementById(id);
-  for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 10; col++) {
+// === Build quadrant grids (4 separate 5x5 blocks) ===
+function buildQuadrant(containerId, filledBlocks) {
+  const wrap = document.getElementById(containerId);
+  for (let b = 0; b < 4; b++) {
+    const block = document.createElement('div');
+    block.className = 'quadrant-block';
+    if (filledBlocks.includes(b)) block.classList.add('filled-block');
+    for (let i = 0; i < 25; i++) {
       const cell = document.createElement('div');
-      // Which quadrant block? (0=TL, 1=TR, 2=BL, 3=BR)
-      const blockRow = row < 5 ? 0 : 1;
-      const blockCol = col < 5 ? 0 : 1;
-      const block = blockRow * 2 + blockCol;
-      const isFilled = filledBlocks.includes(block);
-      cell.className = 'grid-cell ' + (isFilled ? 'filled' : 'empty');
-      // Add border classes for quadrant dividers
-      if (col === 4) cell.classList.add('v-border');
-      if (row === 4) cell.classList.add('h-border');
-      grid.appendChild(cell);
+      cell.className = 'qcell ' + (filledBlocks.includes(b) ? 'filled' : 'empty');
+      block.appendChild(cell);
     }
+    wrap.appendChild(block);
   }
 }
 
+// 1/4: top-left only
+buildQuadrant('quad-quarter', [0]);
+// 3/4: all except bottom-right
+buildQuadrant('quad-three-quarter', [0, 1, 2]);
+
+// === Build regular 100-grids ===
 function buildGrid(id, filledCount) {
   const grid = document.getElementById(id);
   for (let i = 0; i < 100; i++) {
@@ -599,14 +615,10 @@ function buildGrid(id, filledCount) {
   }
 }
 
-// 1/4 = top-left block only
-buildQuadrantGrid('grid-quarter', [0]);
-// 3/4 = 3 blocks (all except bottom-right)
-buildQuadrantGrid('grid-three-quarter', [0, 1, 2]);
-// 1/100 = just 1 cell
+buildGrid('grid-intro', 50);
 buildGrid('grid-hundredth', 1);
 
-// === Practice checking ===
+// === Practice ===
 let answered = {};
 let correctCount = 0;
 const totalQ = 5;
@@ -645,7 +657,6 @@ function check(id, accepted, explanation) {
   }
 }
 
-// Enter key
 document.querySelectorAll('.practice-q input').forEach(input => {
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
