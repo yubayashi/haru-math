@@ -59,17 +59,16 @@
     margin-bottom: 6px;
   }
   .bar-wrap {
-    background: #e8e8e8; border-radius: 22px; padding: 4px;
     display: flex; overflow: hidden;
+    border: 2px solid #bbb; border-radius: 4px;
   }
   .bar-cell {
-    flex: 1; height: 36px;
+    flex: 1; height: 38px;
     display: flex; align-items: center; justify-content: center;
     font-size: 12px; font-weight: 800;
-    margin: 0 1px;
+    border-right: 1px solid rgba(0,0,0,0.12);
   }
-  .bar-cell:first-child { border-radius: 18px 0 0 18px; margin-left: 0; }
-  .bar-cell:last-child { border-radius: 0 18px 18px 0; margin-right: 0; }
+  .bar-cell:last-child { border-right: none; }
   .bar-cell.filled { background: #3498db; color: #fff; }
   .bar-cell.empty { background: #f0f0f0; color: #aaa; }
   .bar-caption {
@@ -94,28 +93,14 @@
   }
   .grid-cell {
     aspect-ratio: 1; border-radius: 3px;
+    border: 1px solid #ddd;
   }
   .grid-cell.filled { background: #3498db; }
   .grid-cell.empty { background: #f0f0f0; }
 
-  /* Quadrant grid — 4 separate 5x5 blocks with gap between them */
-  .quadrant-wrap {
-    max-width: 320px; margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-  .quadrant-block {
-    background: #e0e0e0; border-radius: 8px; padding: 3px;
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    gap: 2px;
-  }
-  .quadrant-block .qcell {
-    aspect-ratio: 1; border-radius: 2px;
-  }
-  .quadrant-block .qcell.filled { background: #3498db; }
-  .quadrant-block .qcell.empty { background: #f0f0f0; }
-  .quadrant-block.filled-block { background: rgba(52,152,219,0.2); }
+  /* Quadrant grid — single 10x10 with red divider lines */
+  .grid-100.quadrant .grid-cell.col4 { border-right: 3px solid #e74c3c; }
+  .grid-100.quadrant .grid-cell.row4 { border-bottom: 3px solid #e74c3c; }
 
   .grid-caption {
     text-align: center; font-size: 13px; color: #777; margin-top: 8px;
@@ -239,9 +224,10 @@
       </div>
       <div class="circle-item">
         <svg viewBox="0 0 90 90">
-          <circle cx="45" cy="45" r="40" fill="#3498db" stroke="#ccc" stroke-width="2"/>
-          <!-- 3/4: all except bottom-left quarter -->
-          <path d="M45,45 L5,45 A40,40 0 0,1 45,85 Z" fill="#ecf0f1"/>
+          <circle cx="45" cy="45" r="40" fill="#ecf0f1" stroke="#ccc" stroke-width="2"/>
+          <!-- 3/4: top-right + bottom-right + top-left -->
+          <path d="M45,45 L45,5 A40,40 0 0,1 45,85 Z" fill="#3498db"/>
+          <path d="M45,45 L45,5 A40,40 0 0,0 5,45 Z" fill="#3498db"/>
           <line x1="45" y1="5" x2="45" y2="85" stroke="#fff" stroke-width="2"/>
           <line x1="5" y1="45" x2="85" y2="45" stroke="#fff" stroke-width="2"/>
         </svg>
@@ -354,8 +340,10 @@
 
     <div class="grid-section">
       <span class="grid-tag">10×10 = 100マスのグリッド</span>
-      <div class="quadrant-wrap" id="quad-quarter"></div>
-      <div class="grid-caption">4ブロックのうち<b>1つ</b>（左上の25マス）が <span class="frac"><span class="num">1</span><span class="den">4</span></span></div>
+      <div class="grid-outer">
+        <div class="grid-100 quadrant" id="grid-quarter"></div>
+      </div>
+      <div class="grid-caption">赤い線で4つに分けた。青い部分が <span class="frac"><span class="num">1</span><span class="den">4</span></span> = 25マス（5×5）</div>
     </div>
 
     <p>100マスのうち25マス → 小数だと <b>0.25</b> → パーセントだと <b>25%</b>。</p>
@@ -381,8 +369,10 @@
 
     <div class="grid-section">
       <span class="grid-tag">10×10 = 100マスのグリッド</span>
-      <div class="quadrant-wrap" id="quad-three-quarter"></div>
-      <div class="grid-caption">4ブロックのうち<b>3つ</b>が塗ってある。右下の1つだけ空き。</div>
+      <div class="grid-outer">
+        <div class="grid-100 quadrant" id="grid-three-quarter"></div>
+      </div>
+      <div class="grid-caption">4ブロックのうち<b>3つ</b>が青。右下の1つだけ空き。</div>
     </div>
 
     <p>ほとんど全部だけど、1ブロックだけ空いてるね。<br>
@@ -584,26 +574,29 @@
 </div>
 
 <script>
-// === Build quadrant grids (4 separate 5x5 blocks) ===
-function buildQuadrant(containerId, filledBlocks) {
-  const wrap = document.getElementById(containerId);
-  for (let b = 0; b < 4; b++) {
-    const block = document.createElement('div');
-    block.className = 'quadrant-block';
-    if (filledBlocks.includes(b)) block.classList.add('filled-block');
-    for (let i = 0; i < 25; i++) {
+// === Build quadrant grids (10x10 with red dividers, 5x5 block fill) ===
+function buildQuadrantGrid(id, filledBlocks) {
+  // filledBlocks: array of block indices (0=TL, 1=TR, 2=BL, 3=BR)
+  const grid = document.getElementById(id);
+  for (let row = 0; row < 10; row++) {
+    for (let col = 0; col < 10; col++) {
       const cell = document.createElement('div');
-      cell.className = 'qcell ' + (filledBlocks.includes(b) ? 'filled' : 'empty');
-      block.appendChild(cell);
+      const blockRow = row < 5 ? 0 : 1;
+      const blockCol = col < 5 ? 0 : 1;
+      const block = blockRow * 2 + blockCol;
+      const isFilled = filledBlocks.includes(block);
+      cell.className = 'grid-cell ' + (isFilled ? 'filled' : 'empty');
+      if (col === 4) cell.classList.add('col4');
+      if (row === 4) cell.classList.add('row4');
+      grid.appendChild(cell);
     }
-    wrap.appendChild(block);
   }
 }
 
-// 1/4: top-left only
-buildQuadrant('quad-quarter', [0]);
+// 1/4: top-left block only
+buildQuadrantGrid('grid-quarter', [0]);
 // 3/4: all except bottom-right
-buildQuadrant('quad-three-quarter', [0, 1, 2]);
+buildQuadrantGrid('grid-three-quarter', [0, 1, 2]);
 
 // === Build regular 100-grids ===
 function buildGrid(id, filledCount) {
