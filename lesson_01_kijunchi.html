@@ -12,292 +12,215 @@
     color: #2d2d2d;
     background: #f5f5f5;
     font-size: 15px;
-    line-height: 1.7;
+    line-height: 1.8;
     padding: 16px;
   }
   .page { max-width: 640px; margin: 0 auto; }
 
   /* Header */
-  .header {
-    text-align: center;
-    padding: 20px 0 12px;
-  }
+  .header { text-align: center; padding: 20px 0 12px; }
   .header .badge {
     display: inline-block;
     background: linear-gradient(135deg, #3498db, #2ecc71);
-    color: #fff;
-    padding: 4px 16px;
-    border-radius: 16px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1px;
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
   }
-  .header h1 {
-    font-size: 22px;
-    font-weight: 900;
-    margin-top: 8px;
-    color: #2c3e50;
-  }
-  .header .sub {
-    font-size: 13px;
-    color: #888;
-  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
 
   /* Section card */
   .card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    margin: 16px 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
   .card-title {
-    font-size: 16px;
-    font-weight: 900;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
   }
+  .card p { margin-bottom: 10px; }
 
-  /* Bar visualization */
-  .bar-container {
-    margin: 16px 0;
-  }
-  .bar-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #555;
-    margin-bottom: 4px;
-  }
-  .bar {
-    display: flex;
-    border-radius: 8px;
-    overflow: hidden;
-    height: 36px;
-    border: 2px solid #ddd;
-  }
-  .bar-cell {
-    flex: 1;
-    border-right: 1px solid #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 700;
-    color: #fff;
-    transition: background 0.3s;
-  }
-  .bar-cell:last-child { border-right: none; }
-  .bar-cell.filled { background: #3498db; }
-  .bar-cell.empty { background: #ecf0f1; color: #bbb; }
-
-  /* 100-grid */
-  .grid-100 {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 2px;
-    max-width: 320px;
-    margin: 12px auto;
-  }
-  .grid-cell {
-    aspect-ratio: 1;
-    border-radius: 3px;
-    border: 1px solid #ddd;
-  }
-  .grid-cell.filled { background: #3498db; }
-  .grid-cell.empty { background: #ecf0f1; }
-
-  /* Equation display */
-  .equation {
-    text-align: center;
-    font-size: 20px;
-    font-weight: 900;
-    margin: 12px 0;
-    color: #2c3e50;
-  }
+  /* Fraction */
   .frac {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    vertical-align: middle;
-    font-weight: 900;
-    margin: 0 4px;
-    line-height: 1.1;
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; font-weight: 900; margin: 0 4px; line-height: 1.1;
   }
   .frac .num { border-bottom: 2.5px solid #2c3e50; padding: 0 6px 2px; }
   .frac .den { padding: 2px 6px 0; }
 
-  /* Intro circle */
+  /* Equation display */
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  /* Bar visualization */
+  .bar-section { margin: 16px 0; }
+  .bar-heading {
+    font-size: 13px; font-weight: 700; color: #2980b9;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bar-heading .tag {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 6px;
+    padding: 1px 8px; font-size: 11px;
+  }
+  .bar {
+    display: flex; border-radius: 8px; overflow: hidden;
+    height: 40px; border: 2px solid #bbb;
+  }
+  .bar-cell {
+    flex: 1; border-right: 1px solid rgba(0,0,0,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .bar-cell:last-child { border-right: none; }
+  .bar-cell.filled { background: #3498db; }
+  .bar-cell.empty { background: #ecf0f1; color: #bbb; }
+  .bar-caption {
+    text-align: center; font-size: 13px; color: #888; margin-top: 4px;
+  }
+
+  /* 100-grid with quadrant support */
+  .grid-section { margin: 16px 0; }
+  .grid-heading {
+    font-size: 13px; font-weight: 700; color: #2980b9;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .grid-heading .tag {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 6px;
+    padding: 1px 8px; font-size: 11px;
+  }
+  .grid-100 {
+    display: grid; grid-template-columns: repeat(10, 1fr);
+    gap: 2px; max-width: 300px; margin: 8px auto;
+    border: 2px solid #bbb; border-radius: 6px; padding: 3px;
+    background: #bbb;
+  }
+  .grid-cell {
+    aspect-ratio: 1; border-radius: 2px;
+  }
+  .grid-cell.filled { background: #3498db; }
+  .grid-cell.empty { background: #ecf0f1; }
+  /* quadrant dividers */
+  .grid-100.quadrant {
+    gap: 0;
+    background: #fff;
+    padding: 0;
+  }
+  .grid-100.quadrant .grid-cell {
+    border: 1px solid #ddd;
+    border-radius: 0;
+  }
+  .grid-100.quadrant .grid-cell.v-border { border-right: 3px solid #e74c3c; }
+  .grid-100.quadrant .grid-cell.h-border { border-bottom: 3px solid #e74c3c; }
+  .grid-caption {
+    text-align: center; font-size: 13px; color: #888; margin-top: 6px;
+  }
+
+  /* Circle intro */
   .circle-demo {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin: 16px 0;
-    flex-wrap: wrap;
+    display: flex; justify-content: center; gap: 24px;
+    margin: 16px 0; flex-wrap: wrap;
   }
-  .circle-item {
-    text-align: center;
-  }
-  .circle-item svg {
-    width: 80px;
-    height: 80px;
-  }
-  .circle-item .label {
-    font-size: 14px;
-    font-weight: 900;
-    margin-top: 4px;
-  }
+  .circle-item { text-align: center; }
+  .circle-item svg { width: 80px; height: 80px; }
+  .circle-item .label { font-size: 14px; font-weight: 900; margin-top: 4px; }
 
-  /* Transition arrow */
-  .transition {
-    text-align: center;
-    font-size: 24px;
-    color: #3498db;
-    margin: 8px 0;
-  }
+  .transition { text-align: center; font-size: 20px; color: #3498db; margin: 12px 0; font-weight: 700; }
 
-  /* Tip box */
+  /* Tip / callout */
   .tip {
-    background: #f0f7ff;
-    border-left: 4px solid #3498db;
-    padding: 12px 14px;
-    border-radius: 0 10px 10px 0;
-    margin: 14px 0;
-    font-size: 13px;
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
   }
   .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
 
   /* Vocab */
-  .vocab {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin: 8px 0;
-  }
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
   .vocab-chip {
-    background: #eaf6ff;
-    border: 1px solid #bee0fa;
-    border-radius: 8px;
-    padding: 4px 10px;
-    font-size: 12px;
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
   }
   .vocab-chip .pt { font-weight: 700; color: #2980b9; }
 
-  /* Practice section */
+  /* Summary table */
+  .summary-table { width: 100%; border-collapse: collapse; text-align: center; font-weight: 700; font-size: 16px; }
+  .summary-table thead td {
+    background: #3498db; color: #fff; padding: 10px 8px;
+  }
+  .summary-table thead td:first-child { border-radius: 10px 0 0 0; }
+  .summary-table thead td:last-child { border-radius: 0 10px 0 0; }
+  .summary-table tbody td { padding: 10px 8px; }
+  .summary-table tbody tr:nth-child(odd) td { background: #f8f9fa; }
+  .summary-table tbody tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+  .summary-table tbody tr:last-child td:last-child { border-radius: 0 0 10px 0; }
+
+  /* Practice */
   .practice-q {
-    background: #fafafa;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 14px;
-    margin: 10px 0;
-    position: relative;
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 12px 0; position: relative;
   }
   .practice-q .q-num {
-    position: absolute;
-    top: -10px;
-    left: 12px;
-    background: #3498db;
-    color: #fff;
-    width: 24px;
-    height: 24px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 900;
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
   }
-  .practice-q .q-text {
-    font-size: 15px;
-    margin-bottom: 8px;
-    padding-top: 4px;
-  }
-  .answer-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; }
   .answer-row input {
-    font-family: 'Nunito', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 6px 12px;
-    width: 120px;
-    text-align: center;
-    outline: none;
-    transition: border-color 0.2s;
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    width: 130px; text-align: center; outline: none;
   }
-  .answer-row input:focus {
-    border-color: #3498db;
-  }
-  .answer-row input.correct {
-    border-color: #27ae60;
-    background: #eafff0;
-  }
-  .answer-row input.wrong {
-    border-color: #e74c3c;
-    background: #fff5f5;
-  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
   .check-btn {
     font-family: 'Nunito', sans-serif;
-    background: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 16px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
   }
   .check-btn:hover { background: #2980b9; }
-  .feedback {
-    margin-top: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    min-height: 20px;
-  }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
   .feedback.correct { color: #27ae60; }
   .feedback.wrong { color: #e74c3c; }
 
-  /* Result */
   .result-box {
-    text-align: center;
-    padding: 16px;
-    background: #f0f7ff;
-    border-radius: 12px;
-    margin-top: 16px;
-    display: none;
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
   }
-  .result-box .score {
-    font-size: 28px;
-    font-weight: 900;
-    color: #2c3e50;
-  }
-  .result-box .msg {
-    font-size: 14px;
-    color: #666;
-    margin-top: 4px;
-  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- Header -->
+  <!-- ===== Header ===== -->
   <div class="header">
     <div class="badge">LIÇÃO 1 / 4</div>
     <h1>🎯 基準値 5セット</h1>
-    <div class="sub">5 valores de referência — Valores de referência</div>
+    <div class="sub">Valores de referência — 覚えておくべき5つの数</div>
   </div>
 
-  <!-- ===== 導入: 円からバーへ ===== -->
+  <!-- ===== 導入: 分数って何？ ===== -->
   <div class="card">
-    <div class="card-title">🍕 分数って「分けること」</div>
-    <p>ピザを分けるとき、分数を使うよね。</p>
+    <div class="card-title">🍕 分数って「分けること」だよね</div>
+
+    <p>ピザを半分に分けたら、1人分は <span class="frac"><span class="num">1</span><span class="den">2</span></span>。<br>
+    4つに分けたら、1人分は <span class="frac"><span class="num">1</span><span class="den">4</span></span>。<br>
+    ここまでは分かるよね。</p>
 
     <div class="circle-demo">
       <div class="circle-item">
@@ -326,34 +249,46 @@
       </div>
     </div>
 
-    <div class="transition">↓ これをバー（帯）にすると… ↓</div>
+    <p>でも、丸いピザだと <span class="frac"><span class="num">3</span><span class="den">10</span></span> みたいな数はうまく描けない。<br>
+    だから、これからは<b>バー（帯）</b>を使って考えよう。</p>
 
-    <!-- 1/2 bar -->
-    <div class="bar-container">
-      <div class="bar-label"><span class="frac"><span class="num">1</span><span class="den">2</span></span> = 10マスのうち5マス</div>
-      <div class="bar">
-        <div class="bar-cell filled"></div>
-        <div class="bar-cell filled"></div>
-        <div class="bar-cell filled"></div>
-        <div class="bar-cell filled"></div>
-        <div class="bar-cell filled"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
+    <div class="transition">↓ 丸をバーに変えると… ↓</div>
+
+    <div class="bar-section">
+      <div class="bar-heading">
+        <span class="tag">10マスのバー</span> 全体を10個に分けたもの
       </div>
+      <div class="bar">
+        <div class="bar-cell filled">1</div>
+        <div class="bar-cell filled">2</div>
+        <div class="bar-cell filled">3</div>
+        <div class="bar-cell filled">4</div>
+        <div class="bar-cell filled">5</div>
+        <div class="bar-cell empty">6</div>
+        <div class="bar-cell empty">7</div>
+        <div class="bar-cell empty">8</div>
+        <div class="bar-cell empty">9</div>
+        <div class="bar-cell empty">10</div>
+      </div>
+      <div class="bar-caption">↑ 10マスのうち5マス塗った = <span class="frac"><span class="num">1</span><span class="den">2</span></span></div>
     </div>
 
-    <p style="margin-top:12px;">これからは、この<b>バー</b>を使って分数を考えるよ。<br>10マスのバー = 1つ分（全体）。塗ったマスの数がそのまま小数になる！</p>
+    <p><b>ルール:</b> 塗ったマスの数がそのまま小数になる。<br>
+    5マス塗った → <b>0.5</b>。 1マス塗った → <b>0.1</b>。<br>
+    このバーをこれからずっと使うよ。</p>
   </div>
 
   <!-- ===== 基準値 1: 1/2 ===== -->
   <div class="card">
     <div class="card-title">① 1/2 = 0.5 = 50%</div>
 
-    <div class="bar-container">
-      <div class="bar-label">10マスのうち 5マス → 0.5</div>
+    <p>まずは一番よく使う数。<b>半分</b>。<br>
+    ポルトガル語では <b>metade</b>（メターデ）だね。</p>
+
+    <div class="bar-section">
+      <div class="bar-heading">
+        <span class="tag">10マスのバー</span>
+      </div>
       <div class="bar">
         <div class="bar-cell filled">1</div>
         <div class="bar-cell filled">2</div>
@@ -366,7 +301,15 @@
         <div class="bar-cell empty"></div>
         <div class="bar-cell empty"></div>
       </div>
+      <div class="bar-caption">10マスのうち5マス → <b>0.5</b></div>
     </div>
+
+    <p>10マスのバーの<b>ちょうど半分</b>は5マス。<br>
+    だから 1/2 = <b>0.5</b>。</p>
+
+    <p>じゃあ、% はどうやって出すの？<br>
+    <b>%（パーセント）は「100のうちいくつ」</b>という意味。<br>
+    100マスあったら、半分は50マスだよね。だから <b>50%</b>。</p>
 
     <div class="equation">
       <span class="frac"><span class="num">1</span><span class="den">2</span></span>
@@ -374,8 +317,8 @@
     </div>
 
     <div class="tip">
-      <b>💡 なぜ50%？</b> 100マスのうち50マス。% は「100のうちいくつ」。<br>
-      <b>🇵🇹</b> percentagem = パーセント（100のうちいくつ）
+      <b>💡 覚え方:</b> 半分 = 5割 = 0.5 = 50%。<br>
+      「半分」って聞いたら、0.5と50%がセットで出てくるようにしよう。
     </div>
   </div>
 
@@ -383,18 +326,30 @@
   <div class="card">
     <div class="card-title">② 1/4 = 0.25 = 25%</div>
 
-    <p>10マスだと1/4はぴったり分けられない。だから<b>100マス</b>で見てみよう。</p>
+    <p>次は<b>4分の1</b>。ポルトガル語では <b>um quarto</b>（ウン・クアルト）。</p>
 
-    <div class="bar-container">
-      <div class="bar-label">100マスのうち 25マス → 0.25</div>
-      <div class="grid-100" id="grid-quarter">
-        <!-- filled by JS -->
+    <p>10マスのバーだと、1/4はぴったり分けられない（10÷4 = 2.5になっちゃう）。<br>
+    だから、もっと細かい <b>100マスのグリッド（10×10）</b>で見てみよう。</p>
+
+    <div class="grid-section">
+      <div class="grid-heading">
+        <span class="tag">10×10 = 100マスのグリッド</span>
       </div>
+      <div class="grid-100 quadrant" id="grid-quarter"></div>
+      <div class="grid-caption">赤い線で4つに分けた。青い部分が <span class="frac"><span class="num">1</span><span class="den">4</span></span> = 25マス</div>
     </div>
+
+    <p>100マスを4つに分けると、1つのブロックは<b>25マス</b>（5×5）。<br>
+    100マスのうち25マスだから → <b>0.25</b> → <b>25%</b>。</p>
 
     <div class="equation">
       <span class="frac"><span class="num">1</span><span class="den">4</span></span>
       = 0.25 = 25%
+    </div>
+
+    <div class="tip">
+      <b>💡 覚え方:</b> 4つに分けた1つ = 25%。<br>
+      25円玉4枚で100円、と同じ考え方！
     </div>
   </div>
 
@@ -402,23 +357,30 @@
   <div class="card">
     <div class="card-title">③ 3/4 = 0.75 = 75%</div>
 
-    <p>1/4が25マスだから、3/4は25×3 = <b>75マス</b>。</p>
+    <p>さっき 1/4 = 25マスだったよね。<br>
+    じゃあ <b>3/4</b> は？ → 25マス × 3 = <b>75マス</b>！</p>
 
-    <div class="bar-container">
-      <div class="bar-label">100マスのうち 75マス → 0.75</div>
-      <div class="grid-100" id="grid-three-quarter">
+    <div class="grid-section">
+      <div class="grid-heading">
+        <span class="tag">10×10 = 100マスのグリッド</span>
       </div>
+      <div class="grid-100 quadrant" id="grid-three-quarter"></div>
+      <div class="grid-caption">4ブロックのうち3ブロック（75マス）が <span class="frac"><span class="num">3</span><span class="den">4</span></span></div>
     </div>
+
+    <p>4つのブロックのうち<b>3つ</b>を塗った。<br>
+    ほとんど全部だけど、右下のブロック1つだけ空いてるね。</p>
 
     <div class="equation">
       <span class="frac"><span class="num">3</span><span class="den">4</span></span>
       = 0.75 = 75%
     </div>
 
-    <div class="tip">
-      <b>💡 つながり:</b>
-      <span class="frac"><span class="num">1</span><span class="den">4</span></span> = 25%、だから
-      <span class="frac"><span class="num">3</span><span class="den">4</span></span> = 25% × 3 = 75%
+    <div class="callout-green">
+      <b>✅ 1/4と3/4はセットで覚えよう:</b><br>
+      <span class="frac"><span class="num">1</span><span class="den">4</span></span> = 25% → <span class="frac"><span class="num">3</span><span class="den">4</span></span> = 25% × 3 = 75%<br>
+      <span class="frac"><span class="num">1</span><span class="den">4</span></span> = 0.25 → <span class="frac"><span class="num">3</span><span class="den">4</span></span> = 0.25 × 3 = 0.75<br>
+      1/4が分かれば3/4も分かる！
     </div>
   </div>
 
@@ -426,21 +388,29 @@
   <div class="card">
     <div class="card-title">④ 1/10 = 0.1 = 10%</div>
 
-    <div class="bar-container">
-      <div class="bar-label">10マスのうち 1マス → 0.1</div>
+    <p>ここはすごく簡単。<b>10マスのバーの1マス</b>。それだけ！</p>
+
+    <div class="bar-section">
+      <div class="bar-heading">
+        <span class="tag">10マスのバー</span>
+      </div>
       <div class="bar">
         <div class="bar-cell filled">1</div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
-        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty">2</div>
+        <div class="bar-cell empty">3</div>
+        <div class="bar-cell empty">4</div>
+        <div class="bar-cell empty">5</div>
+        <div class="bar-cell empty">6</div>
+        <div class="bar-cell empty">7</div>
+        <div class="bar-cell empty">8</div>
+        <div class="bar-cell empty">9</div>
+        <div class="bar-cell empty">10</div>
       </div>
+      <div class="bar-caption">10マスのうち1マスだけ → <b>0.1</b></div>
     </div>
+
+    <p>バーの1マスが <b>0.1</b>。<br>
+    100マスで考えると10マス分だから → <b>10%</b>。</p>
 
     <div class="equation">
       <span class="frac"><span class="num">1</span><span class="den">10</span></span>
@@ -448,7 +418,9 @@
     </div>
 
     <div class="tip">
-      <b>💡 これが一番シンプル！</b> 10マスのうち1マス。バーで見ると「0.1」がそのまま見える。
+      <b>💡 ポイント:</b> 10マスのバーでは、<b>マスの数 = 小数</b>。<br>
+      1マス → 0.1、3マス → 0.3、7マス → 0.7。<br>
+      この仕組みは次のレッスンでもっと使うよ！
     </div>
   </div>
 
@@ -456,11 +428,18 @@
   <div class="card">
     <div class="card-title">⑤ 1/100 = 0.01 = 1%</div>
 
-    <div class="bar-container">
-      <div class="bar-label">100マスのうち 1マス → 0.01</div>
-      <div class="grid-100" id="grid-hundredth">
+    <p>最後は一番小さい数。<b>100マスのうちたった1マス</b>。</p>
+
+    <div class="grid-section">
+      <div class="grid-heading">
+        <span class="tag">10×10 = 100マスのグリッド</span>
       </div>
+      <div class="grid-100" id="grid-hundredth"></div>
+      <div class="grid-caption">100マスのうち、左上の1マスだけ → <b>0.01</b></div>
     </div>
+
+    <p>すごく小さいね。これが <b>1%</b>。<br>
+    「100個のうちの1個」と考えれば分かりやすい。</p>
 
     <div class="equation">
       <span class="frac"><span class="num">1</span><span class="den">100</span></span>
@@ -468,28 +447,39 @@
     </div>
 
     <div class="tip">
-      <b>💡</b> 100マスのうちたった1マス。すごく小さい！
+      <b>💡 バーとグリッドの関係:</b><br>
+      10マスのバーの <b>1マス = 0.1</b><br>
+      100マスのグリッドの <b>1マス = 0.01</b><br>
+      グリッドの方が10倍細かい！
     </div>
   </div>
 
   <!-- ===== まとめ ===== -->
   <div class="card">
-    <div class="card-title">📋 まとめ — 5つ覚えよう！</div>
+    <div class="card-title">📋 まとめ — この5つを覚えよう！</div>
 
-    <table style="width:100%; border-collapse:collapse; text-align:center; font-weight:700; font-size:15px;">
-      <tr style="background:#3498db; color:#fff;">
-        <td style="padding:8px; border-radius:8px 0 0 0;">分数<br><span style="font-size:11px;">fração</span></td>
-        <td style="padding:8px;">小数<br><span style="font-size:11px;">decimal</span></td>
-        <td style="padding:8px; border-radius:0 8px 0 0;">%<br><span style="font-size:11px;">percentagem</span></td>
-      </tr>
-      <tr style="background:#f8f9fa;"><td style="padding:8px;"><span class="frac"><span class="num">1</span><span class="den">2</span></span></td><td>0.5</td><td>50%</td></tr>
-      <tr><td style="padding:8px;"><span class="frac"><span class="num">1</span><span class="den">4</span></span></td><td>0.25</td><td>25%</td></tr>
-      <tr style="background:#f8f9fa;"><td style="padding:8px;"><span class="frac"><span class="num">3</span><span class="den">4</span></span></td><td>0.75</td><td>75%</td></tr>
-      <tr><td style="padding:8px;"><span class="frac"><span class="num">1</span><span class="den">10</span></span></td><td>0.1</td><td>10%</td></tr>
-      <tr style="background:#f8f9fa;"><td style="padding:8px; border-radius:0 0 0 8px;"><span class="frac"><span class="num">1</span><span class="den">100</span></span></td><td>0.01</td><td style="border-radius:0 0 8px 0;">1%</td></tr>
+    <p>分数、小数、%は<b>全部同じ数の違う書き方</b>。<br>
+    この5セットが頭に入っていれば、テストでも日常でもすぐ使える。</p>
+
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <td>分数<br><span style="font-size:11px;">fração</span></td>
+          <td>小数<br><span style="font-size:11px;">decimal</span></td>
+          <td>%<br><span style="font-size:11px;">percentagem</span></td>
+          <td>イメージ</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="frac"><span class="num">1</span><span class="den">2</span></span></td><td>0.5</td><td>50%</td><td style="font-size:13px;">半分</td></tr>
+        <tr><td><span class="frac"><span class="num">1</span><span class="den">4</span></span></td><td>0.25</td><td>25%</td><td style="font-size:13px;">4つのうち1つ</td></tr>
+        <tr><td><span class="frac"><span class="num">3</span><span class="den">4</span></span></td><td>0.75</td><td>75%</td><td style="font-size:13px;">4つのうち3つ</td></tr>
+        <tr><td><span class="frac"><span class="num">1</span><span class="den">10</span></span></td><td>0.1</td><td>10%</td><td style="font-size:13px;">バー1マス</td></tr>
+        <tr><td><span class="frac"><span class="num">1</span><span class="den">100</span></span></td><td>0.01</td><td>1%</td><td style="font-size:13px;">グリッド1マス</td></tr>
+      </tbody>
     </table>
 
-    <div class="vocab" style="margin-top:12px;">
+    <div class="vocab" style="margin-top:14px;">
       <div class="vocab-chip"><span class="pt">fração</span> = 分数</div>
       <div class="vocab-chip"><span class="pt">decimal</span> = 小数</div>
       <div class="vocab-chip"><span class="pt">percentagem</span> = %</div>
@@ -501,74 +491,71 @@
   <!-- ===== 練習 ===== -->
   <div class="card">
     <div class="card-title">✏️ 練習 — Prática</div>
-    <p style="margin-bottom:12px; color:#888; font-size:13px;">上の表を見ないでやってみよう！</p>
+    <p style="margin-bottom:14px; color:#666; font-size:14px;">
+      上のまとめ表を<b>見ないで</b>やってみよう！<br>
+      分からなかったら、上に戻って確認してからもう一度チャレンジ。
+    </p>
 
-    <!-- Q1 -->
     <div class="practice-q">
       <div class="q-num">1</div>
       <div class="q-text">
-        <span class="frac"><span class="num">1</span><span class="den">4</span></span> を小数で書くと？
+        <span class="frac"><span class="num">1</span><span class="den">4</span></span> を小数（decimal）で書くと？
       </div>
       <div class="answer-row">
         <input type="text" id="q1" placeholder="0.??" inputmode="decimal">
-        <button class="check-btn" onclick="checkAnswer('q1', ['0.25','0,25'], '1/4 = 0.25（100マスのうち25マス）')">確認</button>
+        <button class="check-btn" onclick="check('q1',['0.25','0,25'],'1/4 → 100マスのうち25マス → 0.25')">確認</button>
       </div>
       <div class="feedback" id="q1-fb"></div>
     </div>
 
-    <!-- Q2 -->
     <div class="practice-q">
       <div class="q-num">2</div>
       <div class="q-text">
-        0.75 を分数で書くと？（例: 1/2）
+        0.75 を分数（fração）で書くと？<span style="color:#aaa; font-size:13px;">（例: 1/2）</span>
       </div>
       <div class="answer-row">
         <input type="text" id="q2" placeholder="?/?" inputmode="text">
-        <button class="check-btn" onclick="checkAnswer('q2', ['3/4'], '0.75 = 3/4（100マスのうち75マス）')">確認</button>
+        <button class="check-btn" onclick="check('q2',['3/4'],'0.75 → 100マスのうち75マス → 3/4')">確認</button>
       </div>
       <div class="feedback" id="q2-fb"></div>
     </div>
 
-    <!-- Q3 -->
     <div class="practice-q">
       <div class="q-num">3</div>
       <div class="q-text">
-        <span class="frac"><span class="num">1</span><span class="den">2</span></span> は何%？
+        <span class="frac"><span class="num">1</span><span class="den">2</span></span> は何パーセント（percentagem）？
       </div>
       <div class="answer-row">
         <input type="text" id="q3" placeholder="??%" inputmode="numeric">
-        <button class="check-btn" onclick="checkAnswer('q3', ['50','50%'], '1/2 = 50%（100マスのうち50マス）')">確認</button>
+        <button class="check-btn" onclick="check('q3',['50','50%'],'1/2 → 100マスのうち50マス → 50%')">確認</button>
       </div>
       <div class="feedback" id="q3-fb"></div>
     </div>
 
-    <!-- Q4 -->
     <div class="practice-q">
       <div class="q-num">4</div>
       <div class="q-text">
-        25% を分数で書くと？（例: 1/2）
+        25% を分数（fração）で書くと？
       </div>
       <div class="answer-row">
         <input type="text" id="q4" placeholder="?/?" inputmode="text">
-        <button class="check-btn" onclick="checkAnswer('q4', ['1/4'], '25% = 1/4（100マスのうち25マス）')">確認</button>
+        <button class="check-btn" onclick="check('q4',['1/4'],'25% → 100マスのうち25マス → 1/4')">確認</button>
       </div>
       <div class="feedback" id="q4-fb"></div>
     </div>
 
-    <!-- Q5 -->
     <div class="practice-q">
       <div class="q-num">5</div>
       <div class="q-text">
-        <span class="frac"><span class="num">3</span><span class="den">4</span></span> を小数で書くと？
+        <span class="frac"><span class="num">3</span><span class="den">4</span></span> を小数（decimal）で書くと？
       </div>
       <div class="answer-row">
         <input type="text" id="q5" placeholder="0.??" inputmode="decimal">
-        <button class="check-btn" onclick="checkAnswer('q5', ['0.75','0,75'], '3/4 = 0.75（100マスのうち75マス）')">確認</button>
+        <button class="check-btn" onclick="check('q5',['0.75','0,75'],'3/4 → 1/4(0.25) × 3 = 0.75')">確認</button>
       </div>
       <div class="feedback" id="q5-fb"></div>
     </div>
 
-    <!-- Result -->
     <div class="result-box" id="result-box">
       <div class="score" id="result-score"></div>
       <div class="msg" id="result-msg"></div>
@@ -582,7 +569,27 @@
 </div>
 
 <script>
-// Build 100-grids
+// === Build 100-grid with quadrant borders (5×5 blocks) ===
+function buildQuadrantGrid(id, filledBlocks) {
+  // filledBlocks: array of block indices (0=top-left, 1=top-right, 2=bottom-left, 3=bottom-right)
+  const grid = document.getElementById(id);
+  for (let row = 0; row < 10; row++) {
+    for (let col = 0; col < 10; col++) {
+      const cell = document.createElement('div');
+      // Which quadrant block? (0=TL, 1=TR, 2=BL, 3=BR)
+      const blockRow = row < 5 ? 0 : 1;
+      const blockCol = col < 5 ? 0 : 1;
+      const block = blockRow * 2 + blockCol;
+      const isFilled = filledBlocks.includes(block);
+      cell.className = 'grid-cell ' + (isFilled ? 'filled' : 'empty');
+      // Add border classes for quadrant dividers
+      if (col === 4) cell.classList.add('v-border');
+      if (row === 4) cell.classList.add('h-border');
+      grid.appendChild(cell);
+    }
+  }
+}
+
 function buildGrid(id, filledCount) {
   const grid = document.getElementById(id);
   for (let i = 0; i < 100; i++) {
@@ -591,59 +598,57 @@ function buildGrid(id, filledCount) {
     grid.appendChild(cell);
   }
 }
-buildGrid('grid-quarter', 25);
-buildGrid('grid-three-quarter', 75);
+
+// 1/4 = top-left block only
+buildQuadrantGrid('grid-quarter', [0]);
+// 3/4 = 3 blocks (all except bottom-right)
+buildQuadrantGrid('grid-three-quarter', [0, 1, 2]);
+// 1/100 = just 1 cell
 buildGrid('grid-hundredth', 1);
 
-// Check answers
+// === Practice checking ===
 let answered = {};
 let correctCount = 0;
 const totalQ = 5;
 
-function checkAnswer(id, acceptedAnswers, explanation) {
+function check(id, accepted, explanation) {
   const input = document.getElementById(id);
   const fb = document.getElementById(id + '-fb');
   const val = input.value.trim().replace(/\s/g, '');
-
   if (!val) return;
 
-  const isCorrect = acceptedAnswers.some(a => val.toLowerCase() === a.toLowerCase());
-
-  if (isCorrect) {
+  const ok = accepted.some(a => val.toLowerCase() === a.toLowerCase());
+  if (ok) {
     input.className = 'correct';
     fb.className = 'feedback correct';
-    fb.textContent = '⭕ ' + explanation;
+    fb.textContent = '⭕ そう！ ' + explanation;
     if (!answered[id]) { correctCount++; answered[id] = true; }
   } else {
     input.className = 'wrong';
     fb.className = 'feedback wrong';
-    fb.textContent = '❌ → 正解: ' + acceptedAnswers[0] + '（' + explanation + '）';
+    fb.textContent = '❌ 正解は ' + accepted[0] + ' → ' + explanation;
     if (!answered[id]) { answered[id] = true; }
   }
 
-  // Show result when all answered
   if (Object.keys(answered).length === totalQ) {
     const box = document.getElementById('result-box');
-    const score = document.getElementById('result-score');
-    const msg = document.getElementById('result-msg');
     box.style.display = 'block';
-    score.textContent = correctCount + ' / ' + totalQ;
+    document.getElementById('result-score').textContent = correctCount + ' / ' + totalQ;
+    const msg = document.getElementById('result-msg');
     if (correctCount === totalQ) {
-      msg.textContent = 'Perfeito! 💯 全問正解！次のレッスンに進もう！';
+      msg.textContent = 'Perfeito! 全問正解！ 次のレッスンに進もう！';
     } else if (correctCount >= 3) {
-      msg.textContent = 'Bom! もう一度上の表を見て、間違えたところを確認しよう。';
+      msg.textContent = 'Bom! 間違えたところをもう一度上の解説で確認しよう。';
     } else {
-      msg.textContent = 'もう一度上の解説を読んで、やり直してみよう！';
+      msg.textContent = '上の解説をもう一度読んで、やり直してみよう！';
     }
   }
 }
 
-// Enter key to check
+// Enter key
 document.querySelectorAll('.practice-q input').forEach(input => {
   input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      input.parentElement.querySelector('.check-btn').click();
-    }
+    if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
   });
 });
 </script>
