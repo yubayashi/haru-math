@@ -628,7 +628,7 @@ function check(id, accepted, explanation) {
   if (!val) return;
 
   // Init tracking for this question
-  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '' };
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
   const t = tracking[id];
 
   // Already correct — do nothing
@@ -648,6 +648,7 @@ function check(id, accepted, explanation) {
     fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
   } else {
     t.result = 'wrong';
+    t.wrong_answers.push(val);
     input.className = 'wrong';
     fb.className = 'feedback wrong';
     fb.textContent = '❌ ちがう。もう一度やってみよう！';
@@ -687,7 +688,8 @@ function sendToSheet() {
     answers[id] = {
       answer: t.answer,
       attempts: t.attempts,
-      result: t.result  // "first" or "retry"
+      result: t.result,  // "first" or "retry"
+      wrong_answers: t.wrong_answers  // e.g. ["0.34", "0.5"]
     };
   }
 
