@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 4 — 部分と全体</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; font-weight: 900; margin: 0 4px; line-height: 1.1;
+  }
+  .frac .num { border-bottom: 2.5px solid #2c3e50; padding: 0 6px 2px; }
+  .frac .den { padding: 2px 6px 0; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .bar-section { margin: 16px 0; }
+  .bar-tag {
+    display: inline-block;
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 6px;
+    padding: 2px 10px; font-size: 12px; font-weight: 700; color: #2980b9;
+    margin-bottom: 6px;
+  }
+  .bar-wrap {
+    display: flex; overflow: hidden;
+    border: 2px solid #bbb; border-radius: 4px;
+  }
+  .bar-cell {
+    flex: 1; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    border-right: 1px solid rgba(0,0,0,0.12);
+  }
+  .bar-cell:last-child { border-right: none; }
+  .bar-cell.filled { background: #3498db; color: #fff; }
+  .bar-cell.empty { background: #f0f0f0; color: #aaa; }
+  .bar-caption {
+    text-align: center; font-size: 13px; color: #777; margin-top: 6px;
+  }
+
+  .scene {
+    background: #f8f9fa; border-radius: 12px; padding: 16px;
+    margin: 14px 0; border: 1px solid #e8e8e8;
+  }
+  .scene-title { font-weight: 900; font-size: 15px; margin-bottom: 8px; }
+  .scene-q { font-size: 15px; color: #555; }
+  .scene-answer {
+    margin-top: 8px; font-weight: 900; font-size: 18px; color: #2c3e50;
+    text-align: center;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 12px 0; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    width: 130px; text-align: center; outline: none;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 4 / 4</div>
+    <h1>🧩 部分と全体</h1>
+    <div class="sub">Parte e todo — どっちが上でどっちが下？</div>
+  </div>
+
+  <!-- ===== 導入: 分数の向き ===== -->
+  <div class="card">
+    <div class="card-title">🏫 まずルールを確認</div>
+
+    <p>分数は<b>「全体のうちの何個か」</b>を表す数。</p>
+
+    <div class="equation">
+      <span class="frac"><span class="num">部分（選んだ数）</span><span class="den">全体（ぜんぶの数）</span></span>
+    </div>
+
+    <p><b>分子</b>（上）= 選んだもの、注目しているもの<br>
+    <b>分母</b>（下）= 全体、ぜんぶの数</p>
+
+    <div class="tip">
+      <b>💡 覚え方:</b> 分<b>母</b>（お母さん）が下で支えている。<br>
+      分<b>子</b>（子ども）が上に乗っている。<br>
+      お母さん（全体）の上に子ども（部分）が乗ってるイメージ！
+    </div>
+  </div>
+
+  <!-- ===== 例題で練習 ===== -->
+  <div class="card">
+    <div class="card-title">🎯 例で確認しよう</div>
+
+    <div class="scene">
+      <div class="scene-title">⚽ サッカーチームの例</div>
+      <div class="scene-q">チームに <b>11人</b> いる。そのうち <b>4人</b> が4年生。<br>
+      4年生の割合を分数で書くと？</div>
+      <div class="scene-answer">
+        <span class="frac"><span class="num">4（4年生）</span><span class="den">11（チーム全員）</span></span>
+      </div>
+    </div>
+
+    <p>全体が11人 → <b>分母は11</b><br>
+    その中の4人 → <b>分子は4</b></p>
+
+    <div class="bar-section">
+      <span class="bar-tag">11人のチーム</span>
+      <div class="bar-wrap" id="team-bar"></div>
+      <div class="bar-caption">青 = 4年生（4人） / 灰色 = その他（7人）</div>
+    </div>
+
+    <div class="scene">
+      <div class="scene-title">🍬 お菓子の例</div>
+      <div class="scene-q">袋に <b>20個</b> のお菓子がある。<b>7個</b> 食べた。<br>
+      食べた割合を分数で書くと？</div>
+      <div class="scene-answer">
+        <span class="frac"><span class="num">7（食べた）</span><span class="den">20（全部）</span></span>
+      </div>
+    </div>
+
+    <p>全体が20個 → <b>分母は20</b><br>
+    食べたのが7個 → <b>分子は7</b></p>
+  </div>
+
+  <!-- ===== よくある間違い ===== -->
+  <div class="card">
+    <div class="card-title">⚠️ よくある間違い — 上下が逆！</div>
+
+    <div class="callout-orange">
+      <b>❌ 間違い例:</b><br>
+      「20個のうち7個食べた」→ <span class="frac"><span class="num">20</span><span class="den">7</span></span> ？<br><br>
+      これだと「7個のうち20個」になっちゃう。<br>
+      全部（7個）より多い（20個）って変だよね！<br><br>
+      <b>⭕ 正しくは:</b> <span class="frac"><span class="num">7</span><span class="den">20</span></span><br>
+      分母（下）はいつも<b>全体</b>。分子（上）はいつも<b>部分</b>。
+    </div>
+
+    <div class="tip">
+      <b>💡 チェック方法:</b><br>
+      分数を書いたら確認しよう → <b>分子 ≦ 分母</b> になってる？<br>
+      （「全体より部分が大きい」はありえない！）<br>
+      ※ 帯分数・仮分数は別のルール。今は「部分/全体」だけでOK。
+    </div>
+  </div>
+
+  <!-- ===== %との関係 ===== -->
+  <div class="card">
+    <div class="card-title">💯 分数→%への変換もセットで！</div>
+
+    <p>分数が書けたら、%にするのもカンタン。<br>
+    レッスン2で覚えた方法を使おう。</p>
+
+    <div class="scene">
+      <div class="scene-title">🎒 クラスの例</div>
+      <div class="scene-q">25人のクラスで <b>10人</b> がサッカー好き。<br>
+      サッカー好きは何%？</div>
+    </div>
+
+    <p>
+    ① 分数にする: <span class="frac"><span class="num">10</span><span class="den">25</span></span><br>
+    ② 分母を100にする: 25 × <b>4</b> = 100 → 分子も × 4<br>
+    ③ <span class="frac"><span class="num">40</span><span class="den">100</span></span> = <b>40%</b></p>
+
+    <div class="equation">
+      <span class="frac"><span class="num">10</span><span class="den">25</span></span>
+      = <span class="frac"><span class="num">40</span><span class="den">100</span></span>
+      = 40%
+    </div>
+
+    <div class="callout-green">
+      <b>✅ テストでの書き方（Explica como pensaste）:</b><br>
+      "10 alunos em 25 gostam de futebol.<br>
+      A fração é 10/25.<br>
+      10/25 = 40/100 = 40%."<br><br>
+      <span style="font-size:13px; color:#666;">（25人中10人がサッカー好き。分数は 10/25。10/25 = 40/100 = 40%。）</span>
+    </div>
+  </div>
+
+  <!-- ===== 練習 ===== -->
+  <div class="card">
+    <div class="card-title">✏️ 練習 — Prática</div>
+    <p style="margin-bottom:14px; color:#666; font-size:14px;">
+      場面を読んで、分数を書こう！（例: 3/8）
+    </p>
+
+    <div class="practice-q">
+      <div class="q-num">1</div>
+      <div class="q-text">
+        <b>10個</b>のりんごのうち、<b>3個</b>が赤い。<br>
+        赤いりんごの割合は？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q1" placeholder="?/?" inputmode="text">
+        <button class="check-btn" onclick="check('q1',['3/10'],'部分(3) / 全体(10) = 3/10')">確認</button>
+      </div>
+      <div class="feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">2</div>
+      <div class="q-text">
+        クラスに <b>20人</b>。そのうち <b>8人</b> がめがねをかけている。<br>
+        めがねの人の割合は？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q2" placeholder="?/?" inputmode="text">
+        <button class="check-btn" onclick="check('q2',['8/20','2/5'],'部分(8) / 全体(20) = 8/20。約分すると 2/5 でもOK！')">確認</button>
+      </div>
+      <div class="feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">3</div>
+      <div class="q-text">
+        サッカーの試合で <b>8回</b> シュートして、<b>5回</b> ゴールした。<br>
+        ゴールの割合は？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q3" placeholder="?/?" inputmode="text">
+        <button class="check-btn" onclick="check('q3',['5/8'],'部分(5ゴール) / 全体(8シュート) = 5/8')">確認</button>
+      </div>
+      <div class="feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">4</div>
+      <div class="q-text">
+        <b>25人</b>のクラスで <b>15人</b> がサッカー好き。<br>
+        サッカー好きは<b>何%</b>？
+        <span style="color:#aaa; font-size:13px;">ヒント: まず分数にして、分母を100にしよう</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q4" placeholder="??%" inputmode="text">
+        <button class="check-btn" onclick="check('q4',['60','60%'],'15/25 → 60/100 = 60%')">確認</button>
+      </div>
+      <div class="feedback" id="q4-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">5</div>
+      <div class="q-text">
+        テストが <b>50問</b> あって、<b>35問</b> 正解した。<br>
+        正解率は<b>何%</b>？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q5" placeholder="??%" inputmode="text">
+        <button class="check-btn" onclick="check('q5',['70','70%'],'35/50 → 70/100 = 70%')">確認</button>
+      </div>
+      <div class="feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+  <div class="vocab" style="margin: 0 22px 16px;">
+    <div class="vocab-chip"><span class="pt">parte</span> = 部分</div>
+    <div class="vocab-chip"><span class="pt">todo / total</span> = 全体</div>
+    <div class="vocab-chip"><span class="pt">numerador</span> = 分子（上）</div>
+    <div class="vocab-chip"><span class="pt">denominador</span> = 分母（下）</div>
+    <div class="vocab-chip"><span class="pt">percentagem</span> = パーセント</div>
+  </div>
+
+  <div style="text-align:center; padding:16px; color:#aaa; font-size:12px;">
+    Lição 4 / 4 — Missão Matemática Revisão 🎉 Completo!
+  </div>
+
+</div>
+
+<script>
+// Build team bar (11 cells, 4 filled)
+(function() {
+  const bar = document.getElementById('team-bar');
+  for (let i = 0; i < 11; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'bar-cell ' + (i < 4 ? 'filled' : 'empty');
+    cell.textContent = i + 1;
+    bar.appendChild(cell);
+  }
+})();
+
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz8mMJIkEbLaE75FMxNIqrzrTU9kSH-6SB9q1WEw7JWe7K3XjTNLdKN1pLJfyb48MK5/exec';
+
+let tracking = {};
+let totalCorrect = 0;
+const totalQ = 5;
+let submitted = false;
+
+function check(id, accepted, explanation) {
+  if (submitted) return;
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  const val = input.value.trim().replace(/\s/g, '');
+  if (!val) return;
+
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return;
+
+  t.attempts++;
+  t.answer = val;
+
+  const ok = accepted.some(a => val.toLowerCase() === a.toLowerCase());
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+    totalCorrect++;
+    input.className = 'correct';
+    input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(val);
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ちがう。「部分が上、全体が下」を思い出して！';
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1200);
+  }
+
+  const correctIds = Object.keys(tracking).filter(k => tracking[k].correct);
+  if (correctIds.length === totalQ) {
+    showResult();
+    sendToSheet();
+  }
+}
+
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + totalQ + ' 一発正解';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === totalQ) {
+    msg.textContent = 'Perfeito! 💯 全レッスン完了！テストがんばれ！ Boa sorte!';
+  } else if (firstCount >= 3) {
+    msg.textContent = 'Bom! あとはテスト前にもう1回復習すればバッチリ！';
+  } else {
+    msg.textContent = '例題をもう一回読んで、「部分/全体」のルールを確認しよう！';
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer,
+      attempts: t.attempts,
+      result: t.result,
+      wrong_answers: t.wrong_answers
+    };
+  }
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_04_bubun_zentai',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+document.querySelectorAll('.practice-q input').forEach(input => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
+  });
+});
+</script>
+</body>
+</html>

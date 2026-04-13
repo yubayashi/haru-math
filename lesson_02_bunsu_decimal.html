@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 2 — 分数→小数</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; font-weight: 900; margin: 0 4px; line-height: 1.1;
+  }
+  .frac .num { border-bottom: 2.5px solid #2c3e50; padding: 0 6px 2px; }
+  .frac .den { padding: 2px 6px 0; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .bar-section { margin: 16px 0; }
+  .bar-tag {
+    display: inline-block;
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 6px;
+    padding: 2px 10px; font-size: 12px; font-weight: 700; color: #2980b9;
+    margin-bottom: 6px;
+  }
+  .bar-wrap {
+    display: flex; overflow: hidden;
+    border: 2px solid #bbb; border-radius: 4px;
+  }
+  .bar-cell {
+    flex: 1; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    border-right: 1px solid rgba(0,0,0,0.12);
+  }
+  .bar-cell:last-child { border-right: none; }
+  .bar-cell.filled { background: #3498db; color: #fff; }
+  .bar-cell.empty { background: #f0f0f0; color: #aaa; }
+  .bar-caption {
+    text-align: center; font-size: 13px; color: #777; margin-top: 6px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .step-box {
+    background: #f8f9fa; border-radius: 10px; padding: 14px 16px;
+    margin: 12px 0; border: 1px solid #e8e8e8;
+  }
+  .step-box .step-num {
+    display: inline-block; background: #3498db; color: #fff;
+    width: 24px; height: 24px; border-radius: 12px; text-align: center;
+    font-size: 13px; font-weight: 900; line-height: 24px; margin-right: 8px;
+  }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 12px 0; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    width: 130px; text-align: center; outline: none;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 2 / 4</div>
+    <h1>🔄 分数→小数の変換</h1>
+    <div class="sub">Converter frações em decimais — バーを使って「見える」ようにする</div>
+  </div>
+
+  <!-- ===== 導入: 分数=わり算 ===== -->
+  <div class="card">
+    <div class="card-title">🔑 一番大事なルール</div>
+
+    <p>分数って、実は<b>わり算</b>なんだ。</p>
+
+    <div class="equation">
+      <span class="frac"><span class="num">分子</span><span class="den">分母</span></span>
+      = 分子 ÷ 分母
+    </div>
+
+    <p>例えば <span class="frac"><span class="num">1</span><span class="den">2</span></span> は「1 ÷ 2 = <b>0.5</b>」。<br>
+    <span class="frac"><span class="num">3</span><span class="den">4</span></span> は「3 ÷ 4 = <b>0.75</b>」。</p>
+
+    <p>でも毎回わり算するのは大変だよね。<br>
+    もっとラクな方法がある。<b>分母を10か100にそろえる</b>んだ。</p>
+  </div>
+
+  <!-- ===== テクニック: 分母を10にする ===== -->
+  <div class="card">
+    <div class="card-title">📊 テクニック① 分母を10にする</div>
+
+    <p>分母が <b>2</b> か <b>5</b> なら、かけ算で<b>10</b>にできる。</p>
+
+    <div class="step-box">
+      <span class="step-num">1</span><b>分母を10にするには何をかければいい？</b><br>
+      <span style="margin-left:36px;">2 × <b>5</b> = 10 → 分子にも5をかける</span><br>
+      <span style="margin-left:36px;">5 × <b>2</b> = 10 → 分子にも2をかける</span>
+    </div>
+
+    <div class="step-box">
+      <span class="step-num">2</span><b>分母が10になったら、分子がそのまま小数！</b><br>
+      <span style="margin-left:36px;"><span class="frac"><span class="num">?</span><span class="den">10</span></span> → 0.?（分子が小数第1位）</span>
+    </div>
+
+    <p><b>やってみよう:</b></p>
+
+    <div class="equation">
+      <span class="frac"><span class="num">1</span><span class="den">2</span></span>
+      = <span class="frac"><span class="num">1 × 5</span><span class="den">2 × 5</span></span>
+      = <span class="frac"><span class="num">5</span><span class="den">10</span></span>
+      = 0.5
+    </div>
+
+    <div class="bar-section">
+      <span class="bar-tag">10マスのバー</span>
+      <div class="bar-wrap">
+        <div class="bar-cell filled">1</div>
+        <div class="bar-cell filled">2</div>
+        <div class="bar-cell filled">3</div>
+        <div class="bar-cell filled">4</div>
+        <div class="bar-cell filled">5</div>
+        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty"></div>
+      </div>
+      <div class="bar-caption">5/10 = 5マス塗った = <b>0.5</b></div>
+    </div>
+
+    <p>もう1つ。<span class="frac"><span class="num">2</span><span class="den">5</span></span> は？</p>
+
+    <div class="equation">
+      <span class="frac"><span class="num">2</span><span class="den">5</span></span>
+      = <span class="frac"><span class="num">2 × 2</span><span class="den">5 × 2</span></span>
+      = <span class="frac"><span class="num">4</span><span class="den">10</span></span>
+      = 0.4
+    </div>
+
+    <div class="bar-section">
+      <span class="bar-tag">10マスのバー</span>
+      <div class="bar-wrap">
+        <div class="bar-cell filled">1</div>
+        <div class="bar-cell filled">2</div>
+        <div class="bar-cell filled">3</div>
+        <div class="bar-cell filled">4</div>
+        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty"></div>
+        <div class="bar-cell empty"></div>
+      </div>
+      <div class="bar-caption">4/10 = 4マス塗った = <b>0.4</b></div>
+    </div>
+
+    <div class="tip">
+      <b>💡 ポイント:</b> 分母が2か5なら、すぐ10にできる。<br>
+      分母2 → ×5する。分母5 → ×2する。カンタン！
+    </div>
+  </div>
+
+  <!-- ===== テクニック: 分母を100にする ===== -->
+  <div class="card">
+    <div class="card-title">📊 テクニック② 分母を100にする</div>
+
+    <p>分母が <b>4</b>, <b>20</b>, <b>25</b>, <b>50</b> のときは、<b>100</b>にする。</p>
+
+    <div class="step-box">
+      <span class="step-num">1</span><b>分母を100にするには何をかければいい？</b><br>
+      <span style="margin-left:36px;">4 × <b>25</b> = 100</span><br>
+      <span style="margin-left:36px;">20 × <b>5</b> = 100</span><br>
+      <span style="margin-left:36px;">25 × <b>4</b> = 100</span><br>
+      <span style="margin-left:36px;">50 × <b>2</b> = 100</span>
+    </div>
+
+    <div class="step-box">
+      <span class="step-num">2</span><b>分母が100になったら…</b><br>
+      <span style="margin-left:36px;"><span class="frac"><span class="num">?</span><span class="den">100</span></span> → 0.0?（2桁なら0.??）</span><br>
+      <span style="margin-left:36px;">しかも分子がそのまま<b>%</b>にもなる！</span>
+    </div>
+
+    <p><b>やってみよう:</b></p>
+
+    <div class="equation">
+      <span class="frac"><span class="num">3</span><span class="den">4</span></span>
+      = <span class="frac"><span class="num">3 × 25</span><span class="den">4 × 25</span></span>
+      = <span class="frac"><span class="num">75</span><span class="den">100</span></span>
+      = 0.75 = 75%
+    </div>
+
+    <p>もう1つ。<span class="frac"><span class="num">3</span><span class="den">20</span></span> は？</p>
+
+    <div class="equation">
+      <span class="frac"><span class="num">3</span><span class="den">20</span></span>
+      = <span class="frac"><span class="num">3 × 5</span><span class="den">20 × 5</span></span>
+      = <span class="frac"><span class="num">15</span><span class="den">100</span></span>
+      = 0.15 = 15%
+    </div>
+
+    <div class="callout-green">
+      <b>✅ まとめ:</b><br>
+      ・分母が <b>2, 5</b> → <b>10</b> にそろえる<br>
+      ・分母が <b>4, 20, 25, 50</b> → <b>100</b> にそろえる<br>
+      ・分母が10 → 分子がそのまま小数の十の位<br>
+      ・分母が100 → 分子がそのまま%
+    </div>
+  </div>
+
+  <!-- ===== よくある間違い ===== -->
+  <div class="card">
+    <div class="card-title">⚠️ よくある間違い</div>
+
+    <div class="callout-orange">
+      <b>❌ 数字をそのまま並べちゃう</b><br>
+      <span class="frac"><span class="num">1</span><span class="den">2</span></span> → 「0.12」？ → これは<b>間違い</b>！<br>
+      <span class="frac"><span class="num">3</span><span class="den">4</span></span> → 「0.34」？ → これも<b>間違い</b>！<br><br>
+      分数は<b>わり算</b>。数字をくっつけるんじゃない。<br>
+      迷ったら「分母を10か100にする」方法を使おう。
+    </div>
+  </div>
+
+  <!-- ===== 練習 ===== -->
+  <div class="card">
+    <div class="card-title">✏️ 練習 — Prática</div>
+    <p style="margin-bottom:14px; color:#666; font-size:14px;">
+      分母を10か100にそろえて、小数に変換しよう！
+    </p>
+
+    <div class="practice-q">
+      <div class="q-num">1</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">3</span><span class="den">5</span></span> を小数（decimal）にすると？
+        <span style="color:#aaa; font-size:13px;">ヒント: 5 × ? = 10</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q1" placeholder="0.?" inputmode="decimal">
+        <button class="check-btn" onclick="check('q1',['0.6','0,6'],'3/5 → 6/10 → 0.6')">確認</button>
+      </div>
+      <div class="feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">2</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">4</span><span class="den">5</span></span> を小数（decimal）にすると？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q2" placeholder="0.?" inputmode="decimal">
+        <button class="check-btn" onclick="check('q2',['0.8','0,8'],'4/5 → 8/10 → 0.8')">確認</button>
+      </div>
+      <div class="feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">3</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">1</span><span class="den">4</span></span> を小数（decimal）にすると？
+        <span style="color:#aaa; font-size:13px;">ヒント: 4 × ? = 100</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q3" placeholder="0.??" inputmode="decimal">
+        <button class="check-btn" onclick="check('q3',['0.25','0,25'],'1/4 → 25/100 → 0.25')">確認</button>
+      </div>
+      <div class="feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">4</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">7</span><span class="den">20</span></span> を小数（decimal）にすると？
+        <span style="color:#aaa; font-size:13px;">ヒント: 20 × ? = 100</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q4" placeholder="0.??" inputmode="decimal">
+        <button class="check-btn" onclick="check('q4',['0.35','0,35'],'7/20 → 35/100 → 0.35')">確認</button>
+      </div>
+      <div class="feedback" id="q4-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">5</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">9</span><span class="den">50</span></span> を小数（decimal）にすると？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q5" placeholder="0.??" inputmode="decimal">
+        <button class="check-btn" onclick="check('q5',['0.18','0,18'],'9/50 → 18/100 → 0.18')">確認</button>
+      </div>
+      <div class="feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+  <div class="vocab" style="margin: 0 22px 16px;">
+    <div class="vocab-chip"><span class="pt">converter</span> = 変換する</div>
+    <div class="vocab-chip"><span class="pt">fração</span> = 分数</div>
+    <div class="vocab-chip"><span class="pt">decimal</span> = 小数</div>
+    <div class="vocab-chip"><span class="pt">numerador</span> = 分子</div>
+    <div class="vocab-chip"><span class="pt">denominador</span> = 分母</div>
+    <div class="vocab-chip"><span class="pt">dividir</span> = わる</div>
+  </div>
+
+  <div style="text-align:center; padding:16px; color:#aaa; font-size:12px;">
+    Lição 2 / 4 — Missão Matemática Revisão
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz8mMJIkEbLaE75FMxNIqrzrTU9kSH-6SB9q1WEw7JWe7K3XjTNLdKN1pLJfyb48MK5/exec';
+
+let tracking = {};
+let totalCorrect = 0;
+const totalQ = 5;
+let submitted = false;
+
+function check(id, accepted, explanation) {
+  if (submitted) return;
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  const val = input.value.trim().replace(/\s/g, '');
+  if (!val) return;
+
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return;
+
+  t.attempts++;
+  t.answer = val;
+
+  const ok = accepted.some(a => val.toLowerCase() === a.toLowerCase());
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+    totalCorrect++;
+    input.className = 'correct';
+    input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(val);
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ちがう。分母を10か100にしてみよう！';
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1200);
+  }
+
+  const correctIds = Object.keys(tracking).filter(k => tracking[k].correct);
+  if (correctIds.length === totalQ) {
+    showResult();
+    sendToSheet();
+  }
+}
+
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + totalQ + ' 一発正解';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === totalQ) {
+    msg.textContent = 'Perfeito! 💯 変換マスター！ 次のレッスンに進もう！';
+  } else if (firstCount >= 3) {
+    msg.textContent = 'Bom! コツがつかめてきたね！';
+  } else {
+    msg.textContent = 'テクニック①②をもう一回読んで、明日もう1回やってみよう！';
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer,
+      attempts: t.attempts,
+      result: t.result,
+      wrong_answers: t.wrong_answers
+    };
+  }
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_02_bunsu_decimal',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+document.querySelectorAll('.practice-q input').forEach(input => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
+  });
+});
+</script>
+</body>
+</html>
