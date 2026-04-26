@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 5 — 対称（Simetria de Reflexão）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #9b59b6, #3498db);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .callout-red {
+    background: #fff5f5; border-left: 4px solid #e74c3c;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-red b { color: #c0392b; }
+
+  /* 図形ギャラリー */
+  .shape-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .shape-card {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .shape-card .name { font-weight: 900; font-size: 14px; margin-bottom: 4px; color: #2c3e50; }
+  .shape-card .pt { font-size: 11px; color: #888; margin-bottom: 6px; }
+  .shape-card svg { display: block; margin: 0 auto; }
+  .shape-card .axis-count {
+    margin-top: 6px;
+    display: inline-block;
+    background: #9b59b6; color: #fff;
+    border-radius: 12px; padding: 2px 12px;
+    font-size: 13px; font-weight: 800;
+  }
+  .shape-card.zero .axis-count { background: #e74c3c; }
+  .shape-card.infinity .axis-count { background: #f39c12; }
+
+  /* 文字ギャラリー */
+  .letter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .letter-card {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 8px;
+    padding: 8px 4px;
+    text-align: center;
+  }
+  .letter-card .letter {
+    font-size: 28px; font-weight: 900; color: #2c3e50;
+    line-height: 1;
+  }
+  .letter-card .axis-info {
+    margin-top: 4px;
+    font-size: 10px; font-weight: 700;
+  }
+  .letter-card.vertical .axis-info { color: #3498db; }
+  .letter-card.horizontal .axis-info { color: #27ae60; }
+  .letter-card.both .axis-info { color: #9b59b6; }
+  .letter-card.none .axis-info { color: #e74c3c; }
+
+  /* 練習問題用 SVG ボックス */
+  .quiz-figure {
+    background: #fff; border-radius: 8px; padding: 8px;
+    text-align: center; margin: 8px 0;
+  }
+  .quiz-figure svg { display: block; margin: 0 auto; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #f3eaff; border: 1px solid #d4baf2; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #8e44ad; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 12px 0; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #9b59b6; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    width: 130px; text-align: center; outline: none;
+  }
+  .answer-row input:focus { border-color: #9b59b6; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #9b59b6; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #8e44ad; }
+
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+  .choice-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50;
+    border: 2px solid #ddd; border-radius: 8px;
+    padding: 10px 16px; font-size: 15px; font-weight: 700; cursor: pointer;
+    flex: 1; min-width: 80px;
+  }
+  .choice-btn:hover { border-color: #9b59b6; }
+  .choice-btn.selected { border-color: #9b59b6; background: #f3eaff; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .choice-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+
+  .result-box {
+    text-align: center; padding: 20px; background: #f3eaff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* 対称軸の点線スタイル */
+  .axis-line { stroke: #e74c3c; stroke-width: 1.5; stroke-dasharray: 4 3; }
+  .axis-line-strong { stroke: #e74c3c; stroke-width: 2; stroke-dasharray: 5 3; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 5 / 5</div>
+    <h1>🦋 対称（Simetria de Reflexão）</h1>
+    <div class="sub">ぴったり重なる図形 — 対称軸（eixo de simetria）を見つけよう</div>
+  </div>
+
+  <!-- ===== 導入 ===== -->
+  <div class="card">
+    <div class="card-title">📐 まずルールを確認</div>
+
+    <p><b>対称（Simetria）</b>とは…<br>
+    紙を折って半分にした時、<b>左右（または上下）がぴったり重なる</b>こと。</p>
+
+    <p>その<b>折り目の線</b>のことを<br>
+    <b>対称軸（Eixo de simetria）</b>と言う。</p>
+
+    <div class="equation">
+      🦋 ぴったり重なる = Simétrica<br>
+      ❌ 重ならない = Não simétrica
+    </div>
+
+    <div class="tip">
+      <b>💡 イメージで覚える:</b><br>
+      ・蝶（borboleta）の羽 → 真ん中で折ったら左右ぴったり 🦋<br>
+      ・人の顔 → 鼻のラインで折ったら左右ほぼ同じ 👤<br>
+      ・ハート ❤️ → 真ん中で折ったらぴったり<br>
+      ぜんぶ「対称（simétrico）」だよ。
+    </div>
+
+    <div class="callout-green">
+      <b>🪞 もう1つの見方:</b><br>
+      対称軸 = 鏡（espelho）を置く線。<br>
+      鏡に映した形と元の形が同じだったら「対称」！
+    </div>
+  </div>
+
+  <!-- ===== 図形の対称軸 ===== -->
+  <div class="card">
+    <div class="card-title">🔷 図形ごとの対称軸を見てみよう</div>
+
+    <p>図形によって、対称軸の<b>本数が違う</b>。点線（赤）が対称軸だよ。</p>
+
+    <div class="shape-grid">
+
+      <!-- 正方形: 4本 -->
+      <div class="shape-card">
+        <div class="name">正方形</div>
+        <div class="pt">Quadrado</div>
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <rect x="15" y="15" width="50" height="50" fill="#aed6f1" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="40" y1="5" x2="40" y2="75" class="axis-line"/>
+          <line x1="5" y1="40" x2="75" y2="40" class="axis-line"/>
+          <line x1="10" y1="10" x2="70" y2="70" class="axis-line"/>
+          <line x1="70" y1="10" x2="10" y2="70" class="axis-line"/>
+        </svg>
+        <div class="axis-count">4本</div>
+      </div>
+
+      <!-- 長方形: 2本 -->
+      <div class="shape-card">
+        <div class="name">長方形</div>
+        <div class="pt">Retângulo</div>
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <rect x="8" y="22" width="64" height="36" fill="#aed6f1" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="40" y1="12" x2="40" y2="68" class="axis-line"/>
+          <line x1="2" y1="40" x2="78" y2="40" class="axis-line"/>
+        </svg>
+        <div class="axis-count">2本</div>
+      </div>
+
+      <!-- 正三角形: 3本 -->
+      <div class="shape-card">
+        <div class="name">正三角形</div>
+        <div class="pt">Triângulo equilátero</div>
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <polygon points="40,12 12,62 68,62" fill="#a9dfbf" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="40" y1="5" x2="40" y2="68" class="axis-line"/>
+          <line x1="14" y1="20" x2="62" y2="58" class="axis-line"/>
+          <line x1="66" y1="20" x2="18" y2="58" class="axis-line"/>
+        </svg>
+        <div class="axis-count">3本</div>
+      </div>
+
+      <!-- 円: 無限 -->
+      <div class="shape-card infinity">
+        <div class="name">円</div>
+        <div class="pt">Círculo</div>
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="28" fill="#fad7a0" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="40" y1="6" x2="40" y2="74" class="axis-line"/>
+          <line x1="6" y1="40" x2="74" y2="40" class="axis-line"/>
+          <line x1="16" y1="16" x2="64" y2="64" class="axis-line"/>
+          <line x1="64" y1="16" x2="16" y2="64" class="axis-line"/>
+        </svg>
+        <div class="axis-count">無限 (∞)</div>
+      </div>
+
+      <!-- 正五角形: 5本 -->
+      <div class="shape-card">
+        <div class="name">正五角形</div>
+        <div class="pt">Pentágono regular</div>
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <polygon points="40,10 68,30 58,64 22,64 12,30" fill="#d2b4de" stroke="#2c3e50" stroke-width="2"/>
+          <line x1="40" y1="5" x2="40" y2="70" class="axis-line"/>
+          <line x1="12" y1="30" x2="62" y2="64" class="axis-line"/>
+          <line x1="68" y1="30" x2="18" y2="64" class="axis-line"/>
+          <line x1="22" y1="64" x2="60" y2="22" class="axis-line"/>
+          <line x1="58" y1="64" x2="20" y2="22" class="axis-line"/>
+        </svg>
+        <div class="axis-count">5本</div>
+      </div>
+
+      <!-- 平行四辺形: 0本 -->
+      <div class="shape-card zero">
+        <div class="name">平行四辺形</div>
+        <div class="pt">Paralelogramo</div>
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <polygon points="20,22 70,22 60,58 10,58" fill="#f5b7b1" stroke="#2c3e50" stroke-width="2"/>
+        </svg>
+        <div class="axis-count">0本！</div>
+      </div>
+
+    </div>
+
+    <div class="callout-green">
+      <b>✨ 法則:</b><br>
+      ・「正○角形」は辺の数だけ対称軸がある（正三角形→3、正方形→4、正五角形→5、正六角形→6…）<br>
+      ・円は<b>どこで折ってもぴったり</b>だから、対称軸が無限（infinitos）にある<br>
+      ・長方形は <b>縦と横の2本だけ</b>（斜めに折ったら重ならない！）
+    </div>
+  </div>
+
+  <!-- ===== よくある間違い ===== -->
+  <div class="card">
+    <div class="card-title">⚠️ よくある間違い 3つ</div>
+
+    <div class="callout-red">
+      <b>❌ ワナ① 平行四辺形は対角線で半分にできるから対称？</b><br>
+      → <b>NO!</b> 半分にはなるけど<b>ぴったり重ならない</b>。<br>
+      対称軸は<b>0本</b>。
+    </div>
+
+    <div class="callout-red">
+      <b>❌ ワナ② 長方形の対角線は対称軸？</b><br>
+      → <b>NO!</b> 折ってみると三角形がズレる。<br>
+      長方形は <b>縦と横の2本だけ</b>。
+    </div>
+
+    <div class="callout-red">
+      <b>❌ ワナ③ 円の対称軸は1本？</b><br>
+      → <b>NO!</b> 円はどこで折ってもぴったり重なる。<br>
+      対称軸は<b>無限（infinitos）</b>。
+    </div>
+
+    <div class="tip">
+      <b>💡 確かめ方:</b><br>
+      迷ったら頭の中で<b>紙を折ってみる</b>。<br>
+      ぴったり重なる？ → 対称軸 ⭕<br>
+      少しでもズレる？ → 対称軸じゃない ❌
+    </div>
+  </div>
+
+  <!-- ===== アルファベットの対称 ===== -->
+  <div class="card">
+    <div class="card-title">🔤 アルファベットの対称</div>
+
+    <p>アルファベットも対称軸を持つものと、持たないものがあるよ。</p>
+
+    <p style="font-size:13px; color:#888; margin-top:10px;"><b>🟦 縦の対称軸（vertical）</b></p>
+    <div class="letter-grid">
+      <div class="letter-card vertical"><div class="letter">A</div><div class="axis-info">↕ 1本</div></div>
+      <div class="letter-card vertical"><div class="letter">M</div><div class="axis-info">↕ 1本</div></div>
+      <div class="letter-card vertical"><div class="letter">T</div><div class="axis-info">↕ 1本</div></div>
+      <div class="letter-card vertical"><div class="letter">V</div><div class="axis-info">↕ 1本</div></div>
+      <div class="letter-card vertical"><div class="letter">W</div><div class="axis-info">↕ 1本</div></div>
+      <div class="letter-card vertical"><div class="letter">Y</div><div class="axis-info">↕ 1本</div></div>
+      <div class="letter-card vertical"><div class="letter">U</div><div class="axis-info">↕ 1本</div></div>
+      <div class="letter-card vertical"><div class="letter">A</div><div class="axis-info">↕ 1本</div></div>
+    </div>
+
+    <p style="font-size:13px; color:#888; margin-top:10px;"><b>🟩 横の対称軸（horizontal）</b></p>
+    <div class="letter-grid">
+      <div class="letter-card horizontal"><div class="letter">B</div><div class="axis-info">↔ 1本</div></div>
+      <div class="letter-card horizontal"><div class="letter">C</div><div class="axis-info">↔ 1本</div></div>
+      <div class="letter-card horizontal"><div class="letter">D</div><div class="axis-info">↔ 1本</div></div>
+      <div class="letter-card horizontal"><div class="letter">E</div><div class="axis-info">↔ 1本</div></div>
+    </div>
+
+    <p style="font-size:13px; color:#888; margin-top:10px;"><b>🟪 両方ある（vertical + horizontal）</b></p>
+    <div class="letter-grid">
+      <div class="letter-card both"><div class="letter">H</div><div class="axis-info">↕↔ 2本</div></div>
+      <div class="letter-card both"><div class="letter">I</div><div class="axis-info">↕↔ 2本</div></div>
+      <div class="letter-card both"><div class="letter">O</div><div class="axis-info">↕↔ 2本</div></div>
+      <div class="letter-card both"><div class="letter">X</div><div class="axis-info">↕↔ 2本</div></div>
+    </div>
+
+    <p style="font-size:13px; color:#888; margin-top:10px;"><b>🟥 対称軸なし（não simétrica）</b></p>
+    <div class="letter-grid">
+      <div class="letter-card none"><div class="letter">F</div><div class="axis-info">なし</div></div>
+      <div class="letter-card none"><div class="letter">G</div><div class="axis-info">なし</div></div>
+      <div class="letter-card none"><div class="letter">P</div><div class="axis-info">なし</div></div>
+      <div class="letter-card none"><div class="letter">R</div><div class="axis-info">なし</div></div>
+      <div class="letter-card none"><div class="letter">S</div><div class="axis-info">なし</div></div>
+      <div class="letter-card none"><div class="letter">N</div><div class="axis-info">なし</div></div>
+      <div class="letter-card none"><div class="letter">Z</div><div class="axis-info">なし</div></div>
+      <div class="letter-card none"><div class="letter">Q</div><div class="axis-info">なし</div></div>
+    </div>
+
+    <div class="tip">
+      <b>💡 ポルトガル語のテストでよく出る:</b><br>
+      "Quantos eixos de simetria tem a letra ___?"<br>
+      （○○の文字には対称軸が何本ありますか？）<br>
+      → H・I・O・X = 2本、A・M・T・V・B・C・D・E = 1本、F・G・P・R・S = 0本
+    </div>
+  </div>
+
+  <!-- ===== テストでの書き方 ===== -->
+  <div class="card">
+    <div class="card-title">✍️ テストでの書き方（Explica como pensaste）</div>
+
+    <div class="callout-green">
+      <b>例: 「正方形には対称軸が何本ありますか？」</b><br><br>
+      "O quadrado tem <b>4 eixos de simetria</b>:<br>
+      2 eixos pelas diagonais e 2 eixos pelos meios dos lados."<br><br>
+      <span style="font-size:13px; color:#666;">
+      （正方形には対称軸が4本ある: 対角線で2本と、辺の真ん中を通る2本）
+      </span>
+    </div>
+
+    <div class="callout-green">
+      <b>例: 「平行四辺形は対称ですか？」</b><br><br>
+      "O paralelogramo <b>não tem eixos de simetria</b>.<br>
+      Quando dobramos, as partes não coincidem."<br><br>
+      <span style="font-size:13px; color:#666;">
+      （平行四辺形には対称軸がない。折っても部分がぴったり重ならないから）
+      </span>
+    </div>
+
+    <p style="margin-top:14px; font-size:13px; color:#666;">
+    <b>キーワード:</b> tem / não tem eixos de simetria（対称軸がある／ない）、coincidem（重なる）、dobrar（折る）
+    </p>
+  </div>
+
+  <!-- ===== 練習 ===== -->
+  <div class="card">
+    <div class="card-title">✏️ 練習 — Prática</div>
+    <p style="margin-bottom:14px; color:#666; font-size:14px;">
+      対称軸の本数を答えよう！（数字だけでOK。例: 4）
+    </p>
+
+    <!-- Q1: 正方形 -->
+    <div class="practice-q">
+      <div class="q-num">1</div>
+      <div class="q-text">
+        <b>正方形（quadrado）</b>には対称軸が何本ありますか？
+        <div class="quiz-figure">
+          <svg width="70" height="70" viewBox="0 0 80 80">
+            <rect x="15" y="15" width="50" height="50" fill="#aed6f1" stroke="#2c3e50" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q1" placeholder="?" inputmode="numeric">
+        <button class="check-btn" onclick="check('q1',['4','4本','4 eixos'],'正方形は4本！縦・横・対角線2本で合計4本だよ。')">確認</button>
+      </div>
+      <div class="feedback" id="q1-fb"></div>
+    </div>
+
+    <!-- Q2: 長方形 -->
+    <div class="practice-q">
+      <div class="q-num">2</div>
+      <div class="q-text">
+        <b>長方形（retângulo）</b>には対称軸が何本ありますか？
+        <div class="quiz-figure">
+          <svg width="80" height="50" viewBox="0 0 100 50">
+            <rect x="10" y="10" width="80" height="30" fill="#aed6f1" stroke="#2c3e50" stroke-width="2"/>
+          </svg>
+        </div>
+        <span style="color:#aaa; font-size:13px;">⚠ 対角線は対称軸じゃないよ！</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q2" placeholder="?" inputmode="numeric">
+        <button class="check-btn" onclick="check('q2',['2','2本','2 eixos'],'長方形は2本だけ！縦と横。対角線で折ったらズレるからダメ。')">確認</button>
+      </div>
+      <div class="feedback" id="q2-fb"></div>
+    </div>
+
+    <!-- Q3: アルファベット H -->
+    <div class="practice-q">
+      <div class="q-num">3</div>
+      <div class="q-text">
+        アルファベットの <b>「H」</b> には対称軸が何本ありますか？
+        <div class="quiz-figure" style="font-size:48px; font-weight:900; color:#2c3e50; padding:8px;">H</div>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q3" placeholder="?" inputmode="numeric">
+        <button class="check-btn" onclick="check('q3',['2','2本'],'H は2本！縦に折っても横に折ってもぴったり重なる。')">確認</button>
+      </div>
+      <div class="feedback" id="q3-fb"></div>
+    </div>
+
+    <!-- Q4: 正三角形 -->
+    <div class="practice-q">
+      <div class="q-num">4</div>
+      <div class="q-text">
+        <b>正三角形（triângulo equilátero）</b>には対称軸が何本ありますか？
+        <div class="quiz-figure">
+          <svg width="70" height="65" viewBox="0 0 80 70">
+            <polygon points="40,8 10,62 70,62" fill="#a9dfbf" stroke="#2c3e50" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q4" placeholder="?" inputmode="numeric">
+        <button class="check-btn" onclick="check('q4',['3','3本','3 eixos'],'正三角形は3本！3つの頂点それぞれから反対の辺の真ん中に向かって。')">確認</button>
+      </div>
+      <div class="feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- Q5: 平行四辺形（罠問題） -->
+    <div class="practice-q">
+      <div class="q-num">5</div>
+      <div class="q-text">
+        <b>平行四辺形（paralelogramo）</b>には対称軸が何本ありますか？
+        <div class="quiz-figure">
+          <svg width="90" height="55" viewBox="0 0 100 60">
+            <polygon points="20,12 90,12 80,48 10,48" fill="#f5b7b1" stroke="#2c3e50" stroke-width="2"/>
+          </svg>
+        </div>
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: 折ってみて、ぴったり重なる線はある？</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q5" placeholder="?" inputmode="numeric">
+        <button class="check-btn" onclick="check('q5',['0','0本','なし','não tem'],'正解！平行四辺形は対称軸が0本（ない）！対角線で折ってもズレるから。')">確認</button>
+      </div>
+      <div class="feedback" id="q5-fb"></div>
+    </div>
+
+    <!-- Q6: 円 -->
+    <div class="practice-q">
+      <div class="q-num">6</div>
+      <div class="q-text">
+        <b>円（círculo）</b>には対称軸が何本ありますか？
+        <div class="quiz-figure">
+          <svg width="60" height="60" viewBox="0 0 70 70">
+            <circle cx="35" cy="35" r="28" fill="#fad7a0" stroke="#2c3e50" stroke-width="2"/>
+          </svg>
+        </div>
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: どこで折ってもぴったり重なるよ</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q6" placeholder="?" inputmode="text">
+        <button class="check-btn" onclick="check('q6',['無限','infinitos','infinito','無数','∞','たくさん'],'正解！円は無限（infinitos）の対称軸を持つ。中心を通るどんな線でもOK！')">確認</button>
+      </div>
+      <div class="feedback" id="q6-fb"></div>
+    </div>
+
+    <!-- Q7: 文字「F」-->
+    <div class="practice-q">
+      <div class="q-num">7</div>
+      <div class="q-text">
+        アルファベットの <b>「F」</b> には対称軸が何本ありますか？
+        <div class="quiz-figure" style="font-size:48px; font-weight:900; color:#2c3e50; padding:8px;">F</div>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q7" placeholder="?" inputmode="text">
+        <button class="check-btn" onclick="check('q7',['0','0本','なし','não tem'],'正解！F は対称軸なし。縦でも横でも折るとズレる。')">確認</button>
+      </div>
+      <div class="feedback" id="q7-fb"></div>
+    </div>
+
+    <!-- Q8: 「次のうち対称な図形はどれ？」 -->
+    <div class="practice-q">
+      <div class="q-num">8</div>
+      <div class="q-text">
+        次のうち <b>対称な（simétrica）</b> 図形はどれ？
+      </div>
+      <div class="choice-row">
+        <button class="choice-btn" data-choice="A" onclick="checkChoice('q8','B','A',this)">
+          <div style="font-size:32px;">F</div><div style="font-size:11px;">A. 文字F</div>
+        </button>
+        <button class="choice-btn" data-choice="B" onclick="checkChoice('q8','B','B',this)">
+          <div style="font-size:32px;">❤</div><div style="font-size:11px;">B. ハート</div>
+        </button>
+        <button class="choice-btn" data-choice="C" onclick="checkChoice('q8','B','C',this)">
+          <div style="font-size:32px;">S</div><div style="font-size:11px;">C. 文字S</div>
+        </button>
+        <button class="choice-btn" data-choice="D" onclick="checkChoice('q8','B','D',this)">
+          <div style="font-size:24px;">▰</div><div style="font-size:11px;">D. 平行四辺形</div>
+        </button>
+      </div>
+      <div class="feedback" id="q8-fb"></div>
+    </div>
+
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+  <div class="vocab" style="margin: 0 22px 16px;">
+    <div class="vocab-chip"><span class="pt">simetria</span> = 対称</div>
+    <div class="vocab-chip"><span class="pt">simétrica / simétrico</span> = 対称な</div>
+    <div class="vocab-chip"><span class="pt">eixo de simetria</span> = 対称軸</div>
+    <div class="vocab-chip"><span class="pt">reflexão</span> = 反射・鏡映</div>
+    <div class="vocab-chip"><span class="pt">dobrar</span> = 折る</div>
+    <div class="vocab-chip"><span class="pt">coincidir</span> = ぴったり重なる</div>
+    <div class="vocab-chip"><span class="pt">infinitos</span> = 無限</div>
+    <div class="vocab-chip"><span class="pt">quadrado</span> = 正方形</div>
+    <div class="vocab-chip"><span class="pt">retângulo</span> = 長方形</div>
+    <div class="vocab-chip"><span class="pt">círculo</span> = 円</div>
+    <div class="vocab-chip"><span class="pt">triângulo equilátero</span> = 正三角形</div>
+    <div class="vocab-chip"><span class="pt">paralelogramo</span> = 平行四辺形</div>
+  </div>
+
+  <div style="text-align:center; padding:16px; color:#aaa; font-size:12px;">
+    Lição 5 / 5 — Simetria de Reflexão 🦋 Boa sorte no teste!
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz8mMJIkEbLaE75FMxNIqrzrTU9kSH-6SB9q1WEw7JWe7K3XjTNLdKN1pLJfyb48MK5/exec';
+
+let tracking = {};
+let totalCorrect = 0;
+const totalQ = 8;
+let submitted = false;
+
+function check(id, accepted, explanation) {
+  if (submitted) return;
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  const val = input.value.trim().replace(/\s/g, '');
+  if (!val) return;
+
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return;
+
+  t.attempts++;
+  t.answer = val;
+
+  const ok = accepted.some(a => val.toLowerCase() === a.toLowerCase());
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+    totalCorrect++;
+    input.className = 'correct';
+    input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(val);
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ちがう。頭の中で「紙を折ったら重なるか？」を考えてみて！';
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1400);
+  }
+
+  checkComplete();
+}
+
+function checkChoice(id, correct, picked, btn) {
+  if (submitted) return;
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return;
+
+  t.attempts++;
+  t.answer = picked;
+  const fb = document.getElementById(id + '-fb');
+  const allBtns = btn.parentElement.querySelectorAll('.choice-btn');
+
+  if (picked === correct) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+    totalCorrect++;
+    btn.classList.add('correct');
+    allBtns.forEach(b => b.disabled = true);
+    fb.className = 'feedback correct';
+    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + 'ハートは真ん中で折ったらぴったり重なる！対称軸1本。F・S は対称軸なし、平行四辺形も0本。';
+    checkComplete();
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(picked);
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    fb.className = 'feedback wrong';
+    let hint = '';
+    if (picked === 'A') hint = 'F は折ってもズレるよ。もう一度。';
+    else if (picked === 'C') hint = 'S は回転させると同じだけど、折ってもぴったりにはならない（回転対称はあるけど、線対称じゃない）。';
+    else if (picked === 'D') hint = '平行四辺形はワナ問題！対角線で折ってもズレるよ。';
+    fb.textContent = '❌ ちがう。' + hint;
+  }
+}
+
+function checkComplete() {
+  const correctIds = Object.keys(tracking).filter(k => tracking[k].correct);
+  if (correctIds.length === totalQ) {
+    showResult();
+    sendToSheet();
+  }
+}
+
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + totalQ + ' 一発正解';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === totalQ) {
+    msg.textContent = 'Perfeito! 💯 Simetria マスター！テストもバッチリ！';
+  } else if (firstCount >= 6) {
+    msg.textContent = 'Muito bom! あと少しでマスター！平行四辺形・円・F文字の3つを復習しよう。';
+  } else if (firstCount >= 4) {
+    msg.textContent = 'Bom! ワナ問題（平行四辺形・対角線）にもう一度注意して見直そう。';
+  } else {
+    msg.textContent = '紙を折るイメージをもう一度復習しよう！「ぴったり重なる線」が対称軸だよ。';
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer,
+      attempts: t.attempts,
+      result: t.result,
+      wrong_answers: t.wrong_answers
+    };
+  }
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_05_simetria',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+document.querySelectorAll('.practice-q input').forEach(input => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
+  });
+});
+</script>
+</body>
+</html>
