@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 6 — 分数⇔小数⇔割合 (Frações, Decimais, Percentagens)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #e67e22, #f1c40f);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; font-weight: 900; margin: 0 4px; line-height: 1.1;
+  }
+  .frac .num { border-bottom: 2.5px solid #2c3e50; padding: 0 6px 2px; }
+  .frac .den { padding: 2px 6px 0; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #fff8e8; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .callout-red {
+    background: #fff5f5; border-left: 4px solid #e74c3c;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-red b { color: #c0392b; }
+
+  /* 3つの表現を並べる三角ダイアグラム */
+  .triangle-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .tri-box {
+    text-align: center; padding: 14px 8px;
+    border-radius: 12px; font-weight: 900;
+  }
+  .tri-box .label { font-size: 11px; font-weight: 700; opacity: 0.85; }
+  .tri-box .pt { font-size: 10px; font-weight: 600; opacity: 0.7; }
+  .tri-box .val { font-size: 22px; margin-top: 4px; }
+  .tri-frac { background: #e8f4fc; color: #2980b9; }
+  .tri-dec { background: #fdf2e9; color: #d35400; }
+  .tri-perc { background: #f9ebea; color: #c0392b; }
+
+  /* 帯グラフ */
+  .bar-section { margin: 16px 0; }
+  .bar-tag {
+    display: inline-block;
+    background: #fff8e8; border: 1px solid #f9e4a6; border-radius: 6px;
+    padding: 2px 10px; font-size: 12px; font-weight: 700; color: #d35400;
+    margin-bottom: 6px;
+  }
+  .bar-wrap {
+    display: flex; overflow: hidden;
+    border: 2px solid #bbb; border-radius: 4px;
+  }
+  .bar-cell {
+    flex: 1; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+    border-right: 1px solid rgba(0,0,0,0.12);
+  }
+  .bar-cell:last-child { border-right: none; }
+  .bar-cell.filled { background: #e67e22; color: #fff; }
+  .bar-cell.empty { background: #f0f0f0; color: #aaa; }
+  .bar-caption {
+    text-align: center; font-size: 13px; color: #777; margin-top: 6px;
+  }
+
+  /* 変換パターン表 */
+  .pattern-table {
+    width: 100%; border-collapse: collapse;
+    margin: 12px 0; font-size: 14px;
+  }
+  .pattern-table th, .pattern-table td {
+    border: 1px solid #e0e0e0; padding: 8px 6px;
+    text-align: center;
+  }
+  .pattern-table th {
+    background: #fff8e8; color: #d35400; font-weight: 900;
+    font-size: 12px;
+  }
+  .pattern-table td.frac-cell { background: #fcfdfe; font-weight: 900; color: #2980b9; }
+  .pattern-table td.dec-cell { background: #fffaf3; font-weight: 900; color: #d35400; }
+  .pattern-table td.perc-cell { background: #fef6f6; font-weight: 900; color: #c0392b; }
+
+  /* 練習問題 */
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 12px 0; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #e67e22; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row .prefix, .answer-row .suffix {
+    font-size: 18px; font-weight: 900; color: #555;
+  }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    width: 110px; text-align: center; outline: none;
+  }
+  .answer-row input:focus { border-color: #e67e22; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #e67e22; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #d35400; }
+
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 22px; }
+  .vocab-chip {
+    background: #fff8e8; border: 1px solid #f9e4a6; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #d35400; }
+
+  .result-box {
+    text-align: center; padding: 20px; background: #fff8e8;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  .calc-step {
+    font-family: 'Nunito', sans-serif;
+    background: #f8f9fa; border-radius: 8px; padding: 10px 14px;
+    margin: 8px 0; font-size: 14px; line-height: 1.8;
+  }
+  .calc-step .arrow { color: #e67e22; font-weight: 900; margin: 0 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 6</div>
+    <h1>🍕 分数⇔小数⇔割合(%)</h1>
+    <div class="sub">3つの書き方は<b>同じ大きさ</b> — 行き来できるようになろう</div>
+  </div>
+
+  <!-- ===== 導入 ===== -->
+  <div class="card">
+    <div class="card-title">🎯 まず大事なこと</div>
+
+    <p>同じ「半分」を表すのに、書き方は <b>3つ</b>ある。</p>
+
+    <div class="triangle-wrap">
+      <div class="tri-box tri-frac">
+        <div class="label">分数</div>
+        <div class="pt">fração</div>
+        <div class="val">
+          <span class="frac"><span class="num">1</span><span class="den">2</span></span>
+        </div>
+      </div>
+      <div class="tri-box tri-dec">
+        <div class="label">小数</div>
+        <div class="pt">decimal</div>
+        <div class="val">0.5</div>
+      </div>
+      <div class="tri-box tri-perc">
+        <div class="label">割合</div>
+        <div class="pt">percentagem</div>
+        <div class="val">50%</div>
+      </div>
+    </div>
+
+    <div class="bar-section">
+      <div class="bar-tag">🍫 板チョコで見ると</div>
+      <div class="bar-wrap">
+        <div class="bar-cell filled">1</div>
+        <div class="bar-cell filled">2</div>
+        <div class="bar-cell filled">3</div>
+        <div class="bar-cell filled">4</div>
+        <div class="bar-cell filled">5</div>
+        <div class="bar-cell empty">6</div>
+        <div class="bar-cell empty">7</div>
+        <div class="bar-cell empty">8</div>
+        <div class="bar-cell empty">9</div>
+        <div class="bar-cell empty">10</div>
+      </div>
+      <div class="bar-caption">10コの板チョコのうち5コ食べた = <b>1/2 = 0.5 = 50%</b></div>
+    </div>
+
+    <div class="equation">
+      <span class="frac"><span class="num">1</span><span class="den">2</span></span>
+      = 0.5 = 50%
+    </div>
+
+    <div class="tip">
+      <b>💡 ポイント:</b><br>
+      ぜんぶ「<b>半分</b>」のこと。<b>書き方が違うだけ</b>で大きさは同じ。<br>
+      テストでは「これを%にしなさい」「これを小数にしなさい」と聞かれるよ。
+    </div>
+  </div>
+
+  <!-- ===== 変換ルール ===== -->
+  <div class="card">
+    <div class="card-title">⚙️ 3つの変換ルール</div>
+
+    <div class="callout-orange">
+      <b>① 分数 → 小数</b> （fração → decimal）<br>
+      <b>分子 ÷ 分母</b> をする。<br>
+      例: <span class="frac"><span class="num">3</span><span class="den">4</span></span>
+      → 3 ÷ 4 = <b>0.75</b>
+    </div>
+
+    <div class="callout-orange">
+      <b>② 小数 → 割合(%)</b> （decimal → percentagem）<br>
+      <b>×100</b> する（小数点を右に2つズラす）。<br>
+      例: 0.75 × 100 = <b>75%</b><br>
+      例: 0.4 × 100 = <b>40%</b>
+    </div>
+
+    <div class="callout-orange">
+      <b>③ 割合(%) → 小数</b> （percentagem → decimal）<br>
+      <b>÷100</b> する（小数点を左に2つズラす）。<br>
+      例: 35% ÷ 100 = <b>0.35</b><br>
+      例: 7% ÷ 100 = <b>0.07</b>
+    </div>
+
+    <div class="callout-green">
+      <b>✨ つまり…</b><br>
+      <b>分数 → 小数 → %</b> の順で進む。<br>
+      「分子÷分母」して、それを「×100」したら%になる！
+    </div>
+  </div>
+
+  <!-- ===== 暗記パターン ===== -->
+  <div class="card">
+    <div class="card-title">📘 これだけ覚えたら超ラク（暗記表）</div>
+
+    <p>テストでよく出る基本パターン。<b>頭に入れちゃえば一瞬で答えられる</b>よ。</p>
+
+    <table class="pattern-table">
+      <tr>
+        <th>分数 (fração)</th>
+        <th>小数 (decimal)</th>
+        <th>割合 (%)</th>
+      </tr>
+      <tr>
+        <td class="frac-cell">1/2</td>
+        <td class="dec-cell">0.5</td>
+        <td class="perc-cell">50%</td>
+      </tr>
+      <tr>
+        <td class="frac-cell">1/4</td>
+        <td class="dec-cell">0.25</td>
+        <td class="perc-cell">25%</td>
+      </tr>
+      <tr>
+        <td class="frac-cell">3/4</td>
+        <td class="dec-cell">0.75</td>
+        <td class="perc-cell">75%</td>
+      </tr>
+      <tr>
+        <td class="frac-cell">1/5</td>
+        <td class="dec-cell">0.2</td>
+        <td class="perc-cell">20%</td>
+      </tr>
+      <tr>
+        <td class="frac-cell">2/5</td>
+        <td class="dec-cell">0.4</td>
+        <td class="perc-cell">40%</td>
+      </tr>
+      <tr>
+        <td class="frac-cell">3/5</td>
+        <td class="dec-cell">0.6</td>
+        <td class="perc-cell">60%</td>
+      </tr>
+      <tr>
+        <td class="frac-cell">4/5</td>
+        <td class="dec-cell">0.8</td>
+        <td class="perc-cell">80%</td>
+      </tr>
+      <tr>
+        <td class="frac-cell">1/10</td>
+        <td class="dec-cell">0.1</td>
+        <td class="perc-cell">10%</td>
+      </tr>
+      <tr>
+        <td class="frac-cell">1/1 (全部)</td>
+        <td class="dec-cell">1</td>
+        <td class="perc-cell">100%</td>
+      </tr>
+    </table>
+
+    <div class="tip">
+      <b>💡 覚え方のコツ:</b><br>
+      ・分母が <b>10</b> → 分子をそのまま %（3/10 = 30%）<br>
+      ・分母が <b>5</b> → 分子を <b>×20</b> すると %（2/5 = 2×20 = 40%）<br>
+      ・分母が <b>4</b> → 分子を <b>×25</b> すると %（3/4 = 3×25 = 75%）<br>
+      ・分母が <b>2</b> → 分子を <b>×50</b> すると %（1/2 = 50%）
+    </div>
+  </div>
+
+  <!-- ===== 大きい数字の分数 ===== -->
+  <div class="card">
+    <div class="card-title">🔢 大きい数の分数を%にする（学校で出るやつ）</div>
+
+    <p>分母が <b>20、25、50</b> の時のやり方。</p>
+
+    <div class="callout-orange">
+      <b>例題①: <span class="frac"><span class="num">13</span><span class="den">25</span></span> を%にしなさい</b>
+      <div class="calc-step">
+        分母を100にしたい <span class="arrow">→</span> 25 × <b>4</b> = 100<br>
+        だから分子も ×4 <span class="arrow">→</span> 13 × 4 = <b>52</b><br>
+        答え: <span class="frac"><span class="num">52</span><span class="den">100</span></span> = <b>52%</b>
+      </div>
+    </div>
+
+    <div class="callout-orange">
+      <b>例題②: <span class="frac"><span class="num">9</span><span class="den">20</span></span> を%にしなさい</b>
+      <div class="calc-step">
+        分母を100にしたい <span class="arrow">→</span> 20 × <b>5</b> = 100<br>
+        だから分子も ×5 <span class="arrow">→</span> 9 × 5 = <b>45</b><br>
+        答え: <span class="frac"><span class="num">45</span><span class="den">100</span></span> = <b>45%</b>
+      </div>
+    </div>
+
+    <div class="callout-orange">
+      <b>例題③: <span class="frac"><span class="num">7</span><span class="den">50</span></span> を%にしなさい</b>
+      <div class="calc-step">
+        分母を100にしたい <span class="arrow">→</span> 50 × <b>2</b> = 100<br>
+        だから分子も ×2 <span class="arrow">→</span> 7 × 2 = <b>14</b><br>
+        答え: <span class="frac"><span class="num">14</span><span class="den">100</span></span> = <b>14%</b>
+      </div>
+    </div>
+
+    <div class="callout-green">
+      <b>✨ 必殺技:</b><br>
+      <b>「分母を 100 にできるか？」</b>を考える。<br>
+      分母を×何で100になるか分かれば、分子も同じ数で×すれば、もう%！<br>
+      （これが「<b>同じ数を分子と分母にかけても大きさは変わらない</b>」ってルール）
+    </div>
+  </div>
+
+  <!-- ===== ワナ ===== -->
+  <div class="card">
+    <div class="card-title">⚠️ よくある間違い</div>
+
+    <div class="callout-red">
+      <b>❌ ワナ① 0.5 を 5% と書いちゃう</b><br>
+      → ちがう！ 0.5 × <b>100</b> = <b>50%</b><br>
+      小数を%にするときは <b>×100</b>（小数点を右に <b>2つ</b> ズラす）。
+    </div>
+
+    <div class="callout-red">
+      <b>❌ ワナ② 0.05 を 5% にせず 50% にしちゃう</b><br>
+      → 0.05 × 100 = <b>5%</b>（0が大事！）<br>
+      0.05 と 0.5 は10倍違う、別の数だよ。
+    </div>
+
+    <div class="callout-red">
+      <b>❌ ワナ③ 3/4 = 34% と書いちゃう</b><br>
+      → ちがう！ 分子と分母をそのまま並べたら%にはならない。<br>
+      3 ÷ 4 = 0.75 → ×100 = <b>75%</b>
+    </div>
+
+    <div class="tip">
+      <b>💡 困った時の流れ:</b><br>
+      <b>分数</b> →（分子÷分母）→ <b>小数</b> →（×100）→ <b>%</b><br>
+      この順番に進めば必ず答えが出る。
+    </div>
+  </div>
+
+  <!-- ===== 応用①: 全体の○%を求める ===== -->
+  <div class="card">
+    <div class="card-title">🎯 応用① 「全体の○%は？」</div>
+
+    <p>テストや日常で<b>一番よく出る</b>使い方。<br>
+    「○○の△%はいくつ？」と聞かれたら、<b>全体 × (%を小数にしたもの)</b>。</p>
+
+    <div class="equation">
+      全体 × <span class="frac"><span class="num">%</span><span class="den">100</span></span> = 答え
+    </div>
+
+    <div class="callout-orange">
+      <b>例題: 200の 30% はいくつ？</b>
+      <div class="calc-step">
+        30% → 小数にすると <b>0.3</b><span class="arrow">→</span>200 × 0.3 = <b>60</b><br>
+        または: 200 × <span class="frac"><span class="num">30</span><span class="den">100</span></span> =
+        <span class="frac"><span class="num">6000</span><span class="den">100</span></span> = <b>60</b>
+      </div>
+    </div>
+
+    <div class="callout-orange">
+      <b>例題: 40人クラスで 25% がメガネをかけている。何人？</b>
+      <div class="calc-step">
+        25% → 0.25 <span class="arrow">→</span> 40 × 0.25 = <b>10人</b><br>
+        または: 40 × <span class="frac"><span class="num">25</span><span class="den">100</span></span> =
+        <span class="frac"><span class="num">1000</span><span class="den">100</span></span> = <b>10人</b>
+      </div>
+    </div>
+
+    <div class="tip">
+      <b>💡 イメージで:</b><br>
+      ・10% = 全体の <b>1/10</b>（÷10すればいい）<br>
+      ・25% = 全体の <b>1/4</b>（÷4すればいい）<br>
+      ・50% = 全体の <b>1/2</b>（÷2、半分）<br>
+      ・75% = 全体の <b>3/4</b>
+    </div>
+  </div>
+
+  <!-- ===== 応用②: 割引・増加 ===== -->
+  <div class="card">
+    <div class="card-title">💰 応用② 割引・増加（買い物の話）</div>
+
+    <div class="callout-orange">
+      <b>「20%引き」 = もとの 80% を払う</b><br><br>
+      <span style="font-size:14px;">例: 1500円の 20% 引きは？</span>
+      <div class="calc-step">
+        <b>方法A（残りを直接出す）</b>: 100% − 20% = <b>80%</b> 払う<br>
+        → 1500 × 0.8 = <b>1200円</b><br><br>
+        <b>方法B（引く分を計算）</b>: 1500 × 0.2 = 300円（引く分）<br>
+        → 1500 − 300 = <b>1200円</b>
+      </div>
+    </div>
+
+    <div class="callout-orange">
+      <b>「20%増えた」 = もとの 120% になる</b><br><br>
+      <span style="font-size:14px;">例: 500円が 20% 値上がりしたら？</span>
+      <div class="calc-step">
+        100% + 20% = <b>120%</b> = 1.2<br>
+        → 500 × 1.2 = <b>600円</b>
+      </div>
+    </div>
+
+    <div class="callout-orange">
+      <b>「何%引き／何%増えた」を聞かれたら</b><br><br>
+      <span style="font-size:14px;">例: 500円が 600円に値上がり。何%増えた？</span>
+      <div class="calc-step">
+        増えた分: 600 − 500 = <b>100円</b><br>
+        元と比べる: 100 ÷ 500 = 0.2 = <b>20%</b><br><br>
+        <b>公式</b>: <span class="frac"><span class="num">変化した分</span><span class="den">元の数</span></span> × 100 = %
+      </div>
+    </div>
+
+    <div class="callout-red">
+      <b>⚠️ ワナ:</b> 「20%引いて、また20%足したら元に戻る？」<br>
+      → <b>NO!</b> 1000円 → 20%引き = 800円 → 800の20%増 = 960円。<br>
+      ベースが違うから元に戻らない！
+    </div>
+  </div>
+
+  <!-- ===== 練習 ===== -->
+  <div class="card">
+    <div class="card-title">✏️ 練習①（基本） — Prática Básica</div>
+    <p style="margin-bottom:14px; color:#666; font-size:14px;">
+      答えを入れて「確認」を押そう。数字だけ書けばOK！
+    </p>
+
+    <!-- Q1: 1/2 を % に -->
+    <div class="practice-q">
+      <div class="q-num">1</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">1</span><span class="den">2</span></span>
+        を <b>%</b> にしなさい
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q1" placeholder="?" inputmode="numeric">
+        <span class="suffix">%</span>
+        <button class="check-btn" onclick="check('q1',['50','50%'],'1/2は半分。半分 = 50%！')">確認</button>
+      </div>
+      <div class="feedback" id="q1-fb"></div>
+    </div>
+
+    <!-- Q2: 0.25 を % に -->
+    <div class="practice-q">
+      <div class="q-num">2</div>
+      <div class="q-text">
+        <b>0.25</b> を <b>%</b> にしなさい
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q2" placeholder="?" inputmode="numeric">
+        <span class="suffix">%</span>
+        <button class="check-btn" onclick="check('q2',['25','25%'],'0.25 × 100 = 25%。小数点を右に2つズラすだけ！')">確認</button>
+      </div>
+      <div class="feedback" id="q2-fb"></div>
+    </div>
+
+    <!-- Q3: 3/4 を 小数 に -->
+    <div class="practice-q">
+      <div class="q-num">3</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">3</span><span class="den">4</span></span>
+        を <b>小数</b> にしなさい
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q3" placeholder="?" inputmode="decimal">
+        <button class="check-btn" onclick="check('q3',['0.75','.75'],'3 ÷ 4 = 0.75！ 3/4は0.75 = 75%だよ。')">確認</button>
+      </div>
+      <div class="feedback" id="q3-fb"></div>
+    </div>
+
+    <!-- Q4: 0.4 を 分数 に -->
+    <div class="practice-q">
+      <div class="q-num">4</div>
+      <div class="q-text">
+        <b>0.4</b> を <b>分数</b> にしなさい<br>
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: 0.4 = 4/10。これを約分すると…？</span>
+      </div>
+      <div class="answer-row">
+        <span class="prefix">答え =</span>
+        <input type="text" id="q4" placeholder="?/?" inputmode="text">
+        <button class="check-btn" onclick="check('q4',['2/5','4/10','2÷5'],'0.4 = 4/10 = 2/5（約分して）。どちらも正解！')">確認</button>
+      </div>
+      <div class="feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- Q5: 75% を 分数 に -->
+    <div class="practice-q">
+      <div class="q-num">5</div>
+      <div class="q-text">
+        <b>75%</b> を <b>分数</b> にしなさい<br>
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: 75% = 75/100。約分すると…？</span>
+      </div>
+      <div class="answer-row">
+        <span class="prefix">答え =</span>
+        <input type="text" id="q5" placeholder="?/?" inputmode="text">
+        <button class="check-btn" onclick="check('q5',['3/4','75/100','3÷4'],'75% = 75/100 = 3/4！ 暗記表のとおりだね。')">確認</button>
+      </div>
+      <div class="feedback" id="q5-fb"></div>
+    </div>
+
+    <!-- Q6: 13/25 を % に（学校で出ているレベル） -->
+    <div class="practice-q">
+      <div class="q-num">6</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">13</span><span class="den">25</span></span>
+        を <b>%</b> にしなさい<br>
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: 25 × ? = 100？</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q6" placeholder="?" inputmode="numeric">
+        <span class="suffix">%</span>
+        <button class="check-btn" onclick="check('q6',['52','52%'],'25×4=100だから13×4=52 → 52%！ よくできました。')">確認</button>
+      </div>
+      <div class="feedback" id="q6-fb"></div>
+    </div>
+
+    <!-- Q7: 9/20 を % に -->
+    <div class="practice-q">
+      <div class="q-num">7</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">9</span><span class="den">20</span></span>
+        を <b>%</b> にしなさい<br>
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: 20 × ? = 100？</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q7" placeholder="?" inputmode="numeric">
+        <span class="suffix">%</span>
+        <button class="check-btn" onclick="check('q7',['45','45%'],'20×5=100だから9×5=45 → 45%！')">確認</button>
+      </div>
+      <div class="feedback" id="q7-fb"></div>
+    </div>
+
+    <!-- Q8: 35% を 小数 に -->
+    <div class="practice-q">
+      <div class="q-num">8</div>
+      <div class="q-text">
+        <b>35%</b> を <b>小数</b> にしなさい
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q8" placeholder="?" inputmode="decimal">
+        <button class="check-btn" onclick="check('q8',['0.35','.35'],'35 ÷ 100 = 0.35！ 小数点を左に2つズラすだけ。')">確認</button>
+      </div>
+      <div class="feedback" id="q8-fb"></div>
+    </div>
+
+    <!-- Q9: 文章題（ワナ:%への変換） -->
+    <div class="practice-q">
+      <div class="q-num">9</div>
+      <div class="q-text">
+        <b>テストで20問中14問</b>正解した。<br>
+        正解の<b>割合</b>は何%？<br>
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: まず分数で書く → %にする</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q9" placeholder="?" inputmode="numeric">
+        <span class="suffix">%</span>
+        <button class="check-btn" onclick="check('q9',['70','70%'],'14/20 → 20×5=100だから14×5=70 → 70%！ 完璧。')">確認</button>
+      </div>
+      <div class="feedback" id="q9-fb"></div>
+    </div>
+
+    <!-- Q10: ワナ問題 -->
+    <div class="practice-q">
+      <div class="q-num">10</div>
+      <div class="q-text">
+        <b>0.07</b> を <b>%</b> にしなさい<br>
+        <span style="color:#aaa; font-size:13px;">⚠️ ワナ問題！ 0.7%じゃないよ。よく見て…</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q10" placeholder="?" inputmode="numeric">
+        <span class="suffix">%</span>
+        <button class="check-btn" onclick="check('q10',['7','7%'],'0.07 × 100 = 7%！ 小数点を右に2つズラすと「0007.」=7。')">確認</button>
+      </div>
+      <div class="feedback" id="q10-fb"></div>
+    </div>
+  </div>
+
+  <!-- ===== 練習②（応用） ===== -->
+  <div class="card">
+    <div class="card-title">✏️ 練習②（応用） — Prática Avançada</div>
+    <p style="margin-bottom:14px; color:#666; font-size:14px;">
+      文章を読んで答えよう！「全体 × (%/100)」を思い出してね。
+    </p>
+
+    <!-- Q11: 全体×% -->
+    <div class="practice-q">
+      <div class="q-num">11</div>
+      <div class="q-text">
+        <b>200の30%</b> はいくつ？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q11" placeholder="?" inputmode="numeric">
+        <button class="check-btn" onclick="check('q11',['60'],'200 × 0.3 = 60！ または 200 × 30/100 = 60。')">確認</button>
+      </div>
+      <div class="feedback" id="q11-fb"></div>
+    </div>
+
+    <!-- Q12: クラスの人数 -->
+    <div class="practice-q">
+      <div class="q-num">12</div>
+      <div class="q-text">
+        <b>40人</b> のクラスで <b>25%</b> がメガネをかけている。<br>
+        メガネの人は<b>何人</b>？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q12" placeholder="?" inputmode="numeric">
+        <span class="suffix">人</span>
+        <button class="check-btn" onclick="check('q12',['10','10人'],'40 × 0.25 = 10人！ 25%は1/4だから 40÷4 でもOK。')">確認</button>
+      </div>
+      <div class="feedback" id="q12-fb"></div>
+    </div>
+
+    <!-- Q13: 割引 -->
+    <div class="practice-q">
+      <div class="q-num">13</div>
+      <div class="q-text">
+        <b>1500円</b> の本が <b>20%引き</b>。<br>
+        いくらで買える？
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: 100%−20% = 80%を払う</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q13" placeholder="?" inputmode="numeric">
+        <span class="suffix">円</span>
+        <button class="check-btn" onclick="check('q13',['1200','1200円'],'1500 × 0.8 = 1200円！ または 1500 − (1500×0.2) = 1500 − 300 = 1200円。')">確認</button>
+      </div>
+      <div class="feedback" id="q13-fb"></div>
+    </div>
+
+    <!-- Q14: 増加 -->
+    <div class="practice-q">
+      <div class="q-num">14</div>
+      <div class="q-text">
+        ある店で <b>500円</b> だった商品が <b>600円</b> に値上がりした。<br>
+        <b>何%</b> 値上がりした？
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: 増えた分 ÷ 元の数</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q14" placeholder="?" inputmode="numeric">
+        <span class="suffix">%</span>
+        <button class="check-btn" onclick="check('q14',['20','20%'],'増えた分100円 ÷ 元の500円 = 0.2 = 20%！')">確認</button>
+      </div>
+      <div class="feedback" id="q14-fb"></div>
+    </div>
+
+    <!-- Q15: 逆算（部分→全体） -->
+    <div class="practice-q">
+      <div class="q-num">15</div>
+      <div class="q-text">
+        テストで <b>正解率80%</b>だった。正解は <b>20問</b>。<br>
+        テストは <b>全部で何問</b> あった？
+        <span style="color:#aaa; font-size:13px;">💡 ヒント: 20問 = 全体 × 0.8。全体は？</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q15" placeholder="?" inputmode="numeric">
+        <span class="suffix">問</span>
+        <button class="check-btn" onclick="check('q15',['25','25問'],'20 ÷ 0.8 = 25問！ 80%が20問なら、10%は2.5問、100%は25問。')">確認</button>
+      </div>
+      <div class="feedback" id="q15-fb"></div>
+    </div>
+
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+  <div class="vocab">
+    <div class="vocab-chip"><span class="pt">fração</span> = 分数</div>
+    <div class="vocab-chip"><span class="pt">decimal</span> = 小数</div>
+    <div class="vocab-chip"><span class="pt">percentagem</span> = 割合(%)</div>
+    <div class="vocab-chip"><span class="pt">por cento</span> = パーセント</div>
+    <div class="vocab-chip"><span class="pt">numerador</span> = 分子</div>
+    <div class="vocab-chip"><span class="pt">denominador</span> = 分母</div>
+    <div class="vocab-chip"><span class="pt">dividir</span> = 割る</div>
+    <div class="vocab-chip"><span class="pt">multiplicar</span> = かける</div>
+    <div class="vocab-chip"><span class="pt">simplificar</span> = 約分する</div>
+    <div class="vocab-chip"><span class="pt">equivalente</span> = 同じ大きさ</div>
+  </div>
+
+  <div style="text-align:center; padding:16px; color:#aaa; font-size:12px;">
+    Lição 6 — Frações, Decimais e Percentagens 🍕
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz8mMJIkEbLaE75FMxNIqrzrTU9kSH-6SB9q1WEw7JWe7K3XjTNLdKN1pLJfyb48MK5/exec';
+
+let tracking = {};
+let totalCorrect = 0;
+const totalQ = 15;
+let submitted = false;
+
+function check(id, accepted, explanation) {
+  if (submitted) return;
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  const val = input.value.trim().replace(/\s/g, '').replace(/%/g, '');
+  if (!val) return;
+
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return;
+
+  t.attempts++;
+  t.answer = val;
+
+  const cleanedAccepted = accepted.map(a => String(a).replace(/%/g, '').toLowerCase());
+  const ok = cleanedAccepted.some(a => val.toLowerCase() === a);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+    totalCorrect++;
+    input.className = 'correct';
+    input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(val);
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ちがう。分数 → 小数 → % の順で計算してみて！';
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1400);
+  }
+
+  checkComplete();
+}
+
+function checkComplete() {
+  const correctIds = Object.keys(tracking).filter(k => tracking[k].correct);
+  if (correctIds.length === totalQ) {
+    showResult();
+    sendToSheet();
+  }
+}
+
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + totalQ + ' 一発正解';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === totalQ) {
+    msg.textContent = 'Perfeito! 💯 基本も応用もパーフェクト！テストもバッチリ！';
+  } else if (firstCount >= 12) {
+    msg.textContent = 'Muito bom! 応用までかなりできてる！間違えたところだけ見直そう。';
+  } else if (firstCount >= 8) {
+    msg.textContent = 'Bom! 基本はOK。応用は「全体 × (%/100)」の式をもう一度確認！';
+  } else if (firstCount >= 5) {
+    msg.textContent = '暗記表（1/2=50%、1/4=25%…）をもう一度見て、分母を100にする練習をしよう。';
+  } else {
+    msg.textContent = 'まず「分数 → 小数 → %」の流れを覚えよう。分子÷分母 → ×100 だよ！';
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer,
+      attempts: t.attempts,
+      result: t.result,
+      wrong_answers: t.wrong_answers
+    };
+  }
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_06_porcentagem',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+document.querySelectorAll('.practice-q input').forEach(input => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
+  });
+});
+</script>
+</body>
+</html>
