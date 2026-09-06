@@ -22,16 +22,17 @@
       "packId": "dlc_casino",
       "file": "dlc_casino.kqpack",
       "title": "カジノの しま",
-      "stages": 3,
+      "stages": 1,
       "order": 30,
-      "desc": "タイピングスロット。出ている もじを 打って リールを 止め、3つ そろえると 大当たり と カード。"
+      "desc": "スロットを まわして 3つ そろえる。1れつ目を 止めたら、あとは おなじ もじだけ 止まる。"
     },
     {
       "packId": "dlc_english",
-      "title": "？？？",
+      "file": "dlc_english.kqpack",
+      "title": "アルファベット王国",
+      "stages": 5,
       "order": 40,
-      "comingSoon": true,
-      "desc": "つくっている ところ"
+      "desc": "えいごを そのまま うつ。にほんごを 見て えいごを うつ。さいごは みじかい ぶん。"
     },
     {
       "packId": "dlc_suuji",

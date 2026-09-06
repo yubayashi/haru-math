@@ -133,6 +133,10 @@ svg.px{display:block;image-rendering:pixelated;shape-rendering:crispEdges}
 .q .kana{font-size:clamp(24px,5vw,38px);letter-spacing:.14em;word-break:break-all}
 .q .kana .done{color:#55557a}
 .q .kana .cur{color:var(--acc);border-bottom:4px solid var(--acc)}
+/* お題（日本語）を 見て、下の 英語を 打つ ときの 見た目 */
+.q .kana .ask{color:#fff;letter-spacing:.1em}
+.q.askmode .roma{font-size:clamp(20px,4.2vw,30px);margin-top:9px}
+.q.askmode .roma .todo{color:#8a8ab0}
 .q .roma{font-size:clamp(16px,3.2vw,24px);letter-spacing:.16em;margin-top:6px;word-break:break-all}
 .q .roma .done{color:var(--ok)} .q .roma .todo{color:#6a6a90}
 .q .roma .next{color:#000;background:var(--acc);padding:0 3px}
@@ -221,6 +225,7 @@ svg.px{display:block;image-rendering:pixelated;shape-rendering:crispEdges}
   background:#fff;border:2px solid #000;padding:0 5px;text-transform:uppercase}
 .ship.near b{animation:blink .38s steps(1) infinite}
 /* タイピングスロット：カジノの だい */
+.slotscreen{max-width:430px;margin:0 auto;text-align:center}
 .slotmc{max-width:352px;margin:0 auto;padding:9px 22px 9px;
   background:linear-gradient(#4a3410,#1c1408);border:4px solid #e0b040;
   box-shadow:0 0 0 3px #000, inset 0 0 0 2px #8a6a20}
@@ -243,6 +248,20 @@ svg.px{display:block;image-rendering:pixelated;shape-rendering:crispEdges}
 .slotwin{text-align:center;font-size:19px;color:#ffe14a;text-shadow:2px 2px 0 #000;
   margin-top:5px;letter-spacing:.06em;animation:blink .3s steps(1) 6}
 .slotwin.lose{font-size:13px;color:#8a8ab0;text-shadow:none;animation:none}
+/* かけ金えらび */
+.betrow{display:flex;justify-content:center;gap:8px;margin:12px 0 4px;flex-wrap:wrap}
+.betrow .bet{background:var(--panel);border:2px solid #4a4a78;padding:6px 12px;cursor:pointer;
+  font-size:13px;color:var(--sub);line-height:1.5}
+.betrow .bet b{display:block;font-size:16px;color:#fff}
+.betrow .bet.on{border-color:var(--acc);background:#2a2410}
+.betrow .bet.on b{color:var(--acc)}
+.betrow .bet.no{opacity:.35;cursor:default}
+.slotstat{display:flex;justify-content:center;gap:16px;font-size:12px;color:var(--sub);margin-top:9px}
+.slotstat b{color:var(--acc)}
+/* まわっている リールの「あと何回」ゲージ */
+.spinbar{height:6px;background:#000;border:2px solid #5a5a90;margin:8px auto 0;max-width:352px}
+.spinbar>i{display:block;height:100%;background:var(--acc);transition:width .1s linear}
+.slotreels .rl.auto .mid{background:#8a8ab0;color:#000}
 .foe.cast{animation:foecast .26s steps(2)}
 @keyframes foecast{45%{filter:brightness(2.4) saturate(.45);transform:translateX(-7px)}}
 .shootinfo{display:inline-block;font-size:13px;line-height:1.6;background:#000;
@@ -451,6 +470,37 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
       <button class="sub" id="btn-menu">メニュー</button>
       <div class="sp"></div>
       <button class="sub sm" id="btn-title">タイトルへ</button>
+    </div>
+  </div>
+
+  <!-- ============ CASINO (SLOT) ============ -->
+  <div class="screen" id="sc-slot">
+    <div class="card">
+      <div class="hud">
+        <div id="cs-art"></div>
+        <div><b id="cs-title">カジノ</b><br><span class="muted" id="cs-sub">まわして そろえよう</span></div>
+        <div class="sp"></div>
+        <div class="muted">コイン <b style="font-size:19px;color:var(--acc)" id="cs-gold">0</b></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="slotscreen">
+        <div id="cs-machine"></div>
+        <div class="spinbar" id="cs-barwrap"><i id="cs-bar" style="width:100%"></i></div>
+        <div class="betrow" id="cs-bets"></div>
+        <p class="muted" id="cs-msg" style="margin:10px 0 0;min-height:20px"></p>
+        <div class="slotstat">
+          <span>まわした <b id="cs-plays">0</b></span>
+          <span>そろった <b id="cs-wins">0</b></span>
+          <span>もうけ <b id="cs-net">0</b></span>
+        </div>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:14px">
+        <button id="btn-cs-spin">まわす</button>
+        <button class="sub" id="btn-cs-back">やめて ちずへ</button>
+      </div>
+      <p class="muted" style="text-align:center;margin:9px 0 0">
+        <kbd>Space</kbd> まわす　<kbd>←</kbd><kbd>→</kbd> かけ金　<kbd>Esc</kbd> やめる</p>
     </div>
   </div>
 
@@ -1802,20 +1852,27 @@ $("btn-hc-go").onclick = () => { const st = HC.stage; HC = null; startStage(st);
 $("btn-hc-skip").onclick = () => { const st = HC.stage; HOME_LAST = null; HC = null; startStage(st); };
 
 /* ---------- 問題生成 ---------- */
+/* ワードリストの 1つは 文字列 か {q:"お題", a:"うつ文字"}。
+   {q,a} なら **上に お題（日本語）、下に うつ文字（英語）** が 出る
+   ＝「りんご を 見て apple と 打つ」練習が できる。 */
+function wordOf(e){ return (e && typeof e === "object") ? e : {a:e}; }
 function genProblem(stage, battle){
   if (stage.mode === "kana"){
     const wl = CONTENT.wordlists[battle.wordlist];
     const pool = wl ? wl.entries : ["あいうえお"];
     const weak = weakKeys();
     if (weak.length && Math.random() < 0.55){
-      const cands = pool.filter(w => {
-        const r = parseKana(w).map(u => u.cands[0]).join("");
+      const cands = pool.filter(e => {
+        const r = parseKana(wordOf(e).a).map(u => u.cands[0]).join("");
         return weak.some(k => r.includes(k));
       });
-      if (cands.length){ const w = pick(cands); return {text:w, units:parseKana(w)}; }
+      if (cands.length){
+        const w = wordOf(pick(cands));
+        return {text:w.a, ask:w.q || null, units:parseKana(w.a)};
+      }
     }
-    const w = pick(pool);
-    return {text:w, units:parseKana(w)};
+    const w = wordOf(pick(pool));
+    return {text:w.a, ask:w.q || null, units:parseKana(w.a)};
   }
   const g = battle.gen || {pool:"fj", len:[2,4]};
   const [lo,hi] = g.len;
@@ -1866,13 +1923,14 @@ const BOSS_LINES = {
 
 /* ---------- バトル ---------- */
 const B = {
-  shoot:false, ships:[], killed:0, spawnAcc:0, shootT:null, slot:null, slotT:null,
+  shoot:false, ships:[], killed:0, spawnAcc:0, shootT:null, slot:null, slotT:null, problem:null,
   stage:null, battle:null, bi:0, foe:null, hp:0, mp:0, totalDmg:0,
   combo:0, maxCombo:0, qLeft:0, qTotal:0, typer:null, cast:0, castT:null,
   hits:0, misses:0, perfect:0, qMiss:0, t0:0, active:false,
   guard:0, blind:0, mode:"type"
 };
 function startStage(stage){
+  if (stage.mode === "casino"){ openCasino(stage); return; }   /* カジノは たたかいでは ない */
   B.stage = stage; B.bi = 0;
   const st = stats();
   B.hp = st.maxHp; B.mp = st.maxMp;
@@ -1923,17 +1981,25 @@ function startBattle(){
 function nextQuestion(){
   lastKeyT = 0;                    /* 問題の切れ目は 計測しない（考える時間が入るため） */
   const p = genProblem(B.stage, B.battle);
+  B.problem = p;
   B.typer = new Typer(p.units); B.qMiss = 0;
   renderQuestion();
 }
 function renderQuestion(){
   const t = B.typer;
-  let kana = "";
-  t.units.forEach((u,i) => {
-    const cls = i < t.idx ? "done" : (i === t.idx ? "cur" : "");
-    kana += '<span class="' + cls + '">' + u.disp + "</span>";
-  });
-  $("b-kana").innerHTML = kana;
+  const ask = B.problem && B.problem.ask;
+  $("b-q").className = "q" + (ask ? " askmode" : "");
+  if (ask){
+    /* お題つき：上は 日本語のまま。うつ文字は 下の ガイドに 出る */
+    $("b-kana").innerHTML = '<span class="ask">' + ask + "</span>";
+  } else {
+    let kana = "";
+    t.units.forEach((u,i) => {
+      const cls = i < t.idx ? "done" : (i === t.idx ? "cur" : "");
+      kana += '<span class="' + cls + '">' + u.disp + "</span>";
+    });
+    $("b-kana").innerHTML = kana;
+  }
   if (S.settings.hint === "on"){
     const g = t.guide();
     $("b-roma").innerHTML = '<span class="done">'+g.done+'</span><span class="next">'+g.nextCh+
@@ -2069,6 +2135,154 @@ function finishSpin(){
   setTimeout(newSpin, 900);
 }
 
+/* ---------- カジノ（mode:"casino"） ----------
+   たたかいでは ない。**専用画面**で スロットだけ まわす。
+   ・1れつ目は どの文字でも 止められる
+   ・**2れつ目からは 1れつ目と 同じ文字でしか 止まらない**（ちがう文字は 何も おきない）
+   ・止められないまま まわりきると じどうで 止まる ＝ はずれ
+   これで「ねらった 文字が 来た しゅんかんに 打つ」練習に なる。 */
+const BETS = [
+  {g: 20,  pool:"fj",       spin:26, name:"かんたん"},
+  {g: 50,  pool:"fjdk",     spin:30, name:"ふつう"},
+  {g:100,  pool:"asdfjk",   spin:34, name:"むずかしい"},
+  {g:200,  pool:"asdfjkl;", spin:38, name:"げきむず"}
+];
+const CS = { stage:null, bet:0, reels:null, timer:null, plays:0, wins:0, net:0, busy:false };
+function casinoCfg(){ return BETS[CS.bet]; }
+function openCasino(stage){
+  CS.stage = stage; CS.reels = null; CS.busy = false;
+  clearInterval(CS.timer); CS.timer = null;
+  $("cs-title").textContent = stage.name || "カジノ";
+  $("cs-sub").textContent = stage.teach || "そろえると 大あたり";
+  $("cs-art").innerHTML = pixelArt(lookArt(), 3);
+  $("cs-msg").textContent = "かけ金を えらんで「まわす」";
+  renderCasino();
+  show("sc-slot");
+}
+function renderCasino(){
+  const c = casinoCfg(), r = CS.reels;
+  $("cs-gold").textContent = S.gold;
+  $("cs-bets").innerHTML = BETS.map((b,i) =>
+    '<div class="bet' + (i === CS.bet ? " on" : "") + (S.gold < b.g ? " no" : "") +
+    '" data-i="' + i + '">' + b.name + "<b>Ｇ" + b.g + "</b>" +
+    '<span style="font-size:10px">' + b.pool.length + "もじ</span></div>").join("");
+  Array.from($("cs-bets").querySelectorAll(".bet")).forEach(el => {
+    el.onclick = () => { if (CS.busy) return; CS.bet = +el.dataset.i; renderCasino(); };
+  });
+  const F = k => keyFace(k).toUpperCase();
+  const rows = r ? r.cur : [[c.pool[0],c.pool[0],c.pool[0]],[c.pool[0],c.pool[0],c.pool[0]],
+                            [c.pool[0],c.pool[0],c.pool[0]]];
+  $("cs-machine").innerHTML =
+    '<div class="slotmc">' +
+      '<div class="slotcoin"><span>コイン Ｇ' + S.gold + "</span><span>かけ金 Ｇ" + c.g + "</span></div>" +
+      '<div class="slotreels">' + [0,1,2].map(i => {
+        const set = r ? r.set[i] : null;
+        const auto = r && r.autoStopped && r.autoStopped[i];
+        const mk = set || rows[i][1];
+        const col = set ? "#000" : "var(--" + (FINGER_OF[mk] || "th") + ")";
+        return '<div class="rl' + (set ? " set" : "") + (auto ? " auto" : "") +
+          (r && r.win ? " win" : "") + '">' +
+          '<b class="up">' + F(rows[i][0]) + "</b>" +
+          '<b class="mid" style="color:' + col + '">' + F(mk) + "</b>" +
+          '<b class="dn">' + F(rows[i][2]) + "</b></div>";
+      }).join("") + "</div>" +
+      '<div class="slotbet">' + casinoHint() + "</div>" +
+    "</div>";
+  $("cs-plays").textContent = CS.plays;
+  $("cs-wins").textContent = CS.wins;
+  $("cs-net").textContent = (CS.net >= 0 ? "+" : "") + CS.net;
+  $("cs-net").style.color = CS.net >= 0 ? "var(--ok)" : "var(--ng)";
+  $("btn-cs-spin").disabled = CS.busy || S.gold < c.g;
+  const left = r ? Math.max(0, r.left / r.total) : 1;
+  $("cs-bar").style.width = (left*100).toFixed(0) + "%";
+  $("cs-barwrap").style.opacity = r ? 1 : 0.25;
+  const t = (r && r.i < 3) ? r.target(r) : null;
+  litKey(t); pointHands(t);
+}
+function casinoHint(){
+  const r = CS.reels;
+  if (!r) return "▶ しろい ところの もじを うつと 止まる";
+  if (r.i === 0) return "▶ すきな もじで 1れつ目を 止める";
+  if (r.i < 3) return "▶ " + keyFace(r.set[0]).toUpperCase() + " だけ 止められる（ほかは きかない）";
+  return r.win ? "★ そろった！" : "はずれ…";
+}
+function spinCasino(){
+  const c = casinoCfg();
+  if (CS.busy || S.gold < c.g) return;
+  CS.busy = true;
+  S.gold -= c.g;                                  /* さきに かけ金を はらう */
+  const rc = () => c.pool[rnd(c.pool.length)];
+  CS.reels = {
+    cur: [[rc(),rc(),rc()], [rc(),rc(),rc()], [rc(),rc(),rc()]],
+    set: [null,null,null], autoStopped:[false,false,false],
+    i: 0, left: c.spin, total: c.spin, win:false,
+    /* いま 止められる 文字。1れつ目は なんでも（null）、2れつ目からは 1れつ目と 同じ */
+    target: r => r.i === 0 ? null : r.set[0]
+  };
+  $("cs-msg").textContent = "";
+  clearInterval(CS.timer);
+  CS.timer = setInterval(casinoTick, 150);
+  renderCasino();
+}
+function casinoTick(){
+  const r = CS.reels, c = casinoCfg();
+  if (!r || r.i >= 3) return;
+  for (let i = r.i; i < 3; i++)
+    r.cur[i] = [r.cur[i][1], r.cur[i][2], c.pool[rnd(c.pool.length)]];
+  r.left--;
+  if (r.left <= 0){                               /* まわりきった：のこりを じどうで 止める */
+    while (r.i < 3){ r.set[r.i] = r.cur[r.i][1]; r.autoStopped[r.i] = true; r.i++; }
+    renderCasino(); finishCasino(); return;
+  }
+  renderCasino();
+}
+function casinoKey(ch){
+  const r = CS.reels;
+  if (!r || r.i >= 3) return;
+  const want = r.target(r);
+  if (want && ch !== want) return;                /* 2れつ目からは ちがう文字は きかない */
+  if (ch !== r.cur[r.i][1]) return;               /* いま 出ている 文字と ちがえば 止まらない */
+  r.set[r.i] = ch; r.i++;
+  recordKey(ch, true, 0);
+  if (r.i >= 3){ renderCasino(); finishCasino(); return; }
+  renderCasino();
+}
+function finishCasino(){
+  clearInterval(CS.timer); CS.timer = null;
+  const r = CS.reels, c = casinoCfg();
+  const a = r.set[0], b = r.set[1], d = r.set[2];
+  const three = (a === b && b === d), two = !three && (a === b || b === d || a === d);
+  CS.plays++;
+  let gain = 0, msgTxt = "";
+  if (three){
+    r.win = true; gain = c.g * 10; CS.wins++;
+    const card = drawCard(); const got = card ? gainCard(card.id) : null;
+    msgTxt = "★ 3つ そろった！　Ｇ" + gain + " を てにいれた！" +
+      (got ? "　カード「" + card.name + "」も もらった！" : "");
+    /* はじめて そろえたら この ステージは クリア */
+    const pp = S.packProgress[CS.stage.packId] || (S.packProgress[CS.stage.packId] = {cleared:[]});
+    if (!pp.cleared.includes(CS.stage.id)){
+      pp.cleared.push(CS.stage.id);
+      msgTxt += "　（この しまを クリアした！）";
+    }
+  } else if (two){
+    gain = c.g * 2;
+    msgTxt = "2つ そろい。　Ｇ" + gain + " が もどってきた";
+  } else {
+    msgTxt = "はずれ…　Ｇ" + c.g + " を うしなった";
+  }
+  S.gold += gain;
+  CS.net += gain - c.g;
+  CS.busy = false;
+  $("cs-msg").textContent = msgTxt;
+  save(); renderCasino();
+}
+$("btn-cs-spin").onclick = spinCasino;
+$("btn-cs-back").onclick = () => {
+  clearInterval(CS.timer); CS.timer = null; CS.busy = false;
+  renderMap(); show("sc-map");
+};
+
 /* ---------- たたかいの モード ----------
    モードを 足すときは ここに 1行 くわえる。
      key   … 1打鍵の しょり（ひつよう）
@@ -2081,9 +2295,6 @@ const MODES = {
   shoot: {key: shootKey, start: startShoot,
           stop(){ clearInterval(B.shootT); clearShips(); },
           view: {plane:true, scrollBg:true, hideRoma:true, noCast:true, hideFoeExceptBoss:true}},
-  slot:  {key: slotKey,  start: startSlot,
-          stop(){ clearInterval(B.slotT); B.slot = null; },
-          view: {hideRoma:true, noCast:true}}
 };
 function modeDef(){ return MODES[(B.stage && B.stage.mode) || "kana"] || MODES.kana; }
 function stopModes(){ Object.keys(MODES).forEach(k => MODES[k].stop && MODES[k].stop()); }
@@ -2560,6 +2771,16 @@ function closeAllWindows(){ closeCmd(); closeSpells(); closeTools(); }
 document.addEventListener("keydown", e => {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   if (["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) return;
+  if ($("sc-slot").classList.contains("on")){
+    if (e.key === "Escape"){ e.preventDefault(); $("btn-cs-back").onclick(); return; }
+    if (e.key === "ArrowLeft"){ e.preventDefault(); if (!CS.busy && CS.bet > 0){ CS.bet--; renderCasino(); } return; }
+    if (e.key === "ArrowRight"){ e.preventDefault(); if (!CS.busy && CS.bet < BETS.length-1){ CS.bet++; renderCasino(); } return; }
+    if (e.key === " " || e.key === "Enter"){ e.preventDefault(); if (!CS.busy) spinCasino(); return; }
+    let c = e.key.length === 1 ? e.key.toLowerCase() : null;
+    if (e.code === "Semicolon" || c === "ç") c = ";";
+    if (c && CS.busy){ e.preventDefault(); casinoKey(c); }
+    return;
+  }
   if ($("bossintro").classList.contains("on")){
     /* 演出中は すべての キーを すいとる（もんだいへの 誤入力よけ） */
     if (e.key === " " || e.key === "Enter" || e.key === "Escape"){ e.preventDefault(); endBossIntro(); }
@@ -2616,7 +2837,11 @@ document.addEventListener("keydown", e => {
     if (e.key === "Backspace"){ e.preventDefault(); spellBuf = spellBuf.slice(0,-1); renderSpells(); return; }
     if (e.key === " " || e.key === "Enter"){ e.preventDefault(); castSpell(); return; }
   } else if (e.key === " " || e.code === "Space"){
-    e.preventDefault(); openCmd(); return;
+    e.preventDefault();
+    /* いま スペースを 打つ場面なら 入力にする（英文の たんごの くぎり）。
+       それ以外は これまでどおり コマンド窓 */
+    if (B.typer && !B.typer.done && B.typer.nextKey() === " "){ onKey(" "); return; }
+    openCmd(); return;
   }
   let ch = e.key.length === 1 ? e.key.toLowerCase() : null;
   if (e.code === "Semicolon" || ch === "ç") ch = ";";
@@ -2647,6 +2872,10 @@ const WORLD_STYLES = {
            rock:"#a08858", tree:"#5a7a3a", isle:[64,38,55,26],
            mnts:[[42,26,18,10],[58,24,12,7],[100,54,14,8]],
            trees:[[24,46],[86,58],[46,60],[108,40]]},
+  stone:  {sea:"#26364a", sea2:"#33465e", sand:"#bab08e", land:"#8e8e82", land2:"#6c6c62",
+           rock:"#aeaea4", tree:"#4a6a4a", isle:[64,38,54,26],
+           mnts:[[44,26,17,10],[60,23,12,7],[98,54,15,9]],
+           trees:[[24,45],[30,41],[82,60],[90,55],[42,58],[108,39]]},
   sky:    {isSky:true,
            sea:"#7ab8e8", sea2:"#9ad0f4", sand:"#ffffff", land:"#e6eefc", land2:"#c6d6f0",
            rock:"#a4b6d8", tree:"#5a9ad0", isle:[64,38,52,26],
@@ -2807,7 +3036,7 @@ const WORLD_DEFAULTS = {
   core:             {order:  0},              /* ホームとう（本編） */
   dlc_dakuon_youon: {order: 10, recLv:  8},   /* だくおん大陸：かなの ひろがり */
   dlc_shooting:     {order: 20, recLv: 10},   /* そらの とりで：新しいキーは ゼロ。速さだけ */
-  dlc_casino:       {order: 30},              /* （予定）カジノ */
+  dlc_casino:       {order: 30, recLv: 10},   /* カジノ：スロットだけ。たたかいは ない */
   dlc_english:      {order: 40},              /* （予定）英語 */
   dlc_suuji:        {order: 90, recLv: 13}    /* すうじステーション：いったん 取り下げ中 */
 };
@@ -2911,8 +3140,8 @@ function renderWorld(){
   let you = null;
   placed.forEach(st => {
     const o = openOf[st.id];
-    const boss = st.battles.filter(b => b.boss)[0];
-    const e = boss && CONTENT.enemies[boss.enemy];
+    const boss = (st.battles || []).filter(b => b.boss)[0];
+    const e = st.icon ? CONTENT.enemies[st.icon] : (boss && CONTENT.enemies[boss.enemy]);
     const isNext = o.open && !o.cleared && !you;
     if (isNext) you = st;
     html += '<div class="wm-node ' + (o.cleared ? "done" : o.open ? (isNext ? "next" : "") : "lock") +
@@ -2954,7 +3183,7 @@ function renderGlobal(worlds){
     return {
       w: w, done: sts.filter(st => pp.cleared.indexOf(st.id) >= 0).length, tot: sts.length,
       x: g[0]/W*100, y: g[1]/H*100,
-      boss: last ? last.battles.filter(b => b.boss)[0] : null
+      boss: last ? (last.battles || []).filter(b => b.boss)[0] : null
     };
   });
   let html = "";
@@ -2978,7 +3207,9 @@ function renderGlobal(worlds){
     }
     const all = o.tot > 0 && o.done >= o.tot;
     const cur = o.w.packId === curWorld;
-    const e = o.boss && CONTENT.enemies[o.boss.enemy];
+    const lastSt = CONTENT.stages.filter(x => x.packId === o.w.packId && x.pos).slice(-1)[0];
+    const e = (lastSt && lastSt.icon && CONTENT.enemies[lastSt.icon]) ||
+              (o.boss && CONTENT.enemies[o.boss.enemy]);
     const short = o.w.recLv && S.lv < o.w.recLv;
     html += '<div class="wm-node' + (all ? " done" : cur ? " next" : "") +
       '" data-w="' + o.w.packId + '" style="left:'+o.x.toFixed(1)+'%;top:'+o.y.toFixed(1)+'%">' +
@@ -3034,8 +3265,9 @@ function renderMap(){
     const cleared = pp.cleared.includes(st.id);
     if (!(st.packId in chainOpen)) chainOpen[st.packId] = true;
     const open = chainOpen[st.packId] || cleared;
-    const boss = st.battles.filter(b => b.boss)[0];
-    const bossArt = (open && boss && CONTENT.enemies[boss.enemy]) ? pixelArt(CONTENT.enemies[boss.enemy].px, 2) : "";
+    const boss = (st.battles || []).filter(b => b.boss)[0];
+    const icoE = st.icon ? CONTENT.enemies[st.icon] : (boss && CONTENT.enemies[boss.enemy]);
+    const bossArt = (open && icoE) ? pixelArt(icoE.px, 2) : "";
     const d = document.createElement("div");
     d.className = "stage" + (open ? "" : " lock");
     d.innerHTML = '<div class="no">' + (open ? (cleared ? "✔" : st.no) : "×") + "</div>" +
