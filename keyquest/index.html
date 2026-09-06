@@ -1,0 +1,3484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>KEY QUEST — キークエスト</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d18; --panel:#181830; --deep:#000; --line:#fff;
+  --txt:#fff; --sub:#9a9ac0; --acc:#ffd23f; --ok:#4ade80; --ng:#f87171;
+  --hp:#4ade80; --mp:#60a5fa;
+  --lp:#e04848; --lr:#e08c28; --lm:#e0d040; --li:#48c048; --ri:#40a8e0; --rm:#6070e0; --rr:#a058e0; --rp:#e058a8; --th:#8a8aa8;
+}
+*{box-sizing:border-box}
+html{image-rendering:pixelated}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:'DotGothic16',"MS Gothic","Osaka-Mono",monospace;
+  font-size:15px;line-height:1.7;min-height:100vh;overflow-x:hidden;
+  background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px)}
+#app{max-width:900px;margin:0 auto;padding:14px 14px 44px}
+h1,h2,h3{margin:0 0 .5em;font-weight:400;letter-spacing:.04em}
+.screen{display:none} .screen.on{display:block}
+
+/* ===== ファミコン風ウィンドウ ===== */
+.card,.dq{background:var(--deep);border:3px solid var(--line);border-radius:0;
+  padding:13px 15px;margin-bottom:12px;box-shadow:0 0 0 3px var(--deep)}
+.dq{margin-bottom:0}
+button{font:inherit;color:#000;background:var(--acc);border:3px solid #fff;border-radius:0;
+  padding:7px 16px;cursor:pointer;box-shadow:4px 4px 0 #000;transition:none}
+button:hover{background:#fff}
+button:active{transform:translate(4px,4px);box-shadow:none}
+button.sub{background:var(--panel);color:#fff}
+button.sub:hover{background:#33335c}
+button.sm{padding:4px 10px;font-size:13px;box-shadow:3px 3px 0 #000}
+button:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:4px 4px 0 #000}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.sp{flex:1}
+input,textarea,select{font:inherit;background:#000;color:#fff;border:2px solid #fff;border-radius:0;padding:7px 9px;width:100%}
+textarea{font-size:11px;line-height:1.5;resize:vertical;word-break:break-all}
+.muted{color:var(--sub);font-size:13px}
+.tag{display:inline-block;background:var(--panel);border:2px solid var(--sub);padding:1px 8px;font-size:12px;margin-right:5px}
+kbd{background:#fff;color:#000;padding:0 6px;font-family:inherit;font-size:12px}
+hr{border:0;border-top:2px solid var(--sub);margin:14px 0}
+
+.logo{text-align:center;padding:22px 0 6px}
+.logo .en{font-size:clamp(32px,8vw,58px);color:var(--acc);letter-spacing:.1em;
+  text-shadow:4px 4px 0 #7a5a00, 8px 8px 0 #000}
+.logo .jp{letter-spacing:.55em;color:var(--sub);font-size:13px;margin-top:8px}
+
+/* ドット絵 */
+svg.px{display:block;image-rendering:pixelated;shape-rendering:crispEdges}
+.px-wrap{display:inline-block;line-height:0}
+
+.hud{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bar{height:12px;background:#000;border:2px solid #fff;overflow:hidden;min-width:120px;flex:1}
+.bar>i{display:block;height:100%;transition:width .2s steps(8)}
+.bar.hp>i{background:var(--hp)} .bar.mp>i{background:var(--mp)}
+.bar.foe>i{background:var(--ng)} .bar.cast>i{background:var(--acc)}
+.bar.danger>i{animation:blink .4s steps(1) infinite}
+@keyframes blink{50%{opacity:.2}}
+
+/* 戦闘 */
+.battlefield{position:relative;overflow:hidden;height:214px;
+  background:#000;border:2px solid #33335c;margin-bottom:8px}
+.bg{position:absolute;inset:0;z-index:0}
+.bg svg{width:100%;height:100%;display:block}
+.foe{position:absolute;right:14%;top:14px;z-index:1;animation:float 2.4s steps(2) infinite}
+@keyframes float{50%{transform:translateY(-6px)}}
+.foe.hurt{animation:shake .2s steps(2) 2;filter:brightness(4)}
+@keyframes shake{50%{transform:translateX(9px)}}
+.foe.appear{animation:appear .4s steps(4)}
+@keyframes appear{from{opacity:0;transform:scale(.3)}}
+.foe.dead{animation:die .5s steps(5) forwards}
+@keyframes die{to{opacity:0;transform:scale(.2)}}
+.player{position:absolute;left:8%;bottom:4px;z-index:2}
+.player.fly{bottom:auto;top:34%;left:6%;animation:flyfloat 1.6s steps(2) infinite}
+@keyframes flyfloat{50%{transform:translateY(-8px)}}
+.bgscroll{display:flex;width:200%;height:100%;animation:bgscroll 7s linear infinite}
+.bg .bgscroll svg{width:50%;height:100%;flex:none}
+@keyframes bgscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.player.atk{animation:jab .18s steps(2)}
+@keyframes jab{50%{transform:translate(10px,-5px)}}
+.player.big{animation:bigjab .3s steps(3)}
+@keyframes bigjab{40%{transform:translate(30px,-16px) scale(1.08)}}
+
+/* 打鍵ごとに飛ぶ弾（色は使った指の色） */
+.shot{position:absolute;left:15%;bottom:58px;width:7px;height:7px;z-index:3;pointer-events:none;
+  box-shadow:0 0 0 2px rgba(0,0,0,.55);animation:shot .22s steps(5) forwards}
+@keyframes shot{to{left:79%;bottom:104px;width:11px;height:11px}}
+.shot.c2{animation-duration:.19s}
+.shot.c3{animation-duration:.16s}
+
+/* 問題を打ち切ったときの斬撃 */
+.slash{position:absolute;right:11%;top:12px;width:100px;height:100px;z-index:4;pointer-events:none;
+  animation:slashfx .26s steps(4) forwards}
+@keyframes slashfx{0%{opacity:1;transform:scale(.7) rotate(-14deg)}
+  99%{opacity:1;transform:scale(1.25) rotate(6deg)}100%{opacity:0}}
+.slash i{position:absolute;background:#fff;height:5px;left:0;right:0;top:46px;
+  box-shadow:0 0 0 2px rgba(255,255,255,.35);transform:rotate(-34deg)}
+.slash i:nth-child(2){top:30px;transform:rotate(-34deg) translateX(-10px);opacity:.8}
+.slash i:nth-child(3){top:62px;transform:rotate(-34deg) translateX(10px);opacity:.8}
+
+/* 強打時の画面ゆれ */
+.battlefield.quake{animation:quake .18s steps(2) 2}
+@keyframes quake{50%{transform:translate(4px,-3px)}}
+
+/* PERFECT の閃光 */
+.zap{position:absolute;inset:0;z-index:5;pointer-events:none;background:#fff;opacity:0;
+  animation:zapfx .3s steps(3) forwards}
+@keyframes zapfx{0%{opacity:.75}99%{opacity:.12}100%{opacity:0}}
+
+.foe.stagger{animation:stagger .32s steps(3)}
+@keyframes stagger{30%{transform:translate(16px,-6px) rotate(7deg)}70%{transform:translate(-5px,2px)}}
+.combo{position:absolute;right:7px;top:5px;text-align:right;font-size:12px;color:#c8c8e8;z-index:3;
+  text-shadow:2px 2px 0 #000}
+.combo b{font-size:26px;color:var(--acc);display:block}
+.popup{position:absolute;left:50%;top:26%;transform:translateX(-50%);font-size:22px;z-index:4;
+  color:var(--acc);text-shadow:3px 3px 0 #000;pointer-events:none;opacity:0;white-space:nowrap}
+.popup.go{animation:pop .8s steps(8)}
+@keyframes pop{0%{opacity:1}99%{opacity:1;transform:translate(-50%,-44px)}100%{opacity:0}}
+#flash{position:fixed;inset:0;pointer-events:none;z-index:60;opacity:0;background:var(--ng)}
+#flash.go{animation:fl .24s steps(2)}
+@keyframes fl{0%{opacity:.45}100%{opacity:0}}
+
+#msgwin{min-height:84px;font-size:14px}
+#msgwin p{margin:0}
+
+.q{text-align:center;padding:10px 0 2px}
+.q .kana{font-size:clamp(24px,5vw,38px);letter-spacing:.14em;word-break:break-all}
+.q .kana .done{color:#55557a}
+.q .kana .cur{color:var(--acc);border-bottom:4px solid var(--acc)}
+.q .roma{font-size:clamp(16px,3.2vw,24px);letter-spacing:.16em;margin-top:6px;word-break:break-all}
+.q .roma .done{color:var(--ok)} .q .roma .todo{color:#6a6a90}
+.q .roma .next{color:#000;background:var(--acc);padding:0 3px}
+.q.miss{animation:ng .2s steps(2) 2}
+@keyframes ng{50%{transform:translateX(-9px)}}
+
+/* キーボード＋手 */
+.kbwrap{position:relative;width:465px;height:250px;margin:12px auto 0}
+#b-kb{position:relative;z-index:1}
+.kbrow{display:flex;gap:5px;margin-bottom:5px}
+.key{width:42px;height:42px;background:rgba(34,34,62,.45);border:2px solid #5a5a90;position:relative;
+  display:flex;align-items:center;justify-content:center;font-size:15px;text-transform:uppercase;color:#8a8ab0}
+/* ホームポジションの 8キー：その せいれいの 色の おびを 下に */
+.key.home{border-color:#7a7ab0;color:#d0d0e8}
+.key.home::after{content:"";position:absolute;left:2px;right:2px;bottom:2px;height:4px;
+  background:var(--hc,#fff);opacity:.9}
+/* F と J：ほんものの キーボードに ある でっぱり */
+.key.bump::before{content:"";position:absolute;left:50%;bottom:9px;transform:translateX(-50%);
+  width:14px;height:3px;background:#fff;opacity:.95}
+.key.space{width:465px}
+.key.lit{color:#000;border-color:#fff;box-shadow:0 0 0 2px #fff;transform:translateY(-3px)}
+#hands{position:absolute;left:0;top:0;z-index:0;pointer-events:none}
+#hands .fg{stroke-linecap:round;fill:none;stroke:#fff;stroke-width:12;stroke-opacity:.24}
+#hands .palm{fill:#fff;fill-opacity:.14;stroke:#fff;stroke-opacity:.24;stroke-width:2}
+#hands .fg.on{stroke-opacity:.9;stroke-width:15}
+.legend{display:flex;justify-content:center;gap:4px;margin-top:6px;flex-wrap:wrap}
+.fdot{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--sub)}
+.fdot i{width:10px;height:10px;display:inline-block}
+
+/* リスト系 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:8px}
+.sp-card{background:var(--panel);border:2px solid #4a4a78;padding:9px;text-align:center}
+.sp-card .k{font-size:24px} .sp-card .n{margin:2px 0}
+.bond{height:8px;background:#000;border:2px solid #fff;overflow:hidden;margin-top:5px}
+.bond>i{display:block;height:100%;background:var(--acc)}
+.stage{display:flex;gap:11px;align-items:center;background:var(--panel);border:2px solid #4a4a78;
+  padding:11px;margin-bottom:7px;cursor:pointer}
+.stage:hover{background:#33335c}
+.stage.lock{opacity:.35;cursor:not-allowed}
+.stage .no{font-size:22px;color:var(--acc);min-width:46px;text-align:center}
+.stage .clear{color:var(--ok)}
+
+/* ウィンドウ／メニュー */
+.dqmenu{list-style:none;margin:0;padding:0;min-width:140px}
+.dqmenu li{padding:1px 0 1px 21px;position:relative;cursor:pointer;white-space:nowrap}
+.dqmenu li.sel::before{content:"▶";position:absolute;left:1px}
+.dqmenu li.no{color:#5a5a80;cursor:not-allowed}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:50;padding:10px}
+.overlay.on{display:flex}
+#cmdlayer{background:rgba(0,0,0,.42)}
+
+/* ボスの とうじょう演出 */
+#bossintro{background:rgba(4,0,8,.94);cursor:pointer}
+.bi-wrap{text-align:center;position:relative;z-index:2;animation:bishake .55s steps(2) .28s}
+@keyframes bishake{0%,100%{transform:translate(0,0)}20%{transform:translate(-5px,2px)}
+  45%{transform:translate(5px,-3px)}70%{transform:translate(-3px,-1px)}}
+.bi-flash{position:absolute;inset:0;background:#e04a4a;z-index:1;pointer-events:none;
+  animation:biflash 1.1s steps(1) forwards}
+@keyframes biflash{0%{opacity:.88}12%{opacity:0}26%{opacity:.72}40%{opacity:0}100%{opacity:0}}
+.bi-art{line-height:0;opacity:0;animation:biart .75s steps(5) .22s forwards;
+  filter:drop-shadow(4px 4px 0 rgba(0,0,0,.7))}
+@keyframes biart{0%{opacity:0;transform:scale(.22)}65%{opacity:1;transform:scale(1.18)}
+  100%{opacity:1;transform:scale(1)}}
+.bi-band{display:inline-block;margin-top:16px;font-size:14px;letter-spacing:.55em;
+  color:#000;background:var(--ng);padding:2px 10px 2px 16px;
+  opacity:0;animation:bipop .28s steps(2) .95s forwards}
+.bi-name{font-size:26px;line-height:1.3;margin-top:11px;color:var(--ng);
+  text-shadow:3px 3px 0 #000;opacity:0;animation:bipop .28s steps(2) 1.2s forwards}
+.bi-line{margin-top:13px;font-size:15px;color:#fff;max-width:420px;
+  opacity:0;animation:bipop .4s steps(2) 1.7s forwards}
+.bi-skip{margin-top:18px;opacity:0;animation:bipop .3s steps(2) 2.4s forwards}
+@keyframes bipop{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* ボス戦の あいだの 見せ方 */
+.battlefield.boss .bg{filter:brightness(.6) saturate(1.2) hue-rotate(-12deg)}
+.bar.foe.boss{border-color:var(--ng);box-shadow:0 0 0 2px rgba(224,74,74,.45)}
+.bar.foe.boss.danger{animation:blink .5s steps(1) infinite}
+.bossbadge{display:inline-block;background:var(--ng);color:#000;font-size:11px;
+  letter-spacing:.18em;padding:1px 6px 1px 8px;margin-right:6px;vertical-align:2px}
+
+/* シューティング：右から ながれてくる てき */
+#shootlayer{position:absolute;inset:0;z-index:3;pointer-events:none}
+.ship{position:absolute;transform:translate(-50%,-50%);text-align:center;line-height:0;
+  filter:drop-shadow(2px 2px 0 rgba(0,0,0,.6))}
+.ship b{display:block;font-size:14px;line-height:1.3;margin-top:3px;color:#000;
+  background:#fff;border:2px solid #000;padding:0 5px;text-transform:uppercase}
+.ship.near b{animation:blink .38s steps(1) infinite}
+/* タイピングスロット：カジノの だい */
+.slotmc{max-width:352px;margin:0 auto;padding:9px 22px 9px;
+  background:linear-gradient(#4a3410,#1c1408);border:4px solid #e0b040;
+  box-shadow:0 0 0 3px #000, inset 0 0 0 2px #8a6a20}
+.slotcoin{display:flex;justify-content:space-between;font-size:11px;color:#ffd24a;margin-bottom:8px}
+.slotreels{display:flex;justify-content:center;gap:9px;position:relative}
+/* ▶ ◀ で まんなかの だんを さす（線は 文字に かぶるので おかない） */
+.slotreels::before,.slotreels::after{position:absolute;top:50%;transform:translateY(-50%);
+  color:#ff5a4a;font-size:15px;line-height:1;text-shadow:1px 1px 0 #000}
+.slotreels::before{content:"▶";left:-17px}
+.slotreels::after{content:"◀";right:-17px}
+.slotreels .rl{width:84px;background:#05050b;border:3px solid #f0f0f8;overflow:hidden}
+.slotreels .rl b{display:block;text-align:center;text-transform:uppercase;font-weight:400}
+/* 上下は 雰囲気だけ。まんなかだけ 白ぬきで 大きく＝どこを 打つか 一目で わかる */
+.slotreels .rl .up,.slotreels .rl .dn{height:19px;line-height:19px;font-size:14px;color:#23233c}
+.slotreels .rl .mid{height:44px;line-height:44px;font-size:32px;background:#fff;color:#000;
+  border-top:2px solid #ff5a4a;border-bottom:2px solid #ff5a4a}
+.slotreels .rl.set .mid{background:var(--acc)}
+.slotreels .rl.win .mid{animation:blink .26s steps(1) 8}
+.slotbet{text-align:center;font-size:11px;color:#c8a860;margin-top:8px;white-space:nowrap}
+.slotwin{text-align:center;font-size:19px;color:#ffe14a;text-shadow:2px 2px 0 #000;
+  margin-top:5px;letter-spacing:.06em;animation:blink .3s steps(1) 6}
+.slotwin.lose{font-size:13px;color:#8a8ab0;text-shadow:none;animation:none}
+.foe.cast{animation:foecast .26s steps(2)}
+@keyframes foecast{45%{filter:brightness(2.4) saturate(.45);transform:translateX(-7px)}}
+.shootinfo{display:inline-block;font-size:13px;line-height:1.6;background:#000;
+  border:2px solid #fff;padding:1px 10px;color:var(--acc)}
+#cmdwin{position:absolute;right:6px;bottom:80px}
+.srow{display:flex;gap:8px;align-items:baseline;padding:1px 0 1px 21px;position:relative;white-space:nowrap;font-size:13px}
+.srow.sel::before{content:"▶";position:absolute;left:1px;color:var(--acc)}
+.srow.no{color:#5a5a80}
+.srow .sq{color:var(--acc);min-width:70px;letter-spacing:.2em}
+.srow.no .sq{color:#5a5a80}
+.srow .sn{min-width:176px}
+.srow .sm{font-size:12px;color:var(--sub)}
+#spellbuf{font-size:20px;letter-spacing:.34em;color:var(--acc);min-height:28px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#000;
+  border:3px solid #fff;padding:9px 18px;z-index:99;display:none}
+.toast.on{display:block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weight:400}
+
+/* ワールドマップ */
+.worldmap{position:relative;height:300px;background:#12305a;border:3px solid #fff;
+  box-shadow:0 0 0 3px #000;overflow:hidden;margin-bottom:12px}
+.wm-bg{position:absolute;inset:0;z-index:0}
+.wm-bg svg{width:100%;height:100%;display:block}
+.road{position:absolute;width:5px;height:5px;background:#5a5a4a;box-shadow:0 0 0 1px #33332a;
+  transform:translate(-50%,-50%);z-index:1}
+.road.done{background:#e8d8a0;box-shadow:0 0 0 1px #6a5a30}
+.wm-prog{position:absolute;left:6px;top:5px;z-index:4;font-size:11px;background:#000;
+  border:2px solid #fff;padding:1px 7px}
+.wm-node{position:absolute;transform:translate(-50%,-50%);text-align:center;cursor:pointer;z-index:2}
+.wm-node .ico{line-height:0;display:inline-block;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.6))}
+.wm-node .lb{font-size:11px;background:#000;border:2px solid #fff;padding:0 5px;
+  white-space:nowrap;margin-top:2px;display:inline-block}
+.wm-node.done .lb{border-color:var(--ok);color:var(--ok)}
+.wm-node.next .lb{border-color:var(--acc);color:var(--acc);animation:blink .8s steps(1) infinite}
+.wm-node.lock{cursor:default}
+.wm-node.lock .ico{filter:brightness(0) invert(22%)}
+.wm-node.lock .lb{color:#6a6a90;border-color:#4a4a78}
+.wm-node .ico{position:relative}
+.wm-node .star{position:absolute;right:-9px;top:-11px;font-size:18px;color:#ffe14a;
+  text-shadow:2px 2px 0 #000, 0 0 7px rgba(255,225,74,.85);pointer-events:none}
+.wm-node .lb2{font-size:10px;background:#000;border:2px solid #4a4a78;padding:0 5px;
+  white-space:nowrap;margin-top:2px;display:inline-block;color:var(--sub)}
+.wm-node.ghost .lb{border-color:#4a4a78;color:#8a8ab0}
+.wm-node.ghost .qm{font-size:25px;line-height:1;color:#5f6f96;text-shadow:2px 2px 0 #000}
+.wm-node.ghost.soon{cursor:default}
+.wm-node.ghost.soon .lb2{color:#6a6a90}
+.wm-node.ghost.get .lb2{color:var(--acc);border-color:var(--acc)}
+.hckeys{display:flex;justify-content:center;gap:6px;margin-top:16px;flex-wrap:wrap}
+.hckeys .k{width:46px;height:46px;background:rgba(34,34,62,.45);border:2px solid #5a5a90;
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+  text-transform:uppercase;color:#8a8ab0}
+.hckeys .k.gap{border:none;background:none;width:22px}
+.hckeys .k.ok{border-color:var(--ok);color:var(--ok)}
+.hckeys .k.on{color:#000;border-color:#fff;box-shadow:0 0 0 2px #fff;transform:translateY(-3px)}
+.wm-you{position:absolute;transform:translate(-50%,-96%);z-index:3;pointer-events:none;
+  animation:float 2.4s steps(2) infinite;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.6))}
+
+/* トレーディングカード風のデザイン */
+.tcg{width:198px;background:#0e0e1a;border:4px solid var(--rc);padding:7px 7px 8px;
+  text-align:left;box-shadow:0 0 0 3px #000, 5px 5px 0 rgba(0,0,0,.55);position:relative}
+.tcg-head{display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;color:var(--rc);letter-spacing:.08em}
+.tcg-rar{background:var(--rc);color:#000;padding:0 5px;font-weight:400}
+.tcg-name{font-size:13px;line-height:1.35;margin:3px 0 5px;min-height:36px;
+  border-bottom:2px solid var(--rc);padding-bottom:3px}
+.tcg-art{background:#04040c;border:3px solid var(--rc);height:124px;display:flex;
+  align-items:center;justify-content:center;overflow:hidden;
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.045) 0 3px,transparent 3px 7px)}
+.tcg-type{display:inline-block;font-size:10px;background:var(--rc);color:#000;
+  padding:0 6px;margin:6px 0 4px}
+.tcg-text{font-size:10px;line-height:1.65;color:#b8b8d8;min-height:66px}
+.tcg.ur{animation:urframe 1.4s steps(6) infinite}
+@keyframes urframe{0%{border-color:#ffd23f}33%{border-color:#ff8ad8}66%{border-color:#7ad8ff}100%{border-color:#ffd23f}}
+
+/* ずかん用の小さいカード */
+.tcg.mini{width:100%;padding:4px}
+.tcg.mini .tcg-name{font-size:10px;min-height:26px;margin:2px 0 3px;padding-bottom:2px}
+.tcg.mini .tcg-art{height:62px;border-width:2px}
+.tcg.mini .tcg-head{font-size:9px}
+.tcg.mini .tcg-type{font-size:9px;margin:4px 0 0;padding:0 4px}
+.tcg.mini .tcg-text{display:none}
+
+/* カードの かいふう */
+#openlayer{background:rgba(0,0,0,.92)}
+.op-wrap{text-align:center;max-width:560px;width:96%}
+.op-choices{display:grid;gap:8px;justify-content:center;margin:8px 0}
+.op-pick{padding:5px;background:#000;border:4px solid #4a4a78;cursor:pointer;line-height:0;transition:none}
+.op-pick:hover{border-color:#8a8ac0}
+.op-pick.cur{border-color:var(--acc);transform:translateY(-7px);box-shadow:0 6px 0 #000}
+.op-pick.taken{opacity:.3;cursor:default;transform:none;border-color:#33335c}
+.op-got{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.op-got > .tcg{width:118px}
+.op-card{display:inline-block;padding:10px;background:#000;border:4px solid #4a4a78;position:relative}
+/* ① ため（小刻みに震える） */
+.op-card.hold{animation:holdfx .4s steps(3) infinite}
+@keyframes holdfx{0%,100%{transform:translate(0,0)}33%{transform:translate(-3px,1px)}
+  66%{transform:translate(3px,-1px)}}
+/* 予兆：なにか光っている（レアほど出やすい。たまにフェイクもある） */
+.op-card.omen{box-shadow:0 0 0 5px var(--om), 0 0 30px 6px var(--om)}
+.op-card.omen::before{content:"";position:absolute;inset:-14px;border:3px solid var(--om);
+  opacity:.5;animation:omenfx .9s steps(5) infinite}
+@keyframes omenfx{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.1);opacity:0}}
+/* ② ゆっくり閉じる */
+.op-card.close{animation:closefx .55s ease-in forwards}
+@keyframes closefx{from{transform:scaleX(1)}to{transform:scaleX(.03)}}
+/* ③ ひらく */
+.op-card.open{animation:openfx .45s steps(8) forwards}
+@keyframes openfx{from{transform:scaleX(.03)}to{transform:scaleX(1)}}
+/* めくれる瞬間の閃光 */
+.op-glint{position:absolute;inset:-20px;background:#fff;pointer-events:none;z-index:6;
+  animation:glintfx .3s steps(3) forwards}
+@keyframes glintfx{0%{opacity:.85}99%{opacity:.1}100%{opacity:0}}
+.op-card.shine::after{content:"";position:absolute;inset:-8px;pointer-events:none;
+  border:4px solid var(--acc);animation:shinefx .7s steps(7) 2}
+@keyframes shinefx{0%{opacity:1;transform:scale(1)}99%{opacity:.15;transform:scale(1.16)}100%{opacity:0}}
+.op-burst{position:absolute;inset:0;pointer-events:none;z-index:1}
+.op-burst i{position:absolute;width:6px;height:6px;background:var(--acc);
+  animation:burst .6s steps(6) forwards}
+@keyframes burst{to{transform:translate(var(--bx),var(--by)) scale(.2);opacity:0}}
+.op-name{font-size:19px;margin-top:10px}
+.op-tip{line-height:1.85;margin-top:6px}
+.op-count{color:var(--sub);font-size:12px}
+.packrow{display:flex;gap:10px;align-items:center;background:var(--panel);border:2px solid #4a4a78;
+  padding:9px 11px;margin-bottom:7px;flex-wrap:wrap}
+.packrow .nm{min-width:170px}
+.packrow .ds{font-size:12px;color:var(--sub);flex:1;min-width:150px}
+.packrow .pr{color:var(--acc);min-width:78px;text-align:right}
+
+/* カードずかん */
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+.cardit{cursor:pointer;position:relative}
+.cardit:hover{transform:translateY(-3px)}
+.cardit.lock{opacity:.5;cursor:default}
+.cardit.lock .tcg-art{filter:brightness(.35)}
+.cardit .dupbadge{position:absolute;right:4px;bottom:4px}
+.cardbg{overflow:hidden;border:2px solid #4a4a78}
+.cardbg svg{width:100%;height:100%;display:block}
+.cardsp{display:flex;align-items:center;justify-content:center;border:3px solid currentColor;line-height:1}
+.dupbadge{font-size:10px;color:var(--acc)}
+
+/* ショップ */
+.shoprow{display:flex;gap:10px;align-items:center;background:var(--panel);border:2px solid #4a4a78;
+  padding:8px 10px;margin-bottom:6px;flex-wrap:wrap}
+.shoprow .nm{min-width:168px}
+.shoprow .ds{font-size:12px;color:var(--sub);flex:1;min-width:130px}
+.shoprow .pr{color:var(--acc);min-width:76px;text-align:right}
+.shoprow.have{opacity:.55}
+.shoprow.equipped{border-color:var(--acc)}
+.tabs{display:flex;gap:5px;flex-wrap:wrap}
+.tabs button{font-size:13px;padding:5px 11px;box-shadow:3px 3px 0 #000}
+.tabs button.on{background:var(--acc);color:#000}
+@media(max-width:520px){ .kbwrap{transform:scale(.76);transform-origin:top center;margin-bottom:-56px} }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ TITLE ============ -->
+  <div class="screen on" id="sc-title">
+    <div class="logo"><div class="en">KEY QUEST</div><div class="jp">キークエスト</div></div>
+    <div class="card" style="text-align:center">
+      <div id="title-art" style="display:flex;justify-content:center;gap:22px;margin-bottom:12px"></div>
+      <p class="muted">文字がきえた「キーボード王国」。<br>
+      8人の ゆびの精霊 といっしょに、ことばを とりもどそう。</p>
+      <div class="row" style="justify-content:center;margin-top:14px">
+        <button id="btn-continue">つづきから</button>
+        <button class="sub" id="btn-new">はじめから</button>
+        <button class="sub" id="btn-import-title">ひきつぎ</button>
+      </div>
+      <p class="muted" id="save-info" style="margin-top:12px"></p>
+      <p class="muted" id="title-persist" style="margin-top:4px;font-size:11px"></p>
+    </div>
+  </div>
+
+  <!-- ============ MAP ============ -->
+  <div class="screen" id="sc-map">
+    <div class="card">
+      <div class="hud">
+        <div id="map-art"></div>
+        <div><b id="m-name">—</b><br><span class="muted" id="m-rank"></span></div>
+        <div class="sp"></div>
+        <div class="muted">Lv.<b style="font-size:19px;color:var(--acc)" id="m-lv">1</b></div>
+        <div class="muted">つぎまで <span id="m-next">—</span></div>
+        <div class="muted">Ｇ <b style="color:var(--acc)" id="m-gold">0</b></div>
+        <div class="muted">★ <b style="color:var(--acc)" id="m-star">0</b></div>
+      </div>
+    </div>
+    <div class="card" id="newpack-card" style="display:none;border-color:var(--acc)">
+      <h3 style="margin:0 0 6px;color:var(--acc)">★ あたらしい ぼうけんが とどいたよ！</h3>
+      <p class="muted" id="newpack-name" style="margin:0 0 9px"></p>
+      <button id="btn-newpack-add">ここを おして ついかする</button>
+    </div>
+    <div class="tabs" id="world-tabs" style="margin-bottom:8px"></div>
+    <div class="worldmap" id="worldmap">
+      <div class="wm-bg" id="wm-bg"></div>
+    </div>
+    <div class="card" id="stagelist-wrap">
+      <h3>ぼうけんの ちず</h3>
+      <div id="stagelist"></div>
+    </div>
+    <div class="row">
+      <button id="btn-shop">みせに いく</button>
+      <button class="sub" id="btn-cards">カードずかん</button>
+      <button class="sub" id="btn-status">ステータス</button>
+      <button class="sub" id="btn-menu">メニュー</button>
+      <div class="sp"></div>
+      <button class="sub sm" id="btn-title">タイトルへ</button>
+    </div>
+  </div>
+
+  <!-- ============ HOME POSITION CHECK ============ -->
+  <div class="screen" id="sc-home">
+    <div class="card" style="text-align:center">
+      <h2>ホームポジション かくにん</h2>
+      <p class="muted">ひかった キーを おしてね。ゆびは ホームに おいたまま。</p>
+      <div class="hckeys" id="hc-keys"></div>
+      <p id="hc-finger" style="font-size:17px;color:var(--acc);margin:14px 0 2px">—</p>
+      <p class="muted" id="hc-count"></p>
+      <div id="hc-result" style="margin-top:10px"></div>
+      <div class="row" style="justify-content:center;margin-top:12px">
+        <button id="btn-hc-go" style="display:none">ぼうけんへ！</button>
+        <button class="sub sm" id="btn-hc-skip">とばす</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BATTLE ============ -->
+  <div class="screen" id="sc-battle">
+    <div class="card">
+      <div class="hud">
+        <div style="min-width:112px"><b id="b-name">—</b><br><span class="muted">Lv.<span id="b-lv">1</span></span></div>
+        <div style="flex:1;min-width:150px">
+          <div class="muted">HP <span id="b-hp"></span> <span id="b-guard" style="color:var(--mp)"></span></div>
+          <div class="bar hp" id="b-hpwrap"><i id="b-hpbar"></i></div>
+          <div class="muted" style="margin-top:4px">MP <span id="b-mp"></span></div>
+          <div class="bar mp"><i id="b-mpbar"></i></div>
+        </div>
+        <div class="muted" style="text-align:right">のこり<br><b style="font-size:20px;color:var(--acc)" id="b-left">0</b> たい</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="battlefield" id="b-field">
+        <div class="bg" id="b-bg"></div>
+        <div class="combo">COMBO<b id="b-combo">0</b></div>
+        <div class="popup" id="b-popup"></div>
+        <div class="foe" id="b-foe"></div>
+        <div class="player" id="b-player"></div>
+        <div id="shootlayer"></div>
+      </div>
+      <div style="text-align:center">
+        <b id="b-foename">—</b>
+        <div style="max-width:300px;margin:5px auto 0">
+          <div class="bar foe" id="b-foewrap"><i id="b-foehp"></i></div>
+          <div class="muted" id="b-castwrap" style="margin-top:4px;display:none">
+            えいしょう<div class="bar cast"><i id="b-cast"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="q" id="b-q">
+        <div class="kana" id="b-kana"></div>
+        <div class="roma" id="b-roma"></div>
+      </div>
+
+      <div class="kbwrap" id="b-kbwrap">
+        <div id="b-kb"></div>
+        <svg id="hands" width="465" height="250" viewBox="0 0 465 250"></svg>
+      </div>
+      <div class="legend" id="b-legend"></div>
+      <p class="muted" id="b-hint" style="text-align:center;margin:8px 0 0"></p>
+    </div>
+    <div class="dq" id="msgwin"></div>
+    <p class="muted" style="text-align:center;margin:10px 0 0">
+      <kbd>Space</kbd> コマンド　<kbd>Esc</kbd> とじる
+    </p>
+  </div>
+
+  <!-- ============ RESULT ============ -->
+  <div class="screen" id="sc-result">
+    <div class="card" style="text-align:center">
+      <h2 id="r-title">たたかいに かった！</h2>
+      <div id="r-body"></div>
+      <div class="row" style="justify-content:center;margin-top:14px">
+        <button id="btn-r-next">つぎへ</button>
+      </div>
+      <p class="muted" style="margin-top:8px"><kbd>Space</kbd> または <kbd>Enter</kbd> で つぎへ</p>
+    </div>
+  </div>
+
+  <!-- ============ SHOP ============ -->
+  <div class="screen" id="sc-shop">
+    <div class="card">
+      <div class="hud">
+        <div id="shop-art"></div>
+        <div><b>どうぐと ぶきの みせ</b><br><span class="muted">「まいど！ なにに するね？」</span></div>
+        <div class="sp"></div>
+        <div>もちきん Ｇ <b style="color:var(--acc)" id="shop-gold">0</b></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="tabs" id="shop-tabs"></div>
+      <div id="shop-list" style="margin-top:12px"></div>
+    </div>
+    <button class="sub" id="btn-shop-back">みせを でる</button>
+  </div>
+
+  <!-- ============ CARDS ============ -->
+  <div class="screen" id="sc-cards">
+    <div class="card">
+      <div class="hud">
+        <div><b>カードずかん</b><br><span class="muted" id="cd-count">0 / 0</span></div>
+        <div class="sp"></div>
+        <div class="muted">もちきん Ｇ <b style="color:var(--acc)" id="cd-gold">0</b></div>
+        <button class="sm" id="btn-cd-pack">カードパックを かう</button>
+      </div>
+      <p class="muted" style="margin:8px 0 0">カードには キーボードの ひみつが かいてある。クリックで よめるよ。</p>
+    </div>
+    <div class="card" id="cd-detail" style="display:none"></div>
+    <div class="card"><div class="cardgrid" id="cd-grid"></div></div>
+    <button class="sub" id="btn-cd-back">もどる</button>
+  </div>
+
+  <!-- ============ STATUS ============ -->
+  <div class="screen" id="sc-status">
+    <div class="card">
+      <div class="hud" style="align-items:flex-start">
+        <div id="st-art"></div>
+        <table id="st-table" style="flex:1;min-width:230px"></table>
+      </div>
+    </div>
+    <div class="card">
+      <h3>そうび</h3>
+      <p class="muted">クリックで つけかえ できます。</p>
+      <div id="st-equip"></div>
+    </div>
+    <div class="card">
+      <h3>ゆびの せいれい</h3>
+      <p class="muted">きずなは「そのキーを どれだけ 正しく うてたか」で そだつ。きずなが あがると あたらしい じゅもんを おぼえる。</p>
+      <div class="grid" id="st-spirits"></div>
+    </div>
+    <div class="card"><h3>じゅもん</h3><div id="st-spells"></div></div>
+    <div class="card"><h3>どうぐ</h3><div id="st-tools"></div></div>
+    <button class="sub" id="btn-st-back">もどる</button>
+  </div>
+
+  <!-- ============ MENU ============ -->
+  <div class="screen" id="sc-menu">
+    <div class="card">
+      <h3>セーブ</h3>
+      <p class="muted">この ブラウザに じどうで ほぞんされています。</p>
+      <div class="row"><button id="btn-save">いま すぐ セーブ</button><span class="muted" id="menu-saved"></span></div>
+      <p class="muted" id="persist-state" style="margin:9px 0 0"></p>
+    </div>
+    <div class="card">
+      <h3>ひきつぎ（べつの パソコンで つづける）</h3>
+      <p class="muted">コードを コピーして、べつの パソコンで はりつければ、レベルも そうびも そのまま つづきが できます。</p>
+      <div class="row" style="margin-bottom:8px">
+        <button class="sm" id="btn-gen-code">ひきつぎコードを つくる</button>
+        <button class="sm sub" id="btn-copy-code">コピー</button>
+        <button class="sm sub" id="btn-dl-save">ファイルで ほぞん</button>
+      </div>
+      <textarea id="code-out" rows="5" placeholder="ここに ひきつぎコードが でます"></textarea>
+      <hr>
+      <p class="muted">うけとる がわ：コードを はりつけて「よみこむ」。</p>
+      <textarea id="code-in" rows="4" placeholder="ひきつぎコードを ここに はりつけ"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="sm" id="btn-import">よみこむ</button>
+        <button class="sm sub" id="btn-load-file">ファイルから よみこむ</button>
+        <input type="file" id="file-save" accept=".kqsave,.json" hidden>
+      </div>
+    </div>
+    <div class="card">
+      <h3>DLC（あたらしい ぼうけん）</h3>
+      <p class="muted">とうさんが つくった ついかコンテンツ（.kqpack）を ここに ドラッグ＆ドロップ。
+      レベル・そうび・せいれいは そのままで、あたらしい ステージが ふえます。</p>
+      <div class="row" style="margin-bottom:10px">
+        <button class="sm" id="btn-remote">ネットから さがす</button>
+        <span class="muted" id="remote-msg"></span>
+      </div>
+      <div id="remote-list" style="margin-bottom:10px"></div>
+      <div id="dropzone" style="border:3px dashed #4a4a78;padding:24px;text-align:center;color:var(--sub)">
+        ここに .kqpack ファイルを ドロップ
+      </div>
+      <div style="margin-top:10px" id="packlist"></div>
+    </div>
+    <div class="card">
+      <h3>せってい</h3>
+      <div class="row" style="margin-bottom:8px">
+        <label style="min-width:180px">キーボードの ならび</label>
+        <select id="set-layout" style="max-width:220px">
+          <option value="US">US（ふつう / L の右は ;）</option>
+          <option value="PT">ポルトガル（L の右は ç）</option>
+        </select>
+      </div>
+      <div class="row" style="margin-bottom:8px">
+        <label style="min-width:180px">キーボードと 手の え</label>
+        <select id="set-kb" style="max-width:220px">
+          <option value="auto">じどう（すすむと うすくなる）</option>
+          <option value="on">いつも みせる</option>
+          <option value="off">ださない</option>
+        </select>
+      </div>
+      <div class="row" style="margin-bottom:8px">
+        <label style="min-width:180px">ローマ字の ヒント</label>
+        <select id="set-hint" style="max-width:220px">
+          <option value="on">みせる</option><option value="off">ださない</option>
+        </select>
+      </div>
+      <div class="row" style="margin-bottom:8px">
+        <label style="min-width:180px">ホームポジション かくにん</label>
+        <select id="set-homecheck" style="max-width:220px">
+          <option value="on">ステージの まえに やる</option>
+          <option value="off">やらない</option>
+        </select>
+      </div>
+      <div class="row">
+        <label style="min-width:180px">がくしゅうきろくを おくる</label>
+        <select id="set-log" style="max-width:220px">
+          <option value="on">おくる（とうさんが みられる）</option>
+          <option value="off">おくらない</option>
+        </select>
+      </div>
+    </div>
+    <div class="card" style="border-color:var(--ng)">
+      <h3 style="color:var(--ng)">きけんな そうさ</h3>
+      <button class="sub sm" id="btn-wipe">セーブを ぜんぶ けす</button>
+    </div>
+    <button class="sub" id="btn-menu-back">もどる</button>
+  </div>
+</div>
+
+<!-- コマンド -->
+<div class="overlay" id="cmdlayer">
+  <div style="position:relative;width:100%;max-width:640px;height:100%">
+    <div class="dq" id="cmdwin"><ul class="dqmenu" id="cmdmenu"></ul></div>
+  </div>
+</div>
+<!-- じゅもん -->
+<div class="overlay" id="spelllayer">
+  <div class="dq" style="max-width:96%;max-height:88vh;overflow:auto">
+    <div style="border-bottom:3px solid #fff;padding-bottom:6px;margin-bottom:8px">じゅもん</div>
+    <div class="muted">となえる ならびを うつ　→　<kbd>Space</kbd> で となえる</div>
+    <div id="spellbuf">＿</div>
+    <div id="spellname" style="color:var(--acc);min-height:24px;margin-bottom:6px"></div>
+    <div id="spelllist"></div>
+    <div class="muted" style="margin-top:8px"><kbd>BS</kbd> けす　<kbd>Esc</kbd> やめる</div>
+  </div>
+</div>
+<!-- どうぐ -->
+<div class="overlay" id="toollayer">
+  <div class="dq" style="max-width:96%;max-height:88vh;overflow:auto">
+    <div style="border-bottom:3px solid #fff;padding-bottom:6px;margin-bottom:8px">どうぐ</div>
+    <ul class="dqmenu" id="toolmenu"></ul>
+    <div class="muted" style="margin-top:8px"><kbd>↑↓</kbd> えらぶ　<kbd>Space</kbd> つかう　<kbd>Esc</kbd> やめる</div>
+  </div>
+</div>
+
+<div class="overlay" id="bossintro">
+  <div class="bi-flash"></div>
+  <div class="bi-wrap">
+    <div class="bi-art" id="bi-art"></div>
+    <div><span class="bi-band">B O S S</span></div>
+    <div class="bi-name" id="bi-name">—</div>
+    <div class="bi-line" id="bi-line"></div>
+    <p class="muted bi-skip"><kbd>Space</kbd> で すすむ</p>
+  </div>
+</div>
+
+<div class="overlay" id="openlayer">
+  <div class="op-wrap">
+    <div id="op-stage"></div>
+    <p class="muted" id="op-hint" style="margin-top:12px"></p>
+  </div>
+</div>
+
+<div id="flash"></div>
+<div class="toast" id="toast"></div>
+
+<!-- ================= CORE CONTENT PACK ================= -->
+<script id="corepack" type="application/json">
+{
+  "packId": "core",
+  "packVersion": 3,
+  "title": "本編：8つのカギの精霊",
+  "requiresEngine": ">=1.2.0",
+  "enemies": [
+    {"id":"e_slime","name":"ミスタイプ・スライム","hp":26,"atk":4,"exp":12,"gold":10,
+     "px":{"c":["#1b3a2b","#5be08a","#2f9c62","#12121a"],"m":true,"d":[
+      "........","........","........","......11","....1122","...11222","..112222",".1122222",
+      ".1144222",".1144222",".1122222","11222222","11222222","11222222",".1111111","........"]}},
+    {"id":"e_bat","name":"タイプこうもり","hp":34,"atk":6,"exp":18,"gold":15,
+     "px":{"c":["#4a3a5e","#8a6ab0","#5e4a7a","#ffe14a"],"m":true,"d":[
+      "........","........","1.......","11......","111....1","1111..12","11111122","11111142",
+      ".1111142","..111122","...11122","....1122",".....112","......11","........","........"]}},
+    {"id":"e_golem","name":"キーゴーレム","hp":48,"atk":8,"exp":26,"gold":22,
+     "px":{"c":["#2a2418","#7a6a4a","#4a4030","#ffe14a"],"m":true,"d":[
+      "........","..111111",".1122222","11222222","11244222","11244222","11222222","11333322",
+      "11222222","11322232",".1122222","..111111","...12222","...12222","...11111","........"]}},
+    {"id":"e_ghost","name":"うちまちがい ゆうれい","hp":42,"atk":7,"exp":24,"gold":20,
+     "px":{"c":["#5a6a8a","#dfe6f5","#aab6d0","#2a2a4a"],"m":true,"d":[
+      "........","......11","....1122","...11222","..112222",".1144222",".1144222",".1122222",
+      "11222222","11222222","11222222","11222222","11222222","1.122122","...1.1..","........"]}},
+    {"id":"b_home","name":"ホームくずしオーガ","hp":80,"atk":9,"exp":80,"gold":90,"boss":true,
+     "px":{"c":["#5a2a2a","#e0705a","#a84a3a","#ffe14a"],"m":true,"d":[
+      "..1.....","..11....","...11111","..112222",".1122222",".1144222",".1144222",".1122222",
+      ".1133332",".1122222","..112222","...11111","...12222","..112222","..111111","........"]}},
+    {"id":"b_upper","name":"じょうだん魔人","hp":110,"atk":11,"exp":110,"gold":120,"boss":true,
+     "px":{"c":["#2a2a5a","#6a7ad0","#4a5aa0","#ffffff","#101020"],"m":true,"d":[
+      "........","....1111","..112222",".1122222","11222222","11224442","11224552","11222222",
+      "11222222",".1122222","..112222","....1111","........","...1..1.","..1..1..","........"]}},
+    {"id":"b_lower","name":"げだんの けもの","hp":140,"atk":13,"exp":150,"gold":160,"boss":true,
+     "px":{"c":["#4a2a1a","#b07a4a","#8a5a30","#ffe14a"],"m":true,"d":[
+      "........","..1.....",".11....1","1122...1","11222.11","11222111",".1442222",".1442222",
+      "..122222",".1222222","11222222","11222222","11222222",".1122222","..1.1.1.","........"]}},
+    {"id":"b_gojuon","name":"あいうえおドラゴン","hp":200,"atk":16,"exp":260,"gold":280,"boss":true,
+     "px":{"c":["#1a3a2a","#3ac07a","#2a8a5a","#ffe14a"],"m":true,"d":[
+      "......11",".....122","....1222","...12222","..112222",".1144222",".1144222","11233332",
+      "11222222",".1222222","..122222","...12222","1..12222","11112222",".1111111","........"]}}
+  ],
+  "items": [
+    {"id":"w_wood","type":"weapon","name":"きのキーキャップ","atk":2,"price":80},
+    {"id":"w_silver","type":"weapon","name":"ぎんのスイッチ","atk":5,"price":260},
+    {"id":"w_blue","type":"weapon","name":"あおじくの つるぎ","atk":9,"price":640},
+    {"id":"w_gold","type":"weapon","name":"きんじくの せいけん","atk":14,"price":1500},
+    {"id":"a_cloth","type":"armor","name":"ぬのの パームレスト","def":2,"price":70},
+    {"id":"a_iron","type":"armor","name":"てつの プレート","def":5,"price":240},
+    {"id":"a_steel","type":"armor","name":"はがねの プレート","def":9,"price":600},
+    {"id":"ac_cable","type":"accessory","name":"みじかい ケーブル","agi":2,"price":90},
+    {"id":"ac_wireless","type":"accessory","name":"ワイヤレスの おまもり","agi":5,"price":300},
+    {"id":"ac_ring","type":"accessory","name":"8せいれいの ゆびわ","agi":9,"price":950},
+
+    {"id":"i_herb","type":"tool","name":"やくそう","effect":"heal","power":0.5,"price":30,"desc":"HPを はんぶん かいふく"},
+    {"id":"i_water","type":"tool","name":"まほうの みず","effect":"mp","power":0.6,"price":60,"desc":"MPを かいふく"},
+    {"id":"i_bell","type":"tool","name":"せいれいの すず","effect":"blind","power":1,"price":50,"desc":"てきの えいしょうを とめる"},
+    {"id":"i_shield","type":"tool","name":"ひかりの たて","effect":"guard","power":5,"price":80,"desc":"5かいぶん ダメージ半分"},
+    {"id":"i_elixir","type":"tool","name":"せかいじゅの しずく","effect":"full","power":1,"price":300,"desc":"HPとMPを ぜんかいふく"},
+
+    {"id":"c_hero","type":"cosmetic","name":"ゆうしゃ","price":400,
+     "px":{"c":["#241c14","#f0c8a0","#4a7ad0","#e0c040","#3a3a4a"],"m":true,"d":[
+      "........","....3333","...31111","..312122","...12222","...12222","....1111","...14444",
+      "..144444",".1444444","1.144444","...44444","...14444","...15555","...15555","...11111"]},
+     "pxb":{"c":["#241c14","#e0c040","#4a7ad0","#f0c8a0","#3a3a4a"],"m":true,"d":[
+      "........","....1111","...12222","...12222","...12222","....1111","..133333",".1333333",
+      "13333333","14333333","..133333","..133333","...13333","...15555","...11111","........"]}},
+    {"id":"c_mage","type":"cosmetic","name":"まほうつかい","price":400,
+     "px":{"c":["#241c14","#f0c8a0","#7a4ad0","#c0a0e0","#3a3a4a"],"m":true,"d":[
+      ".....1..","....133.","...13333","..133333",".1333333","...11111","...12122","...12222",
+      "....1111","...13333","..133333",".1333333","...13333","...15555","...15555","...11111"]},
+     "pxb":{"c":["#241c14","#7a4ad0","#9a6ae0","#f0c8a0","#3a3a4a"],"m":true,"d":[
+      ".....1..","....122.","...12222","..122222",".1222222","...11111","...13333","..133333",
+      ".1333333","14333333","..133333","...13333","...13333","...15555","...11111","........"]}},
+    {"id":"c_ninja","type":"cosmetic","name":"にんじゃ","price":600,
+     "px":{"c":["#141420","#f0c8a0","#2a2a44","#e04848","#3a3a4a"],"m":true,"d":[
+      "........","....1111","...13333","...12122","...13333","....1111","...33333","..333333",
+      ".3333333","3..33333","...33333","...13333","...15555","...15555","...11111","........"]},
+     "pxb":{"c":["#141420","#2a2a44","#2a2a44","#e04848","#3a3a4a"],"m":true,"d":[
+      "........","....1111","...12222","...12222","...12222","....1111","..133333",".1333333",
+      "13333333","..133333","...14444","...13333","...13333","...15555","...11111","........"]}},
+    {"id":"c_robot","type":"cosmetic","name":"ロボット","price":600,
+     "px":{"c":["#1a1a2a","#b0b8c8","#7a8598","#40e0e0","#3a3a4a"],"m":true,"d":[
+      "......1.","....1111","...12222","...12422","...12222","...11111","...12222","..122222",
+      "1.122222","..122222","...12222","...11111","...12222","...15555","...15555","...11111"]},
+     "pxb":{"c":["#1a1a2a","#7a8598","#b0b8c8","#40e0e0","#3a3a4a"],"m":true,"d":[
+      "......1.","....1111","...12222","...12222","...12222","...11111","...13333","..133333",
+      ".1333333","13334333","..133333","...13333","...11111","...15555","...11111","........"]}},
+    {"id":"c_cat","type":"cosmetic","name":"ねこ","price":800,
+     "px":{"c":["#241c14","#e8a848","#c07828","#ffffff","#3a3a4a"],"m":true,"d":[
+      "..1.....","..11....","...11111","..122222","..124222","..122222","...11111","...12222",
+      "..122222",".1222222","..122222","...12222","...11111","...15555","...15555","...11111"]},
+     "pxb":{"c":["#241c14","#e8a848","#c07828","#f0c8a0","#3a3a4a"],"m":true,"d":[
+      "..1.....","..11....","...11111","..122222","..122222","..122222","...11111","..133333",
+      ".1333333","13333333","14333333","..133333","...13333","...15555","...11111","........"]}},
+    {"id":"c_dragon","type":"cosmetic","name":"ドラゴン","price":1500,
+     "px":{"c":["#132a1e","#3ac07a","#2a8a5a","#ffe14a","#1a5a3a"],"m":true,"d":[
+      "....1...","...11...","..111111",".1122222","..114222","..112222","...11111","...12222",
+      "..122222",".1222222","11122222","...12222","...11111","...14444","...14444","...11111"]},
+     "pxb":{"c":["#132a1e","#3ac07a","#2a8a5a","#ffe14a","#1a5a3a"],"m":true,"d":[
+      "....1...","...11...","..111111",".1122222","..122222","..122222","...11111","1..12222",
+      "11312222","13312222","13312222","1.312222","...11111","...14444","...11111","........"]}},
+    {"id":"c_king","type":"cosmetic","name":"おうさま","price":2500,
+     "px":{"c":["#241c14","#f0c8a0","#c02a4a","#ffd23f","#3a3a4a"],"m":true,"d":[
+      "..3.3.3.","..33333.","...33333","...11111","...12122","...12222","....1111","...12333",
+      "..133333",".1333333","1..33333","...33333","...13333","...15555","...15555","...11111"]},
+     "pxb":{"c":["#241c14","#ffd23f","#c02a4a","#4a3020","#3a3a4a"],"m":true,"d":[
+      "..1.1.1.","..11111.","...11111","...14444","...14444","....1111","..133333",".1333333",
+      "13333333","..133333","..133333","...13333","...13333","...15555","...11111","........"]}},
+
+    {"id":"t_fast","type":"title","name":"はやうちの","price":300},
+    {"id":"t_perfect","type":"title","name":"ミスしない","price":500},
+    {"id":"t_spirit","type":"title","name":"せいれいつかいの","price":900},
+    {"id":"t_legend","type":"title","name":"でんせつの","price":2200}
+  ],
+  "cards": [
+    {"id":"cd_a","name":"アクア","rarity":"R","type":"せいれい","art":"spirit:a","tip":"ひだりの こゆびが おく キー。いちばん よわい ゆびなので、ここが うてると タイピングは ぐんと はやくなる。"},
+    {"id":"cd_s","name":"シルフ","rarity":"R","type":"せいれい","art":"spirit:s","tip":"ひだりの くすりゆび。こゆびの つぎに うごかしにくい。ゆっくりでも いいから 正しい ゆびで うつのが 近道。"},
+    {"id":"cd_d","name":"ドラコ","rarity":"R","type":"せいれい","art":"spirit:d","tip":"ひだりの なかゆび。ホームポジションから うえの E、したの C も この ゆびの たんとう。"},
+    {"id":"cd_f","name":"フレア","rarity":"R","type":"せいれい","art":"spirit:f","tip":"ひだりの ひとさしゆび。F の キーには ちいさな でっぱりが ある。目で 見なくても 手が ホームを 見つけられる ように。"},
+    {"id":"cd_j","name":"ジェイド","rarity":"R","type":"せいれい","art":"spirit:j","tip":"みぎの ひとさしゆび。J にも でっぱりが ある。F と J に ゆびを おけば、あとの 6本は しぜんに ならぶ。"},
+    {"id":"cd_k","name":"カゲロウ","rarity":"R","type":"せいれい","art":"spirit:k","tip":"みぎの なかゆび。うえの I、したの コンマも たんとう。ローマ字の「き」「か」で よく つかう。"},
+    {"id":"cd_l","name":"ルーナ","rarity":"R","type":"せいれい","art":"spirit:l","tip":"みぎの くすりゆび。O や ピリオドも たんとう。「ら行」を うつ ときに 大かつやく。"},
+    {"id":"cd_x","name":"セレネ","rarity":"SR","type":"せいれい","art":"spirit:;","tip":"みぎの こゆび。ローマ字入力では あまり つかわないが、Enter や Shift を おす 大事な ゆび。ポルトガルの キーボードでは ここが Ç になる。"},
+
+    {"id":"cd_slime","name":"ミスタイプ・スライム","rarity":"N","type":"モンスター","art":"enemy:e_slime","tip":"うちまちがいから 生まれる まもの。ゆっくり 正しく うつと 出てこない。はやさより 正かくさが 先。"},
+    {"id":"cd_bat","name":"タイプこうもり","rarity":"N","type":"モンスター","art":"enemy:e_bat","tip":"手もとを 見ながら うつ 人の まわりに あつまる。画面を 見て うつ ことを ブラインドタッチと いう。"},
+    {"id":"cd_golem","name":"キーゴーレム","rarity":"N","type":"モンスター","art":"enemy:e_golem","tip":"キーを 強く たたきすぎると あらわれる。かるく たたく ほうが、じつは はやく うてる。"},
+    {"id":"cd_ghost","name":"うちまちがい ゆうれい","rarity":"N","type":"モンスター","art":"enemy:e_ghost","tip":"まちがえた まま すすむと ついてくる。まちがえたら その キーを うちなおす ことが 大切。"},
+    {"id":"cd_ogre","name":"ホームくずしオーガ","rarity":"SR","type":"モンスター","art":"enemy:b_home","tip":"ゆびを ホームポジションから はなすと 力を つける。うったら すぐ もどす。これが すべての 基本。"},
+    {"id":"cd_upper","name":"じょうだん魔人","rarity":"SR","type":"モンスター","art":"enemy:b_upper","tip":"うえの れつ QWERTY を まもる まじん。QWERTY という ならびは 150年 いじょう 前から つかわれている。"},
+    {"id":"cd_lower","name":"げだんの けもの","rarity":"SR","type":"モンスター","art":"enemy:b_lower","tip":"したの れつ ZXCVBNM を まもる けもの。したの れつは てくびを 下げずに ゆびだけ のばすのが コツ。"},
+    {"id":"cd_dragon","name":"あいうえおドラゴン","rarity":"UR","type":"モンスター","art":"enemy:b_gojuon","tip":"五十音を まもる りゅう。ローマ字は「しいん＋ぼいん」。か＝K＋A、し＝S＋I。この きまりが わかれば 五十音は ぜんぶ うてる。"},
+
+    {"id":"cd_herb","name":"やくそう","rarity":"N","type":"どうぐ","tip":"つかれたら 手を とめて、ゆびを のばそう。ながく うつときは 20分に 1回 休むと いい。",
+     "px":{"c":["#1a4a1a","#4ac04a"],"m":true,"d":[
+      "........","........","......11",".....122","....1222","...12222","..122222",".1222222",
+      "11222222",".1122222","..112222","...11222","....1122",".....112","......11","........"]}},
+    {"id":"cd_water","name":"まほうの みず","rarity":"N","type":"どうぐ","tip":"のみものは キーボードの ちかくに おかない。こぼすと 中に 入って こわれてしまう。",
+     "px":{"c":["#2a2a3a","#a0c0e0","#4a8ad0"],"m":true,"d":[
+      "........","....1111","....1222","....1222","...11111","...12222","..122222","..123333",
+      "..133333","..133333","..133333","..122222","...11111","........","........","........"]}},
+    {"id":"cd_sword","name":"あおじくの つるぎ","rarity":"R","type":"そうび","tip":"キーボードの スイッチには 色が ある。あお軸は カチカチ 音が する タイプ。ほかに 茶軸・赤軸などが ある。",
+     "px":{"c":["#3a3a4a","#d0d8e8","#8a5a2a"],"m":true,"d":[
+      "........","......11","......12","......12","......12","......12","......12","......12",
+      "......12","...11112","......13","......13","......13","......11","........","........"]}},
+    {"id":"cd_cap","name":"キーキャップ","rarity":"N","type":"どうぐ","tip":"キーの あたまに ついている ぶひん。じつは 外して あらえる。すきな 色に かえる 人も いる。",
+     "px":{"c":["#2a2a3a","#c0c0d0","#8a8a9a"],"m":true,"d":[
+      "........","........","..111111",".1222222","11222222","11223322","11223322","11222222",
+      "11222222",".1122222","..111111","........","........","........","........","........"]}},
+    {"id":"cd_shield","name":"ひかりの たて","rarity":"R","type":"そうび","tip":"まちがえても へこまない 心が いちばんの たて。ミスは じょうずに なる とちゅうの しるし。",
+     "px":{"c":["#3a2a1a","#c8a848","#e8d888"],"m":true,"d":[
+      "........","..111111",".1122222","11222222","11233332","11233332","11222222","11222222",
+      ".1122222","..122222","...12222","....1222",".....122","......11","........","........"]}},
+
+    {"id":"cd_village","name":"ホームのむら","rarity":"N","type":"ばしょ","art":"bg:grass","tip":"8人の せいれいが すむ むら。ASDF と JKL; の 8つの キーが ホームポジション。"},
+    {"id":"cd_hill","name":"うえの丘","rarity":"N","type":"ばしょ","art":"bg:hill","tip":"ホームポジションの ひとつ うえの れつ。QWERTYUIOP。うったら すぐ ホームに もどる。"},
+    {"id":"cd_valley","name":"したの谷","rarity":"N","type":"ばしょ","art":"bg:valley","tip":"ホームポジションの ひとつ したの れつ。ZXCVBNM。てくびを 下げないのが コツ。"},
+    {"id":"cd_plain","name":"あいうえお平原","rarity":"N","type":"ばしょ","art":"bg:plain","tip":"ローマ字の せかい。「ん」は N。ただし つぎが ぼいんや や行の ときは NN と 2回 うつ。"},
+
+    {"id":"cd_ring","name":"8せいれいの ゆびわ","rarity":"UR","type":"でんせつ","tip":"8本の ゆびが そろって はじめて 力に なる。1本でも さぼると 速さは 上がらない。",
+     "px":{"c":["#5a4a1a","#ffd23f"],"m":true,"d":[
+      "........","........","......11","....1122","...1122.","..1122..","..122...","..122...",
+      "..122...","..122...","..1122..","...1122.","....1122","......11","........","........"]}},
+    {"id":"cd_qwerty","name":"QWERTYの ひみつ","rarity":"SR","type":"でんせつ","tip":"キーの ならびが ABC じゃないのは、むかしの タイプライターで うでが からまないように するため だった と いわれている。",
+     "px":{"c":["#2a2a3a","#4a4a6a","#c0c0d0"],"m":true,"d":[
+      "........","........","........","11111111","12222222","12323232","12222222","12323232",
+      "12222222","12332332","12222222","11111111","........","........","........","........"]}},
+    {"id":"cd_stone","name":"ホームポジションの いしぶみ","rarity":"SR","type":"でんせつ","tip":"「うったら もどる」。この 6文字が すべて。手さぐりで F と J を さがせるように なれば 一人前。",
+     "px":{"c":["#2a2a2a","#8a8a7a","#4a4a44"],"m":true,"d":[
+      "........","........","....1111","...12222","...12222","...12322","...12322","...12222",
+      "...12322","...12222","...12222","...11111","..111111","..111111","........","........"]}},
+    {"id":"cd_typist","name":"でんせつの タイピスト","rarity":"UR","type":"でんせつ","tip":"1分間に 500文字 いじょう うつ 人が じっさいに いる。まずは 100文字を めざそう。",
+     "px":{"c":["#241c14","#f0c8a0","#ffd23f","#e0c040","#3a3a4a"],"m":true,"d":[
+      "........","....1111","...12222","...12122","...12222","....1111","...13333","..133333",
+      ".1333333","13333333","..133333","...13333","...11111","...15555","...11111","........"]}},
+    {"id":"cd_kingdom","name":"キーボード王国","rarity":"UR","type":"でんせつ","art":"bg:forest","tip":"文字が きえた 王国。ことばを うてる ように なる ことは、じぶんの 考えを 世界に とどける 力を 手に 入れる こと。"}
+  ],
+  "spells": [
+    {"id":"sp_a","seq":"a","name":"アクアヒール","spirit":"アクア","type":"heal","power":0.4,"mp":4,"bond":0,"desc":"HPを かいふく"},
+    {"id":"sp_s","seq":"s","name":"シルフカッター","spirit":"シルフ","type":"attack","power":2,"mp":5,"bond":0,"desc":"かぜの やいばで 2もんぶん"},
+    {"id":"sp_d","seq":"d","name":"ドラゴンクロー","spirit":"ドラコ","type":"attack","power":3,"mp":7,"bond":1,"desc":"りゅうの つめで 3もんぶん"},
+    {"id":"sp_f","seq":"f","name":"フレアバースト","spirit":"フレア","type":"attack","power":3,"mp":7,"bond":1,"desc":"ほのおで 3もんぶん"},
+    {"id":"sp_j","seq":"j","name":"ジェイドウォール","spirit":"ジェイド","type":"guard","power":4,"mp":5,"bond":2,"desc":"4もんの あいだ ダメージ半分"},
+    {"id":"sp_k","seq":"k","name":"カゲロウブラインド","spirit":"カゲロウ","type":"blind","power":1,"mp":5,"bond":2,"desc":"てきの えいしょうを とめる"},
+    {"id":"sp_l","seq":"l","name":"ルーナライト","spirit":"ルーナ","type":"heal","power":0.9,"mp":9,"bond":3,"desc":"つきの ひかりで 大かいふく"},
+    {"id":"sp_x","seq":";","name":"セレネスター","spirit":"セレネ","type":"attack","power":5,"mp":12,"bond":4,"desc":"ほしくずで 5もんぶん"},
+    {"id":"cb_fd","seq":"fd","name":"バーニングドラゴン","spirit":"フレア＋ドラコ","type":"attack","power":6,"mp":14,"bond":2,"desc":"ほのおの りゅう 6もんぶん"},
+    {"id":"cb_aj","seq":"aj","name":"ガイアスプリング","spirit":"アクア＋ジェイド","type":"healfull","power":1,"mp":13,"bond":2,"desc":"HPを ぜんかいふく"},
+    {"id":"cb_sk","seq":"sk","name":"シャドウゲイル","spirit":"シルフ＋カゲロウ","type":"attackblind","power":3,"mp":12,"bond":3,"desc":"3もんぶん＋えいしょう停止"},
+    {"id":"cb_left","seq":"asdf","name":"レフトハンド・ストーム","spirit":"ひだり4せいれい","type":"attack","power":8,"mp":20,"bond":3,"desc":"ひだり手の あらし 8もんぶん"},
+    {"id":"cb_right","seq":"jkl;","name":"ライトハンド・ストーム","spirit":"みぎ4せいれい","type":"attack","power":8,"mp":20,"bond":3,"desc":"みぎ手の あらし 8もんぶん"},
+    {"id":"cb_nova","seq":"asdfjkl;","name":"エイトスピリット・ノヴァ","spirit":"8せいれい ぜんいん","type":"attack","power":15,"mp":34,"bond":4,"desc":"きゅうきょくの ひっさつわざ"}
+  ],
+  "wordlists": [
+    {"id":"wl_gojuon","entries":["さくら","ねこ","いぬ","やま","うみ","そら","はな","とり","ほし","つき","かわ","もり","あめ","ゆき","みち","ふね","いし","こえ","あし","くち","みみ","はし","いえ","まち","ゆめ","ちから","こころ","ひかり","まつり","なつ","あき","ふゆ","はる","あさ","ひる","よる","きた","みなみ","にし","ひがし","ことり","たいよう","おかし","たまご","にわとり","くすり","てがみ","おとうさん"]}
+  ],
+  "stages": [
+    {
+      "id":"s0","no":0,"name":"ホームのむら","teach":"ホームポジション","mode":"keys","timed":false,
+      "pos":[18,70],"bg":"grass","desc":"8人の せいれいと であう むら。ゆびを おくところを おぼえよう。",
+      "battles":[
+        {"enemy":"e_slime","q":6,"gen":{"pool":"fj","len":[2,3]},"hint":"ひとさしゆび だけ。F と J には ちいさな でっぱりが あるよ！"},
+        {"enemy":"e_slime","q":6,"gen":{"pool":"dk","len":[2,3]},"hint":"なかゆび の ばん。ドラコ と カゲロウ。"},
+        {"enemy":"e_bat","q":6,"gen":{"pool":"sl","len":[2,4]},"hint":"くすりゆび。シルフ と ルーナ。"},
+        {"enemy":"e_bat","q":6,"gen":{"pool":"a;","len":[2,4]},"hint":"こゆび。アクア と セレネ。いちばん むずかしい ゆびだ。"},
+        {"enemy":"b_home","q":12,"gen":{"pool":"asdfjkl;","len":[3,6]},"boss":true,"hint":"8人 ぜんいん！ ゆびを ホームポジションから うごかさないで。"}
+      ]
+    },
+    {
+      "id":"s1","no":1,"name":"うえの丘","teach":"じょうだん（うえの れつ）","mode":"keys","timed":false,
+      "pos":[33,42],"bg":"hill","desc":"ホームポジションの ひとつ うえ。ゆびを のばして、すぐ もどす。",
+      "battles":[
+        {"enemy":"e_slime","q":5,"gen":{"pool":"reui","len":[2,4]},"hint":"うったら すぐ ホームへ もどる！"},
+        {"enemy":"e_bat","q":5,"gen":{"pool":"weio","len":[2,4]},"hint":"くすりゆび も つかうよ。"},
+        {"enemy":"e_ghost","q":6,"gen":{"pool":"qwertyuiop","len":[3,5]},"hint":"うえの れつ ぜんぶ。"},
+        {"enemy":"b_upper","q":10,"gen":{"pool":"qwertyuiopasdfjkl;","len":[4,7]},"boss":true,"hint":"うえ と ホームの いききだ！"}
+      ]
+    },
+    {
+      "id":"s2","no":2,"name":"したの谷","teach":"げだん（したの れつ）","mode":"keys","timed":false,
+      "pos":[52,72],"bg":"valley","desc":"ホームポジションの ひとつ した。てくびを あげすぎないのが コツ。",
+      "battles":[
+        {"enemy":"e_bat","q":5,"gen":{"pool":"vbnm","len":[2,4]},"hint":"ひとさしゆび を したに。"},
+        {"enemy":"e_golem","q":5,"gen":{"pool":"zxc","len":[2,4]},"hint":"ひだりての なかゆび・くすりゆび・こゆび。"},
+        {"enemy":"e_ghost","q":6,"gen":{"pool":"zxcvbnm","len":[3,5]},"hint":"したの れつ ぜんぶ。"},
+        {"enemy":"b_lower","q":10,"gen":{"pool":"qwertyuiopasdfghjklzxcvbnm","len":[4,8]},"boss":true,"hint":"3だん ぜんぶ！ ここを こえたら ローマ字が うてる。"}
+      ]
+    },
+    {
+      "id":"s3","no":3,"name":"あいうえお平原","teach":"五十音（ローマ字）","mode":"kana","timed":true,
+      "pos":[72,40],"bg":"plain","desc":"ついに ことばの せかいへ。ひらがなを ローマ字で うとう。",
+      "battles":[
+        {"enemy":"e_slime","q":5,"wordlist":"wl_gojuon","hint":"「か」は K → A。しいんの つぎに ぼいん！"},
+        {"enemy":"e_bat","q":6,"wordlist":"wl_gojuon","hint":"「し」は SI でも SHI でも OK。"},
+        {"enemy":"e_golem","q":6,"wordlist":"wl_gojuon","hint":"「つ」は TU でも TSU でも OK。"},
+        {"enemy":"e_ghost","q":7,"wordlist":"wl_gojuon","hint":"「ん」は N。ただし つぎが ぼいんの ときは NN。"},
+        {"enemy":"b_gojuon","q":12,"wordlist":"wl_gojuon","boss":true,"hint":"あいうえおドラゴン！ おちついて、1もじずつ。"}
+      ]
+    }
+  ]
+}
+</script>
+
+<script>
+"use strict";
+/* =======================================================================
+   KEY QUEST — engine v1.2.0
+   ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
+   ======================================================================= */
+const ENGINE_VERSION = "1.2.0";
+const SAVE_KEY = "keyquest.save.v1";
+const PACK_KEY = "keyquest.packs.v1";
+const SCHEMA   = 4;
+
+/* 初期すがた（購入不要） */
+const DEFAULT_LOOK = {c:["#241c14","#f0c8a0","#5a8ad0","#e0c040","#3a3a4a"], m:true, d:[
+  "........","....1111","...12222","...12122","...12222","....1111","...13333","..133333",
+  "1.133333","..133333","...13333","...11111","...15555","...15555","...11111","........"]};
+
+/* 初期すがたの後ろ姿（戦闘中はこちらを表示する） */
+const DEFAULT_BACK = {c:["#241c14","#4a3020","#5a8ad0","#f0c8a0","#3a3a4a"], m:true, d:[
+  "........","....1111","...12222","...12222","...12222","...12222","....1111","..133333",
+  ".1333333","13333333","14333333","..133333","...13333","...15555","...11111","........"]};
+
+const SPIRITS = [
+  {key:"a", name:"アクア",   elem:"水", finger:"lp", label:"ひだり こゆび"},
+  {key:"s", name:"シルフ",   elem:"風", finger:"lr", label:"ひだり くすりゆび"},
+  {key:"d", name:"ドラコ",   elem:"竜", finger:"lm", label:"ひだり なかゆび"},
+  {key:"f", name:"フレア",   elem:"炎", finger:"li", label:"ひだり ひとさしゆび"},
+  {key:"j", name:"ジェイド", elem:"地", finger:"ri", label:"みぎ ひとさしゆび"},
+  {key:"k", name:"カゲロウ", elem:"影", finger:"rm", label:"みぎ なかゆび"},
+  {key:"l", name:"ルーナ",   elem:"月", finger:"rr", label:"みぎ くすりゆび"},
+  {key:";", name:"セレネ",   elem:"星", finger:"rp", label:"みぎ こゆび"}
+];
+const FINGER_OF = {};
+(function(){
+  const map = { lp:"1qaz", lr:"2wsx", lm:"3edc", li:"45rtfgvb",
+                ri:"67yuhjnm", rm:"8ik,", rr:"9ol.", rp:"0p;/-'[]" };
+  for (const f in map) for (const c of map[f]) FINGER_OF[c] = f;
+  FINGER_OF[" "] = "th";
+})();
+
+/* ---------- ドット絵 ---------- */
+function pixelArt(px, scale){
+  if (!px || !px.d) return "";
+  const rows = px.m ? px.d.map(r => r + r.split("").reverse().join("")) : px.d;
+  const w = rows[0].length, h = rows.length;
+  let s = '<svg class="px" width="'+(w*scale)+'" height="'+(h*scale)+'" viewBox="0 0 '+w+' '+h+
+          '" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">';
+  for (let y=0; y<h; y++){
+    const row = rows[y];
+    let x = 0;
+    while (x < w){
+      const ch = row[x];
+      const col = (ch >= "1" && ch <= "9") ? px.c[(+ch) - 1] : null;
+      if (!col){ x++; continue; }
+      let len = 1;
+      while (x+len < w && row[x+len] === ch) len++;
+      s += '<rect x="'+x+'" y="'+y+'" width="'+len+'" height="1" fill="'+col+'"/>';
+      x += len;
+    }
+  }
+  return s + "</svg>";
+}
+
+/* ---------- 背景（ステージごと・DLCでも指定できる） ---------- */
+const BG = {
+  grass:  {sky:"#3a6ac0", band:"#6a9ae0", far:"#2a5a3a", ground:"#3a8a3a", dot:"#2a6a2a", deco:"tree"},
+  hill:   {sky:"#4a8ad8", band:"#8ac0f0", far:"#3a7a5a", ground:"#4a9a4a", dot:"#3a7a3a", deco:"hill"},
+  valley: {sky:"#33335f", band:"#54467a", far:"#22224a", ground:"#4a4a5a", dot:"#38384a", deco:"rock"},
+  plain:  {sky:"#c85f3a", band:"#f0a860", far:"#7a4238", ground:"#8a7a3a", dot:"#6a5a2a", deco:"hill"},
+  cave:   {sky:"#12121e", band:"#1e1e30", far:"#080810", ground:"#3a3a48", dot:"#2a2a36", deco:"stalac"},
+  forest: {sky:"#2a5a4a", band:"#3a7a5a", far:"#16321f", ground:"#26522a", dot:"#1a3f1e", deco:"tree"},
+  rocky:  {sky:"#6a5a7a", band:"#9a8aaa", far:"#3a3a48", ground:"#5a5a5a", dot:"#484858", deco:"rock"}
+};
+function bgSVG(key){
+  const p = BG[key] || BG.grass;
+  const W = 128, H = 72, HZ = 48;                 /* HZ = 地平線 */
+  const R = (x,y,w,h,c) => '<rect x="'+Math.round(x)+'" y="'+Math.round(y)+
+    '" width="'+Math.max(1,Math.round(w))+'" height="'+Math.max(1,Math.round(h))+'" fill="'+c+'"/>';
+  /* 階段状の三角（山・木の葉・鍾乳石）。ドット感を出すため1行ずつ矩形で積む */
+  const tri = (cx,w,h,base,c,down) => {
+    let o = "";
+    for (let i=0;i<h;i++){
+      const ww = Math.max(1, Math.round(w*(i+1)/h));
+      o += R(cx-ww/2, down ? base+(h-1-i) : base-h+i, ww, 1, c);
+    }
+    return o;
+  };
+  let s = R(0,0,W,HZ,p.sky) + R(0,HZ-8,W,8,p.band);
+  if (p.deco === "stalac"){
+    [10,32,54,78,100,120].forEach((x,i) => s += tri(x, 7+(i%3)*3, 9+(i%3)*5, 0, p.far, true));
+  } else if (p.deco === "tree"){
+    s += tri(24,32,15,HZ,p.far) + tri(72,42,19,HZ,p.far) + tri(110,26,12,HZ,p.far);
+    [14,42,92,120].forEach(x => { s += R(x-1,HZ-8,2,8,p.far) + tri(x,11,9,HZ-7,p.far); });
+  } else if (p.deco === "rock"){
+    s += tri(20,34,20,HZ,p.far) + tri(66,46,26,HZ,p.far) + tri(112,30,16,HZ,p.far);
+  } else {
+    s += tri(26,34,13,HZ,p.far) + tri(74,44,17,HZ,p.far) + tri(114,28,11,HZ,p.far);
+  }
+  s += R(0,HZ,W,H-HZ,p.ground) + R(0,HZ,W,1,p.dot);
+  for (let i=0;i<30;i++)
+    s += R((i*23+(i%4)*7)%W, HZ+3+((i*11)%(H-HZ-4)), 2, 1, p.dot);
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid slice" ' +
+         'shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">' + s + '</svg>';
+}
+
+/* ---------- ローマ字テーブル ---------- */
+const YOON = {
+  "きゃ":["kya"],"きゅ":["kyu"],"きょ":["kyo"],"きぇ":["kye"],"きぃ":["kyi"],
+  "しゃ":["sya","sha"],"しゅ":["syu","shu"],"しょ":["syo","sho"],"しぇ":["sye","she"],
+  "ちゃ":["tya","cha","cya"],"ちゅ":["tyu","chu","cyu"],"ちょ":["tyo","cho","cyo"],"ちぇ":["tye","che"],
+  "にゃ":["nya"],"にゅ":["nyu"],"にょ":["nyo"],
+  "ひゃ":["hya"],"ひゅ":["hyu"],"ひょ":["hyo"],
+  "みゃ":["mya"],"みゅ":["myu"],"みょ":["myo"],
+  "りゃ":["rya"],"りゅ":["ryu"],"りょ":["ryo"],
+  "ぎゃ":["gya"],"ぎゅ":["gyu"],"ぎょ":["gyo"],
+  "じゃ":["zya","ja","jya"],"じゅ":["zyu","ju","jyu"],"じょ":["zyo","jo","jyo"],"じぇ":["zye","je"],
+  "びゃ":["bya"],"びゅ":["byu"],"びょ":["byo"],
+  "ぴゃ":["pya"],"ぴゅ":["pyu"],"ぴょ":["pyo"],
+  "ふぁ":["fa"],"ふぃ":["fi"],"ふぇ":["fe"],"ふぉ":["fo"],
+  "うぃ":["wi"],"うぇ":["we"],
+  "てぃ":["thi"],"でぃ":["dhi"],"どぅ":["dwu"],"とぅ":["twu"],
+  "ヴぁ":["va"],"ヴぃ":["vi"],"ヴぇ":["ve"],"ヴぉ":["vo"]
+};
+const ROMA = {
+  "あ":["a"],"い":["i","yi"],"う":["u","wu"],"え":["e"],"お":["o"],
+  "か":["ka","ca"],"き":["ki"],"く":["ku","cu","qu"],"け":["ke"],"こ":["ko","co"],
+  "さ":["sa"],"し":["si","shi","ci"],"す":["su"],"せ":["se","ce"],"そ":["so"],
+  "た":["ta"],"ち":["ti","chi"],"つ":["tu","tsu"],"て":["te"],"と":["to"],
+  "な":["na"],"に":["ni"],"ぬ":["nu"],"ね":["ne"],"の":["no"],
+  "は":["ha"],"ひ":["hi"],"ふ":["hu","fu"],"へ":["he"],"ほ":["ho"],
+  "ま":["ma"],"み":["mi"],"む":["mu"],"め":["me"],"も":["mo"],
+  "や":["ya"],"ゆ":["yu"],"よ":["yo"],
+  "ら":["ra"],"り":["ri"],"る":["ru"],"れ":["re"],"ろ":["ro"],
+  "わ":["wa"],"を":["wo"],
+  "が":["ga"],"ぎ":["gi"],"ぐ":["gu"],"げ":["ge"],"ご":["go"],
+  "ざ":["za"],"じ":["zi","ji"],"ず":["zu"],"ぜ":["ze"],"ぞ":["zo"],
+  "だ":["da"],"ぢ":["di"],"づ":["du"],"で":["de"],"ど":["do"],
+  "ば":["ba"],"び":["bi"],"ぶ":["bu"],"べ":["be"],"ぼ":["bo"],
+  "ぱ":["pa"],"ぴ":["pi"],"ぷ":["pu"],"ぺ":["pe"],"ぽ":["po"],
+  "ぁ":["la","xa"],"ぃ":["li","xi"],"ぅ":["lu","xu"],"ぇ":["le","xe"],"ぉ":["lo","xo"],
+  "ゃ":["lya","xya"],"ゅ":["lyu","xyu"],"ょ":["lyo","xyo"],"ゎ":["lwa","xwa"],
+  "ー":["-"],"、":[","],"。":["."],"！":["!"],"？":["?"],"　":[" "]
+};
+const uniq = a => Array.from(new Set(a));
+
+function parseKana(text){
+  const units = []; let i = 0;
+  while (i < text.length){
+    const two = text.substr(i,2);
+    if (YOON[two]){ units.push({disp:two, cands:YOON[two].slice()}); i+=2; continue; }
+    const one = text[i];
+    if (one === "っ"){
+      const nTwo = text.substr(i+1,2), nOne = text[i+1];
+      const nc = YOON[nTwo] ? YOON[nTwo] : (ROMA[nOne] || []);
+      const cands = [];
+      for (const c of nc){ const h = c[0]; if (!"aiueon".includes(h)) cands.push(h); }
+      cands.push("ltu","xtu","ltsu");
+      units.push({disp:"っ", cands:uniq(cands), sokuon:true});
+      i++; continue;
+    }
+    if (one === "ん"){
+      const nTwo = text.substr(i+1,2), nOne = text[i+1];
+      let cands;
+      if (!nOne){ cands = ["nn","xn"]; }
+      else{
+        const nc = YOON[nTwo] ? YOON[nTwo] : (ROMA[nOne] || [nOne]);
+        const risky = nc.some(c => "aiueony".includes(c[0])) || nOne === "ん";
+        cands = risky ? ["nn","xn"] : ["n","nn","xn"];
+      }
+      units.push({disp:"ん", cands, hatsuon:true});
+      i++; continue;
+    }
+    if (ROMA[one]){ units.push({disp:one, cands:ROMA[one].slice()}); i++; continue; }
+    units.push({disp:one, cands:[one.toLowerCase()]}); i++;
+  }
+  return units;
+}
+function parseRaw(str){ return Array.from(str).map(c => ({disp:c.toUpperCase(), cands:[c]})); }
+
+class Typer{
+  constructor(units){
+    this.units = units.map(u => ({...u, active:u.cands.slice()}));
+    this.idx = 0; this.buf = ""; this.typed = ""; this.pendingN = false;
+    this.hits = 0; this.misses = 0;
+  }
+  get done(){ return this.idx >= this.units.length; }
+  get cur(){ return this.units[this.idx]; }
+  input(ch){
+    if (this.done) return "done";
+    const u = this.cur;
+    const next = this.buf + ch;
+    const remain = u.active.filter(c => c.startsWith(next));
+    if (remain.length === 0){
+      if (this.pendingN && ch === "n" && this.buf === ""){ this.pendingN = false; return "ignore"; }
+      this.misses++; return "miss";
+    }
+    this.pendingN = false;
+    this.buf = next; this.hits++;
+    if (remain.includes(next)){
+      if (u.sokuon && !/^[lx]/.test(next)){
+        const nu = this.units[this.idx+1];
+        if (nu){ const f = nu.active.filter(c => c.startsWith(next)); if (f.length) nu.active = f; }
+      }
+      if (u.hatsuon && next === "n") this.pendingN = true;
+      u.typed = next; this.typed += next;
+      this.idx++; this.buf = "";
+      return this.done ? "done" : "ok";
+    }
+    return "progress";
+  }
+  nextKey(){
+    if (this.done) return null;
+    const u = this.cur;
+    const c = u.active.filter(x => x.startsWith(this.buf)).sort((a,b)=>a.length-b.length)[0];
+    return c ? c[this.buf.length] : null;
+  }
+  guide(){
+    let done = "", nextCh = "", todo = "";
+    for (let i=0;i<this.idx;i++) done += this.units[i].typed || this.units[i].active[0];
+    const u = this.cur;
+    if (u){
+      const c = u.active.filter(x => x.startsWith(this.buf)).sort((a,b)=>a.length-b.length)[0] || u.active[0];
+      done += this.buf; nextCh = c[this.buf.length] || ""; todo += c.slice(this.buf.length+1);
+    }
+    for (let i=this.idx+1;i<this.units.length;i++)
+      todo += this.units[i].active.slice().sort((a,b)=>a.length-b.length)[0];
+    return {done, nextCh, todo};
+  }
+}
+
+/* ---------- コンテンツ ---------- */
+const CONTENT = { stages:[], enemies:{}, items:{}, spells:{}, cards:{}, wordlists:{}, packs:[] };
+function mergePack(p){
+  if (CONTENT.packs.find(x => x.packId === p.packId)) return false;
+  CONTENT.packs.push({packId:p.packId, packVersion:p.packVersion, title:p.title||p.packId, world:p.world});
+  (p.enemies||[]).forEach(e => CONTENT.enemies[e.id] = e);
+  (p.items||[]).forEach(i => CONTENT.items[i.id] = i);
+  (p.spells||[]).forEach(s => CONTENT.spells[s.id] = s);
+  (p.cards||[]).forEach(c => CONTENT.cards[c.id] = c);
+  (p.wordlists||[]).forEach(w => CONTENT.wordlists[w.id] = w);
+  (p.stages||[]).forEach(s => CONTENT.stages.push({...s, packId:p.packId}));
+  return true;
+}
+mergePack(JSON.parse(document.getElementById("corepack").textContent));
+(function(){
+  try{ const raw = localStorage.getItem(PACK_KEY); if (raw) JSON.parse(raw).forEach(mergePack); }
+  catch(e){ console.warn("pack restore failed", e); }
+})();
+function persistPacks(l){ localStorage.setItem(PACK_KEY, JSON.stringify(l)); }
+function storedPacks(){ try{ return JSON.parse(localStorage.getItem(PACK_KEY)||"[]"); }catch(e){ return []; } }
+const itemsOf = type => Object.values(CONTENT.items).filter(i => i.type === type);
+
+/* ---------- セーブ ---------- */
+const RANKS = [[1,"みならい"],[5,"かけだし"],[10,"一人前"],[16,"じゅくれん"],[24,"たつじん"],[34,"えいゆう"],[45,"でんせつ"]];
+function rankOf(lv){ let r = RANKS[0][1]; for (const [n,t] of RANKS) if (lv >= n) r = t; return r; }
+function expToNext(lv){ return lv*lv*8 + 20; }
+
+function newSave(name){
+  const sp = {}; SPIRITS.forEach(s => sp[s.key] = {bond:0});
+  return {
+    schemaVersion: SCHEMA, engine: ENGINE_VERSION,
+    playerName: name || "ぼうけんしゃ",
+    createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    lv:1, exp:0, gold:0,
+    equipment:{weapon:null, armor:null, accessory:null},
+    inventory:[], tools:{}, cosmetics:[], look:null, title:null, cards:{},
+    spirits: sp, keyStats: {},
+    packProgress: { core:{cleared:[]} },
+    daily:{streak:0, best:0, lastDate:null, todayCount:0},
+    records:{bestWpm:0, bestAcc:0, recent:[]},
+    settings:{layout:"US", kb:"auto", hint:"on", log:"on", homecheck:"on"}
+  };
+}
+function migrate(s){
+  if (!s.settings) s.settings = {layout:"US", kb:"auto", hint:"on", log:"on", homecheck:"on"};
+  if (!s.settings.log) s.settings.log = "on";
+  if (!s.settings.homecheck) s.settings.homecheck = "on";     /* v5: ホームポジション かくにん */
+  if (!s.packProgress) s.packProgress = {};
+  if (!s.keyStats) s.keyStats = {};
+  if (!s.spirits){ s.spirits = {}; SPIRITS.forEach(x => s.spirits[x.key] = {bond:0}); }
+  if (!s.records) s.records = {bestWpm:0, bestAcc:0, recent:[]};
+  if (!s.daily) s.daily = {streak:0, best:0, lastDate:null, todayCount:0};
+  if (!s.inventory) s.inventory = [];
+  if (!s.tools) s.tools = {};                       /* v3: どうぐ（消耗品） */
+  if (!s.cosmetics) s.cosmetics = [];               /* v3: かった すがた・しょうごう */
+  if (s.look === undefined) s.look = null;
+  if (s.title === undefined) s.title = null;
+  if (!s.cards) s.cards = {};                       /* v4: あつめたカード */
+  delete s.skills;                                  /* v1 の技リストは廃止 */
+  s.schemaVersion = SCHEMA;
+  return s;
+}
+let S = null;
+function loadSave(){
+  try{ const raw = localStorage.getItem(SAVE_KEY); return raw ? migrate(JSON.parse(raw)) : null; }
+  catch(e){ return null; }
+}
+function save(){ if (!S) return; S.updatedAt = new Date().toISOString(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }
+setInterval(save, 30000);
+
+/* ---------- 学習きろくの送信（とうさんの スプレッドシートへ） ----------
+   ステージをクリアしたときだけ送る。失敗しても遊びには一切影響しない。
+   設定でオフにできる。 */
+const LOG_URL = "https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec";
+const LOG_TAG = "keyquest";
+const LOG_KEY = "kq-haru-2026";     /* 無差別な書き込みよけの合言葉 */
+let LOG_LAST = null;                /* 最後に送った結果（デバッグ用） */
+function sendLog(row, detail){
+  try{
+    if (!LOG_URL || !S || (S.settings && S.settings.log === "off")){ LOG_LAST = "skip"; return; }
+    if (typeof fetch !== "function"){ LOG_LAST = "nofetch"; return; }
+    const body = JSON.stringify({
+      lesson: LOG_TAG, key: LOG_KEY,
+      timestamp: new Date().toISOString(),
+      row: row, answers: detail
+    });
+    /* GASはCORSヘッダを返さないので no-cors。text/plain にしてプリフライトを避ける */
+    const r = fetch(LOG_URL, {
+      method: "POST", mode: "no-cors", cache: "no-store",
+      headers: {"Content-Type": "text/plain;charset=utf-8"},
+      body: body
+    });
+    if (r && r.catch) r.catch(() => {});
+    LOG_LAST = "sent";
+  }catch(e){ LOG_LAST = "error"; }
+}
+
+/* ---------- セーブの保護 ----------
+   ブラウザに「このデータは かってに 消さないで」と要求する。
+   ディスク容量が足りなくなったときの自動削除を防げる（手動削除は防げない）。 */
+let PERSIST_STATE = null;   /* true=保護あり / false=ブラウザまかせ / null=未確認・非対応 */
+function requestPersist(){
+  try{
+    if (typeof navigator === "undefined" || !navigator.storage || !navigator.storage.persist){
+      PERSIST_STATE = null;
+      return Promise.resolve(null);
+    }
+    const check = navigator.storage.persisted
+      ? navigator.storage.persisted()
+      : Promise.resolve(false);
+    return check.then(already => {
+      if (already){ PERSIST_STATE = true; return true; }
+      return navigator.storage.persist().then(ok => { PERSIST_STATE = !!ok; return PERSIST_STATE; });
+    }).catch(() => { PERSIST_STATE = null; return null; });
+  }catch(e){
+    PERSIST_STATE = null;
+    return Promise.resolve(null);
+  }
+}
+function persistLabel(){
+  if (PERSIST_STATE === true)  return "セーブの ほご：ゆうこう（ブラウザが かってに けしません）";
+  if (PERSIST_STATE === false) return "セーブの ほご：ブラウザ まかせ。ときどき「ファイルで ほぞん」を しておくと あんしん";
+  return "セーブの ほご：この ブラウザでは かくにん できません";
+}
+function showPersist(){
+  const t = persistLabel();
+  const el = $("persist-state"); if (el) el.textContent = t;
+  const tt = $("title-persist");                   /* タイトルにも 出す */
+  if (tt){
+    tt.textContent = t;
+    tt.style.color = (PERSIST_STATE === true) ? "var(--sub)" : "var(--acc)";
+  }
+}
+
+/* ---------- 派生 ---------- */
+function eqBonus(){
+  const b = {atk:0, def:0, agi:0};
+  for (const slot of ["weapon","armor","accessory"]){
+    const it = CONTENT.items[S.equipment[slot]];
+    if (it){ b.atk += it.atk||0; b.def += it.def||0; b.agi += it.agi||0; }
+  }
+  return b;
+}
+function stats(){
+  const lv = S.lv, b = eqBonus();
+  return { maxHp: 30 + lv*6, maxMp: 10 + lv*3,
+    atk: Math.round(5 + lv*2 + b.atk), def: Math.round(3 + lv*1.5 + b.def), agi: Math.round(5 + lv*1.2 + b.agi) };
+}
+function bondOf(key){
+  const k = S.keyStats[key];
+  if (!k || k.hit < 6) return 0;
+  const acc = k.hit / (k.hit + k.miss);
+  const vol = Math.min(1, k.hit / 120);
+  return Math.max(0, Math.min(10, Math.round(acc * vol * 10 + (acc>0.95 ? 1 : 0))));
+}
+let lastKeyT = 0;              /* 前の打鍵の時刻。問題の切れ目でリセットする */
+function recordKey(key, ok, dt){
+  if (!/^[a-z0-9;\-,.]$/.test(key)) return;
+  const k = S.keyStats[key] || (S.keyStats[key] = {hit:0, miss:0});
+  ok ? k.hit++ : k.miss++;
+  /* 60ms未満（同時押し）と 3秒超（考えこみ）は のぞいて 平均を出す。
+     一本指うちだと 遠いキーへの 移動が はっきり 遅くなるので、指づかいの めやすになる */
+  if (ok && dt >= 60 && dt <= 3000){ k.ms = (k.ms||0) + dt; k.n = (k.n||0) + 1; }
+}
+function weakKeys(){
+  return Object.entries(S.keyStats)
+    .filter(([,v]) => v.hit + v.miss >= 12)
+    .map(([k,v]) => [k, v.hit/(v.hit+v.miss)])
+    .sort((a,b) => a[1]-b[1]).slice(0,6).map(x => x[0]);
+}
+function spellUsable(sp){ return Array.from(sp.seq).every(k => bondOf(k) >= sp.bond); }
+function allSpells(){ return Object.values(CONTENT.spells).sort((a,b) => a.seq.length - b.seq.length || a.mp - b.mp); }
+function displayName(){
+  const t = CONTENT.items[S.title];
+  return (t ? t.name + " " : "") + S.playerName;
+}
+function lookArt(){
+  const c = CONTENT.items[S.look];
+  return (c && c.px) ? c.px : DEFAULT_LOOK;
+}
+/* 戦闘中は後ろ姿。pxb が無ければ正面で代用する（DLC互換） */
+function backArt(){
+  const c = CONTENT.items[S.look];
+  if (c && c.pxb) return c.pxb;
+  if (c && c.px)  return c.px;
+  return DEFAULT_BACK;
+}
+function ownedTools(){
+  return Object.keys(S.tools).filter(id => S.tools[id] > 0 && CONTENT.items[id]).map(id => CONTENT.items[id]);
+}
+
+/* ---------- カード ---------- */
+const RARITY = {
+  N:  {label:"N",  color:"#9a9ac0", weight:58, back:40},
+  R:  {label:"R",  color:"#60a5fa", weight:27, back:70},
+  SR: {label:"SR", color:"#c084fc", weight:12, back:130},
+  UR: {label:"UR", color:"#ffd23f", weight:3,  back:320}
+};
+const PACK_PRICE = 200;
+const allCards = () => Object.values(CONTENT.cards);
+function haveCard(id){ return (S.cards[id]||0) > 0; }
+function cardCount(){ return allCards().filter(c => haveCard(c.id)).length; }
+/* レアリティの重みでランダムに1枚引く */
+function drawCard(minRarity){
+  let pool = allCards();
+  if (minRarity){
+    const need = {N:0, R:1, SR:2, UR:3}[minRarity] || 0;
+    const f = pool.filter(c => ({N:0,R:1,SR:2,UR:3}[c.rarity] || 0) >= need);
+    if (f.length) pool = f;
+  }
+  if (!pool.length) return null;
+  let total = 0;
+  pool.forEach(c => total += (RARITY[c.rarity] || RARITY.N).weight);
+  let r = Math.random() * total;
+  for (const c of pool){
+    r -= (RARITY[c.rarity] || RARITY.N).weight;
+    if (r <= 0) return c;
+  }
+  return pool[pool.length-1];
+}
+function gainCard(id){
+  const c = CONTENT.cards[id];
+  if (!c) return null;
+  const dup = haveCard(id);
+  S.cards[id] = (S.cards[id]||0) + 1;
+  let back = 0;
+  if (dup){ back = (RARITY[c.rarity]||RARITY.N).back; S.gold += back; }
+  return {card:c, dup:dup, back:back};
+}
+/* カード1枚をトレカ風に組む。mini はずかんの一覧用 */
+function cardNo(c){
+  const i = allCards().map(x => x.id).indexOf(c.id);
+  return "No." + String(i + 1).padStart(2, "0");
+}
+function cardHTML(c, mini){
+  const r = RARITY[c.rarity] || RARITY.N;
+  return '<div class="tcg' + (mini ? " mini" : "") + (c.rarity === "UR" ? " ur" : "") +
+    '" style="--rc:' + r.color + '">' +
+    '<div class="tcg-head"><span>' + cardNo(c) + '</span><span class="tcg-rar">' + r.label + "</span></div>" +
+    '<div class="tcg-name">' + c.name + "</div>" +
+    '<div class="tcg-art">' + cardArt(c, mini ? 3 : 6) + "</div>" +
+    '<div class="tcg-type">' + (c.type || "カード") + "</div>" +
+    '<div class="tcg-text">' + c.tip + "</div></div>";
+}
+/* うら面もカードの形に合わせる */
+function cardBackHTML(mini){
+  return '<div class="tcg' + (mini ? " mini" : "") + '" style="--rc:#5a5a9a">' +
+    '<div class="tcg-head"><span>? ?</span><span class="tcg-rar">?</span></div>' +
+    '<div class="tcg-name">？ ？ ？</div>' +
+    '<div class="tcg-art">' + pixelArt(CARD_BACK, mini ? 3 : 6) + "</div>" +
+    '<div class="tcg-type">カード</div><div class="tcg-text"></div></div>';
+}
+
+/* カードの絵：敵・精霊・背景・独自ドット絵のどれか */
+function cardArt(c, scale){
+  const a = c.art || "";
+  if (a.indexOf("enemy:") === 0){
+    const e = CONTENT.enemies[a.slice(6)];
+    return e ? pixelArt(e.px, scale) : "";
+  }
+  if (a.indexOf("bg:") === 0)
+    return '<div class="cardbg" style="width:' + (16*scale) + 'px;height:' + (16*scale) + 'px">' +
+           bgSVG(a.slice(3)) + "</div>";
+  if (a.indexOf("spirit:") === 0){
+    const k = a.slice(7);
+    const sp = SPIRITS.filter(x => x.key === k)[0];
+    if (!sp) return "";
+    const label = (k === ";" && S.settings.layout === "PT") ? "Ç" : k.toUpperCase();
+    return '<div class="cardsp" style="width:' + (16*scale) + 'px;height:' + (16*scale) +
+           'px;color:var(--' + sp.finger + ');font-size:' + (10*scale) + 'px">' + label + "</div>";
+  }
+  return pixelArt(c.px, scale);
+}
+
+/* ---------- カードパック（お店で買う） ---------- */
+const PACKS = [
+  {id:"p_normal", name:"ふつうの カードパック", price:200, n:1, choices:8,  min:null,
+   desc:"8まいの なかから 1まい えらぶ"},
+  {id:"p_big",    name:"おとくパック",         price:520, n:3, choices:10, min:null,
+   desc:"10まいの なかから 3まい えらぶ（1まいぶん おとく）"},
+  {id:"p_shiny",  name:"キラキラパック",       price:800, n:1, choices:8,  min:"R",
+   desc:"8まいの なかから 1まい。ぜんぶ R いじょう"}
+];
+const RANK_ORDER = {N:0, R:1, SR:2, UR:3};
+/* カードの うら面 */
+const CARD_BACK = {c:["#20204a","#ffd23f","#4a4a9a","#12122a"],m:true,d:[
+  "11111111","12222221","12333321","12311321","12313321","12313321","12313321","12313321",
+  "12313321","12313321","12313321","12313321","12333321","12222221","11111111","........"]};
+
+/* 伏せ札から自分で選ぶ。選んだものだけが手に入る（選ばなかったカードは消える） */
+let OP = {cards:[], picks:0, taken:[], cursor:0, mode:"choose", last:null, lastIdx:-1, got:[]};
+
+function openPack(packId){
+  const pk = PACKS.filter(x => x.id === packId)[0];
+  if (!pk) return;
+  if (S.gold < pk.price){ toast("おかねが たりない！"); return; }
+  S.gold -= pk.price;
+  const cand = [];
+  const num = pk.choices || (pk.n + 2);       /* 伏せ札の枚数 */
+  for (let i=0;i<num;i++){
+    const c = drawCard(pk.min);
+    if (c) cand.push(c);
+  }
+  save();
+  OP = {cards:cand, picks:pk.n, taken:[], cursor:0, mode:"choose", last:null, lastIdx:-1, got:[]};
+  renderOpen();
+  $("openlayer").classList.add("on");
+}
+/* 1枚えらぶ */
+function pickCard(i){
+  if (OP.mode !== "choose") return;
+  if (i < 0 || i >= OP.cards.length) return;
+  if (OP.taken.indexOf(i) >= 0) return;
+  OP.taken.push(i);
+  OP.lastIdx = i;
+  OP.last = gainCard(OP.cards[i].id);
+  OP.got.push(OP.last);
+  save();
+  /* えらんだ札を中央で ゆっくり めくる：ため → 閉じる → ひらく → 表 */
+  const rank = RANK_ORDER[OP.last.card.rarity] || 0;
+  /* 予兆：SR以上は必ず光る。R は半々、N もたまに光る（フェイク） */
+  OP.omen = rank >= 2 ? true : rank === 1 ? Math.random() < 0.5 : Math.random() < 0.12;
+  OP.mode = "hold";
+  renderOpen();
+  const holdMs = [600, 850, 1150, 1500][rank] || 600;
+  setTimeout(() => {
+    if (OP.mode !== "hold") return;
+    OP.mode = "closing"; renderOpen();
+    setTimeout(() => {
+      if (OP.mode !== "closing") return;
+      OP.mode = "opening"; renderOpen();
+      setTimeout(() => {
+        if (OP.mode !== "opening") return;
+        OP.mode = "reveal"; renderOpen();
+        const card = document.querySelector(".op-card");
+        const r = RARITY[OP.last.card.rarity] || RARITY.N;
+        if (card && rank >= 1){
+          card.classList.add("shine");
+          card.style.setProperty("--acc", r.color);
+          burst(r.color, rank);
+        }
+      }, 450);
+    }, 550);
+  }, holdMs);
+}
+function renderOpen(){
+  const st = $("op-stage"), hint = $("op-hint");
+  if (OP.mode === "choose"){
+    const rest = OP.picks - OP.taken.length;
+    const cols = OP.cards.length >= 10 ? 5 : 4;
+    st.innerHTML = '<div style="font-size:17px;margin-bottom:6px">すきな カードを えらんでね' +
+      (OP.picks > 1 ? '　<span class="op-count">あと ' + rest + " まい</span>" : "") + "</div>" +
+      '<div class="op-choices" style="grid-template-columns:repeat(' + cols + ',auto)">' +
+      OP.cards.map((c,i) => {
+        const done = OP.taken.indexOf(i) >= 0;
+        return '<div class="op-pick' + (done ? " taken" : "") + (i === OP.cursor && !done ? " cur" : "") +
+          '" data-i="' + i + '">' + pixelArt(CARD_BACK, 3) + "</div>";
+      }).join("") + "</div>";
+    hint.innerHTML = "クリック、または <kbd>←</kbd><kbd>→</kbd> で えらんで <kbd>Space</kbd>";
+    Array.from(st.querySelectorAll("[data-i]")).forEach(el =>
+      el.onclick = (ev) => { ev.stopPropagation(); pickCard(+el.dataset.i); });
+    return;
+  }
+  if (OP.mode === "hold" || OP.mode === "closing"){
+    const om = OP.omen ? " omen" : "";
+    const cls = OP.mode === "hold" ? "hold" + om : "close" + om;
+    st.innerHTML = '<div class="op-card ' + cls + '" style="border:0;padding:0;display:inline-block;' +
+      '--om:#ffd23f;position:relative">' + cardBackHTML(false) + "</div>";
+    hint.innerHTML = OP.mode === "hold"
+      ? (OP.omen ? '<span style="color:var(--acc)">なにか ひかっている…！</span>' : "なにが でるかな…")
+      : "…";
+    return;
+  }
+  if (OP.mode === "opening"){
+    st.innerHTML = '<div class="op-card open" style="border:0;padding:0;display:inline-block;position:relative">' +
+      cardHTML(OP.last.card, false) + '<div class="op-glint"></div></div>';
+    hint.innerHTML = "…";
+    return;
+  }
+  if (OP.mode === "reveal"){
+    const g = OP.last;
+    const r = RARITY[g.card.rarity] || RARITY.N;
+    st.innerHTML = '<div class="op-card" style="border:0;padding:0;display:inline-block">' +
+      cardHTML(g.card, false) + '<div class="op-burst" id="op-burst"></div></div>' +
+      (g.dup ? '<div class="op-count" style="margin-top:8px">おなじ カードだったので Ｇ' +
+        g.back + " に かえた</div>" : "");
+    hint.innerHTML = (OP.taken.length < OP.picks
+      ? "クリック または <kbd>Space</kbd> で つぎを えらぶ"
+      : "クリック または <kbd>Space</kbd> で とじる");
+    return;
+  }
+  /* done：まとめて見せる */
+  st.innerHTML = '<div style="font-size:17px">てにいれた カード</div>' +
+    '<div class="op-got">' + OP.got.map(g => cardHTML(g.card, true)).join("") + "</div>" +
+    '<p class="muted" style="margin-top:8px">ずかんで いつでも 見なおせるよ</p>';
+  hint.innerHTML = "クリック または <kbd>Space</kbd> で とじる";
+}
+function advanceOpen(){
+  if (!$("openlayer").classList.contains("on")) return;
+  if (OP.mode === "hold" || OP.mode === "closing" || OP.mode === "opening") return;  /* めくり中は待つ */
+  if (OP.mode === "choose"){ pickCard(OP.cursor); return; }
+  if (OP.mode === "reveal"){
+    if (OP.taken.length < OP.picks){
+      OP.mode = "choose";
+      /* 次に選べる札へカーソルを移す */
+      for (let k=0;k<OP.cards.length;k++){
+        if (OP.taken.indexOf(k) < 0){ OP.cursor = k; break; }
+      }
+      renderOpen();
+    } else {
+      OP.mode = OP.got.length > 1 ? "done" : "close";
+      if (OP.mode === "close") closeOpen(); else renderOpen();
+    }
+    return;
+  }
+  closeOpen();
+}
+function moveCursor(d){
+  if (OP.mode !== "choose") return;
+  const nCards = OP.cards.length;
+  for (let step=1; step<=nCards; step++){
+    const k = (OP.cursor + d*step + nCards*step) % nCards;
+    if (OP.taken.indexOf(k) < 0){ OP.cursor = k; break; }
+  }
+  renderOpen();
+}
+function burst(color, rank){
+  const host = $("op-burst"); if (!host) return;
+  const num = 6 + rank * 6;
+  let h = "";
+  for (let i=0;i<num;i++){
+    const a = (Math.PI*2) * i / num, d = 60 + (i%3)*22;
+    h += '<i style="left:50%;top:50%;background:' + color + ';--bx:' +
+      Math.round(Math.cos(a)*d) + 'px;--by:' + Math.round(Math.sin(a)*d) + 'px"></i>';
+  }
+  host.innerHTML = h;
+}
+function closeOpen(){
+  $("openlayer").classList.remove("on");
+  OP = {cards:[], picks:0, taken:[], cursor:0, mode:"choose", last:null, lastIdx:-1, got:[]};
+  if ($("sc-shop").classList.contains("on")) renderShop();
+  if ($("sc-cards").classList.contains("on")) renderCards();
+}
+
+/* ---------- ユーティリティ ---------- */
+const $ = id => document.getElementById(id);
+function show(id){
+  document.querySelectorAll(".screen").forEach(e => e.classList.remove("on"));
+  $(id).classList.add("on"); window.scrollTo(0,0);
+}
+let toastT;
+function toast(m){
+  const t = $("toast"); t.textContent = m; t.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2000);
+}
+const rnd = n => Math.floor(Math.random()*n);
+const pick = a => a[rnd(a.length)];
+
+/* ---------- キーボード＋手 ---------- */
+const KB_ROWS = ["qwertyuiop".split(""), "asdfghjkl;".split(""), "zxcvbnm,.-".split("")];
+const KB_NUM  = "1234567890".split("");          /* 数字段。ステージが numrow:true のときだけ出す */
+const KEY_POS = {};
+let KB_OFF = 0;                                  /* 数字段を出しているぶんの ずれ（px） */
+const KB_H0 = 250;                               /* 数字段なしの高さ */
+function kbRows(){ return KB_OFF ? [KB_NUM].concat(KB_ROWS) : KB_ROWS; }
+function layoutKeys(){
+  Object.keys(KEY_POS).forEach(k => delete KEY_POS[k]);
+  kbRows().forEach((row,r) => row.forEach((k,i) => KEY_POS[k] = {x:i*47+21, y:r*47+21}));
+  KEY_POS[" "] = {x:232, y:162+KB_OFF};
+}
+layoutKeys();
+const FINGERS = [
+  {f:"lp", base:[48,200],  home:"a"},
+  {f:"lr", base:[76,202],  home:"s"},
+  {f:"lm", base:[104,204], home:"d"},
+  {f:"li", base:[132,202], home:"f"},
+  {f:"ri", base:[333,202], home:"j"},
+  {f:"rm", base:[361,204], home:"k"},
+  {f:"rr", base:[389,202], home:"l"},
+  {f:"rp", base:[417,200], home:";"}
+];
+function buildKeyboard(){
+  KB_OFF = (B.stage && B.stage.numrow) ? 47 : 0;
+  layoutKeys();
+  const h = KB_H0 + KB_OFF;
+  $("b-kbwrap").style.height = h + "px";
+  const sv = $("hands");
+  sv.setAttribute("height", h); sv.setAttribute("viewBox", "0 0 465 " + h);
+  const el = $("b-kb"); el.innerHTML = "";
+  kbRows().forEach(row => {
+    const d = document.createElement("div"); d.className = "kbrow";
+    row.forEach(k => {
+      const b = document.createElement("div");
+      const sp = spiritOf(k);
+      b.className = "key" + (sp ? " home" : "") + (k === "f" || k === "j" ? " bump" : "");
+      if (sp) b.style.setProperty("--hc", "var(--" + sp.finger + ")");
+      b.dataset.k = k;
+      b.textContent = (k === ";" && S.settings.layout === "PT") ? "ç" : k;
+      d.appendChild(b);
+    });
+    el.appendChild(d);
+  });
+  const d = document.createElement("div"); d.className = "kbrow";
+  const sp = document.createElement("div"); sp.className = "key space"; sp.dataset.k = " ";
+  d.appendChild(sp); el.appendChild(d);
+  buildHands();
+}
+function buildHands(){
+  const o = KB_OFF;
+  let s = '<ellipse class="palm" cx="90" cy="'+(222+o)+'" rx="58" ry="26"/>' +
+          '<ellipse class="palm" cx="375" cy="'+(222+o)+'" rx="58" ry="26"/>' +
+          '<line class="fg" data-f="th" x1="152" y1="'+(206+o)+'" x2="205" y2="'+(166+o)+'"/>' +
+          '<line class="fg" data-f="th" x1="313" y1="'+(206+o)+'" x2="260" y2="'+(166+o)+'"/>';
+  FINGERS.forEach(fg => {
+    const p = KEY_POS[fg.home];
+    s += '<line class="fg" data-f="'+fg.f+'" x1="'+fg.base[0]+'" y1="'+(fg.base[1]+o)+'" x2="'+p.x+'" y2="'+p.y+'"/>';
+  });
+  $("hands").innerHTML = s;
+}
+function pointHands(key){
+  const svg = $("hands");
+  svg.querySelectorAll(".fg").forEach(l => { l.classList.remove("on"); l.style.stroke = ""; });
+  FINGERS.forEach(fg => {
+    const line = svg.querySelector('.fg[data-f="' + fg.f + '"]');
+    if (!line) return;
+    const target = (key && FINGER_OF[key] === fg.f && KEY_POS[key]) ? KEY_POS[key] : KEY_POS[fg.home];
+    line.setAttribute("x2", target.x); line.setAttribute("y2", target.y);
+  });
+  if (!key) return;
+  const f = FINGER_OF[key];
+  const line = svg.querySelector('.fg[data-f="' + f + '"]');
+  if (line){ line.classList.add("on"); line.style.stroke = "var(--" + f + ")"; }
+}
+function litKey(key){
+  const el = $("b-kb");
+  el.querySelectorAll(".key").forEach(e => { e.classList.remove("lit"); e.style.background = ""; });
+  if (!key) return;
+  const t = Array.from(el.querySelectorAll(".key")).find(e => e.dataset.k === key);
+  if (!t) return;
+  t.classList.add("lit"); t.style.background = "var(--" + (FINGER_OF[key]||"th") + ")";
+}
+function buildLegend(){
+  const el = $("b-legend"); el.innerHTML = "";
+  SPIRITS.forEach(s => {
+    const d = document.createElement("div"); d.className = "fdot";
+    d.innerHTML = '<i style="background:var(--'+s.finger+')"></i>' +
+      (s.key === ";" && S.settings.layout === "PT" ? "ç" : s.key.toUpperCase()) + " " + s.name;
+    el.appendChild(d);
+  });
+}
+
+/* ---------- ホームポジション かくにん ----------
+   ステージに入る前に、8つのホームキーを ひとつずつ 押させる。
+   ゆびが ズレていれば 本人が気づく。かかった秒数と まちがいの数は 学習ログにのせる。
+   テストは startStage() を直接呼ぶので、この関門は通らない（＝自動クリアに影響しない）。 */
+const HOME_KEYS = ["a","s","d","f","j","k","l",";"];
+let HC = null;                 /* かくにん中の状態 */
+let HOME_LAST = null;          /* 直近の結果（学習ログ用） */
+function keyFace(k){ return (k === ";" && S.settings.layout === "PT") ? "ç" : k; }
+function spiritOf(k){ return SPIRITS.filter(x => x.key === k)[0]; }
+function enterStage(st){
+  if (!S || S.settings.homecheck === "off"){ startStage(st); return; }
+  const rest = HOME_KEYS.filter(k => k !== "f" && k !== "j");
+  for (let i=rest.length-1;i>0;i--){ const j = rnd(i+1); const t = rest[i]; rest[i] = rest[j]; rest[j] = t; }
+  HC = {stage:st, seq:["f","j"].concat(rest), i:0, miss:0, t0:Date.now()};
+  $("hc-result").innerHTML = ""; $("btn-hc-go").style.display = "none";
+  renderHomeCheck(); show("sc-home");
+}
+function renderHomeCheck(){
+  const cur = (HC && HC.i < HC.seq.length) ? HC.seq[HC.i] : null;
+  $("hc-keys").innerHTML = HOME_KEYS.map((k,i) => {
+    const done = HC && HC.seq.indexOf(k) < HC.i;
+    const sp = spiritOf(k);
+    return (i === 4 ? '<div class="k gap"></div>' : "") +
+      '<div class="k' + (k === cur ? " on" : done ? " ok" : "") + '"' +
+      (k === cur ? ' style="background:var(--' + sp.finger + ')"' : "") +
+      ">" + keyFace(k) + "</div>";
+  }).join("");
+  $("hc-finger").textContent = cur ? spiritOf(cur).label : "";
+  $("hc-count").textContent = HC ? (HC.i + " / " + HC.seq.length) : "";
+}
+function homeCheckKey(ch){
+  if (!HC || HC.i >= HC.seq.length) return;
+  if (ch !== HC.seq[HC.i]){
+    HC.miss++;
+    $("hc-finger").textContent = "ちがうよ → " + spiritOf(HC.seq[HC.i]).label;
+    return;
+  }
+  HC.i++;
+  if (HC.i >= HC.seq.length) finishHomeCheck(); else renderHomeCheck();
+}
+function finishHomeCheck(){
+  const sec = (Date.now() - HC.t0)/1000;
+  HOME_LAST = {sec:+sec.toFixed(1), miss:HC.miss};
+  renderHomeCheck();
+  const good = sec <= 8 && HC.miss === 0;
+  $("hc-result").innerHTML =
+    '<p style="font-size:19px;color:var(--' + (good ? "ok" : "acc") + ')">' +
+      (good ? "バッチリ！ ホームポジション できてる" : "OK") + "</p>" +
+    '<p class="muted">' + sec.toFixed(1) + " びょう ／ まちがい " + HC.miss + " かい</p>" +
+    (good ? "" : '<p class="muted">ゆびを ホームに おいたまま うてると、もっと はやくなるよ。</p>');
+  $("btn-hc-go").style.display = "";
+}
+$("btn-hc-go").onclick = () => { const st = HC.stage; HC = null; startStage(st); };
+$("btn-hc-skip").onclick = () => { const st = HC.stage; HOME_LAST = null; HC = null; startStage(st); };
+
+/* ---------- 問題生成 ---------- */
+function genProblem(stage, battle){
+  if (stage.mode === "kana"){
+    const wl = CONTENT.wordlists[battle.wordlist];
+    const pool = wl ? wl.entries : ["あいうえお"];
+    const weak = weakKeys();
+    if (weak.length && Math.random() < 0.55){
+      const cands = pool.filter(w => {
+        const r = parseKana(w).map(u => u.cands[0]).join("");
+        return weak.some(k => r.includes(k));
+      });
+      if (cands.length){ const w = pick(cands); return {text:w, units:parseKana(w)}; }
+    }
+    const w = pick(pool);
+    return {text:w, units:parseKana(w)};
+  }
+  const g = battle.gen || {pool:"fj", len:[2,4]};
+  const [lo,hi] = g.len;
+  const n = lo + rnd(hi-lo+1);
+  const weak = weakKeys().filter(k => g.pool.includes(k));
+  let s = "";
+  for (let i=0;i<n;i++) s += (weak.length && Math.random() < 0.3) ? pick(weak) : g.pool[rnd(g.pool.length)];
+  return {text:s, units:parseRaw(s)};
+}
+
+/* ---------- メッセージ ---------- */
+let MSG = [];
+function msg(text){
+  MSG.push(text); if (MSG.length > 3) MSG.shift();
+  $("msgwin").innerHTML = MSG.map(m => "<p>" + m + "</p>").join("");
+}
+function msgClear(){ MSG = []; $("msgwin").innerHTML = ""; }
+
+/* シューティング中の 主人公。ひこうきに のって 右を むいている（16x16・ミラーなし） */
+const PLANE_ART = {
+  c: ["#1a2a4a", "#e8eef8", "#5ad0f0", "#ffe14a", "#c8d4e8"],
+  m: false,
+  d: ["................",
+      "................",
+      "................",
+      "....11..........",
+      "....121.........",
+      "....1221........",
+      "...11222111.....",
+      "..1122222221....",
+      "4112332222221...",
+      "41222222222221..",
+      "4112222222221...",
+      "..111255521.....",
+      "....15551.......",
+      ".....111........",
+      "................",
+      "................"]
+};
+
+/* 本編ボスの セリフ。DLCの ボスは .kqpack の enemies に "line" を書く */
+const BOSS_LINES = {
+  b_home:   "ホームポジションから はなれるでない！",
+  b_upper:  "うえの だんは おまえには まだ はやい！",
+  b_lower:  "したの だんまで こられるかな？",
+  b_gojuon: "五十おん すべて、うてるか ためして やろう！"
+};
+
+/* ---------- バトル ---------- */
+const B = {
+  shoot:false, ships:[], killed:0, spawnAcc:0, shootT:null, slot:null, slotT:null,
+  stage:null, battle:null, bi:0, foe:null, hp:0, mp:0, totalDmg:0,
+  combo:0, maxCombo:0, qLeft:0, qTotal:0, typer:null, cast:0, castT:null,
+  hits:0, misses:0, perfect:0, qMiss:0, t0:0, active:false,
+  guard:0, blind:0, mode:"type"
+};
+function startStage(stage){
+  B.stage = stage; B.bi = 0;
+  const st = stats();
+  B.hp = st.maxHp; B.mp = st.maxMp;
+  B.hits = B.misses = B.perfect = B.maxCombo = 0; B.t0 = Date.now();
+  msgClear(); startBattle();
+}
+function startBattle(){
+  const b = B.stage.battles[B.bi];
+  if (!b){ finishStage(); return; }
+  B.battle = b;
+  B.foe = CONTENT.enemies[b.enemy] || {name:"???", hp:30, atk:5, exp:10, gold:5};
+  B.qLeft = b.q; B.qTotal = b.q; B.totalDmg = 0; B.combo = 0; B.cast = 0;
+  B.guard = 0; B.blind = 0; B.mode = "type"; B.active = true;
+  const M = modeDef(), V = M.view || {};
+  B.shoot = (B.stage.mode === "shoot");
+  stopModes();
+  $("b-roma").style.display = V.hideRoma ? "none" : "";
+  buildKeyboard(); buildLegend();
+  $("b-hint").textContent = b.hint || "";
+  $("b-bg").innerHTML = V.scrollBg                    /* 2まい ならべて ながす */
+    ? '<div class="bgscroll">' + bgSVG(B.stage.bg) + bgSVG(B.stage.bg) + "</div>"
+    : bgSVG(B.stage.bg);
+  /* シューティングでは ひこうきに のる。ふつうの たたかいは 後ろすがた */
+  $("b-player").innerHTML = pixelArt(V.plane ? PLANE_ART : backArt(), V.plane ? 5 : 6);
+  $("b-player").className = "player" + (V.plane ? " fly" : "");
+  $("b-foe").innerHTML = pixelArt(B.foe.px, b.boss ? 6 : 5);
+  $("b-foe").className = "foe appear";
+  /* シューティングの ザコ戦だけ 右上の 1体を 出さない（ながれてくる てきと まぎらわしい）。
+     ボス戦では 右に いすわって、そこから てきが わいてくる 見た目にする */
+  $("b-foe").style.display = (V.hideFoeExceptBoss && !b.boss) ? "none" : "";
+  msg("<b>" + B.foe.name + "</b> が あらわれた！" + (b.boss ? "　◆ ボスだ！" : ""));
+  M.start(b);
+  renderBattle(); show("sc-battle");
+  if (b.boss) bossIntro();
+  clearInterval(B.castT);          /* ここで shootT を 止めないこと（startShoot が 起こした直後） */
+  if (B.stage.timed && !V.noCast){       /* シューティング・スロットでは 詠唱ゲージを 出さない */
+    $("b-castwrap").style.display = "";
+    const speed = Math.max(0.25, 1.6 - stats().agi*0.02);
+    B.castT = setInterval(() => {
+      if (!B.active || B.mode !== "type") return;
+      if (B.blind > 0){ B.blind--; return; }
+      B.cast += speed;
+      if (B.cast >= 100){ B.cast = 0; foeAttack(); }
+      $("b-cast").style.width = B.cast + "%";
+    }, 100);
+  } else $("b-castwrap").style.display = "none";
+}
+function nextQuestion(){
+  lastKeyT = 0;                    /* 問題の切れ目は 計測しない（考える時間が入るため） */
+  const p = genProblem(B.stage, B.battle);
+  B.typer = new Typer(p.units); B.qMiss = 0;
+  renderQuestion();
+}
+function renderQuestion(){
+  const t = B.typer;
+  let kana = "";
+  t.units.forEach((u,i) => {
+    const cls = i < t.idx ? "done" : (i === t.idx ? "cur" : "");
+    kana += '<span class="' + cls + '">' + u.disp + "</span>";
+  });
+  $("b-kana").innerHTML = kana;
+  if (S.settings.hint === "on"){
+    const g = t.guide();
+    $("b-roma").innerHTML = '<span class="done">'+g.done+'</span><span class="next">'+g.nextCh+
+      '</span><span class="todo">'+g.todo+'</span>';
+  } else $("b-roma").textContent = "";
+  const mode = S.settings.kb;
+  let op = 1;
+  if (mode === "off") op = 0;
+  else if (mode === "auto") op = Math.max(0.2, 1 - (B.stage.no||0) * 0.2);
+  $("b-kbwrap").style.opacity = op; $("b-legend").style.opacity = op;
+  if (op > 0){ const k = t.nextKey(); litKey(k); pointHands(k); }
+}
+function renderBattle(){
+  const st = stats();
+  $("b-name").textContent = displayName(); $("b-lv").textContent = S.lv;
+  $("b-hp").textContent = Math.max(0,Math.round(B.hp)) + " / " + st.maxHp;
+  $("b-mp").textContent = Math.max(0,Math.round(B.mp)) + " / " + st.maxMp;
+  $("b-hpbar").style.width = Math.max(0, B.hp/st.maxHp*100) + "%";
+  $("b-mpbar").style.width = Math.max(0, B.mp/st.maxMp*100) + "%";
+  $("b-hpwrap").classList.toggle("danger", B.hp/st.maxHp < 0.28);
+  $("b-guard").textContent = B.guard > 0 ? "▣×" + B.guard : "";
+  const isBoss = !!B.battle.boss;
+  $("b-foename").innerHTML = (isBoss ? '<span class="bossbadge">BOSS</span>' : "") + B.foe.name;
+  const fr = Math.max(0, B.qLeft / B.qTotal);        /* のこりの わりあい */
+  $("b-foehp").style.width = fr*100 + "%";
+  /* ボスは のこりが へると 黄 → 赤。あと すこしで 点めつ */
+  $("b-foehp").style.background = !isBoss ? "" : fr > 0.5 ? "" : fr > 0.25 ? "#e0a83a" : "#e05a3a";
+  $("b-foewrap").classList.toggle("boss", isBoss);
+  $("b-foewrap").classList.toggle("danger", isBoss && fr <= 0.25);
+  $("b-field").classList.toggle("boss", isBoss);
+  $("b-left").textContent = Math.max(0, B.stage.battles.length - B.bi);
+  $("b-combo").textContent = B.combo;
+}
+/* ---------- タイピングスロット（mode:"slot"） ----------
+   3つの リールに 文字が つぎつぎ 出る。**いま 出ている 文字**を 打つと そのリールが 止まる。
+   ねらった 文字が 来た しゅんかんに 打てば そろえられる ＝ 運だけでは ない。
+   3つ そろい：かけ金 ×10 ＋ カード1まい／2つ そろい：×2／はずれ：かけ金を うしなう。 */
+function slotGen(){ return (B.battle && B.battle.gen) || {pool:"fjdk", speed:520}; }
+function startSlot(b){
+  B.qLeft = b.q; B.qTotal = b.q;
+  $("b-kbwrap").style.opacity = 1; $("b-legend").style.opacity = 1;
+  newSpin();
+}
+function newSpin(){
+  if (!B.active) return;
+  const g = slotGen(), rc = () => g.pool[rnd(g.pool.length)];
+  /* リールごとに 3だん（上・まんなか・下）。**まんなかが 当たりのライン** */
+  B.slot = {cur:[[rc(),rc(),rc()], [rc(),rc(),rc()], [rc(),rc(),rc()]],
+            set:[null,null,null], i:0, win:false, msg:""};
+  clearInterval(B.slotT);
+  B.slotT = setInterval(slotTick, slotGen().speed || 520);
+  slotTick();
+}
+function slotTick(){
+  if (!B.active || B.mode !== "type" || !B.slot) return;
+  const g = slotGen(), sl = B.slot;
+  for (let i = sl.i; i < 3; i++){        /* 下から 上へ ながれる */
+    sl.cur[i] = [sl.cur[i][1], sl.cur[i][2], g.pool[rnd(g.pool.length)]];
+  }
+  renderSlot();
+}
+function renderSlot(){
+  const sl = B.slot; if (!sl) return;
+  const bet = Math.min((B.battle && B.battle.bet) || 0, S.gold);
+  const F = k => keyFace(k).toUpperCase();
+  $("b-kana").innerHTML =
+    '<div class="slotmc">' +
+      '<div class="slotcoin"><span>コイン Ｇ' + S.gold + "</span><span>かけ金 Ｇ" + bet + "</span></div>" +
+      '<div class="slotreels">' + [0,1,2].map(i => {
+        const r = sl.cur[i];
+        const mk = sl.set[i] || r[1];
+        const col = sl.set[i] ? "#000" : "var(--" + (FINGER_OF[mk] || "th") + ")";
+        return '<div class="rl' + (sl.set[i] ? " set" : "") + (sl.win ? " win" : "") + '">' +
+          '<b class="up">' + F(r[0]) + "</b>" +
+          '<b class="mid" style="color:' + col + '">' + F(mk) + "</b>" +
+          '<b class="dn">' + F(r[2]) + "</b></div>";
+      }).join("") + "</div>" +
+      '<div class="slotbet">▶ しろい ところを うつ　／　3つ そろえば ×10 ＋カード</div>' +
+      (sl.msg ? '<div class="slotwin' + (sl.win ? "" : " lose") + '">' + sl.msg + "</div>" : "") +
+    "</div>";
+  const t = sl.i < 3 ? sl.cur[sl.i][1] : null;
+  litKey(t); pointHands(t);
+}
+function slotKey(ch){
+  const sl = B.slot; if (!sl || sl.i >= 3) return;
+  const now = Date.now(), dt = lastKeyT ? now - lastKeyT : 0;
+  lastKeyT = now;
+  if (ch !== sl.cur[sl.i][1]){       /* まんなかの もじ 以外：ミスは のこるが ダメージは なし */
+    recordKey(ch, false, dt); B.misses++; B.combo = 0;
+    const q = $("b-q"); q.classList.remove("miss"); void q.offsetWidth; q.classList.add("miss");
+    renderBattle(); return;
+  }
+  recordKey(ch, true, dt); B.hits++;
+  B.combo++; B.maxCombo = Math.max(B.maxCombo, B.combo);
+  B.mp = Math.min(stats().maxMp, B.mp + 0.35);
+  sl.set[sl.i] = ch; sl.i++;
+  fireShot(ch); renderSlot();
+  if (sl.i >= 3) finishSpin(); else renderBattle();
+}
+function finishSpin(){
+  clearInterval(B.slotT);
+  const sl = B.slot, b = B.battle;
+  const bet = Math.min(b.bet || 0, S.gold);
+  const a = sl.set[0], c = sl.set[1], d = sl.set[2];
+  const three = (a === c && c === d);
+  const two = !three && (a === c || c === d || a === d);
+  if (three){
+    sl.win = true; sl.msg = "★ BIG BONUS ★"; S.gold += bet * 10; renderSlot();
+    B.totalDmg += Math.max(1, Math.round(stats().atk * 6));
+    hitFoe(); zapFX(); popup("そろった！！ ×10", "var(--acc)");
+    let got = null;
+    const card = drawCard(); if (card) got = gainCard(card.id);
+    msg("<b>3つ そろった！</b>　Ｇ" + (bet*10) + " を てにいれた！" +
+        (got ? "　カード「" + card.name + "」も もらった！" : ""));
+    B.perfect++;
+  } else if (two){
+    S.gold += bet * 2;
+    B.totalDmg += Math.max(1, Math.round(stats().atk * 2));
+    hitFoe(); popup("2つ そろい ×2", "var(--ok)");
+    sl.msg = "あたり！ ×2"; renderSlot();
+    msg("2つ そろった！　Ｇ" + (bet*2) + " を てにいれた！");
+  } else {
+    S.gold = Math.max(0, S.gold - bet);
+    B.combo = 0;
+    popup("はずれ…", "var(--ng)");
+    sl.msg = "はずれ"; renderSlot();
+    msg("そろわなかった…" + (bet ? "　Ｇ" + bet + " を うしなった" : ""));
+    foeAttack();
+  }
+  B.qLeft--; renderBattle(); save();
+  if (!B.active) return;
+  if (B.qLeft <= 0){ defeatFoe(); return; }
+  setTimeout(newSpin, 900);
+}
+
+/* ---------- たたかいの モード ----------
+   モードを 足すときは ここに 1行 くわえる。
+     key   … 1打鍵の しょり（ひつよう）
+     start … たたかいの はじめに よぶ（ひつよう）
+     stop  … 後始末（タイマーなど。なくてもよい）
+     view  … 見た目の きりかえ */
+const MODES = {
+  kana:  {key: typeKey,  start(){ nextQuestion(); }},
+  keys:  {key: typeKey,  start(){ nextQuestion(); }},
+  shoot: {key: shootKey, start: startShoot,
+          stop(){ clearInterval(B.shootT); clearShips(); },
+          view: {plane:true, scrollBg:true, hideRoma:true, noCast:true, hideFoeExceptBoss:true}},
+  slot:  {key: slotKey,  start: startSlot,
+          stop(){ clearInterval(B.slotT); B.slot = null; },
+          view: {hideRoma:true, noCast:true}}
+};
+function modeDef(){ return MODES[(B.stage && B.stage.mode) || "kana"] || MODES.kana; }
+function stopModes(){ Object.keys(MODES).forEach(k => MODES[k].stop && MODES[k].stop()); }
+
+/* ---------- ボスの とうじょう演出 ----------
+   3.6秒の カットイン。Space / Enter / クリックで とばせる。
+   演出中は B.mode = "intro" にして 敵の詠唱ゲージを 止める。
+   テストは onKey() を 直接よぶので、この演出は 自動クリアの じゃまを しない。 */
+let BI_T = null;
+function bossIntro(){
+  const foe = B.foe;
+  $("bi-art").innerHTML = pixelArt(foe.px, 9);
+  $("bi-name").textContent = foe.name;
+  $("bi-line").textContent = foe.line || BOSS_LINES[B.battle.enemy] || "いくぞ！ かくごは いいか！";
+  B.mode = "intro";
+  const el = $("bossintro");
+  el.classList.remove("on"); void el.offsetWidth; el.classList.add("on");   /* アニメを 頭から */
+  clearTimeout(BI_T);
+  BI_T = setTimeout(endBossIntro, 3600);
+}
+function endBossIntro(){
+  clearTimeout(BI_T); BI_T = null;
+  $("bossintro").classList.remove("on");
+  if (B.mode === "intro") B.mode = "type";
+}
+$("bossintro").onclick = endBossIntro;
+
+/* ---------- シューティング（mode:"shoot"） ----------
+   右から てきが ながれてくる。てきに ついた 1文字（ホームポジションの8キー）を
+   おすと 撃ちおとせる。にがすと ぶつかって ダメージ。q機 おとしたら 勝ち。
+   B.shoot フラグで 分ける（B.mode は コマンド窓の 開閉で 変わるため）。 */
+const SHOOT_MS = 90;
+function shootGen(){ return (B.battle && B.battle.gen) || {pool:"fj", speed:1.3, spawn:1800}; }
+function startShoot(b){
+  B.ships = []; B.killed = 0; B.spawnAcc = 0;
+  B.qLeft = b.q; B.qTotal = b.q;
+  $("shootlayer").innerHTML = "";
+  $("b-kbwrap").style.opacity = 1; $("b-legend").style.opacity = 1;   /* 8キーの位置は 常に見せる */
+  clearInterval(B.shootT);
+  B.shootT = setInterval(shootTick, SHOOT_MS);
+}
+function clearShips(){
+  (B.ships||[]).forEach(s => s.el && s.el.remove());
+  B.ships = []; const l = $("shootlayer"); if (l) l.innerHTML = "";
+}
+/* ボスが 弾を はなつ ときに ひかる */
+function bossFlash(){
+  const f = $("b-foe");
+  f.classList.remove("cast"); void f.offsetWidth; f.classList.add("cast");
+  setTimeout(() => f.classList.remove("cast"), 280);
+}
+function spawnShip(){
+  const g = shootGen();
+  const key = g.pool[rnd(g.pool.length)];
+  const boss = !!(B.battle && B.battle.boss);
+  const el = document.createElement("div");
+  el.className = "ship";
+  el.innerHTML = pixelArt(B.foe.px, 2) +
+    '<b style="background:var(--' + (FINGER_OF[key] || "th") + ')">' +
+    keyFace(key).toUpperCase() + "</b>";
+  /* ザコは 画面の 右はしから。ボス戦は ボスの いる ところから 扇状に とび出す */
+  const x = boss ? 82 : 104;
+  const y = boss ? 29 + (rnd(9) - 4) : 12 + rnd(62);
+  const vy = boss ? (rnd(9) - 4) * 0.32 : 0;
+  el.style.left = x + "%"; el.style.top = y + "%";
+  $("shootlayer").appendChild(el);
+  B.ships.push({key:key, x:x, y:y, vy:vy, el:el});
+  if (boss) bossFlash();
+}
+/* 1こま すすめる。テストからも 直接よぶ（setInterval が 動かないため） */
+function shootTick(){
+  if (!B.active || !B.shoot) return;
+  if (B.mode !== "type") return;            /* コマンド窓・じゅもん・ボス演出中は 止まる */
+  const g = shootGen();
+  B.spawnAcc += SHOOT_MS;
+  if (B.spawnAcc >= (g.spawn || 1800) && B.ships.length < 6){ B.spawnAcc = 0; spawnShip(); }
+  const sp = g.speed || 1.3;
+  const leaked = [];
+  B.ships.forEach(s => {
+    s.x -= sp;
+    if (s.vy){                                   /* ボスの 弾は たてにも うごく（かべで はねる） */
+      s.y += s.vy;
+      if (s.y < 8){ s.y = 8; s.vy = -s.vy; }
+      if (s.y > 86){ s.y = 86; s.vy = -s.vy; }
+    }
+    if (s.x <= 4) leaked.push(s);
+  });
+  B.ships = B.ships.filter(s => s.x > 4);
+  B.ships.forEach(s => {
+    s.el.style.left = s.x.toFixed(1) + "%";
+    if (s.vy) s.el.style.top = s.y.toFixed(1) + "%";
+    s.el.classList.toggle("near", s.x < 26);
+  });
+  /* いちばん 手前の てきの キーを 光らせる */
+  const front = B.ships.reduce((a,s) => (!a || s.x < a.x) ? s : a, null);
+  litKey(front ? front.key : null); pointHands(front ? front.key : null);
+  $("b-kana").innerHTML = '<span class="shootinfo">のこり ' + B.qLeft + " き</span>";
+  leaked.forEach(s => { s.el.remove(); shootLeak(); });
+}
+function shootLeak(){
+  if (!B.active) return;
+  B.combo = 0; B.misses++;
+  msg("にげられた！");
+  foeAttack();
+}
+function shootKey(ch){
+  const now = Date.now(), dt = lastKeyT ? now - lastKeyT : 0;
+  lastKeyT = now;
+  let i = -1, best = 1e9;
+  B.ships.forEach((s,k) => { if (s.key === ch && s.x < best){ best = s.x; i = k; } });
+  if (i < 0){                       /* からうち：ミスは のこすが ダメージは なし */
+    recordKey(ch, false, dt); B.misses++; B.combo = 0;
+    const q = $("b-q"); q.classList.remove("miss"); void q.offsetWidth; q.classList.add("miss");
+    renderBattle(); return;
+  }
+  const s = B.ships[i];
+  B.ships.splice(i,1); s.el.remove();
+  recordKey(ch, true, dt); B.hits++;
+  B.combo++; B.maxCombo = Math.max(B.maxCombo, B.combo);
+  B.mp = Math.min(stats().maxMp, B.mp + 0.35);
+  B.totalDmg += Math.max(1, Math.round(stats().atk * comboMul() * (1 + bondOf(ch)/20)));
+  fireShot(ch);
+  B.killed++; B.qLeft = Math.max(0, B.qTotal - B.killed);
+  if (B.combo > 0 && B.combo % 10 === 0) popup("COMBO ×" + comboMul().toFixed(1));
+  renderBattle();
+  if (B.qLeft <= 0){ clearInterval(B.shootT); clearShips(); defeatFoe(); }
+}
+
+function popup(txt, color){
+  const p = $("b-popup"); p.textContent = txt; p.style.color = color || "var(--acc)";
+  p.classList.remove("go"); void p.offsetWidth; p.classList.add("go");
+}
+/* 1打鍵ごと：使った指の色の弾がプレイヤーから敵へ飛ぶ */
+function fireShot(key){
+  const field = $("b-field"); if (!field) return;
+  const el = document.createElement("i");
+  const tier = B.combo >= 20 ? " c3" : B.combo >= 10 ? " c2" : "";
+  el.className = "shot" + tier;
+  el.style.background = "var(--" + (FINGER_OF[key] || "th") + ")";
+  el.style.bottom = (52 + (Math.random()*12|0)) + "px";
+  field.appendChild(el);
+  const done = () => { el.remove(); tinyHit(); };
+  el.addEventListener("animationend", done);
+  setTimeout(() => { if (el.isConnected) done(); }, 400);   /* 保険：取りこぼし掃除 */
+  const p = $("b-player"); p.classList.remove("atk"); void p.offsetWidth; p.classList.add("atk");
+}
+/* 着弾：敵が一瞬光る */
+function tinyHit(){
+  const f = $("b-foe"); if (!f) return;
+  f.style.filter = "brightness(2.8)";
+  setTimeout(() => { if (f) f.style.filter = ""; }, 70);
+}
+/* 問題を打ち切ったとき：斬撃＋のけぞり＋画面ゆれ */
+function hitFoe(){
+  const f = $("b-foe"); f.classList.remove("hurt","stagger"); void f.offsetWidth; f.classList.add("stagger");
+  const p = $("b-player"); p.classList.remove("atk","big"); void p.offsetWidth; p.classList.add("big");
+  const field = $("b-field");
+  if (field){
+    field.classList.remove("quake"); void field.offsetWidth; field.classList.add("quake");
+    const sl = document.createElement("div");
+    sl.className = "slash"; sl.innerHTML = "<i></i><i></i><i></i>";
+    field.appendChild(sl);
+    sl.addEventListener("animationend", () => sl.remove());
+    setTimeout(() => sl.remove(), 500);
+  }
+}
+/* PERFECT：閃光 */
+function zapFX(){
+  const field = $("b-field"); if (!field) return;
+  const z = document.createElement("div");
+  z.className = "zap"; field.appendChild(z);
+  z.addEventListener("animationend", () => z.remove());
+  setTimeout(() => z.remove(), 500);
+}
+function flash(){ const f = $("flash"); f.classList.remove("go"); void f.offsetWidth; f.classList.add("go"); }
+function comboMul(){ return Math.min(2.0, 1 + Math.floor(B.combo/10)*0.1); }
+
+function foeAttack(){
+  const st = stats();
+  let d = Math.max(1, B.foe.atk - Math.floor(st.def/2));
+  if (B.guard > 0){ d = Math.max(1, Math.round(d/2)); B.guard--; }
+  B.hp -= d;
+  msg(B.foe.name + "の こうげき！　" + S.playerName + "は <b>" + d + "</b> の ダメージを うけた！");
+  popup("-" + d, "var(--ng)"); flash();
+  if (B.hp <= 0){
+    B.hp = st.maxHp * 0.6; B.combo = 0;
+    msg("せいれいたちが " + S.playerName + "を まもった！　HPが かいふくした！");
+    popup("せいれいの かご！", "var(--mp)");
+  }
+  renderBattle();
+}
+function onKey(ch){
+  if (!B.active || B.mode === "cmd" || B.mode === "tool") return;
+  if (B.mode === "spell"){ spellKey(ch); return; }
+  modeDef().key(ch);
+}
+/* ふつうの たたかい（ひらがな／キー練習）の 1打鍵 */
+function typeKey(ch){
+  const now = Date.now(), dt = lastKeyT ? now - lastKeyT : 0;
+  lastKeyT = now;
+  const r = B.typer.input(ch);
+  if (r === "ignore") return;
+  if (r === "miss"){
+    recordKey(ch, false, dt); B.misses++; B.qMiss++; B.combo = 0;
+    B.cast = Math.min(100, B.cast + 6);
+    const q = $("b-q"); q.classList.remove("miss"); void q.offsetWidth; q.classList.add("miss");
+    msg(S.playerName + "は うちまちがえた！");
+    foeAttack(); renderQuestion(); return;
+  }
+  recordKey(ch, true, dt); B.hits++;
+  B.combo++; B.maxCombo = Math.max(B.maxCombo, B.combo);
+  B.mp = Math.min(stats().maxMp, B.mp + 0.35);
+  B.totalDmg += Math.max(1, Math.round(stats().atk * comboMul() * (1 + bondOf(ch)/20)));
+  fireShot(ch);
+  if (B.combo > 0 && B.combo % 10 === 0) popup("COMBO ×" + comboMul().toFixed(1));
+  renderQuestion(); renderBattle();
+  if (r === "done"){
+    hitFoe();
+    const dealt = Math.max(1, Math.round(stats().atk * comboMul() * B.typer.units.length));
+    popup("-" + dealt, "#fff");
+    if (B.qMiss === 0){
+      B.perfect++; zapFX(); popup("PERFECT!!", "var(--ok)");
+      B.mp = Math.min(stats().maxMp, B.mp + 3);
+      msg("かんぺきな こうげき！　" + B.foe.name + "は ひるんだ！");
+    }
+    B.qLeft--; renderBattle();
+    if (B.qLeft <= 0){ defeatFoe(); return; }
+    nextQuestion(); renderBattle();
+  }
+}
+function defeatFoe(){
+  B.active = false; clearInterval(B.castT); stopModes(); closeAllWindows();
+  $("b-foe").className = "foe dead";
+  msg("<b>" + B.foe.name + "</b> を たおした！");
+  const bonus = Math.round(B.totalDmg / 14);
+  const gainExp = B.foe.exp + bonus;
+  let gainGold = B.foe.gold;
+  S.exp += gainExp;
+  const drops = [], sold = [];
+  let gotCard = null;
+  if (B.battle.boss){
+    const c = drawCard();
+    if (c) gotCard = gainCard(c.id);
+  }
+  if (B.battle.boss || Math.random() < 0.32){
+    const pool = ["weapon","armor","accessory","tool"].reduce((a,t) => a.concat(itemsOf(t)), []);
+    const it = pick(pool);
+    if (it){
+      if (it.type === "tool"){ S.tools[it.id] = (S.tools[it.id]||0) + 1; drops.push(it); }
+      else if (!S.inventory.includes(it.id)){ S.inventory.push(it.id); drops.push(it); firstEquip(it); }
+      else { const g = Math.round((it.price||50)/2); gainGold += g; sold.push({it:it, g:g}); }
+    }
+  }
+  S.gold += gainGold;
+  const lvups = [];
+  while (S.exp >= expToNext(S.lv)){ S.exp -= expToNext(S.lv); S.lv++; lvups.push(S.lv); }
+  SPIRITS.forEach(s => S.spirits[s.key].bond = bondOf(s.key));
+  save();
+  setTimeout(() => {
+    B.bi++;
+    const more = B.stage.battles[B.bi];
+    let html = '<div style="display:flex;justify-content:center;margin-bottom:8px">' +
+      '<div class="px-wrap">' + pixelArt(lookArt(), 4) + "</div></div>";
+    html += '<p>けいけんちを <b>' + gainExp + '</b> かくとくした！<span class="muted">（うち れんげき +' + bonus + '）</span></p>';
+    html += '<p>Ｇ <b style="color:var(--acc)">' + gainGold + "</b> を てにいれた！</p>";
+    drops.forEach(d => html += '<p style="color:var(--acc)">▲ ' + d.name + " を てにいれた！</p>");
+    sold.forEach(x => html += '<p class="muted">' + x.it.name + " は もっていたので Ｇ" + x.g + " に かえた</p>");
+    if (gotCard){
+      const rc = RARITY[gotCard.card.rarity] || RARITY.N;
+      html += '<div style="margin:10px 0"><div style="display:flex;justify-content:center">' +
+        cardHTML(gotCard.card, false) + "</div>" +
+        '<p style="color:' + rc.color + '">★ カード「' + gotCard.card.name + "」を てにいれた！" +
+        (gotCard.dup ? '<span class="muted">（ダブり → Ｇ' + gotCard.back + "）</span>" : "") + "</p></div>";
+    }
+    lvups.forEach(l => html += '<p style="color:var(--ok)">★ レベルが ' + l + " に あがった！（" + rankOf(l) + "）</p>");
+    if (more) html += '<p class="muted" style="margin-top:10px">つぎの てきが やってくる…</p>';
+    $("r-title").textContent = "たたかいに かった！";
+    $("r-body").innerHTML = html;
+    $("btn-r-next").textContent = more ? "つぎの てきへ" : "ステージを クリア";
+    $("btn-r-next").onclick = () => more ? startBattle() : finishStage();
+    show("sc-result");
+  }, 620);
+}
+function firstEquip(it){
+  const cur = CONTENT.items[S.equipment[it.type]];
+  const val = x => (x.atk||0)+(x.def||0)+(x.agi||0);
+  if (!cur || val(it) > val(cur)) S.equipment[it.type] = it.id;
+}
+function finishStage(){
+  B.active = false; clearInterval(B.castT); stopModes(); closeAllWindows();
+  const pid = B.stage.packId;
+  const pp = S.packProgress[pid] || (S.packProgress[pid] = {cleared:[]});
+  const first = !pp.cleared.includes(B.stage.id);
+  if (first) pp.cleared.push(B.stage.id);
+  const sec = Math.max(1, (Date.now() - B.t0)/1000);
+  const cpm = Math.min(999, Math.round(B.hits / (sec/60)));
+  const acc = B.hits + B.misses > 0 ? B.hits/(B.hits+B.misses) : 1;
+  S.records.bestWpm = Math.max(S.records.bestWpm, cpm);
+  S.records.bestAcc = Math.max(S.records.bestAcc, acc);
+  S.records.recent.push(cpm); if (S.records.recent.length > 10) S.records.recent.shift();
+  const bondBefore = {}; SPIRITS.forEach(s => bondBefore[s.key] = S.spirits[s.key].bond);
+  SPIRITS.forEach(s => S.spirits[s.key].bond = bondOf(s.key));
+  save();
+  let html = "";
+  if (first) html += '<p style="color:var(--ok);font-size:19px">ステージ クリア！</p>';
+  html += '<table style="max-width:320px;margin:10px auto">' +
+    "<tr><th>そくど</th><td>" + cpm + " もじ/ふん</td></tr>" +
+    "<tr><th>せいかくさ</th><td>" + (acc*100).toFixed(1) + " %</td></tr>" +
+    "<tr><th>さいだい コンボ</th><td>" + B.maxCombo + "</td></tr>" +
+    "<tr><th>PERFECT</th><td>" + B.perfect + " かい</td></tr>" +
+    "<tr><th>ミス</th><td>" + B.misses + " かい</td></tr></table>";
+  SPIRITS.filter(s => S.spirits[s.key].bond > bondBefore[s.key]).forEach(s =>
+    html += '<p style="color:var(--acc)">◆ ' + s.name + " との きずなが Lv." + S.spirits[s.key].bond + " に あがった！</p>");
+  allSpells().filter(sp => spellUsable(sp) && !Array.from(sp.seq).every(k => bondBefore[k] >= sp.bond))
+    .forEach(sp => html += '<p style="color:var(--ok)">★ じゅもん「' + sp.name + '」を おぼえた！（' + sp.seq.toUpperCase() + "）</p>");
+  const weak = weakKeys();
+  if (weak.length) html += '<p class="muted">にがてな キー：<b style="color:var(--ng)">' +
+    weak.map(k => k.toUpperCase()).join(" ") + "</b>　つぎから おおめに でます。</p>";
+  /* とうさんに きょうの けっかを おくる（失敗しても遊びに影響しない） */
+  sendLog(
+    [ new Date().toLocaleString("ja-JP"), S.playerName, B.stage.name,
+      cpm, +(acc*100).toFixed(1), B.maxCombo, B.perfect, B.misses, S.lv,
+      weakKeys().map(k => k.toUpperCase()).join(" "),
+      Object.values(S.keyStats).reduce((a,v) => a + v.hit, 0) ],
+    { stage: B.stage.id, stageName: B.stage.name, cpm: cpm, acc: acc,
+      maxCombo: B.maxCombo, perfect: B.perfect, misses: B.misses,
+      lv: S.lv, gold: S.gold,
+      cards: { n: cardCount(), all: allCards().length,
+               ids:   allCards().filter(c => haveCard(c.id)).map(c => c.id).join(" "),
+               names: allCards().filter(c => haveCard(c.id)).map(c => c.name).join(" / ") },
+      bonds: SPIRITS.map(x => x.key + ":" + S.spirits[x.key].bond).join(" "),
+      home: HOME_LAST, keyStats: S.keyStats }
+  );
+  $("r-title").textContent = B.stage.name + " クリア";
+  $("r-body").innerHTML = html;
+  $("btn-r-next").textContent = "ちずへ もどる";
+  $("btn-r-next").onclick = () => { renderMap(); show("sc-map"); };
+  show("sc-result");
+  checkNewPacks();      /* 遊んでいる あいだに 届いた DLC も ちずに 出す */
+}
+
+/* ---------- コマンド ---------- */
+const CMDS = [
+  {c:"fight", label:"たたかう"},
+  {c:"spell", label:"じゅもん"},
+  {c:"tool",  label:"どうぐ"},
+  {c:"flee",  label:"にげる"}
+];
+let cmdIdx = 1;
+function openCmd(){
+  if (!B.active || B.mode !== "type") return;
+  B.mode = "cmd"; cmdIdx = 1; renderCmd();
+  $("cmdlayer").classList.add("on");
+}
+function renderCmd(){
+  $("cmdmenu").innerHTML = CMDS.map((c,i) =>
+    '<li class="' + (i === cmdIdx ? "sel" : "") + (c.c === "tool" && !ownedTools().length ? " no" : "") +
+    '" data-i="' + i + '">' + c.label + "</li>").join("");
+  Array.from($("cmdmenu").children).forEach(li => {
+    li.onclick = () => { cmdIdx = +li.dataset.i; renderCmd(); chooseCmd(); };
+  });
+}
+function closeCmd(){ $("cmdlayer").classList.remove("on"); if (B.mode === "cmd") B.mode = "type"; }
+function chooseCmd(){
+  const c = CMDS[cmdIdx].c;
+  if (c === "tool" && !ownedTools().length){ toast("どうぐを もっていない"); return; }
+  closeCmd();
+  if (c === "fight") return;
+  if (c === "flee"){ B.active = false; clearInterval(B.castT); stopModes();
+    renderMap(); show("sc-map"); return; }
+  if (c === "spell") openSpells(); else openTools();
+}
+
+/* ---------- じゅもん ---------- */
+let spellBuf = "";
+function openSpells(){
+  if (!B.active) return;
+  B.mode = "spell"; spellBuf = "";
+  renderSpells(); $("spelllayer").classList.add("on");
+}
+function closeSpells(){ $("spelllayer").classList.remove("on"); if (B.mode === "spell") B.mode = "type"; }
+function renderSpells(){
+  $("spellbuf").textContent = spellBuf ? spellBuf.toUpperCase() : "＿";
+  const hit = allSpells().find(sp => sp.seq === spellBuf);
+  $("spellname").textContent = hit
+    ? (spellUsable(hit) ? (B.mp >= hit.mp ? "▶ " + hit.name + "　MP" + hit.mp : hit.name + "（MPが たりない）")
+                        : hit.name + "（きずな Lv." + hit.bond + " ひつよう）")
+    : (spellBuf ? "…" : "");
+  $("spelllist").innerHTML = allSpells().map(sp => {
+    const usable = spellUsable(sp) && B.mp >= sp.mp;
+    return '<div class="srow' + (usable ? "" : " no") + (sp.seq === spellBuf ? " sel" : "") + '">' +
+      '<span class="sq">' + sp.seq.toUpperCase() + '</span><span class="sn">' + sp.name + "</span>" +
+      '<span class="sm">MP' + sp.mp + "　" + sp.desc + (spellUsable(sp) ? "" : "　◇きずな Lv." + sp.bond) + "</span></div>";
+  }).join("");
+}
+function spellKey(ch){
+  spellBuf += ch;
+  if (!allSpells().some(sp => sp.seq.startsWith(spellBuf))) spellBuf = spellBuf.slice(0,-1);
+  renderSpells();
+}
+function applyEffect(type, power, label){
+  const st = stats();
+  if (type === "attack" || type === "attackblind"){
+    B.qLeft -= power; B.totalDmg += Math.round(st.atk * power * 2);
+    hitFoe(); popup(label + "！", "var(--mp)");
+    msg(B.foe.name + "に おおきな ダメージ！");
+    if (type === "attackblind"){ B.blind = 50; msg(B.foe.name + "は めが くらんだ！"); }
+  } else if (type === "heal"){
+    const n = Math.round(st.maxHp * power);
+    B.hp = Math.min(st.maxHp, B.hp + n);
+    popup("+" + n, "var(--hp)"); msg("HPが <b>" + n + "</b> かいふくした！");
+  } else if (type === "mp"){
+    const n = Math.round(st.maxMp * power);
+    B.mp = Math.min(st.maxMp, B.mp + n);
+    popup("MP+" + n, "var(--mp)"); msg("MPが <b>" + n + "</b> かいふくした！");
+  } else if (type === "healfull" || type === "full"){
+    B.hp = st.maxHp; if (type === "full") B.mp = st.maxMp;
+    popup("かんぜん かいふく！", "var(--hp)"); msg("すべて かいふく した！");
+  } else if (type === "guard"){
+    B.guard += power; popup("▣ ぼうぎょ アップ", "var(--mp)");
+    msg(power + "かいぶん ダメージを はんぶんに する！");
+  } else if (type === "blind"){
+    B.blind = 60; popup("えいしょう ていし", "var(--mp)"); msg(B.foe.name + "は うごけなく なった！");
+  }
+}
+function castSpell(){
+  const sp = allSpells().find(x => x.seq === spellBuf);
+  if (!sp){ toast("その じゅもんは ない"); return; }
+  if (!spellUsable(sp)){ toast("きずなが たりない（Lv." + sp.bond + " ひつよう）"); return; }
+  if (B.mp < sp.mp){ toast("MPが たりない！"); return; }
+  B.mp -= sp.mp;
+  Array.from(sp.seq).forEach(k => recordKey(k, true));
+  closeSpells();
+  msg(S.playerName + "は <b>" + sp.name + "</b> を となえた！");
+  applyEffect(sp.type, sp.power, sp.name);
+  renderBattle();
+  if (B.qLeft <= 0){ defeatFoe(); return; }
+  nextQuestion(); renderBattle();
+}
+
+/* ---------- どうぐ ---------- */
+let toolIdx = 0;
+function openTools(){
+  if (!B.active) return;
+  B.mode = "tool"; toolIdx = 0;
+  renderTools(); $("toollayer").classList.add("on");
+}
+function closeTools(){ $("toollayer").classList.remove("on"); if (B.mode === "tool") B.mode = "type"; }
+function renderTools(){
+  const list = ownedTools();
+  $("toolmenu").innerHTML = list.length
+    ? list.map((it,i) => '<li class="' + (i === toolIdx ? "sel" : "") + '" data-i="' + i + '">' +
+        it.name + " ×" + S.tools[it.id] + '　<span class="muted">' + it.desc + "</span></li>").join("")
+    : '<li class="no">なにも もっていない</li>';
+  Array.from($("toolmenu").children).forEach(li => {
+    if (li.dataset.i === undefined) return;
+    li.onclick = () => { toolIdx = +li.dataset.i; renderTools(); useTool(); };
+  });
+}
+function useTool(){
+  const it = ownedTools()[toolIdx];
+  if (!it) return;
+  S.tools[it.id]--;
+  if (S.tools[it.id] <= 0) delete S.tools[it.id];
+  closeTools();
+  msg(S.playerName + "は <b>" + it.name + "</b> を つかった！");
+  applyEffect(it.effect, it.power, it.name);
+  renderBattle(); save();
+  if (B.qLeft <= 0) defeatFoe();
+}
+function closeAllWindows(){ closeCmd(); closeSpells(); closeTools(); }
+
+/* ---------- 入力 ---------- */
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) return;
+  if ($("bossintro").classList.contains("on")){
+    /* 演出中は すべての キーを すいとる（もんだいへの 誤入力よけ） */
+    if (e.key === " " || e.key === "Enter" || e.key === "Escape"){ e.preventDefault(); endBossIntro(); }
+    return;
+  }
+  if ($("sc-home").classList.contains("on")){
+    if (HC && HC.i >= HC.seq.length && (e.key === " " || e.key === "Enter")){
+      e.preventDefault(); $("btn-hc-go").onclick(); return;
+    }
+    let c = e.key.length === 1 ? e.key.toLowerCase() : null;
+    if (e.code === "Semicolon" || c === "ç") c = ";";
+    if (c && HOME_KEYS.indexOf(c) >= 0){ e.preventDefault(); homeCheckKey(c); }
+    return;
+  }
+  if ($("openlayer").classList.contains("on")){
+    if (e.key === " " || e.key === "Enter"){ e.preventDefault(); advanceOpen(); }
+    else if (e.key === "ArrowLeft"){ e.preventDefault(); moveCursor(-1); }
+    else if (e.key === "ArrowRight"){ e.preventDefault(); moveCursor(1); }
+    else if (e.key === "ArrowUp"){ e.preventDefault(); moveCursor(-(OP.cards.length >= 10 ? 5 : 4)); }
+    else if (e.key === "ArrowDown"){ e.preventDefault(); moveCursor(OP.cards.length >= 10 ? 5 : 4); }
+    else if (e.key === "Escape" && OP.mode !== "choose"){ e.preventDefault(); closeOpen(); }
+    return;
+  }
+  if ($("sc-result").classList.contains("on")){
+    if (e.key === " " || e.key === "Enter"){ e.preventDefault(); $("btn-r-next").click(); }
+    return;
+  }
+  if (!$("sc-battle").classList.contains("on")) return;
+
+  if (e.key === "Escape"){
+    e.preventDefault();
+    if (B.mode === "spell") closeSpells();
+    else if (B.mode === "tool") closeTools();
+    else if (B.mode === "cmd") closeCmd();
+    return;
+  }
+  if (B.mode === "cmd"){
+    e.preventDefault();
+    if (e.key === "ArrowUp") { cmdIdx = (cmdIdx + CMDS.length - 1) % CMDS.length; renderCmd(); }
+    else if (e.key === "ArrowDown"){ cmdIdx = (cmdIdx + 1) % CMDS.length; renderCmd(); }
+    else if (e.key === " " || e.key === "Enter") chooseCmd();
+    return;
+  }
+  if (B.mode === "tool"){
+    e.preventDefault();
+    const n = ownedTools().length;
+    if (!n){ closeTools(); return; }
+    if (e.key === "ArrowUp") { toolIdx = (toolIdx + n - 1) % n; renderTools(); }
+    else if (e.key === "ArrowDown"){ toolIdx = (toolIdx + 1) % n; renderTools(); }
+    else if (e.key === " " || e.key === "Enter") useTool();
+    return;
+  }
+  if (B.mode === "spell"){
+    if (e.key === "Backspace"){ e.preventDefault(); spellBuf = spellBuf.slice(0,-1); renderSpells(); return; }
+    if (e.key === " " || e.key === "Enter"){ e.preventDefault(); castSpell(); return; }
+  } else if (e.key === " " || e.code === "Space"){
+    e.preventDefault(); openCmd(); return;
+  }
+  let ch = e.key.length === 1 ? e.key.toLowerCase() : null;
+  if (e.code === "Semicolon" || ch === "ç") ch = ";";
+  if (!ch || !/^[a-z0-9;,.\-!?]$/.test(ch)) return;
+  e.preventDefault();
+  onKey(ch);
+});
+$("cmdlayer").onclick = e => { if (e.target.id === "cmdlayer") closeCmd(); };
+$("spelllayer").onclick = e => { if (e.target.id === "spelllayer") closeSpells(); };
+$("toollayer").onclick = e => { if (e.target.id === "toollayer") closeTools(); };
+
+/* ---------- ワールドマップ ---------- */
+/* 島の見た目のプリセット。DLCは自分の島（＝新しい大陸）を持てる */
+const WORLD_STYLES = {
+  green:  {sea:"#12305a", sea2:"#1c4478", sand:"#d8c88a", land:"#3a8a3a", land2:"#2d6e2d",
+           rock:"#6a6a5a", tree:"#1f5a24", isle:[64,38,54,27],
+           mnts:[[44,26,16,9],[58,24,12,7],[100,54,14,8]],
+           trees:[[22,44],[28,40],[80,60],[88,56],[36,58],[108,38]]},
+  dark:   {sea:"#161028", sea2:"#221838", sand:"#8a7a9a", land:"#4a3a6a", land2:"#3a2c56",
+           rock:"#6a5a7a", tree:"#2a1f42", isle:[64,38,56,26],
+           mnts:[[36,28,18,11],[54,24,13,8],[96,56,16,10]],
+           trees:[[24,46],[30,42],[84,60],[92,54],[42,60],[110,40]]},
+  snow:   {sea:"#1a3a5a", sea2:"#245278", sand:"#e8eef8", land:"#c8d8e8", land2:"#a8bcd0",
+           rock:"#8a9aae", tree:"#2a5a4a", isle:[64,38,52,28],
+           mnts:[[40,26,20,12],[60,22,14,9],[98,54,15,9]],
+           trees:[[26,46],[32,42],[82,60],[90,56],[44,58],[106,40]]},
+  desert: {sea:"#1a4a6a", sea2:"#246080", sand:"#f0dca0", land:"#d8b868", land2:"#bc9c4c",
+           rock:"#a08858", tree:"#5a7a3a", isle:[64,38,55,26],
+           mnts:[[42,26,18,10],[58,24,12,7],[100,54,14,8]],
+           trees:[[24,46],[86,58],[46,60],[108,40]]},
+  sky:    {isSky:true,
+           sea:"#7ab8e8", sea2:"#9ad0f4", sand:"#ffffff", land:"#e6eefc", land2:"#c6d6f0",
+           rock:"#a4b6d8", tree:"#5a9ad0", isle:[64,38,52,26],
+           mnts:[[42,26,18,11],[62,22,13,8],[98,54,15,9]],
+           trees:[[26,46],[32,42],[84,60],[92,54],[44,58],[108,40]]},
+  volcano:{sea:"#2a1a2a", sea2:"#3a2434", sand:"#6a5a50", land:"#5a4038", land2:"#46302a",
+           rock:"#8a4a3a", tree:"#3a2a20", isle:[64,38,53,27],
+           mnts:[[48,28,24,15],[86,52,16,10],[26,50,14,9]],
+           trees:[[22,46],[100,44],[38,60]]}
+};
+/* 島をドットの階段で描く（楕円を1行ずつ矩形で積む） */
+function worldSVG(styleKey){
+  const P = WORLD_STYLES[styleKey] || WORLD_STYLES.green;
+  if (P.isSky) return skySVG(P);          /* 空の島は 陸ではなく 雲で 描く */
+  const W = 128, H = 72;
+  const R = (x,y,w,h,c) => '<rect x="'+Math.round(x)+'" y="'+Math.round(y)+
+    '" width="'+Math.max(1,Math.round(w))+'" height="'+Math.max(1,Math.round(h))+'" fill="'+c+'"/>';
+  const SEA=P.sea, SEA2=P.sea2, SAND=P.sand, LAND=P.land, LAND2=P.land2,
+        ROCK=P.rock, TREE=P.tree;
+  let s = R(0,0,W,H,SEA);
+  for (let y=0; y<H; y+=4) s += R(0,y,W,1,SEA2);          /* 波 */
+  const ell = (cx,cy,rx,ry,c) => {
+    let o = "";
+    for (let y=Math.ceil(cy-ry); y<=Math.floor(cy+ry); y++){
+      const dy=(y-cy)/ry; if (Math.abs(dy)>1) continue;
+      const w=Math.round(rx*Math.sqrt(1-dy*dy));
+      if (w>0) o += R(cx-w, y, w*2, 1, c);
+    }
+    return o;
+  };
+  const IS = P.isle;
+  s += ell(IS[0],IS[1],IS[2]+2,IS[3]+2,SAND) + ell(IS[0],IS[1],IS[2],IS[3],LAND);
+  s += ell(30,58,13,7,LAND2) + ell(96,26,15,8,LAND2);      /* 地面の濃いところ */
+  /* 山 */
+  const mnt = (cx,base,w,h) => {
+    let o=""; for (let i=0;i<h;i++){ const ww=Math.max(1,Math.round(w*(i+1)/h));
+      o += R(cx-ww/2, base-h+i, ww, 1, ROCK);} return o; };
+  P.mnts.forEach(m => s += mnt(m[0],m[1],m[2],m[3]));
+  /* 木 */
+  P.trees.forEach(t => {
+    s += R(t[0]-1,t[1],2,3,"#3a2a14") + R(t[0]-3,t[1]-4,7,4,TREE) + R(t[0]-2,t[1]-6,5,2,TREE);
+  });
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" ' +
+         'shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">' + s + '</svg>';
+}
+/* ---------- せかいちず（島ぜんぶを ひとつの 海に うかべる） ----------
+   島が ふえるほど 世界が 広がって 見えるようにする。
+   ならびは パックの順。座標は 128x72 の 絶対値（worldSVG と同じ座標系）。 */
+/* 島が いくつに なっても ならべられるように、位置は 計算で 出す。
+   ヘビのように 蛇行させ、となり どうしは たてに ずらして ラベルの かさなりを ふせぐ。 */
+function isleLayout(i, n){
+  const W = 128, H = 72;
+  const perRow = n <= 5 ? 5 : n <= 12 ? 6 : 7;
+  const rows = Math.ceil(n / perRow);
+  const row = Math.floor(i / perRow), col = i % perRow;
+  const c = (row % 2 === 0) ? col : (perRow - 1 - col);       /* 行ごとに 折りかえす */
+  const mX = 15, mY = rows > 1 ? 15 : 24;
+  const stepX = (W - mX*2) / Math.max(1, perRow - 1);
+  const stepY = rows > 1 ? (H - mY*2) / (rows - 1) : 0;
+  const zig = (c % 2 ? 5 : -5);                               /* 左右となりを たてに ずらす */
+  const rx = n <= 5 ? 15 : n <= 12 ? 11 : 9;
+  return [mX + stepX*c, Math.max(12, Math.min(H-12, mY + stepY*row + zig)),
+          rx, Math.max(5, Math.round(rx*0.6))];
+}
+function globalSVG(worlds){
+  const N = worlds.length;
+  const W = 128, H = 72;
+  const R = (x,y,w,h,c) => '<rect x="'+Math.round(x)+'" y="'+Math.round(y)+
+    '" width="'+Math.max(1,Math.round(w))+'" height="'+Math.max(1,Math.round(h))+'" fill="'+c+'"/>';
+  const ell = (cx,cy,rx,ry,c) => {
+    let o = "";
+    for (let y=Math.ceil(cy-ry); y<=Math.floor(cy+ry); y++){
+      const dy=(y-cy)/ry; if (Math.abs(dy)>1) continue;
+      const w=Math.round(rx*Math.sqrt(1-dy*dy));
+      if (w>0) o += R(cx-w, y, w*2, 1, c);
+    }
+    return o;
+  };
+  let s = R(0,0,W,H,"#0e2a50");
+  for (let y=0; y<H; y+=4) s += R(0,y,W,1,"#173a68");              /* 波 */
+  worlds.forEach((wd,i) => {
+    const g = isleLayout(i, N);
+    if (wd.ghost){                                 /* まだ 来ていない島は くらい シルエット */
+      s += ell(g[0],g[1],g[2],g[3],"#1b2742");
+      s += ell(g[0],g[1]-g[3]*0.35,g[2]*0.62,g[3]*0.62,"#243252");
+      return;
+    }
+    const P = WORLD_STYLES[wd.style] || WORLD_STYLES.green;
+    if (P.isSky){                                  /* 空の島は 雲の かたまり */
+      s += ell(g[0], g[1]+1, g[2], g[3]-1, "#dcebfd");
+      s += ell(g[0]-g[2]*0.5, g[1]+2, g[2]*0.44, g[3]*0.6, "#ffffff");
+      s += ell(g[0]+g[2]*0.5, g[1]+2, g[2]*0.44, g[3]*0.6, "#ffffff");
+      s += ell(g[0], g[1]-g[3]*0.45, g[2]*0.6, g[3]*0.66, "#ffffff");
+      return;
+    }
+    s += ell(g[0],g[1],g[2]+2,g[3]+2,P.sand) + ell(g[0],g[1],g[2],g[3],P.land);
+    s += ell(g[0]-g[2]*0.32, g[1]+g[3]*0.3, g[2]*0.44, g[3]*0.42, P.land2);
+    const mh = Math.max(3, Math.round(g[3]*0.9)), mw = Math.max(4, Math.round(g[2]*0.62));
+    for (let k=0;k<mh;k++){
+      const ww = Math.max(1, Math.round(mw*(k+1)/mh));
+      s += R(g[0]-ww/2, g[1]-1-mh+k, ww, 1, P.rock);
+    }
+    const tx = g[0] + g[2]*0.45;
+    s += R(tx-1, g[1]+2, 2, 3, "#3a2a14") + R(tx-3, g[1]-2, 7, 4, P.tree);
+  });
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" ' +
+         'shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">' + s + '</svg>';
+}
+
+/* 空の島。海と陸の かわりに、空のグラデーションと 雲を つみあげる。
+   地点の あたり判定（pos が 島の中か）は ほかの島と 同じ isle を つかう。 */
+function skySVG(P){
+  const W = 128, H = 72;
+  const R = (x,y,w,h,c) => '<rect x="'+Math.round(x)+'" y="'+Math.round(y)+
+    '" width="'+Math.max(1,Math.round(w))+'" height="'+Math.max(1,Math.round(h))+'" fill="'+c+'"/>';
+  const ell = (cx,cy,rx,ry,c) => {
+    let o = "";
+    for (let y=Math.ceil(cy-ry); y<=Math.floor(cy+ry); y++){
+      const dy=(y-cy)/ry; if (Math.abs(dy)>1) continue;
+      const w=Math.round(rx*Math.sqrt(1-dy*dy));
+      if (w>0) o += R(cx-w, y, w*2, 1, c);
+    }
+    return o;
+  };
+  /* 空。上ほど こい */
+  let s = R(0,0,W,18,"#3f86d4") + R(0,18,W,15,"#5c9ee2")
+        + R(0,33,W,17,"#7fb8ec") + R(0,50,W,22,"#a3d2f6");
+  /* とおくの うすい雲 */
+  [[18,12,15,3],[92,9,17,3],[58,16,12,2],[112,25,11,2],[36,27,10,2]]
+    .forEach(c => s += ell(c[0],c[1],c[2],c[3],"#bcdcf8"));
+  /* まんなかの 大きな雲（島の かわり） */
+  const IS = P.isle;
+  s += ell(IS[0], IS[1]+5, IS[2], IS[3]-5, "#d6e8fb");
+  s += ell(IS[0]-IS[2]*0.52, IS[1]+3, IS[2]*0.38, IS[3]*0.5, "#eaf2ff");
+  s += ell(IS[0]+IS[2]*0.46, IS[1]+4, IS[2]*0.40, IS[3]*0.52, "#eaf2ff");
+  s += ell(IS[0], IS[1]-4, IS[2]*0.58, IS[3]*0.60, "#ffffff");
+  s += ell(IS[0]-IS[2]*0.30, IS[1]-1, IS[2]*0.34, IS[3]*0.46, "#ffffff");
+  s += ell(IS[0]+IS[2]*0.28, IS[1]-2, IS[2]*0.30, IS[3]*0.42, "#ffffff");
+  /* 入道雲（山の かわり） */
+  P.mnts.forEach(m => {
+    s += ell(m[0], m[1]-1, m[2]*0.9, m[3], "#ffffff");
+    s += ell(m[0]-m[2]*0.55, m[1]+2, m[2]*0.5, m[3]*0.62, "#f2f7ff");
+    s += ell(m[0]+m[2]*0.55, m[1]+2, m[2]*0.5, m[3]*0.62, "#f2f7ff");
+  });
+  /* ちいさい ちぎれ雲（木の かわり） */
+  P.trees.forEach(t => {
+    s += ell(t[0], t[1], 5, 2, "#ffffff") + ell(t[0]-2, t[1]-1, 3, 2, "#ffffff");
+  });
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" ' +
+         'shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">' + s + '</svg>';
+}
+
+/* 島の ならび順と めやすレベル。
+   ここに ある パックは この値が 優先される（＝すでに 入れた あとでも 並びが 直る）。
+   ここに ない パックは .kqpack の world.order / world.recLv、それも なければ 末尾。
+   ならび＝おすすめの 進む順。あたらしい キーを 覚える 負担が 軽い順に する。 */
+const WORLD_DEFAULTS = {
+  core:             {order:  0},              /* ホームとう（本編） */
+  dlc_dakuon_youon: {order: 10, recLv:  8},   /* だくおん大陸：かなの ひろがり */
+  dlc_shooting:     {order: 20, recLv: 10},   /* そらの とりで：新しいキーは ゼロ。速さだけ */
+  dlc_casino:       {order: 30},              /* （予定）カジノ */
+  dlc_english:      {order: 40},              /* （予定）英語 */
+  dlc_suuji:        {order: 90, recLv: 13}    /* すうじステーション：いったん 取り下げ中 */
+};
+const STYLE_CYCLE = ["dark","snow","desert","volcano"];
+function worldList(){
+  return CONTENT.packs
+    .filter(p => CONTENT.stages.some(st => st.packId === p.packId && st.pos))
+    .map((p, i) => {
+      const w = p.world || {}, d = WORLD_DEFAULTS[p.packId] || {};
+      return {
+        packId: p.packId,
+        name: w.name || (p.packId === "core" ? "ホームとう" : p.title),
+        style: w.style || (p.packId === "core" ? "green" : STYLE_CYCLE[(i-1) % STYLE_CYCLE.length]),
+        recLv: d.recLv !== undefined ? d.recLv : (w.recLv || 0),   /* 0 なら 出さない */
+        order: d.order !== undefined ? d.order
+             : (w.order !== undefined ? w.order : 900 + i)
+      };
+    })
+    .sort((a,b) => a.order - b.order);
+}
+let curWorld = null;
+let mapMode = "world";        /* "world" = 島の中 / "global" = せかいちず */
+/* せかいちずに ならべる 島ぜんぶ。まだ 持っていない島・これから 作る島も シルエットで 出す。
+   「せかいは もっと 広い」ことが 見てわかるように。 */
+function allWorlds(){
+  const real = worldList();
+  const has = real.map(w => w.packId);
+  const ghosts = (CATALOG || [])
+    .filter(x => !x.hidden && has.indexOf(x.packId) < 0)
+    .map(x => ({
+      packId: x.packId,
+      name: x.comingSoon ? "？？？" : (x.title || x.packId),
+      ghost: true, soon: !!x.comingSoon, entry: x, recLv: 0,
+      order: x.order !== undefined ? x.order : 990
+    }));
+  return real.concat(ghosts).sort((a,b) => a.order - b.order);
+}
+function renderWorld(){
+  const el = $("worldmap");
+  if (!el || !S) return;
+  const worlds = worldList();
+  if (!worlds.length){ el.style.display = "none"; $("world-tabs").innerHTML = ""; return; }
+  el.style.display = "";
+  if (!curWorld || !worlds.some(w => w.packId === curWorld)){
+    /* まだクリアしていない島を初期表示にする */
+    const todo = worlds.filter(w => {
+      const pp = S.packProgress[w.packId] || {cleared:[]};
+      return CONTENT.stages.some(st => st.packId === w.packId && st.pos && pp.cleared.indexOf(st.id) < 0);
+    })[0];
+    curWorld = (todo || worlds[0]).packId;
+  }
+  const world = worlds.filter(w => w.packId === curWorld)[0];
+
+  /* 島が2つ以上あるときだけ切り替えを出す */
+  const showGlobal = worlds.length > 1 || allWorlds().length > worlds.length;
+  if (!showGlobal) mapMode = "world";
+  $("world-tabs").innerHTML = showGlobal
+    ? '<button class="sub' + (mapMode === "global" ? " on" : "") + '" data-w="__global">🌏 せかいちず</button>' +
+      worlds.map(w => {
+        const pp = S.packProgress[w.packId] || {cleared:[]};
+        const tot = CONTENT.stages.filter(st => st.packId === w.packId && st.pos).length;
+        return '<button class="sub' + (mapMode === "world" && w.packId === curWorld ? " on" : "") +
+          '" data-w="' + w.packId + '">' + w.name + " " + pp.cleared.length + "/" + tot + "</button>";
+      }).join("")
+    : "";
+  Array.from($("world-tabs").children).forEach(b => {
+    b.onclick = () => {
+      if (b.dataset.w === "__global") mapMode = "global";
+      else { mapMode = "world"; curWorld = b.dataset.w; }
+      renderWorld();
+    };
+  });
+
+  if (mapMode === "global"){ renderGlobal(allWorlds()); return; }
+
+  $("wm-bg").innerHTML = worldSVG(world.style);
+  Array.from(el.querySelectorAll(".road,.wm-node,.wm-you,.wm-prog,.wm-title")).forEach(x => x.remove());
+
+  const placed = CONTENT.stages.filter(st => st.pos && st.packId === curWorld);
+  const openOf = {}, chain = {};
+  CONTENT.stages.forEach(st => {
+    const pp = S.packProgress[st.packId] || {cleared:[]};
+    const cleared = pp.cleared.indexOf(st.id) >= 0;
+    if (!(st.packId in chain)) chain[st.packId] = true;
+    openOf[st.id] = {open: chain[st.packId] || cleared, cleared: cleared};
+    chain[st.packId] = cleared;
+  });
+
+  /* 道：地点どうしを点でつなぐ */
+  let html = "";
+  for (let i=0;i<placed.length-1;i++){
+    const a = placed[i].pos, b = placed[i+1].pos, steps = 9;
+    const walked = openOf[placed[i].id].cleared;      /* 通った道は明るく残る */
+    for (let t=1;t<steps;t++){
+      const x = a[0]+(b[0]-a[0])*t/steps, y = a[1]+(b[1]-a[1])*t/steps;
+      html += '<i class="road' + (walked ? " done" : "") +
+        '" style="left:'+x.toFixed(1)+'%;top:'+y.toFixed(1)+'%"></i>';
+    }
+  }
+  /* 地点 */
+  let you = null;
+  placed.forEach(st => {
+    const o = openOf[st.id];
+    const boss = st.battles.filter(b => b.boss)[0];
+    const e = boss && CONTENT.enemies[boss.enemy];
+    const isNext = o.open && !o.cleared && !you;
+    if (isNext) you = st;
+    html += '<div class="wm-node ' + (o.cleared ? "done" : o.open ? (isNext ? "next" : "") : "lock") +
+      '" data-s="' + st.id + '" style="left:' + st.pos[0] + '%;top:' + st.pos[1] + '%">' +
+      '<div class="ico">' + (e ? pixelArt(e.px, 2) : "") +
+        (o.cleared ? '<b class="star">★</b>' : "") + "</div>" +
+      '<div class="lb">' + (o.cleared ? "✔ " : o.open ? "" : "× ") + st.name + "</div></div>";
+  });
+  /* 主人公は「次に挑む地点」に立つ。全部クリアなら最後の地点 */
+  const here = you || placed[placed.length-1];
+  if (here) html += '<div class="wm-you" style="left:' + (here.pos[0]-9) + '%;top:' +
+    (here.pos[1]-2) + '%">' + pixelArt(lookArt(), 3) + "</div>";
+  const cleared = placed.filter(st => openOf[st.id].cleared).length;
+  const need = world.recLv;
+  const short = need && S.lv < need;
+  html += '<div class="wm-prog">' + world.name +
+    ' <b style="color:var(--acc)">★' + cleared + "</b> / " + placed.length +
+    (need ? '　<span style="color:var(--' + (short ? "ng" : "sub") + ')">めやす Lv.' + need +
+            (short ? "（まだ はやいかも）" : "") + "</span>" : "") + "</div>";
+  el.insertAdjacentHTML("beforeend", html);
+  Array.from(el.querySelectorAll(".wm-node")).forEach(nd => {
+    const st = CONTENT.stages.filter(x => x.id === nd.dataset.s)[0];
+    if (st && openOf[st.id] && openOf[st.id].open)
+      nd.onclick = () => { try{ enterStage(st); }catch(err){ noteError("enterStage", err.message); } };
+  });
+}
+
+/* ---------- せかいちず の 描画 ---------- */
+function renderGlobal(worlds){
+  const el = $("worldmap");
+  $("wm-bg").innerHTML = globalSVG(worlds);
+  Array.from(el.querySelectorAll(".road,.wm-node,.wm-you,.wm-prog,.wm-title")).forEach(x => x.remove());
+  const W = 128, H = 72, N = worlds.length;
+  const info = worlds.map((w,i) => {
+    const g = isleLayout(i, N);
+    const pp = S.packProgress[w.packId] || {cleared:[]};
+    const sts = CONTENT.stages.filter(st => st.packId === w.packId && st.pos);
+    const last = sts[sts.length-1];
+    return {
+      w: w, done: sts.filter(st => pp.cleared.indexOf(st.id) >= 0).length, tot: sts.length,
+      x: g[0]/W*100, y: g[1]/H*100,
+      boss: last ? last.battles.filter(b => b.boss)[0] : null
+    };
+  });
+  let html = "";
+  /* 島と島を つなぐ 航路。すすんだ ところは 明るくなる */
+  for (let i=0;i<info.length-1;i++){
+    const a = info[i], b = info[i+1], steps = 11;
+    for (let t=1;t<steps;t++){
+      const x = a.x+(b.x-a.x)*t/steps, y = a.y+(b.y-a.y)*t/steps;
+      html += '<i class="road' + (a.done > 0 ? " done" : "") +
+        '" style="left:'+x.toFixed(1)+'%;top:'+y.toFixed(1)+'%"></i>';
+    }
+  }
+  info.forEach(o => {
+    if (o.w.ghost){                                   /* まだ 来ていない島 */
+      html += '<div class="wm-node ghost ' + (o.w.soon ? "soon" : "get") +
+        '" data-w="' + o.w.packId + '" style="left:'+o.x.toFixed(1)+'%;top:'+o.y.toFixed(1)+'%">' +
+        '<div class="ico"><span class="qm">？</span></div>' +
+        '<div class="lb">' + o.w.name + "</div>" +
+        '<div class="lb2">' + (o.w.soon ? "つくっているよ" : "▼ とりよせる") + "</div></div>";
+      return;
+    }
+    const all = o.tot > 0 && o.done >= o.tot;
+    const cur = o.w.packId === curWorld;
+    const e = o.boss && CONTENT.enemies[o.boss.enemy];
+    const short = o.w.recLv && S.lv < o.w.recLv;
+    html += '<div class="wm-node' + (all ? " done" : cur ? " next" : "") +
+      '" data-w="' + o.w.packId + '" style="left:'+o.x.toFixed(1)+'%;top:'+o.y.toFixed(1)+'%">' +
+      '<div class="ico">' + (e ? pixelArt(e.px, 2) : "") + (all ? '<b class="star">★</b>' : "") + "</div>" +
+      '<div class="lb">' + o.w.name + "</div>" +
+      '<div class="lb2"' + (short ? ' style="color:var(--ng)"' : "") + ">★" + o.done + "/" + o.tot +
+      (o.w.recLv ? "　Lv." + o.w.recLv : "") + "</div></div>";
+  });
+  const here = info.filter(o => o.w.packId === curWorld && !o.w.ghost)[0] ||
+               info.filter(o => !o.w.ghost)[0];
+  if (here) html += '<div class="wm-you" style="left:' + (here.x-11).toFixed(1) + '%;top:' +
+    (here.y-14).toFixed(1) + '%">' + pixelArt(lookArt(), 3) + "</div>";
+  const real = info.filter(o => !o.w.ghost);
+  html += '<div class="wm-prog">せかいちず　★<b style="color:var(--acc)">' +
+    real.reduce((a,o) => a+o.done, 0) + "</b> / " + real.reduce((a,o) => a+o.tot, 0) +
+    "　しま " + real.length + (info.length > real.length ? "（＋" + (info.length-real.length) + "）" : "") +
+    "</div>";
+  el.insertAdjacentHTML("beforeend", html);
+  Array.from(el.querySelectorAll(".wm-node")).forEach(nd => {
+    const w = worlds.filter(x => x.packId === nd.dataset.w)[0];
+    if (w && w.ghost){
+      nd.onclick = async () => {
+        if (w.soon){ toast("この しまは いま とうさんが つくっているよ"); return; }
+        toast("よみこみ中…");
+        try{ await installRemote(w.entry); }
+        catch(err){ toast("よみこめませんでした。あとで もういちど"); }
+      };
+      return;
+    }
+    nd.onclick = () => { curWorld = nd.dataset.w; mapMode = "world"; renderWorld(); };
+  });
+}
+
+/* ---------- マップ ---------- */
+function renderMap(){
+  renderWorld();
+  $("map-art").innerHTML = pixelArt(lookArt(), 3);
+  $("m-name").textContent = displayName();
+  $("m-rank").textContent = rankOf(S.lv);
+  $("m-lv").textContent = S.lv;
+  $("m-next").textContent = (expToNext(S.lv) - S.exp) + " exp";
+  $("m-gold").textContent = S.gold;
+  const onMap = CONTENT.stages.filter(st => st.pos);
+  $("m-star").textContent =
+    onMap.filter(st => (S.packProgress[st.packId]||{cleared:[]}).cleared.indexOf(st.id) >= 0).length +
+    " / " + onMap.length;
+  const list = $("stagelist"); list.innerHTML = "";
+  const chainOpen = {};
+  const rest = CONTENT.stages.filter(st => !st.pos);
+  $("stagelist-wrap").style.display = rest.length ? "" : "none";
+  CONTENT.stages.forEach(st => {
+    const pp = S.packProgress[st.packId] || {cleared:[]};
+    const cleared = pp.cleared.includes(st.id);
+    if (!(st.packId in chainOpen)) chainOpen[st.packId] = true;
+    const open = chainOpen[st.packId] || cleared;
+    const boss = st.battles.filter(b => b.boss)[0];
+    const bossArt = (open && boss && CONTENT.enemies[boss.enemy]) ? pixelArt(CONTENT.enemies[boss.enemy].px, 2) : "";
+    const d = document.createElement("div");
+    d.className = "stage" + (open ? "" : " lock");
+    d.innerHTML = '<div class="no">' + (open ? (cleared ? "✔" : st.no) : "×") + "</div>" +
+      '<div class="px-wrap">' + bossArt + "</div>" +
+      "<div><b>" + st.name + "</b> " + (cleared ? '<span class="clear">クリア</span>' : "") +
+      '<br><span class="muted">' + (st.desc||"") + "</span>" +
+      '<br><span class="tag">' + st.teach + "</span>" +
+      (st.packId !== "core" ? '<span class="tag">DLC</span>' : "") + "</div>";
+    if (open) d.onclick = () => enterStage(st);
+    if (!st.pos) list.appendChild(d);          /* 地図に地点がないものだけ一覧に出す */
+    chainOpen[st.packId] = cleared;
+  });
+  showNewPackBanner();
+}
+
+/* ---------- ショップ ---------- */
+const SHOP_TABS = [
+  {t:"weapon",   label:"ぶき"},
+  {t:"armor",    label:"ぼうぐ"},
+  {t:"accessory",label:"アクセサリ"},
+  {t:"tool",     label:"どうぐ"},
+  {t:"cosmetic", label:"すがた"},
+  {t:"title",    label:"しょうごう"},
+  {t:"card",     label:"カードや"}
+];
+let shopTab = "weapon";
+function openShop(){ shopTab = "weapon"; renderShop(); show("sc-shop"); }
+function renderShop(){
+  $("shop-art").innerHTML = pixelArt(lookArt(), 3);
+  $("shop-gold").textContent = S.gold;
+  $("shop-tabs").innerHTML = SHOP_TABS.map(x =>
+    '<button class="sub' + (x.t === shopTab ? " on" : "") + '" data-t="' + x.t + '">' + x.label + "</button>").join("");
+  Array.from($("shop-tabs").children).forEach(b => {
+    b.onclick = () => { shopTab = b.dataset.t; renderShop(); };
+  });
+  if (shopTab === "card"){                       /* カードや：パックを売る */
+    $("shop-list").innerHTML =
+      '<p class="muted">カードには キーボードの ひみつが かいてある。あつめると ものしりに なれるよ。</p>' +
+      '<p class="muted" style="margin-bottom:10px">いま <b style="color:var(--acc)">' + cardCount() +
+      " / " + allCards().length + "</b> まい あつめた</p>" +
+      PACKS.map(pk => '<div class="packrow">' +
+        '<div class="px-wrap">' + pixelArt(CARD_BACK, 2) + "</div>" +
+        '<span class="nm">' + pk.name + '</span><span class="ds">' + pk.desc + "</span>" +
+        '<span class="pr">Ｇ ' + pk.price + "</span>" +
+        '<button class="sm" data-pack="' + pk.id + '"' + (S.gold < pk.price ? " disabled" : "") +
+        ">かう</button></div>").join("") +
+      '<div class="row" style="margin-top:12px"><button class="sub sm" id="shop-to-cards">カードずかんを みる</button></div>';
+    Array.from($("shop-list").querySelectorAll("[data-pack]")).forEach(b =>
+      b.onclick = () => openPack(b.dataset.pack));
+    const link = $("shop-to-cards");
+    if (link) link.onclick = openCards;
+    return;
+  }
+  const list = itemsOf(shopTab).filter(i => i.price).sort((a,b) => a.price - b.price);
+  $("shop-list").innerHTML = list.map(it => {
+    let owned = false, equipped = false;
+    if (it.type === "tool") owned = false;
+    else if (it.type === "cosmetic"){ owned = S.cosmetics.indexOf(it.id) >= 0; equipped = S.look === it.id; }
+    else if (it.type === "title"){ owned = S.cosmetics.indexOf(it.id) >= 0; equipped = S.title === it.id; }
+    else { owned = S.inventory.indexOf(it.id) >= 0; equipped = S.equipment[it.type] === it.id; }
+    const eff = it.atk ? "こうげき +" + it.atk : it.def ? "まもり +" + it.def :
+                it.agi ? "すばやさ +" + it.agi :
+                (it.desc || (it.type === "title" ? "なまえの まえに つく" : "みための へんこう"));
+    const cnt = it.type === "tool" ? '<span class="muted">もっている数 ' + (S.tools[it.id]||0) + "</span>" : "";
+    const art = it.px ? '<div class="px-wrap">' + pixelArt(it.px, 2) + "</div>" : "";
+    let btn;
+    if (owned && equipped) btn = '<span class="muted">つけている</span>';
+    else if (owned) btn = '<button class="sm" data-use="' + it.id + '">つける</button>';
+    else btn = '<button class="sm" data-buy="' + it.id + '"' + (S.gold < it.price ? " disabled" : "") + ">かう</button>";
+    return '<div class="shoprow' + (owned && !equipped ? " have" : "") + (equipped ? " equipped" : "") + '">' +
+      art + '<span class="nm">' + it.name + '</span><span class="ds">' + eff + " " + cnt + '</span>' +
+      '<span class="pr">Ｇ ' + it.price + "</span>" + btn + "</div>";
+  }).join("") || '<p class="muted">うっているものが ありません。</p>';
+  Array.from($("shop-list").querySelectorAll("[data-buy]")).forEach(b => b.onclick = () => buyItem(b.dataset.buy));
+  Array.from($("shop-list").querySelectorAll("[data-use]")).forEach(b => b.onclick = () => equipItem(b.dataset.use));
+}
+function buyItem(id){
+  const it = CONTENT.items[id];
+  if (!it || !it.price) return;
+  if (S.gold < it.price){ toast("おかねが たりない！"); return; }
+  S.gold -= it.price;
+  if (it.type === "tool") S.tools[it.id] = (S.tools[it.id]||0) + 1;
+  else if (it.type === "cosmetic" || it.type === "title"){ S.cosmetics.push(it.id); equipItem(it.id); }
+  else { S.inventory.push(it.id); equipItem(it.id); }
+  save();
+  if ($("sc-shop").classList.contains("on")) renderShop();
+  toast(it.name + " を かった！");
+}
+function equipItem(id){
+  const it = CONTENT.items[id];
+  if (!it) return;
+  if (it.type === "cosmetic") S.look = (S.look === id) ? null : id;
+  else if (it.type === "title") S.title = (S.title === id) ? null : id;
+  else S.equipment[it.type] = (S.equipment[it.type] === id) ? null : id;
+  save();
+  if ($("sc-shop").classList.contains("on")) renderShop();
+  if ($("sc-status").classList.contains("on")) renderStatus();
+}
+
+/* ---------- カードずかん ---------- */
+function openCards(){ $("cd-detail").style.display = "none"; renderCards(); show("sc-cards"); }
+function renderCards(){
+  $("cd-gold").textContent = S.gold;
+  $("cd-count").textContent = cardCount() + " / " + allCards().length + " まい";
+  $("btn-cd-pack").textContent = "カードパックを かう（Ｇ" + PACK_PRICE + "）";
+  $("btn-cd-pack").disabled = S.gold < PACK_PRICE;
+  $("cd-grid").innerHTML = allCards().map(c => {
+    const have = haveCard(c.id);
+    const num = S.cards[c.id] || 0;
+    return '<div class="cardit ' + (have ? "have" : "lock") + '" data-c="' + c.id + '">' +
+      (have ? cardHTML(c, true) : cardBackHTML(true)) +
+      (num > 1 ? '<div class="dupbadge">×' + num + "</div>" : "") + "</div>";
+  }).join("");
+  Array.from($("cd-grid").querySelectorAll("[data-c]")).forEach(el => {
+    el.onclick = () => showCardDetail(el.dataset.c);
+  });
+}
+function showCardDetail(id){
+  const c = CONTENT.cards[id];
+  if (!c) return;
+  if (!haveCard(id)){ toast("まだ もっていない カード"); return; }
+  const r = RARITY[c.rarity] || RARITY.N;
+  const d = $("cd-detail");
+  d.style.display = "";
+  d.innerHTML = '<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">' +
+    cardHTML(c, false) +
+    '<div style="flex:1;min-width:200px">' +
+    '<p class="muted">もっている数：' + (S.cards[c.id] || 0) + " まい</p>" +
+    '<p class="muted" style="line-height:1.9">' + c.tip + "</p></div></div>";
+}
+function buyPack(){ openPack("p_normal"); }
+
+/* ---------- ステータス ---------- */
+function renderStatus(){
+  const st = stats();
+  $("st-art").innerHTML = pixelArt(lookArt(), 5);
+  $("st-table").innerHTML =
+    "<tr><th>なまえ</th><td>" + displayName() + "</td></tr>" +
+    "<tr><th>しょうごう</th><td>" + rankOf(S.lv) + "</td></tr>" +
+    "<tr><th>レベル</th><td>" + S.lv + "（つぎまで " + (expToNext(S.lv)-S.exp) + " exp）</td></tr>" +
+    "<tr><th>HP / MP</th><td>" + st.maxHp + " / " + st.maxMp + "</td></tr>" +
+    "<tr><th>こうげき</th><td>" + st.atk + "</td></tr>" +
+    "<tr><th>まもり</th><td>" + st.def + "</td></tr>" +
+    "<tr><th>すばやさ</th><td>" + st.agi + "</td></tr>" +
+    "<tr><th>もちきん</th><td>Ｇ " + S.gold + "</td></tr>" +
+    "<tr><th>さいこう そくど</th><td>" + S.records.bestWpm + " もじ/ふん</td></tr>" +
+    "<tr><th>さいこう せいかくさ</th><td>" + (S.records.bestAcc*100).toFixed(1) + " %</td></tr>";
+
+  $("st-equip").innerHTML = ["weapon","armor","accessory"].map(slot => {
+    const jp = {weapon:"ぶき", armor:"ぼうぐ", accessory:"アクセサリ"}[slot];
+    const owned = S.inventory.map(i => CONTENT.items[i]).filter(x => x && x.type === slot);
+    const cur = CONTENT.items[S.equipment[slot]];
+    return "<p><b>" + jp + "：</b>" + (cur ? cur.name : '<span class="muted">なし</span>') + "</p>" +
+      '<div class="row" style="margin-bottom:9px">' + (owned.length
+        ? owned.map(it => '<button class="sm ' + (S.equipment[slot] === it.id ? "" : "sub") +
+            '" data-eq="' + it.id + '">' + it.name + "</button>").join("")
+        : '<span class="muted">もっていない</span>') + "</div>";
+  }).join("");
+  Array.from($("st-equip").querySelectorAll("[data-eq]")).forEach(b => b.onclick = () => equipItem(b.dataset.eq));
+
+  const g = $("st-spirits"); g.innerHTML = "";
+  SPIRITS.forEach(s => {
+    const b = bondOf(s.key), ks = S.keyStats[s.key] || {hit:0, miss:0};
+    const acc = ks.hit+ks.miss ? (ks.hit/(ks.hit+ks.miss)*100).toFixed(0) : "—";
+    const label = (s.key === ";" && S.settings.layout === "PT") ? "Ç" : s.key.toUpperCase();
+    const own = allSpells().filter(sp => sp.seq === s.key)[0];
+    const d = document.createElement("div"); d.className = "sp-card";
+    d.innerHTML = '<div class="k" style="color:var(--'+s.finger+')">' + label + "</div>" +
+      '<div class="n">' + s.name + "</div>" +
+      '<div class="muted">' + s.elem + " ／ " + s.label + "</div>" +
+      '<div class="muted" style="margin-top:3px">せいかくさ ' + acc + "%</div>" +
+      '<div class="bond"><i style="width:'+(b*10)+'%"></i></div>' +
+      '<div class="muted">きずな Lv.' + b + "</div>" +
+      (own ? '<div class="muted" style="margin-top:4px;color:' +
+        (spellUsable(own) ? "var(--acc)" : "var(--sub)") + '">' + own.name + (spellUsable(own) ? "" : " ◇") + "</div>" : "");
+    g.appendChild(d);
+  });
+
+  $("st-spells").innerHTML = allSpells().map(sp => {
+    const ok = spellUsable(sp);
+    return '<div class="srow' + (ok ? "" : " no") + '" style="padding-left:0">' +
+      '<span class="sq">' + sp.seq.toUpperCase() + '</span><span class="sn">' + sp.name + "</span>" +
+      '<span class="sm">MP' + sp.mp + "　" + sp.desc + (ok ? "" : "　◇ きずな Lv." + sp.bond + " ひつよう") + "</span></div>";
+  }).join("");
+
+  const tl = ownedTools();
+  $("st-tools").innerHTML = tl.length
+    ? tl.map(it => "<p>" + it.name + " ×" + S.tools[it.id] + '　<span class="muted">' + it.desc + "</span></p>").join("")
+    : '<p class="muted">なにも もっていない。みせで かえます。</p>';
+}
+
+/* ---------- 引き継ぎ ---------- */
+function b64enc(str){
+  const bytes = new TextEncoder().encode(str);
+  let s = ""; bytes.forEach(b => s += String.fromCharCode(b));
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function b64dec(b64){
+  const s = atob(b64.replace(/-/g,"+").replace(/_/g,"/"));
+  return new TextDecoder().decode(Uint8Array.from(s, c => c.charCodeAt(0)));
+}
+function checksum(str){
+  let h = 5381;
+  for (let i=0;i<str.length;i++) h = ((h*33) ^ str.charCodeAt(i)) >>> 0;
+  return h.toString(36).slice(-4).toUpperCase().padStart(4,"0");
+}
+function makeCode(){ const b = b64enc(JSON.stringify(S)); return "KQ1-" + b + "-" + checksum(b); }
+function readCode(code){
+  const m = code.replace(/\s+/g,"").match(/^KQ1-(.+)-([A-Z0-9]{4})$/);
+  if (!m) throw new Error("format");
+  if (checksum(m[1]) !== m[2]) throw new Error("checksum");
+  return migrate(JSON.parse(b64dec(m[1])));
+}
+function download(name, text){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], {type:"application/json"}));
+  a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* ---------- DLC ---------- */
+function renderPacks(){
+  $("packlist").innerHTML = "<p class=muted>はいっている コンテンツ：</p>" +
+    CONTENT.packs.map(p => '<span class="tag">' + p.title + " v" + p.packVersion +
+      (p.packId === "core" ? "（本編）" : "") + "</span>").join("");
+}
+function installPack(text){
+  let p;
+  try{ p = JSON.parse(text); }catch(e){ toast("ファイルが よめませんでした"); return; }
+  if (!p.packId || !p.stages){ toast("これは .kqpack では ないみたい"); return; }
+  if (!mergePack(p)){ toast("その コンテンツは もう はいっているよ"); return; }
+  const list = storedPacks().filter(x => x.packId !== p.packId);
+  list.push(p); persistPacks(list);
+  if (!S.packProgress[p.packId]) S.packProgress[p.packId] = {cleared:[]};
+  curWorld = p.packId; mapMode = "global";     /* 世界が広がったことが 見てわかるように */
+  if (typeof CATALOG !== "undefined" && CATALOG) showNewPackBanner();
+  save(); renderPacks(); renderMap();
+  toast("「" + (p.title||p.packId) + "」を ついかしました！");
+}
+(function(){
+  const dz = $("dropzone");
+  ["dragenter","dragover"].forEach(ev => dz.addEventListener(ev, e => {
+    e.preventDefault(); dz.style.borderColor = "var(--acc)"; }));
+  ["dragleave","drop"].forEach(ev => dz.addEventListener(ev, e => {
+    e.preventDefault(); dz.style.borderColor = "#4a4a78"; }));
+  dz.addEventListener("drop", e => {
+    const f = e.dataTransfer.files[0]; if (!f) return;
+    const r = new FileReader(); r.onload = () => installPack(r.result); r.readAsText(f);
+  });
+})();
+
+/* ---------- リモート配信（公開URLの packs/index.json を見にいく） ----------
+   とうさんが packs/ に .kqpack を置いて index.json に足すだけで、
+   息子は「ここを おして ついかする」の1クリックで新しい島が増える。
+   file:// で開いているときや オフラインのときは 何もしない（遊びには影響しない）。 */
+const CATALOG_PATH = "packs/index.json";
+let CATALOG = null;                    /* 最後に取れた一覧。取れていなければ null */
+function canFetchPacks(){
+  return typeof location !== "undefined" && /^https?:$/.test(location.protocol) &&
+         typeof fetch === "function";
+}
+function packURL(rel){
+  /* Netlifyのキャッシュを避けて毎回 新しいものを見る */
+  return new URL(rel, location.href).href + "?v=" + Date.now();
+}
+async function fetchCatalog(){
+  const r = await fetch(packURL(CATALOG_PATH), {cache:"no-store"});
+  if (!r.ok) throw new Error("http " + r.status);
+  const j = await r.json();
+  CATALOG = (j.packs||[]).filter(x => x.packId && (x.file || x.comingSoon));
+  return CATALOG;
+}
+function installedPackIds(){ return CONTENT.packs.map(x => x.packId); }
+function newRemotePacks(){
+  const has = installedPackIds();
+  /* まだ 出さない島（hidden）と 予定だけの島（comingSoon）は しらせない */
+  return (CATALOG||[]).filter(x => x.file && !x.hidden && has.indexOf(x.packId) < 0);
+}
+async function installRemote(entry){
+  const r = await fetch(packURL("packs/" + entry.file), {cache:"no-store"});
+  if (!r.ok) throw new Error("http " + r.status);
+  installPack(await r.text());
+}
+/* ちずのバナー（子どもが ひとりで ついかできる 入口） */
+function showNewPackBanner(){
+  const card = $("newpack-card"); if (!card) return;
+  const list = newRemotePacks();
+  if (!list.length){ card.style.display = "none"; return; }
+  $("newpack-name").textContent = list.map(x => x.title || x.packId).join("・");
+  card.dataset.pid = list[0].packId;
+  card.style.display = "";
+}
+async function checkNewPacks(){
+  if (!canFetchPacks()) return;
+  try{ await fetchCatalog(); }catch(e){ return; }   /* 取れなくても だまって あきらめる */
+  showNewPackBanner();
+}
+$("btn-newpack-add").onclick = async () => {
+  const e = (CATALOG||[]).filter(x => x.packId === $("newpack-card").dataset.pid)[0];
+  if (!e) return;
+  const b = $("btn-newpack-add"); b.disabled = true; toast("よみこみ中…");
+  try{ await installRemote(e); }
+  catch(err){ toast("よみこめませんでした。あとで もういちど ためしてね"); }
+  b.disabled = false; showNewPackBanner();
+};
+/* メニューの一覧（親がたしかめる用。子どもも ここから 選べる） */
+function renderRemote(){
+  const has = installedPackIds();
+  const el = $("remote-list");
+  if (!CATALOG){ el.innerHTML = ""; return; }
+  const list = CATALOG.filter(x => x.file && !x.hidden);
+  if (!list.length){ el.innerHTML = '<p class="muted">いまは あたらしい ぼうけんは ないみたい。</p>'; return; }
+  el.innerHTML = list.map(x => '<div class="packrow">' +
+    '<span class="nm">' + (x.title||x.packId) + "</span>" +
+    '<span class="ds">' + (x.desc||"") + (x.stages ? "（" + x.stages + "ステージ）" : "") + "</span>" +
+    (has.indexOf(x.packId) >= 0
+      ? '<span class="tag">はいってる</span>'
+      : '<button class="sm" data-pid="' + x.packId + '">ついか</button>') + "</div>").join("");
+  Array.from(el.querySelectorAll("button[data-pid]")).forEach(b => {
+    b.onclick = async () => {
+      const e = CATALOG.filter(x => x.packId === b.dataset.pid)[0]; if (!e) return;
+      b.disabled = true; toast("よみこみ中…");
+      try{ await installRemote(e); }
+      catch(err){ toast("よみこめませんでした"); b.disabled = false; }
+      renderRemote(); renderPacks();
+    };
+  });
+}
+$("btn-remote").onclick = async () => {
+  if (!canFetchPacks()){
+    $("remote-msg").textContent = "インターネットの ページから ひらいた ときだけ つかえます";
+    return;
+  }
+  $("remote-msg").textContent = "さがしています…";
+  try{ await fetchCatalog(); $("remote-msg").textContent = ""; }
+  catch(e){ $("remote-msg").textContent = "つながりませんでした"; return; }
+  renderRemote();
+};
+
+/* ---------- 画面イベント ---------- */
+function refreshTitle(){
+  const s = loadSave();
+  $("btn-continue").disabled = !s;
+  $("title-art").innerHTML = pixelArt(DEFAULT_LOOK, 4) +
+    (CONTENT.enemies.e_slime ? pixelArt(CONTENT.enemies.e_slime.px, 4) : "") +
+    (CONTENT.enemies.b_gojuon ? pixelArt(CONTENT.enemies.b_gojuon.px, 4) : "");
+  $("save-info").textContent = s
+    ? "セーブ：" + s.playerName + "（Lv." + s.lv + "・" + new Date(s.updatedAt).toLocaleString("ja-JP") + "）"
+    : "セーブは まだ ありません。";
+  showPersist();
+}
+$("btn-continue").onclick = () => { S = loadSave(); if (!S) return; requestPersist(); renderMap(); show("sc-map"); };
+$("btn-new").onclick = () => {
+  const n = prompt("なまえを おしえて（あとで かえられません）", "ぼうけんしゃ");
+  if (n === null) return;
+  if (loadSave() && !confirm("いまの セーブは きえます。いい？")) return;
+  S = newSave(n.trim() || "ぼうけんしゃ"); save(); requestPersist(); renderMap(); show("sc-map");
+};
+$("btn-import-title").onclick = () => { S = loadSave() || newSave("ぼうけんしゃ"); openMenu(); };
+$("btn-title").onclick = () => { save(); refreshTitle(); show("sc-title"); };
+$("btn-status").onclick = () => { renderStatus(); show("sc-status"); };
+$("btn-st-back").onclick = () => { renderMap(); show("sc-map"); };
+$("btn-shop").onclick = openShop;
+$("btn-cards").onclick = openCards;
+$("btn-cd-back").onclick = () => { renderMap(); show("sc-map"); };
+$("btn-cd-pack").onclick = buyPack;
+$("openlayer").onclick = advanceOpen;
+$("btn-shop-back").onclick = () => { renderMap(); show("sc-map"); };
+$("btn-menu").onclick = openMenu;
+$("btn-menu-back").onclick = () => { renderMap(); show("sc-map"); };
+
+function openMenu(){
+  renderPacks();
+  renderRemote();
+  $("set-layout").value = S.settings.layout;
+  $("set-kb").value = S.settings.kb;
+  $("set-hint").value = S.settings.hint;
+  $("set-log").value = S.settings.log || "on";
+  $("set-homecheck").value = S.settings.homecheck || "on";
+  $("menu-saved").textContent = "さいご：" + new Date(S.updatedAt).toLocaleString("ja-JP");
+  showPersist();
+  requestPersist().then(showPersist);
+  show("sc-menu");
+}
+$("btn-save").onclick = () => { save(); $("menu-saved").textContent = "さいご：" + new Date(S.updatedAt).toLocaleString("ja-JP"); toast("セーブしました"); };
+$("btn-gen-code").onclick = () => { save(); $("code-out").value = makeCode(); toast("コードを つくりました"); };
+$("btn-copy-code").onclick = async () => {
+  const v = $("code-out").value; if (!v) return toast("さきに コードを つくってね");
+  try{ await navigator.clipboard.writeText(v); toast("コピーしました"); }
+  catch(e){ $("code-out").select(); document.execCommand("copy"); toast("コピーしました"); }
+};
+$("btn-dl-save").onclick = () => { save(); download("keyquest_" + S.playerName + ".kqsave", JSON.stringify(S,null,2)); };
+$("btn-import").onclick = () => {
+  const v = $("code-in").value.trim(); if (!v) return;
+  try{
+    const s = readCode(v);
+    if (!confirm(s.playerName + "（Lv." + s.lv + "）の データを よみこみます。いまの データは きえます。いい？")) return;
+    S = s; save(); renderMap(); show("sc-map"); toast("ひきつぎ かんりょう！");
+  }catch(e){ toast("コードが ちがうみたい（" + e.message + "）"); }
+};
+$("btn-load-file").onclick = () => $("file-save").click();
+$("file-save").onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try{
+      const s = migrate(JSON.parse(r.result));
+      if (!s.playerName) throw new Error("bad");
+      S = s; save(); renderMap(); show("sc-map"); toast("よみこみました");
+    }catch(err){ toast("ファイルが よめませんでした"); }
+  };
+  r.readAsText(f);
+};
+$("btn-wipe").onclick = () => {
+  if (!confirm("ほんとうに セーブを ぜんぶ けしますか？ もとに もどせません。")) return;
+  localStorage.removeItem(SAVE_KEY); S = null; refreshTitle(); show("sc-title"); toast("けしました");
+};
+["set-layout","set-kb","set-hint","set-log","set-homecheck"].forEach(id => {
+  $(id).onchange = e => {
+    S.settings[id.replace("set-","")] = e.target.value; save();
+    if (id === "set-layout"){ buildKeyboard(); buildLegend(); }
+    toast("せっていを かえました");
+  };
+});
+
+/* ---------- エラーを 見えるように ----------
+   テストの スタブでは 出ない 不具合（DOM まわり など）を 実機で つかまえるため。
+   画面に トーストで 出し、メニューからも 見られるように 残す。 */
+let LAST_ERR = null;
+function noteError(where, msg){
+  LAST_ERR = { t: new Date().toLocaleTimeString("ja-JP"), where: where, msg: String(msg).slice(0, 200) };
+  try{ toast("エラー: " + String(msg).slice(0, 44)); }catch(e){}
+  try{ console.error("[KEYQUEST]", where, msg); }catch(e){}
+}
+window.addEventListener("error", e => noteError("script", (e && e.message) || "?"));
+window.addEventListener("unhandledrejection", e =>
+  noteError("promise", (e && e.reason && e.reason.message) || e.reason || "?"));
+
+/* ---------- 起動 ---------- */
+refreshTitle();
+checkNewPacks();                        /* あたらしい ぼうけんが 来ていないか そっと 見る */
+requestPersist().then(refreshTitle);    /* 起動時に一度お願いして、結果をタイトルにも出す */
+window.addEventListener("beforeunload", save);
+</script>
+</body>
+</html>

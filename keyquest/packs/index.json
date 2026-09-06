@@ -1,0 +1,46 @@
+{
+  "catalogVersion": 2,
+  "updated": "2026-09-07",
+  "packs": [
+    {
+      "packId": "dlc_dakuon_youon",
+      "file": "dlc_dakuon_youon.kqpack",
+      "title": "だくおん大陸",
+      "stages": 3,
+      "order": 10,
+      "desc": "だくおん・ようおん・つまるおん。てんてん と まる、ちいさい ゃゅょ、ちいさい っ の せかい。"
+    },
+    {
+      "packId": "dlc_shooting",
+      "file": "dlc_shooting.kqpack",
+      "title": "そらの とりで",
+      "stages": 3,
+      "order": 20,
+      "desc": "ひこうきに のって、ながれてくる てきを うちおとす。ホームポジションの 8キーだけ。"
+    },
+    {
+      "packId": "dlc_casino",
+      "file": "dlc_casino.kqpack",
+      "title": "カジノの しま",
+      "stages": 3,
+      "order": 30,
+      "desc": "タイピングスロット。出ている もじを 打って リールを 止め、3つ そろえると 大当たり と カード。"
+    },
+    {
+      "packId": "dlc_english",
+      "title": "？？？",
+      "order": 40,
+      "comingSoon": true,
+      "desc": "つくっている ところ"
+    },
+    {
+      "packId": "dlc_suuji",
+      "file": "dlc_suuji.kqpack",
+      "title": "すうじステーション",
+      "stages": 5,
+      "order": 90,
+      "hidden": true,
+      "desc": "すうじ 1〜0 と きごう . , - 。アルファベットに なれてから 出す（2026-09-07 いったん 取り下げ）"
+    }
+  ]
+}
