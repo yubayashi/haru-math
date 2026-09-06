@@ -275,14 +275,24 @@ svg.px{display:block;image-rendering:pixelated;shape-rendering:crispEdges}
   color:#ff5a4a;font-size:15px;line-height:1;text-shadow:1px 1px 0 #000}
 .slotreels::before{content:"▶";left:-17px}
 .slotreels::after{content:"◀";right:-17px}
-.slotreels .rl{width:84px;background:#05050b;border:3px solid #f0f0f8;overflow:hidden}
-.slotreels .rl b{display:block;text-align:center;text-transform:uppercase;font-weight:400}
-/* 上下は 雰囲気だけ。まんなかだけ 白ぬきで 大きく＝どこを 打つか 一目で わかる */
-.slotreels .rl .up,.slotreels .rl .dn{height:19px;line-height:19px;font-size:14px;color:#23233c}
-.slotreels .rl .mid{height:44px;line-height:44px;font-size:32px;background:#fff;color:#000;
-  border-top:2px solid #ff5a4a;border-bottom:2px solid #ff5a4a}
-.slotreels .rl.set .mid{background:var(--acc)}
-.slotreels .rl.win .mid{animation:blink .26s steps(1) 8}
+/* リールは **上から下へ** ながれる。次に まんなかに 来る もじが 上に 見えるので
+   タイミングを 合わせられる。1コマ 30px・まど 3コマ分 */
+.slotreels .rl{width:84px;height:90px;background:#05050b;border:3px solid #f0f0f8;
+  overflow:hidden;position:relative}
+.slotreels .strip{transform:translateY(-30px)}
+.slotreels .strip.spin{animation:reelflow .26s linear infinite}
+@keyframes reelflow{from{transform:translateY(-30px)}to{transform:translateY(0px)}}
+.slotreels .strip b{display:block;height:30px;line-height:30px;font-size:25px;
+  text-align:center;text-transform:uppercase;font-weight:400;color:#e6e6f2}
+/* まんなかの まど（当たりライン）。リールが うごいても ここは 止まっている */
+.slotreels .rl::after{content:"";position:absolute;left:0;right:0;top:30px;height:30px;
+  border-top:3px solid #ff5a4a;border-bottom:3px solid #ff5a4a;
+  background:rgba(255,255,255,.14);pointer-events:none;z-index:2}
+.slotreels .rl.set{border-color:var(--acc);box-shadow:0 0 15px rgba(255,225,74,.45)}
+.slotreels .rl.set::after{border-color:var(--acc);background:rgba(255,225,74,.28)}
+.slotreels .rl.set .strip b:nth-child(3){color:var(--acc)}
+.slotreels .rl.auto{border-color:#8a8ab0}
+.slotreels .rl.win::after{animation:blink .26s steps(1) 8}
 .slotbet{text-align:center;font-size:11px;color:#c8a860;margin-top:8px;white-space:nowrap}
 .slotwin{text-align:center;font-size:19px;color:#ffe14a;text-shadow:2px 2px 0 #000;
   margin-top:5px;letter-spacing:.06em;animation:blink .3s steps(1) 6}
@@ -530,12 +540,13 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
           <ol>
             <li>かけ金を えらぶ。<b>右に いくほど もじが 多くて むずかしい</b></li>
             <li><b>まわす</b>（<kbd>Space</kbd>）を おすと、3つの リールが まわりだす</li>
-            <li><em>しろい ところ</em> か <em>その すぐ下</em> に 出た もじを うつと、そのリールが 止まる</li>
-            <li>1れつ目は <b>どの もじでも</b> いい。<b>2れつ目からは 1れつ目と おなじ もじだけ</b>。
-                ちがう もじは うっても 止まらない</li>
+            <li>リールは <b>上から 下へ</b> ながれる。<em>まんなかの わく</em> か
+                <em>その すぐ上</em> に 出た もじを うつと、そのリールが 止まる</li>
+            <li><b>3つとも おなじ もじ</b>で 止められたら 大あたり。
+                どの リールも <b>すきな もじで 止められる</b>ので、そろえるのは 自分の うでしだい</li>
             <li>止められないまま まわりきると、<b>じどうで 止まって はずれ</b></li>
           </ol>
-          <p>3つ そろう → かけ金の <b>10ばい</b> ＋ <b>カード1まい</b><br>
+          <p>3つ そろう → かけ金の <b>10ばい</b><br>
              2つ そろう → <b>2ばい</b>　／　そろわない → かけ金は <b>なくなる</b></p>
         </details>
         <div id="cs-machine"></div>
@@ -2135,7 +2146,7 @@ function renderSlot(){
           '<b class="mid" style="color:' + col + '">' + F(mk) + "</b>" +
           '<b class="dn">' + F(r[2]) + "</b></div>";
       }).join("") + "</div>" +
-      '<div class="slotbet">▶ しろい ところを うつ　／　3つ そろえば ×10 ＋カード</div>' +
+      '<div class="slotbet">▶ わくの 中を うつ　／　3つ そろえば ×10</div>' +
       (sl.msg ? '<div class="slotwin' + (sl.win ? "" : " lose") + '">' + sl.msg + "</div>" : "") +
     "</div>";
   const t = sl.i < 3 ? sl.cur[sl.i][1] : null;
@@ -2216,12 +2227,46 @@ function openCasino(stage){
   $("cs-title").textContent = stage.name || "カジノ";
   $("cs-sub").textContent = stage.teach || "そろえると 大あたり";
   $("cs-art").innerHTML = pixelArt(lookArt(), 3);
+  $("cs-machine").innerHTML = "";              /* 入りなおしたら わくを 作りなおす */
   const hp = $("cs-help");                    /* はじめて 来たときだけ ひらいておく */
   if (hp) hp.open = !S.seenCasinoHelp;
   S.seenCasinoHelp = true;
   $("cs-result").innerHTML = "";
   renderCasino();
   show("sc-slot");
+}
+const CS_CELL = 30;               /* リール1コマの 高さ(px)。CSS と そろえる */
+/* 台の わくは 1回だけ 作る。毎回 作りなおすと アニメが 切れるため */
+function buildMachine(){
+  const c = casinoCfg();
+  $("cs-machine").innerHTML =
+    '<div class="slotmc">' +
+      '<div class="slotcoin"><span>コイン<b id="cs-coin">Ｇ0</b></span>' +
+      '<span class="betnow">かけ金<b id="cs-betnow">Ｇ0</b></span></div>' +
+      '<div class="slotreels">' + [0,1,2].map(i =>
+        '<div class="rl" id="cs-rl' + i + '"><div class="strip" id="cs-st' + i + '">' +
+        "<b></b><b></b><b></b><b></b></div></div>").join("") + "</div>" +
+      '<div class="slotbet" id="cs-tip"></div>' +
+    "</div>";
+  paintReels();
+}
+/* リールの もじと 見た目だけを ぬりかえる（DOMは 作りなおさない） */
+function paintReels(){
+  const c = casinoCfg(), r = CS.reels, F = k => keyFace(k).toUpperCase();
+  for (let i = 0; i < 3; i++){
+    const rl = $("cs-rl" + i), st = $("cs-st" + i);
+    if (!rl || !st) continue;
+    const col = r ? r.cur[i] : [c.pool[0], c.pool[0], c.pool[0], c.pool[0]];
+    const bs = st.children || [];
+    for (let k = 0; k < 4; k++) if (bs[k]) bs[k].textContent = F(col[k]);
+    const stopped = r && r.set[i];
+    rl.className = "rl" + (stopped ? " set" : "") +
+      (r && r.autoStopped && r.autoStopped[i] ? " auto" : "") + (r && r.win ? " win" : "");
+    st.className = "strip" + ((r && !stopped) ? " spin" : "");
+  }
+  const tip = $("cs-tip"); if (tip) tip.innerHTML = casinoHint();
+  const coin = $("cs-coin"); if (coin) coin.textContent = "Ｇ" + S.gold;
+  const bn = $("cs-betnow"); if (bn) bn.textContent = "Ｇ" + c.g;
 }
 function renderCasino(){
   const c = casinoCfg(), r = CS.reels;
@@ -2231,28 +2276,9 @@ function renderCasino(){
     '" data-i="' + i + '">' + b.name + "<b>Ｇ" + b.g + "</b>" +
     '<span style="font-size:10px">' + b.pool.length + "もじ</span></div>").join("");
   Array.from($("cs-bets").querySelectorAll(".bet")).forEach(el => {
-    el.onclick = () => { if (CS.busy) return; CS.bet = +el.dataset.i; renderCasino(); };
+    el.onclick = () => { if (CS.busy) return; CS.bet = +el.dataset.i; buildMachine(); renderCasino(); };
   });
-  const F = k => keyFace(k).toUpperCase();
-  const rows = r ? r.cur : [[c.pool[0],c.pool[0],c.pool[0]],[c.pool[0],c.pool[0],c.pool[0]],
-                            [c.pool[0],c.pool[0],c.pool[0]]];
-  $("cs-machine").innerHTML =
-    '<div class="slotmc">' +
-      '<div class="slotcoin"><span>コイン<b>Ｇ' + S.gold + "</b></span>" +
-      '<span class="betnow">かけ金<b>Ｇ' + c.g + "</b></span></div>" +
-      '<div class="slotreels">' + [0,1,2].map(i => {
-        const set = r ? r.set[i] : null;
-        const auto = r && r.autoStopped && r.autoStopped[i];
-        const mk = set || rows[i][1];
-        const col = set ? "#000" : "var(--" + (FINGER_OF[mk] || "th") + ")";
-        return '<div class="rl' + (set ? " set" : "") + (auto ? " auto" : "") +
-          (r && r.win ? " win" : "") + '">' +
-          '<b class="up">' + F(rows[i][0]) + "</b>" +
-          '<b class="mid" style="color:' + col + '">' + F(mk) + "</b>" +
-          '<b class="dn">' + F(rows[i][2]) + "</b></div>";
-      }).join("") + "</div>" +
-      '<div class="slotbet">' + casinoHint() + "</div>" +
-    "</div>";
+  if (!$("cs-rl0")) buildMachine(); else paintReels();
   $("cs-plays").textContent = CS.plays;
   $("cs-wins").textContent = CS.wins;
   $("cs-net").textContent = (CS.net > 0 ? "＋Ｇ" : CS.net < 0 ? "−Ｇ" : "Ｇ") + Math.abs(CS.net);
@@ -2260,8 +2286,8 @@ function renderCasino(){
   /* ねらう もじを 大きく */
   const tg = $("cs-target");
   if (!r) tg.innerHTML = '<span class="free">かけ金を えらんで「まわす」</span>';
-  else if (r.i === 0) tg.innerHTML = '<span class="free">1れつ目は すきな もじで 止められる</span>';
-  else if (r.i < 3) tg.innerHTML = "ねらう もじ<b>" + keyFace(r.set[0]).toUpperCase() + "</b>";
+  else if (r.i === 0) tg.innerHTML = '<span class="free">すきな もじで 1れつ目を 止めよう</span>';
+  else if (r.i < 3) tg.innerHTML = "そろえる もじ<b>" + keyFace(r.set[0]).toUpperCase() + "</b>";
   else tg.innerHTML = '<span class="free">&nbsp;</span>';
   /* 電球 */
   [1,2].forEach(n => { const el = $("cs-bulbs" + n);
@@ -2270,15 +2296,15 @@ function renderCasino(){
   const left = r ? Math.max(0, r.left / r.total) : 1;
   $("cs-bar").style.width = (left*100).toFixed(0) + "%";
   $("cs-barwrap").style.opacity = r ? 1 : 0.25;
-  const t = (r && r.i < 3) ? r.target(r) : null;
+  const t = (r && r.i > 0 && r.i < 3) ? r.set[0] : null;   /* そろえる もじを 光らせる */
   litKey(t); pointHands(t);
 }
 function casinoHint(){
   const r = CS.reels;
   if (!r) return "▶ しろい ところの もじを うつと 止まる";
-  if (r.i === 0) return "▶ しろい ところ か その下に 見えた もじを うつ";
+  if (r.i === 0) return "▶ わくの 中 か その うえに 見えた もじを うつ";
   if (r.i < 3) return "▶ " + keyFace(r.set[0]).toUpperCase() +
-    " が しろい ところ か その下に 来たら うつ";
+    " を そろえよう（うえに 見えたら うつ）";
   return r.win ? "★ そろった！" : "はずれ…";
 }
 function spinCasino(){
@@ -2287,12 +2313,11 @@ function spinCasino(){
   CS.busy = true;
   S.gold -= c.g;                                  /* さきに かけ金を はらう */
   const rc = () => c.pool[rnd(c.pool.length)];
+  /* 1リールは 4コマ [かくれ, うえ, まんなか, した]。うえに 見えている もじが つぎに まんなかへ */
   CS.reels = {
-    cur: [[rc(),rc(),rc()], [rc(),rc(),rc()], [rc(),rc(),rc()]],
+    cur: [[rc(),rc(),rc(),rc()], [rc(),rc(),rc(),rc()], [rc(),rc(),rc(),rc()]],
     set: [null,null,null], autoStopped:[false,false,false],
-    i: 0, left: c.spin, total: c.spin, win:false,
-    /* いま 止められる 文字。1れつ目は なんでも（null）、2れつ目からは 1れつ目と 同じ */
-    target: r => r.i === 0 ? null : r.set[0]
+    i: 0, left: c.spin, total: c.spin, win:false
   };
   $("cs-result").innerHTML = "";
   clearInterval(CS.timer);
@@ -2302,29 +2327,30 @@ function spinCasino(){
 function casinoTick(){
   const r = CS.reels, c = casinoCfg();
   if (!r || r.i >= 3) return;
+  /* **上から 1コマ ながれる**：あたらしい もじを さきあたまに 入れて 1つずつ 下へ */
   for (let i = r.i; i < 3; i++)
-    r.cur[i] = [r.cur[i][1], r.cur[i][2], c.pool[rnd(c.pool.length)]];
+    r.cur[i] = [c.pool[rnd(c.pool.length)], r.cur[i][0], r.cur[i][1], r.cur[i][2]];
   r.left--;
   if (r.left <= 0){                               /* まわりきった：のこりを じどうで 止める */
-    while (r.i < 3){ r.set[r.i] = r.cur[r.i][1]; r.autoStopped[r.i] = true; r.i++; }
+    while (r.i < 3){ r.set[r.i] = r.cur[r.i][2]; r.autoStopped[r.i] = true; r.i++; }
     renderCasino(); finishCasino(); return;
   }
   renderCasino();
 }
+/* ふつうの スロット：**どの リールも どの もじでも 止められる**。
+   3つとも おなじ もじに できたら 大あたり。ちがう もじで 止めれば もちろん はずれ。 */
 function casinoKey(ch){
   const r = CS.reels, c = casinoCfg();
   if (!r || r.i >= 3) return;
-  const want = r.target(r);
-  if (want && ch !== want) return;         /* 2れつ目からは 1れつ目と 同じ文字だけ */
   const i = r.i;
-  if (r.cur[i][1] === ch){
+  if (r.cur[i][2] === ch){
     /* まんなかに 出ている：そのまま 止まる */
-  } else if (r.cur[i][2] === ch){
-    /* **下の だんに 見えている：1コマ 引きこんで まんなかに もってくる**
+  } else if (r.cur[i][1] === ch){
+    /* **うえに 見えている：1コマ 引きこんで まんなかへ**
        （ほんものの スロットの「引きこみ」。見てから おしても 間にあう） */
-    r.cur[i] = [r.cur[i][1], r.cur[i][2], c.pool[rnd(c.pool.length)]];
+    r.cur[i] = [c.pool[rnd(c.pool.length)], r.cur[i][0], r.cur[i][1], r.cur[i][2]];
   } else {
-    return;                                 /* どこにも 見えていない：止まらない */
+    return;                                 /* まんなかにも うえにも 見えていない */
   }
   r.set[i] = ch; r.i++;
   recordKey(ch, true, 0);
@@ -2340,8 +2366,7 @@ function finishCasino(){
   let gain = 0, msgTxt = "";
   if (three){
     r.win = true; gain = c.g * 10; CS.wins++;
-    const card = drawCard(); const got = card ? gainCard(card.id) : null;
-    msgTxt = "3つ そろった！" + (got ? "　カード「" + card.name + "」も もらった" : "");
+    msgTxt = "3つ そろった！　かけ金の 10ばい！";
     /* はじめて そろえたら この ステージは クリア */
     const pp = S.packProgress[CS.stage.packId] || (S.packProgress[CS.stage.packId] = {cleared:[]});
     if (!pp.cleared.includes(CS.stage.id)){
