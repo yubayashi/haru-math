@@ -675,6 +675,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
         <span class="muted" id="remote-msg"></span>
       </div>
       <div id="remote-list" style="margin-bottom:10px"></div>
+      <div id="installed-list" style="margin-bottom:10px"></div>
       <div id="dropzone" style="border:3px dashed #4a4a78;padding:24px;text-align:center;color:var(--sub)">
         ここに .kqpack ファイルを ドロップ
       </div>
@@ -1874,12 +1875,14 @@ function genProblem(stage, battle){
     const w = wordOf(pick(pool));
     return {text:w.a, ask:w.q || null, units:parseKana(w.a)};
   }
-  const g = battle.gen || {pool:"fj", len:[2,4]};
-  const [lo,hi] = g.len;
+  /* gen が ないとき・len を 書き忘れたとき・ふるい形式の パックでも 落ちないように */
+  const g = battle.gen || {};
+  const pool = g.pool || "fj";
+  const [lo,hi] = Array.isArray(g.len) ? g.len : [2,4];
   const n = lo + rnd(hi-lo+1);
-  const weak = weakKeys().filter(k => g.pool.includes(k));
+  const weak = weakKeys().filter(k => pool.includes(k));
   let s = "";
-  for (let i=0;i<n;i++) s += (weak.length && Math.random() < 0.3) ? pick(weak) : g.pool[rnd(g.pool.length)];
+  for (let i=0;i<n;i++) s += (weak.length && Math.random() < 0.3) ? pick(weak) : pool[rnd(pool.length)];
   return {text:s, units:parseRaw(s)};
 }
 
@@ -3493,6 +3496,24 @@ function renderPacks(){
   $("packlist").innerHTML = "<p class=muted>はいっている コンテンツ：</p>" +
     CONTENT.packs.map(p => '<span class="tag">' + p.title + " v" + p.packVersion +
       (p.packId === "core" ? "（本編）" : "") + "</span>").join("");
+  /* おかしくなった ときの ために、入れた パックを 消せるようにしておく。
+     消しても **クリア記録は のこる**（packProgress は そのまま）ので、入れ直せば もどる */
+  const list = storedPacks();
+  const el = $("installed-list");
+  if (!el) return;
+  el.innerHTML = !list.length ? "" :
+    '<p class="muted">入れた ぼうけん（けしても クリア記録は のこります）：</p>' +
+    list.map(p => '<div class="packrow"><span class="nm">' + (p.title || p.packId) +
+      "</span><span class=\"ds\">v" + (p.packVersion || 1) +
+      '</span><button class="sm sub" data-del="' + p.packId + '">けす</button></div>').join("");
+  Array.from(el.querySelectorAll("button[data-del]")).forEach(b => {
+    b.onclick = () => {
+      if (!confirm("「" + b.parentNode.textContent.slice(0,18) + "」を けしますか？\nクリア記録は のこります。")) return;
+      persistPacks(storedPacks().filter(x => x.packId !== b.dataset.del));
+      toast("けしました。よみこみ直します…");
+      setTimeout(() => location.reload(), 900);
+    };
+  });
 }
 function installPack(text){
   let p;
@@ -3563,7 +3584,37 @@ function showNewPackBanner(){
 async function checkNewPacks(){
   if (!canFetchPacks()) return;
   try{ await fetchCatalog(); }catch(e){ return; }   /* 取れなくても だまって あきらめる */
+  if (await updatePacks()) return;                  /* 入れかえたら ページを 読みなおす */
   showNewPackBanner();
+}
+/* 入れてある パックより 新しい バージョンが 出ていたら 入れかえる。
+   パックは 一度 入れると 中身を 直しても そのままなので、これが ないと
+   ふるい パックが のこりつづけて 事故る（2026-09-07 カジノで 実際に 起きた）。 */
+function packsNeedingUpdate(){
+  const stored = storedPacks();
+  return (CATALOG || []).filter(e => {
+    if (!e.file || !e.version) return false;
+    const cur = stored.filter(x => x.packId === e.packId)[0];
+    return !!cur && (cur.packVersion || 1) < e.version;
+  });
+}
+async function updatePacks(){
+  let changed = [];
+  for (const e of packsNeedingUpdate()){
+    try{
+      const r = await fetch(packURL("packs/" + e.file), {cache:"no-store"});
+      if (!r.ok) continue;
+      const np = JSON.parse(await r.text());
+      if (!np.packId || !np.stages) continue;
+      const list = storedPacks().filter(x => x.packId !== np.packId);
+      list.push(np); persistPacks(list);
+      changed.push(np.title || np.packId);
+    }catch(err){ noteError("updatePacks", err.message); }
+  }
+  if (!changed.length) return false;
+  toast(changed.join("・") + " を あたらしくします…");
+  setTimeout(() => location.reload(), 1200);
+  return true;
 }
 $("btn-newpack-add").onclick = async () => {
   const e = (CATALOG||[]).filter(x => x.packId === $("newpack-card").dataset.pid)[0];
