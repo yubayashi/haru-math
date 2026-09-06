@@ -3678,7 +3678,7 @@ function canFetchPacks(){
          typeof fetch === "function";
 }
 function packURL(rel){
-  /* Netlifyのキャッシュを避けて毎回 新しいものを見る */
+  /* キャッシュを避けて毎回 新しいものを見る */
   return new URL(rel, location.href).href + "?v=" + Date.now();
 }
 async function fetchCatalog(){
