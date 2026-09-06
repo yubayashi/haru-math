@@ -2217,14 +2217,15 @@ function finishSpin(){
    ・止められないまま まわりきると じどうで 止まる ＝ はずれ
    これで「ねらった 文字が 来た しゅんかんに 打つ」練習に なる。 */
 const BETS = [
-  {g: 20,  pool:"fj",       spin:24, name:"かんたん"},
-  {g: 50,  pool:"fjdk",     spin:28, name:"ふつう"},
-  {g:100,  pool:"asdfjk",   spin:32, name:"むずかしい"},
-  {g:200,  pool:"asdfjkl;", spin:36, name:"げきむず"}
+  {g: 20,  pool:"fj",       spin:26, ms:250, name:"かんたん"},
+  {g: 50,  pool:"fjdk",     spin:30, ms:220, name:"ふつう"},
+  {g:100,  pool:"asdfjk",   spin:34, ms:195, name:"むずかしい"},
+  {g:200,  pool:"asdfjkl;", spin:38, ms:170, name:"げきむず"}
 ];
 const CASINO_WIN3 = 5;      /* 3つ そろい：かけ金の 5ばい（もとは 10ばい。かせぎすぎた） */
 const CASINO_WIN2 = 1;      /* 2つ そろい：かけ金が もどるだけ（もとは 2ばい） */
-const CASINO_MS = 260;      /* リールが 1コマ すすむ 時間。
+function casinoMs(){ return casinoCfg().ms || CASINO_MS; }
+const CASINO_MS = 220;      /* リールが 1コマ すすむ 時間の 既定（BETS の ms が あれば そちら）。
    150ms だと「見て→はんだんして→おす」に 間にあわない（人は 250〜400ms かかる）。
    さらに **下の だんに 見えていれば 引きこんで 止める**ので、予告を 見て おせる。 */
 const CS = { stage:null, bet:0, reels:null, timer:null, plays:0, wins:0, net:0, busy:false };
@@ -2272,6 +2273,7 @@ function paintReels(){
       (r && r.autoStopped && r.autoStopped[i] ? " auto" : "") +
       (r && r.missed && r.missed[i] ? " missed" : "") + (r && r.win ? " win" : "");
     st.className = "strip" + ((r && !stopped) ? " spin" : "");
+    st.style.animationDuration = (casinoMs()/1000) + "s";   /* ながれる はやさを そろえる */
   }
   const tip = $("cs-tip"); if (tip) tip.innerHTML = casinoHint();
   const coin = $("cs-coin"); if (coin) coin.textContent = "Ｇ" + S.gold;
@@ -2283,7 +2285,9 @@ function renderCasino(){
   $("cs-bets").innerHTML = BETS.map((b,i) =>
     '<div class="bet' + (i === CS.bet ? " on" : "") + (S.gold < b.g ? " no" : "") +
     '" data-i="' + i + '">' + b.name + "<b>Ｇ" + b.g + "</b>" +
-    '<span style="font-size:10px">' + b.pool.length + "もじ</span></div>").join("");
+    '<span style="font-size:10px">' + b.pool.length + "もじ・" +
+    (b.ms <= 180 ? "げきはや" : b.ms <= 200 ? "はやい" : b.ms <= 230 ? "ふつう" : "ゆっくり") +
+    "</span></div>").join("");
   Array.from($("cs-bets").querySelectorAll(".bet")).forEach(el => {
     el.onclick = () => { if (CS.busy) return; CS.bet = +el.dataset.i; buildMachine(); renderCasino(); };
   });
@@ -2330,7 +2334,7 @@ function spinCasino(){
   };
   $("cs-result").innerHTML = "";
   clearInterval(CS.timer);
-  CS.timer = setInterval(casinoTick, CASINO_MS);
+  CS.timer = setInterval(casinoTick, casinoMs());
   renderCasino();
 }
 function casinoTick(){
