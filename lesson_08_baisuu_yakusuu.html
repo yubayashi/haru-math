@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 8 — 倍数と約数 (Múltiplos e divisores)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; font-weight: 900; margin: 0 4px; line-height: 1.1;
+  }
+  .frac .num { border-bottom: 2.5px solid #2c3e50; padding: 0 6px 2px; }
+  .frac .den { padding: 2px 6px 0; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .bar-section { margin: 16px 0; }
+  .bar-tag {
+    display: inline-block;
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 6px;
+    padding: 2px 10px; font-size: 12px; font-weight: 700; color: #2980b9;
+    margin-bottom: 6px;
+  }
+  .bar-wrap {
+    display: flex; overflow: hidden;
+    border: 2px solid #bbb; border-radius: 4px;
+  }
+  .bar-cell {
+    flex: 1; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    border-right: 1px solid rgba(0,0,0,0.12);
+  }
+  .bar-cell:last-child { border-right: none; }
+  .bar-cell.filled { background: #3498db; color: #fff; }
+  .bar-cell.empty { background: #f0f0f0; color: #aaa; }
+  .bar-caption {
+    text-align: center; font-size: 13px; color: #777; margin-top: 6px;
+  }
+
+  /* Variable-width bars for comparison */
+  .compare-section { margin: 16px 0; }
+  .compare-label { font-size: 14px; font-weight: 900; margin-bottom: 4px; color: #2c3e50; }
+  .bar-flex {
+    display: flex; height: 34px; border: 2px solid #bbb; border-radius: 4px;
+    overflow: hidden; margin-bottom: 8px;
+  }
+  .bar-flex .filled-part {
+    background: #3498db; display: flex; align-items: center;
+    justify-content: center; color: #fff; font-size: 12px; font-weight: 800;
+  }
+  .bar-flex .empty-part {
+    background: #f0f0f0; flex: 1;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 12px 0; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; }
+  .answer-row select, .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff;
+  }
+  .answer-row select { width: 80px; }
+  .answer-row input { width: 130px; }
+  .answer-row select:focus, .answer-row input:focus { border-color: #3498db; }
+  .answer-row select.correct, .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row select.wrong, .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 8</div>
+    <h1>🔢 倍数と約数</h1>
+    <div class="sub">Múltiplos e divisores — 通分・約分のエンジン</div>
+  </div>
+
+  <!-- ===== 1. 倍数 ===== -->
+  <div class="card">
+    <div class="card-title">🚀 倍数（múltiplos）= かけ算の答えの仲間</div>
+
+    <p><b>3の倍数</b>って、3のかけ算九九の答えを並べただけ。</p>
+
+    <div class="equation" style="font-size:18px;">
+      3, 6, 9, 12, 15, 18, 21, 24, 27, 30 …
+    </div>
+
+    <p>3を1個、2個、3個…と集めていった数。だから<b>いくらでも続く</b>（終わりがない）。</p>
+
+    <div class="tip">
+      <b>💡 見分け方:</b><br>
+      「3の倍数？」と聞かれたら <b>3で割り切れる？</b> と同じ意味。<br>
+      12 ÷ 3 = 4 あまり0 → 12は3の倍数 ⭕<br>
+      14 ÷ 3 = 4 あまり2 → 14は3の倍数じゃない ❌
+    </div>
+  </div>
+
+  <!-- ===== 2. 約数 ===== -->
+  <div class="card">
+    <div class="card-title">🧱 約数（divisores）= その数を作れる部品</div>
+
+    <p><b>12の約数</b>は、12を<b>ぴったり割り切れる</b>数。</p>
+
+    <div class="equation" style="font-size:18px;">
+      1, 2, 3, 4, 6, 12
+    </div>
+
+    <p>見つけ方は<b>ペアで探す</b>のがコツ。1から順に試して、相方をセットで書く。</p>
+
+    <div class="tip">
+      12 = <b>1 × 12</b><br>
+      12 = <b>2 × 6</b><br>
+      12 = <b>3 × 4</b><br>
+      12 = 4 × 3 ← <b>もう出てきた！ここでストップ</b><br>
+      → 約数は 1, 2, 3, 4, 6, 12 の <b>6個</b>
+    </div>
+
+    <div class="callout-orange">
+      <b>⚠️ 倍数と約数がこんがらがったら:</b><br>
+      倍数 = その数より<b>大きく</b>なっていく（3 → 6 → 9 → …無限）<br>
+      約数 = その数より<b>小さい</b>か同じ（12の約数は12以下、個数は有限）
+    </div>
+  </div>
+
+  <!-- ===== 3. 割り切れるか一瞬で見分ける ===== -->
+  <div class="card">
+    <div class="card-title">⚡ 割り算しないで見抜くワザ</div>
+    <p style="color:#666; font-size:14px;">Critérios de divisibilidade — テストで時間を稼げる</p>
+
+    <div class="tip">
+      <b>2で割り切れる</b> → 一の位が 0,2,4,6,8（偶数）<br>
+      <span style="font-size:13px; color:#666;">例: 3<b>4</b> ⭕ / 5<b>7</b> ❌</span>
+    </div>
+
+    <div class="tip">
+      <b>5で割り切れる</b> → 一の位が 0 か 5<br>
+      <span style="font-size:13px; color:#666;">例: 4<b>5</b> ⭕ / 7<b>2</b> ❌</span>
+    </div>
+
+    <div class="tip">
+      <b>10で割り切れる</b> → 一の位が 0<br>
+      <span style="font-size:13px; color:#666;">例: 9<b>0</b> ⭕</span>
+    </div>
+
+    <div class="tip">
+      <b>3で割り切れる</b> → <b>各位の数字を全部足して</b>、その答えが3で割り切れる<br>
+      <span style="font-size:13px; color:#666;">例: 27 → 2+7=9 → 9は3で割れる → 27は3の倍数 ⭕<br>
+      例: 52 → 5+2=7 → 7は3で割れない → ❌</span>
+    </div>
+
+    <div class="tip">
+      <b>9で割り切れる</b> → 各位を足した答えが9で割り切れる<br>
+      <span style="font-size:13px; color:#666;">例: 153 → 1+5+3=9 → ⭕</span>
+    </div>
+
+    <div class="callout-green">
+      <b>✅ 素数（números primos）:</b><br>
+      約数が <b>1 と自分だけ</b>の数。2, 3, 5, 7, 11, 13, 17, 19, 23…<br>
+      1は素数じゃない（約数が1個しかないから）。2だけが偶数の素数。
+    </div>
+  </div>
+
+  <!-- ===== 4. m.m.c. ===== -->
+  <div class="card">
+    <div class="card-title">🤝 m.m.c. — 通分で使うやつ</div>
+
+    <p><b>最小公倍数（mínimo múltiplo comum）</b>= 2つの数の倍数を並べて、<b>最初に出会う数</b>。</p>
+
+    <div class="tip">
+      4と6の m.m.c. は？<br>
+      4の倍数: 4, 8, <b>12</b>, 16, 20, 24…<br>
+      6の倍数: 6, <b>12</b>, 18, 24…<br>
+      → 最初に出会うのは <b>12</b>。だから m.m.c.(4, 6) = 12
+    </div>
+
+    <div class="callout-green">
+      <b>✅ どこで使う？</b><br>
+      <span class="frac"><span class="num">1</span><span class="den">4</span></span> +
+      <span class="frac"><span class="num">1</span><span class="den">6</span></span> の<b>共通の分母</b>がまさにこれ。<br>
+      12でそろえて 3/12 + 2/12 = <b>5/12</b>
+    </div>
+
+    <div class="tip">
+      <b>💡 近道:</b> 片方がもう片方の倍数なら、大きい方がそのまま m.m.c.<br>
+      m.m.c.(3, 6) = 6 ／ m.m.c.(5, 10) = 10
+    </div>
+  </div>
+
+  <!-- ===== 5. M.D.C. ===== -->
+  <div class="card">
+    <div class="card-title">✂️ M.D.C. — 約分で使うやつ</div>
+
+    <p><b>最大公約数（máximo divisor comum）</b>= 2つの数の約数のうち、<b>共通でいちばん大きい</b>数。</p>
+
+    <div class="tip">
+      12と18の M.D.C. は？<br>
+      12の約数: 1, 2, 3, 4, <b>6</b>, 12<br>
+      18の約数: 1, 2, 3, <b>6</b>, 9, 18<br>
+      → 共通は 1, 2, 3, 6。いちばん大きいのは <b>6</b>
+    </div>
+
+    <div class="callout-green">
+      <b>✅ どこで使う？</b><br>
+      <span class="frac"><span class="num">12</span><span class="den">18</span></span> を約分するとき、<b>6で割る</b>と一発で
+      <span class="frac"><span class="num">2</span><span class="den">3</span></span> になる。<br>
+      （2で割って3で割って…と2回やっても同じ。M.D.C.を使うと1回で終わる）
+    </div>
+
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">múltiplo</span> 倍数</span>
+      <span class="vocab-chip"><span class="pt">divisor</span> 約数</span>
+      <span class="vocab-chip"><span class="pt">m.m.c.</span> 最小公倍数</span>
+      <span class="vocab-chip"><span class="pt">M.D.C.</span> 最大公約数</span>
+      <span class="vocab-chip"><span class="pt">número primo</span> 素数</span>
+      <span class="vocab-chip"><span class="pt">par / ímpar</span> 偶数 / 奇数</span>
+    </div>
+  </div>
+
+  <!-- ===== 6. 説明テンプレ ===== -->
+  <div class="card">
+    <div class="card-title">📝 テストでの書き方（Explica como pensaste）</div>
+
+    <div class="callout-green">
+      "Escrevi os múltiplos de 4: 4, 8, 12, 16…<br>
+      Escrevi os múltiplos de 6: 6, 12, 18…<br>
+      O primeiro número que aparece nas duas listas é <b>12</b>.<br>
+      Por isso, o m.m.c. de 4 e 6 é <b>12</b>."<br><br>
+      <span style="font-size:13px; color:#666;">（4の倍数を書きました。6の倍数を書きました。両方のリストに最初に出てくる数は12です。だから4と6の最小公倍数は12です。）</span>
+    </div>
+  </div>
+
+  <!-- ===== 練習 ===== -->
+  <div class="card">
+    <div class="card-title">✏️ 練習 — Prática</div>
+    <p style="margin-bottom:14px; color:#666; font-size:14px;">
+      数字だけ入力してね。複数answerのときは <b>1,2,3</b> のようにカンマで区切る。
+    </p>
+
+    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ1: 見分けるワザ</p>
+
+    <div class="practice-q">
+      <div class="q-num">1</div>
+      <div class="q-text">
+        <b>48</b> は3の倍数？<br>
+        <span style="color:#888; font-size:14px;">各位を足すと？ その数を入力（4+8）</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q1" placeholder="数字">
+        <button class="check-btn" onclick="check('q1',['12'],'4+8=12。12は3で割り切れる → 48は3の倍数')">確認</button>
+      </div>
+      <div class="feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">2</div>
+      <div class="q-text">
+        次のうち<b>5の倍数</b>はどれ？ 数字で答えてね。<br>
+        <span style="color:#888; font-size:14px;">32 ／ 45 ／ 58</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q2" placeholder="数字">
+        <button class="check-btn" onclick="check('q2',['45'],'一の位が5 → 45だけが5の倍数')">確認</button>
+      </div>
+      <div class="feedback" id="q2-fb"></div>
+    </div>
+
+    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ2: 約数をぜんぶ見つける</p>
+
+    <div class="practice-q">
+      <div class="q-num">3</div>
+      <div class="q-text">
+        <b>20の約数</b>を小さい順に全部書こう。<br>
+        <span style="color:#888; font-size:14px;">ペアで探す: 1×20、2×10、4×5 …</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q3" placeholder="1,2,...">
+        <button class="check-btn" onclick="check('q3',['1,2,4,5,10,20'],'1×20、2×10、4×5 → 1,2,4,5,10,20 の6個')">確認</button>
+      </div>
+      <div class="feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">4</div>
+      <div class="q-text">
+        <b>7の約数</b>は？<br>
+        <span style="color:#888; font-size:14px;">これ、何か気づくかも</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q4" placeholder="1,...">
+        <button class="check-btn" onclick="check('q4',['1,7'],'1と自分だけ → 7は素数（número primo）')">確認</button>
+      </div>
+      <div class="feedback" id="q4-fb"></div>
+    </div>
+
+    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ3: m.m.c.</p>
+
+    <div class="practice-q">
+      <div class="q-num">5</div>
+      <div class="q-text">m.m.c.( <b>3</b>, <b>9</b> ) = ?</div>
+      <div class="answer-row">
+        <input type="text" id="q5" placeholder="数字">
+        <button class="check-btn" onclick="check('q5',['9'],'9は3の倍数だから、大きい方の9がそのまま答え')">確認</button>
+      </div>
+      <div class="feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">6</div>
+      <div class="q-text">m.m.c.( <b>4</b>, <b>10</b> ) = ?</div>
+      <div class="answer-row">
+        <input type="text" id="q6" placeholder="数字">
+        <button class="check-btn" onclick="check('q6',['20'],'4: 4,8,12,16,20… 10: 10,20… → 20')">確認</button>
+      </div>
+      <div class="feedback" id="q6-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">7</div>
+      <div class="q-text">m.m.c.( <b>6</b>, <b>8</b> ) = ?</div>
+      <div class="answer-row">
+        <input type="text" id="q7" placeholder="数字">
+        <button class="check-btn" onclick="check('q7',['24'],'6: 6,12,18,24… 8: 8,16,24… → 24')">確認</button>
+      </div>
+      <div class="feedback" id="q7-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">8</div>
+      <div class="q-text">
+        じゃあ <span class="frac"><span class="num">1</span><span class="den">6</span></span> +
+        <span class="frac"><span class="num">1</span><span class="den">8</span></span> = ?<br>
+        <span style="color:#888; font-size:14px;">さっき求めた24でそろえる。分数で答えて</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q8" placeholder="?/?">
+        <button class="check-btn" onclick="check('q8',['7/24'],'4/24 + 3/24 = 7/24')">確認</button>
+      </div>
+      <div class="feedback" id="q8-fb"></div>
+    </div>
+
+    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ4: M.D.C.</p>
+
+    <div class="practice-q">
+      <div class="q-num">9</div>
+      <div class="q-text">M.D.C.( <b>8</b>, <b>12</b> ) = ?</div>
+      <div class="answer-row">
+        <input type="text" id="q9" placeholder="数字">
+        <button class="check-btn" onclick="check('q9',['4'],'8の約数 1,2,4,8 / 12の約数 1,2,3,4,6,12 → 共通で最大は4')">確認</button>
+      </div>
+      <div class="feedback" id="q9-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">10</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">8</span><span class="den">12</span></span> を約分すると？<br>
+        <span style="color:#888; font-size:14px;">さっきのM.D.C.で上下を割る</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q10" placeholder="?/?">
+        <button class="check-btn" onclick="check('q10',['2/3'],'上下を4で割って 2/3')">確認</button>
+      </div>
+      <div class="feedback" id="q10-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">11</div>
+      <div class="q-text">M.D.C.( <b>15</b>, <b>25</b> ) = ?</div>
+      <div class="answer-row">
+        <input type="text" id="q11" placeholder="数字">
+        <button class="check-btn" onclick="check('q11',['5'],'15の約数 1,3,5,15 / 25の約数 1,5,25 → 5')">確認</button>
+      </div>
+      <div class="feedback" id="q11-fb"></div>
+    </div>
+
+    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ボス戦: 文章題</p>
+
+    <div class="practice-q">
+      <div class="q-num">12</div>
+      <div class="q-text">
+        赤いライトは <b>4秒</b>ごと、青いライトは <b>6秒</b>ごとに光る。<br>
+        同時に光ったあと、次に2つが同時に光るのは<b>何秒後</b>？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q12" placeholder="数字">
+        <button class="check-btn" onclick="check('q12',['12'],'m.m.c.(4,6)=12。12秒後')">確認</button>
+      </div>
+      <div class="feedback" id="q12-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">13</div>
+      <div class="q-text">
+        クッキー <b>18枚</b>とアメ <b>24個</b>を、あまりが出ないように同じ数ずつ袋に分ける。<br>
+        <b>いちばん多くて何袋</b>作れる？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q13" placeholder="数字">
+        <button class="check-btn" onclick="check('q13',['6'],'M.D.C.(18,24)=6。6袋（クッキー3枚+アメ4個ずつ）')">確認</button>
+      </div>
+      <div class="feedback" id="q13-fb"></div>
+    </div>
+
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+let tracking = {};
+const totalQ = 13;
+let submitted = false;
+
+function check(id, accepted, explanation) {
+  if (submitted) return;
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  const val = input.value.trim().replace(/\s/g, '').replace(/、/g, ',');
+  if (!val) return;
+
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return;
+
+  t.attempts++;
+  t.answer = val;
+
+  const ok = accepted.map(a => String(a).replace(/\s/g, '')).includes(val);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+    input.className = 'correct';
+    input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(val);
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ちがう。倍数（増えていく）か約数（割り切れる）か、どっちを聞かれてる？';
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1400);
+  }
+
+  checkComplete();
+}
+
+function checkComplete() {
+  const correctIds = Object.keys(tracking).filter(k => tracking[k].correct);
+  if (correctIds.length === totalQ) {
+    showResult();
+    sendToSheet();
+  }
+}
+
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + totalQ + ' 一発正解';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === totalQ) {
+    msg.textContent = 'Perfeito! 💯 m.m.c. も M.D.C. も完璧！通分・約分がラクになるよ。';
+  } else if (firstCount >= 10) {
+    msg.textContent = 'Muito bom! 倍数・約数の使い分けができてる！';
+  } else if (firstCount >= 6) {
+    msg.textContent = 'Bom! 約数は「ペアで探す」、m.m.c.は「倍数を書き出す」。手を動かすのが近道。';
+  } else {
+    msg.textContent = 'あせらずに。まず倍数（どんどん増える）と約数（割り切れる）の違いから確認しよう。';
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer,
+      attempts: t.attempts,
+      result: t.result,
+      wrong_answers: t.wrong_answers
+    };
+  }
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_08_baisuu_yakusuu',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+document.querySelectorAll('.practice-q input').forEach(input => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
+  });
+});
+</script>
+</body>
+</html>
