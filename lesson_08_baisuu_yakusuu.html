@@ -363,7 +363,7 @@
       </div>
       <div class="answer-row">
         <input type="text" id="q3" placeholder="1,2,...">
-        <button class="check-btn" onclick="check('q3',['1,2,4,5,10,20'],'1×20、2×10、4×5 → 1,2,4,5,10,20 の6個')">確認</button>
+        <button class="check-btn" onclick="checkSet('q3','1,2,4,5,10,20','1×20、2×10、4×5 → 1,2,4,5,10,20 の6個')">確認</button>
       </div>
       <div class="feedback" id="q3-fb"></div>
     </div>
@@ -376,7 +376,7 @@
       </div>
       <div class="answer-row">
         <input type="text" id="q4" placeholder="1,...">
-        <button class="check-btn" onclick="check('q4',['1,7'],'1と自分だけ → 7は素数（número primo）')">確認</button>
+        <button class="check-btn" onclick="checkSet('q4','1,7','1と自分だけ → 7は素数（número primo）')">確認</button>
       </div>
       <div class="feedback" id="q4-fb"></div>
     </div>
@@ -534,6 +534,47 @@ function check(id, accepted, explanation) {
     fb.className = 'feedback wrong';
     fb.textContent = '❌ ちがう。倍数（増えていく）か約数（割り切れる）か、どっちを聞かれてる？';
     setTimeout(() => { input.value = ''; input.className = ''; }, 1400);
+  }
+
+  checkComplete();
+}
+
+// 数の並びは「順番」「区切り文字」を問わず、中身が合っていれば正解にする
+function checkSet(id, expected, explanation) {
+  if (submitted) return;
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  const raw = input.value.trim();
+  if (!raw) return;
+
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return;
+
+  t.attempts++;
+  t.answer = raw;
+
+  const norm = str => (str.match(/\d+/g) || []).map(Number).sort((a, b) => a - b).join(',');
+  const ok = norm(raw) === norm(expected);
+
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+    input.className = 'correct';
+    input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(raw);
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    const mine = (raw.match(/\d+/g) || []).length;
+    const need = (expected.match(/\d+/g) || []).length;
+    fb.textContent = mine < need ? '❌ おしい。まだ見つかってないのがあるよ（ペアで探す！）'
+                   : mine > need ? '❌ 割り切れないものが混ざってるかも。ひとつずつ確かめて。'
+                   : '❌ ちがう。ペアで探してみよう（1×○、2×○ …）';
+    setTimeout(() => { input.className = ''; }, 1400);
   }
 
   checkComplete();

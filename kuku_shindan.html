@@ -242,12 +242,13 @@
         ・36問。ぜんぶで3分くらい<br>
         ・答えを打って <b>Enter</b> で次へ<br>
         ・<b>わからなかったら空っぽのまま Enter</b>（とばしてOK、それも大事な情報）<br>
-        ・指で数えたり、となりの段から計算して出すのはナシ。<b>パッと出るかどうか</b>を見たい
+        ・指で数えたり、となりの段から計算して出すのはナシ。<b>パッと出るかどうか</b>を見たい<br>
+        ・<b>あわてなくていい</b>。ふつうに打てる速さでOK
       </div>
 
       <div class="callout-orange">
-        <b>⚠️ 大事:</b> ゆっくり考えて正解するより、<b>パッと出た方が価値がある</b>。<br>
-        時間も測ってるから、迷ったら無理せず次へ。
+        <b>⚠️ 大事:</b> これは できないところを <b>見つける</b> ための診断。<br>
+        できなかった数が多いほど、のびしろが見つかったってこと。
       </div>
 
       <button class="start-btn" onclick="startTest()">はじめる ▶</button>
@@ -271,26 +272,27 @@
       <div class="card-title">📊 結果</div>
 
       <div class="stat-row">
-        <div class="stat-box"><div class="n" id="r-fast">0</div><div class="l">パッと出た</div></div>
-        <div class="stat-box"><div class="n" id="r-slow">0</div><div class="l">おそい</div></div>
-        <div class="stat-box"><div class="n" id="r-ng">0</div><div class="l">まちがい</div></div>
+        <div class="stat-box"><div class="n" id="r-fast">0</div><div class="l">できてる</div></div>
+        <div class="stat-box"><div class="n" id="r-slow">0</div><div class="l">もうちょっと</div></div>
+        <div class="stat-box"><div class="n" id="r-ng">0</div><div class="l">これから</div></div>
       </div>
 
       <p id="r-comment" style="font-weight:700;"></p>
 
       <div id="r-weak-wrap" style="display:none;">
-        <p style="font-weight:900; color:#c0392b; margin-top:16px;">🔴 これを練習すればいい（優先）</p>
+        <p style="font-weight:900; color:#c0392b; margin-top:16px;">🎯 ここをやれば一気に伸びる</p>
         <div class="fact-grid" id="r-weak"></div>
       </div>
 
       <div id="r-slowlist-wrap" style="display:none;">
-        <p style="font-weight:900; color:#c46a10; margin-top:16px;">🟠 出るけど、ちょっと遅い</p>
+        <p style="font-weight:900; color:#c46a10; margin-top:16px;">🟡 出てる。あとは慣れるだけ</p>
         <div class="fact-grid" id="r-slowlist"></div>
       </div>
 
       <div class="callout-green" style="margin-top:18px;">
         <b>✅ この結果は とうさんに とどいてる。</b><br>
-        苦手だったやつだけを集めた <b>KEY QUEST の新しいDLC</b> を作るから、ちょっと待ってて。
+        まだのやつだけを集めた <b>KEY QUEST の新しいDLC</b> を作るから、ちょっと待ってて。<br>
+        できてるやつは出さない。<b>やる分だけ</b>にするから安心して。
       </div>
 
       <div class="tip">
@@ -325,7 +327,7 @@ function shuffle(arr) {
   return arr;
 }
 
-const SLOW_MS = 3000;
+const SLOW_MS = 4500; // 想起 + 2桁タイピング + Enter の合計時間。純粋な想起だけなら2-3秒だが、打鍵分を足している
 let queue = [];
 let idx = 0;
 let shownAt = 0;
@@ -382,7 +384,7 @@ function submitAnswer() {
     elFlash.textContent = a + ' × ' + b + ' = ' + expected;
   } else if (correct) {
     elFlash.className = 'flash ok';
-    elFlash.textContent = ms < SLOW_MS ? '⭕' : '⭕ （でも、ちょっと おそい）';
+    elFlash.textContent = '⭕';
   } else {
     elFlash.className = 'flash ng';
     elFlash.textContent = '❌ ' + a + ' × ' + b + ' = ' + expected;
@@ -411,14 +413,13 @@ function finish() {
   document.getElementById('r-ng').textContent = ng.length;
 
   const comment = document.getElementById('r-comment');
+  const done = fast.length;
   if (ng.length === 0 && slow.length === 0) {
-    comment.textContent = '完璧！ 36問ぜんぶ一瞬で出てる。九九はもう武器になってる。';
-  } else if (ng.length + slow.length <= 5) {
-    comment.textContent = 'ほとんど入ってる！ あと ' + (ng.length + slow.length) + ' 個だけ。すぐ終わる。';
-  } else if (ng.length + slow.length <= 12) {
-    comment.textContent = '大部分はできてる。あと ' + (ng.length + slow.length) + ' 個。ここだけやれば全部つながるよ。';
+    comment.textContent = '完璧！ 36問ぜんぶ出てる。九九はもう武器になってる。';
+  } else if (ng.length === 0) {
+    comment.textContent = '全問正解！ ' + done + ' 個はスラスラ。あとは ' + slow.length + ' 個が速くなるだけ。';
   } else {
-    comment.textContent = '今わかってよかった。ここを埋めると、わり算も約数も分数も一気にラクになる。';
+    comment.textContent = done + ' 個はもう自分のものになってる。残りは ' + (ng.length + slow.length) + ' 個だけ。';
   }
 
   if (ng.length) {
