@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 7 — 通分と分数のたし算・ひき算 (Denominador comum)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; font-weight: 900; margin: 0 4px; line-height: 1.1;
+  }
+  .frac .num { border-bottom: 2.5px solid #2c3e50; padding: 0 6px 2px; }
+  .frac .den { padding: 2px 6px 0; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .bar-section { margin: 16px 0; }
+  .bar-tag {
+    display: inline-block;
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 6px;
+    padding: 2px 10px; font-size: 12px; font-weight: 700; color: #2980b9;
+    margin-bottom: 6px;
+  }
+  .bar-wrap {
+    display: flex; overflow: hidden;
+    border: 2px solid #bbb; border-radius: 4px;
+  }
+  .bar-cell {
+    flex: 1; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    border-right: 1px solid rgba(0,0,0,0.12);
+  }
+  .bar-cell:last-child { border-right: none; }
+  .bar-cell.filled { background: #3498db; color: #fff; }
+  .bar-cell.empty { background: #f0f0f0; color: #aaa; }
+  .bar-caption {
+    text-align: center; font-size: 13px; color: #777; margin-top: 6px;
+  }
+
+  /* Variable-width bars for comparison */
+  .compare-section { margin: 16px 0; }
+  .compare-label { font-size: 14px; font-weight: 900; margin-bottom: 4px; color: #2c3e50; }
+  .bar-flex {
+    display: flex; height: 34px; border: 2px solid #bbb; border-radius: 4px;
+    overflow: hidden; margin-bottom: 8px;
+  }
+  .bar-flex .filled-part {
+    background: #3498db; display: flex; align-items: center;
+    justify-content: center; color: #fff; font-size: 12px; font-weight: 800;
+  }
+  .bar-flex .empty-part {
+    background: #f0f0f0; flex: 1;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 12px 0; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; }
+  .answer-row select, .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff;
+  }
+  .answer-row select { width: 80px; }
+  .answer-row input { width: 130px; }
+  .answer-row select:focus, .answer-row input:focus { border-color: #3498db; }
+  .answer-row select.correct, .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row select.wrong, .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 7</div>
+    <h1>🧩 分母をそろえる（通分）</h1>
+    <div class="sub">Denominador comum — 分数のたし算・ひき算</div>
+  </div>
+
+  <!-- ===== 1. なぜ同じ数をかけても値が変わらないのか ===== -->
+  <div class="card">
+    <div class="card-title">🍫 まず、いちばん大事なナゾ</div>
+
+    <p>分数は、<b>分子と分母に同じ数をかけても、大きさが変わらない</b>。<br>
+    これ、なんで？ 数字は大きくなってるのに？</p>
+
+    <p>答え: <b>チョコを切りなおしただけ</b>だから。</p>
+
+    <div class="compare-section">
+      <div class="compare-label"><span class="frac"><span class="num">1</span><span class="den">2</span></span> — 2つに切って1つ</div>
+      <div class="bar-flex">
+        <div class="filled-part" style="width:50%;">1/2</div>
+        <div class="empty-part"></div>
+      </div>
+      <div class="compare-label"><span class="frac"><span class="num">2</span><span class="den">4</span></span> — もう1回半分に切って2つ</div>
+      <div class="bar-flex">
+        <div class="filled-part" style="width:50%;">2/4</div>
+        <div class="empty-part"></div>
+      </div>
+      <div class="compare-label"><span class="frac"><span class="num">4</span><span class="den">8</span></span> — さらに半分に切って4つ</div>
+      <div class="bar-flex">
+        <div class="filled-part" style="width:50%;">4/8</div>
+        <div class="empty-part"></div>
+      </div>
+    </div>
+
+    <p>青いところ、全部おなじ長さでしょ。<br>
+    切る回数を増やしただけで、<b>もらったチョコの量は1ミリも変わってない</b>。</p>
+
+    <div class="equation">
+      <span class="frac"><span class="num">1</span><span class="den">2</span></span>
+      =
+      <span class="frac"><span class="num">2</span><span class="den">4</span></span>
+      =
+      <span class="frac"><span class="num">4</span><span class="den">8</span></span>
+    </div>
+
+    <div class="tip">
+      <b>💡 ルール:</b><br>
+      分子と分母に<b>同じ数</b>をかける → 大きさは変わらない（切り方が細かくなるだけ）<br>
+      <span style="font-size:13px;">ポルトガル語では <b>frações equivalentes</b>（同じ大きさの分数）</span>
+    </div>
+
+    <div class="callout-orange">
+      <b>⚠️ 注意:</b> 分子<b>だけ</b>にかけるのはダメ。<br>
+      1/2 → 2/2 は「切り方はそのままで、もらう数だけ増やした」ことになる。量が変わっちゃう！
+    </div>
+  </div>
+
+  <!-- ===== 2. 分母が同じなら足せる ===== -->
+  <div class="card">
+    <div class="card-title">➕ 分母が同じなら、そのまま足せる</div>
+
+    <p>同じ大きさのマスが並んでるだけだから、<b>マスの数を足すだけ</b>。</p>
+
+    <div class="bar-10" style="display:flex; border:2px solid #bbb; overflow:hidden;">
+      <div class="bar-cell filled">1</div><div class="bar-cell filled">2</div>
+      <div class="bar-cell filled">3</div><div class="bar-cell filled">4</div>
+      <div class="bar-cell filled">5</div><div class="bar-cell empty"></div>
+      <div class="bar-cell empty"></div>
+    </div>
+    <div class="bar-caption">7等分のマス。青2つ（2/7）＋ 青3つ（3/7）= 青5つ（5/7）</div>
+
+    <div class="equation">
+      <span class="frac"><span class="num">2</span><span class="den">7</span></span>
+      +
+      <span class="frac"><span class="num">3</span><span class="den">7</span></span>
+      =
+      <span class="frac"><span class="num">5</span><span class="den">7</span></span>
+    </div>
+
+    <div class="callout-orange">
+      <b>⚠️ ぜったいにやっちゃダメ:</b><br>
+      2/7 + 3/7 = 5/<b>14</b> ← 分母は足さない！<br>
+      マスの大きさ（7等分）は変わってないんだから、分母はそのまま。
+    </div>
+  </div>
+
+  <!-- ===== 3. 分母が違うと足せない ===== -->
+  <div class="card">
+    <div class="card-title">🚫 分母が違うと、そのままでは足せない</div>
+
+    <p><span class="frac"><span class="num">1</span><span class="den">2</span></span> +
+    <span class="frac"><span class="num">1</span><span class="den">4</span></span> は？</p>
+
+    <div class="compare-section">
+      <div class="compare-label"><span class="frac"><span class="num">1</span><span class="den">2</span></span> — マスが大きい</div>
+      <div class="bar-flex">
+        <div class="filled-part" style="width:50%;">1/2</div>
+        <div class="empty-part"></div>
+      </div>
+      <div class="compare-label"><span class="frac"><span class="num">1</span><span class="den">4</span></span> — マスが小さい</div>
+      <div class="bar-flex">
+        <div class="filled-part" style="width:25%;">1/4</div>
+        <div class="empty-part"></div>
+      </div>
+    </div>
+
+    <p>マスの大きさがバラバラ。<br>
+    「大きいの1個 ＋ 小さいの1個 = 2個」とは言えないよね。<b>何の2個？</b> ってなる。</p>
+
+    <div class="callout-green">
+      <b>✅ だから先にやること:</b><br>
+      <b>マスの大きさをそろえる</b> = <b>分母をそろえる</b> = <b>通分（denominador comum）</b>
+    </div>
+
+    <p style="margin-top:12px;">1/2 を切りなおして 2/4 にすれば、両方 <b>4等分のマス</b>。これで足せる。</p>
+
+    <div class="compare-section">
+      <div class="compare-label"><span class="frac"><span class="num">2</span><span class="den">4</span></span> + <span class="frac"><span class="num">1</span><span class="den">4</span></span> = <span class="frac"><span class="num">3</span><span class="den">4</span></span></div>
+      <div class="bar-flex">
+        <div class="filled-part" style="width:75%;">3/4</div>
+        <div class="empty-part"></div>
+      </div>
+    </div>
+
+    <div class="equation">
+      <span class="frac"><span class="num">1</span><span class="den">2</span></span>
+      +
+      <span class="frac"><span class="num">1</span><span class="den">4</span></span>
+      =
+      <span class="frac"><span class="num">2</span><span class="den">4</span></span>
+      +
+      <span class="frac"><span class="num">1</span><span class="den">4</span></span>
+      =
+      <span class="frac"><span class="num">3</span><span class="den">4</span></span>
+    </div>
+  </div>
+
+  <!-- ===== 4. そろえ方 2パターン ===== -->
+  <div class="card">
+    <div class="card-title">🔑 分母のそろえ方は2パターンだけ</div>
+
+    <p><b>パターン① 片方の分母が、もう片方の倍数になっている</b><br>
+    → 小さい方を大きい方に合わせる。これがいちばんラク。</p>
+
+    <div class="tip">
+      例: <span class="frac"><span class="num">2</span><span class="den">3</span></span> +
+      <span class="frac"><span class="num">1</span><span class="den">6</span></span><br>
+      6 は 3 の倍数（3×2=6）→ 2/3 の分子分母に 2 をかけて <b>4/6</b><br>
+      4/6 + 1/6 = <b>5/6</b>
+    </div>
+
+    <p style="margin-top:14px;"><b>パターン② 倍数になっていない</b><br>
+    → 2つの分母の<b>倍数を書き出して、最初に出会う数</b>を探す（= m.m.c.）。</p>
+
+    <div class="tip">
+      例: <span class="frac"><span class="num">1</span><span class="den">2</span></span> +
+      <span class="frac"><span class="num">1</span><span class="den">3</span></span><br>
+      2の倍数: 2, 4, <b>6</b>, 8, 10…<br>
+      3の倍数: 3, <b>6</b>, 9, 12…<br>
+      → 最初に出会うのは <b>6</b>（= m.m.c. 最小公倍数）<br>
+      1/2 = 3/6、1/3 = 2/6 → 3/6 + 2/6 = <b>5/6</b>
+    </div>
+
+    <div class="callout-green">
+      <b>💪 困ったときの必殺技:</b><br>
+      m.m.c. が見つからなくても、<b>分母どうしをかける</b>だけでOK。<br>
+      1/4 + 1/3 → 4×3=12 でそろえる。数は大きくなるけど、答えは必ず合う。
+    </div>
+
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">numerador</span> 分子</span>
+      <span class="vocab-chip"><span class="pt">denominador</span> 分母</span>
+      <span class="vocab-chip"><span class="pt">denominador comum</span> 共通の分母</span>
+      <span class="vocab-chip"><span class="pt">m.m.c.</span> 最小公倍数</span>
+      <span class="vocab-chip"><span class="pt">frações equivalentes</span> 同じ大きさの分数</span>
+      <span class="vocab-chip"><span class="pt">simplificar</span> 約分する</span>
+    </div>
+  </div>
+
+  <!-- ===== 5. 説明テンプレ ===== -->
+  <div class="card">
+    <div class="card-title">📝 テストでの書き方（Explica como pensaste）</div>
+
+    <div class="callout-green">
+      "Primeiro, escrevi as frações com o <b>mesmo denominador</b>.<br>
+      O m.m.c. de 2 e 3 é <b>6</b>.<br>
+      Então 1/2 = 3/6 e 1/3 = 2/6.<br>
+      Depois somei só os numeradores: 3 + 2 = 5.<br>
+      A resposta é <b>5/6</b>."<br><br>
+      <span style="font-size:13px; color:#666;">（まず同じ分母にそろえました。2と3の最小公倍数は6です。だから1/2=3/6、1/3=2/6。そのあと分子だけ足しました: 3+2=5。答えは5/6です。）</span>
+    </div>
+
+    <div class="tip">
+      <b>💡 この4ステップを順番に書けば満点:</b><br>
+      ① 分母をそろえる（mesmo denominador）<br>
+      ② m.m.c. はいくつか書く<br>
+      ③ 書きなおした分数を書く<br>
+      ④ <b>分子だけ</b>を足す／引く
+    </div>
+  </div>
+
+  <!-- ===== 練習 ===== -->
+  <div class="card">
+    <div class="card-title">✏️ 練習 — Prática</div>
+    <p style="margin-bottom:14px; color:#666; font-size:14px;">
+      分数は <b>3/4</b> のように書いてね。<br>
+      <b>勘で書かないこと！</b> 先に「分母をいくつにするか」を決めてから答える。
+    </p>
+
+    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ1: 分母が同じ</p>
+
+    <div class="practice-q">
+      <div class="q-num">1</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">2</span><span class="den">7</span></span> +
+        <span class="frac"><span class="num">3</span><span class="den">7</span></span> = ?
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q1" placeholder="?/?">
+        <button class="check-btn" onclick="check('q1',['5/7'],'分母はそのまま7。分子だけ 2+3=5')">確認</button>
+      </div>
+      <div class="feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">2</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">5</span><span class="den">9</span></span> −
+        <span class="frac"><span class="num">2</span><span class="den">9</span></span> = ?
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q2" placeholder="?/?">
+        <button class="check-btn" onclick="check('q2',['3/9','1/3'],'分子だけ 5−2=3 → 3/9。約分すると 1/3')">確認</button>
+      </div>
+      <div class="feedback" id="q2-fb"></div>
+    </div>
+
+    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ2: 片方の分母が倍数（2ステップ）</p>
+
+    <div class="practice-q">
+      <div class="q-num">3</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">1</span><span class="den">2</span></span> +
+        <span class="frac"><span class="num">1</span><span class="den">4</span></span><br>
+        <span style="color:#888; font-size:14px;">まず: 1/2 を 4等分に書きなおすと、分子はいくつ？</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q3" placeholder="数字">
+        <button class="check-btn" onclick="check('q3',['2'],'分子分母に2をかけて 2/4')">確認</button>
+      </div>
+      <div class="feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">4</div>
+      <div class="q-text">
+        では <span class="frac"><span class="num">1</span><span class="den">2</span></span> +
+        <span class="frac"><span class="num">1</span><span class="den">4</span></span> = ?
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q4" placeholder="?/?">
+        <button class="check-btn" onclick="check('q4',['3/4'],'2/4 + 1/4 = 3/4')">確認</button>
+      </div>
+      <div class="feedback" id="q4-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">5</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">2</span><span class="den">3</span></span> +
+        <span class="frac"><span class="num">1</span><span class="den">6</span></span><br>
+        <span style="color:#888; font-size:14px;">まず: 2/3 を 6等分に書きなおすと、分子はいくつ？</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q5" placeholder="数字">
+        <button class="check-btn" onclick="check('q5',['4'],'分子分母に2をかけて 4/6')">確認</button>
+      </div>
+      <div class="feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">6</div>
+      <div class="q-text">
+        では <span class="frac"><span class="num">2</span><span class="den">3</span></span> +
+        <span class="frac"><span class="num">1</span><span class="den">6</span></span> = ?
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q6" placeholder="?/?">
+        <button class="check-btn" onclick="check('q6',['5/6'],'4/6 + 1/6 = 5/6')">確認</button>
+      </div>
+      <div class="feedback" id="q6-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">7</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">7</span><span class="den">10</span></span> −
+        <span class="frac"><span class="num">1</span><span class="den">5</span></span><br>
+        <span style="color:#888; font-size:14px;">まず: 1/5 を 10等分に書きなおすと、分子はいくつ？</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q7" placeholder="数字">
+        <button class="check-btn" onclick="check('q7',['2'],'分子分母に2をかけて 2/10')">確認</button>
+      </div>
+      <div class="feedback" id="q7-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">8</div>
+      <div class="q-text">
+        では <span class="frac"><span class="num">7</span><span class="den">10</span></span> −
+        <span class="frac"><span class="num">1</span><span class="den">5</span></span> = ?
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q8" placeholder="?/?">
+        <button class="check-btn" onclick="check('q8',['5/10','1/2'],'7/10 − 2/10 = 5/10 = 1/2')">確認</button>
+      </div>
+      <div class="feedback" id="q8-fb"></div>
+    </div>
+
+    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ3: m.m.c. を探す</p>
+
+    <div class="practice-q">
+      <div class="q-num">9</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">1</span><span class="den">2</span></span> +
+        <span class="frac"><span class="num">1</span><span class="den">3</span></span><br>
+        <span style="color:#888; font-size:14px;">共通の分母（denominador comum）はいくつ？</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q9" placeholder="数字">
+        <button class="check-btn" onclick="check('q9',['6'],'2の倍数 2,4,6… 3の倍数 3,6… 最初に出会うのは6')">確認</button>
+      </div>
+      <div class="feedback" id="q9-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">10</div>
+      <div class="q-text">
+        では <span class="frac"><span class="num">1</span><span class="den">2</span></span> +
+        <span class="frac"><span class="num">1</span><span class="den">3</span></span> = ?
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q10" placeholder="?/?">
+        <button class="check-btn" onclick="check('q10',['5/6'],'3/6 + 2/6 = 5/6')">確認</button>
+      </div>
+      <div class="feedback" id="q10-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">11</div>
+      <div class="q-text">
+        <span class="frac"><span class="num">3</span><span class="den">4</span></span> −
+        <span class="frac"><span class="num">1</span><span class="den">3</span></span><br>
+        <span style="color:#888; font-size:14px;">共通の分母はいくつ？</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q11" placeholder="数字">
+        <button class="check-btn" onclick="check('q11',['12'],'4の倍数 4,8,12… 3の倍数 3,6,9,12… 最初に出会うのは12')">確認</button>
+      </div>
+      <div class="feedback" id="q11-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">12</div>
+      <div class="q-text">
+        では <span class="frac"><span class="num">3</span><span class="den">4</span></span> −
+        <span class="frac"><span class="num">1</span><span class="den">3</span></span> = ?
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q12" placeholder="?/?">
+        <button class="check-btn" onclick="check('q12',['5/12'],'9/12 − 4/12 = 5/12')">確認</button>
+      </div>
+      <div class="feedback" id="q12-fb"></div>
+    </div>
+
+    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ボス戦: 文章題</p>
+
+    <div class="practice-q">
+      <div class="q-num">13</div>
+      <div class="q-text">
+        ピザを8等分した。ハルは <span class="frac"><span class="num">1</span><span class="den">4</span></span>、
+        お兄ちゃんは <span class="frac"><span class="num">3</span><span class="den">8</span></span> 食べた。<br>
+        2人で食べたのは全体のどれだけ？
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q13" placeholder="?/?">
+        <button class="check-btn" onclick="check('q13',['5/8'],'1/4 = 2/8。2/8 + 3/8 = 5/8')">確認</button>
+      </div>
+      <div class="feedback" id="q13-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">14</div>
+      <div class="q-text">
+        では、残っているピザはどれだけ？<br>
+        <span style="color:#888; font-size:14px;">ヒント: 全部で 1 = 8/8</span>
+      </div>
+      <div class="answer-row">
+        <input type="text" id="q14" placeholder="?/?">
+        <button class="check-btn" onclick="check('q14',['3/8'],'8/8 − 5/8 = 3/8')">確認</button>
+      </div>
+      <div class="feedback" id="q14-fb"></div>
+    </div>
+
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+let tracking = {};
+const totalQ = 14;
+let submitted = false;
+
+function check(id, accepted, explanation) {
+  if (submitted) return;
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  const val = input.value.trim().replace(/\s/g, '');
+  if (!val) return;
+
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return;
+
+  t.attempts++;
+  t.answer = val;
+
+  const ok = accepted.map(a => String(a).replace(/\s/g, '')).includes(val);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+    input.className = 'correct';
+    input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(val);
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ちがう。まず「分母をいくつにそろえるか」から確認しよう！';
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1400);
+  }
+
+  checkComplete();
+}
+
+function checkComplete() {
+  const correctIds = Object.keys(tracking).filter(k => tracking[k].correct);
+  if (correctIds.length === totalQ) {
+    showResult();
+    sendToSheet();
+  }
+}
+
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + totalQ + ' 一発正解';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === totalQ) {
+    msg.textContent = 'Perfeito! 💯 通分マスター！ 5.º ano の分数はもう怖くない！';
+  } else if (firstCount >= 11) {
+    msg.textContent = 'Muito bom! 通分の手順が身についてる！';
+  } else if (firstCount >= 7) {
+    msg.textContent = 'Bom! 「まず分母をそろえる」をクセにしよう。ステージ3をもう一度！';
+  } else {
+    msg.textContent = 'あせらなくてOK。チョコのバーの絵をもう一回見て、「切りなおしただけ」を思い出そう。';
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer,
+      attempts: t.attempts,
+      result: t.result,
+      wrong_answers: t.wrong_answers
+    };
+  }
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_07_tsuubun',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+document.querySelectorAll('.practice-q input').forEach(input => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
+  });
+});
+</script>
+</body>
+</html>
