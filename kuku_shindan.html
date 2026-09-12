@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>九九スピード診断 (Tabuada — teste de velocidade)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; font-weight: 900; margin: 0 4px; line-height: 1.1;
+  }
+  .frac .num { border-bottom: 2.5px solid #2c3e50; padding: 0 6px 2px; }
+  .frac .den { padding: 2px 6px 0; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .bar-section { margin: 16px 0; }
+  .bar-tag {
+    display: inline-block;
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 6px;
+    padding: 2px 10px; font-size: 12px; font-weight: 700; color: #2980b9;
+    margin-bottom: 6px;
+  }
+  .bar-wrap {
+    display: flex; overflow: hidden;
+    border: 2px solid #bbb; border-radius: 4px;
+  }
+  .bar-cell {
+    flex: 1; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    border-right: 1px solid rgba(0,0,0,0.12);
+  }
+  .bar-cell:last-child { border-right: none; }
+  .bar-cell.filled { background: #3498db; color: #fff; }
+  .bar-cell.empty { background: #f0f0f0; color: #aaa; }
+  .bar-caption {
+    text-align: center; font-size: 13px; color: #777; margin-top: 6px;
+  }
+
+  /* Variable-width bars for comparison */
+  .compare-section { margin: 16px 0; }
+  .compare-label { font-size: 14px; font-weight: 900; margin-bottom: 4px; color: #2c3e50; }
+  .bar-flex {
+    display: flex; height: 34px; border: 2px solid #bbb; border-radius: 4px;
+    overflow: hidden; margin-bottom: 8px;
+  }
+  .bar-flex .filled-part {
+    background: #3498db; display: flex; align-items: center;
+    justify-content: center; color: #fff; font-size: 12px; font-weight: 800;
+  }
+  .bar-flex .empty-part {
+    background: #f0f0f0; flex: 1;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 12px 0; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; }
+  .answer-row select, .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff;
+  }
+  .answer-row select { width: 80px; }
+  .answer-row input { width: 130px; }
+  .answer-row select:focus, .answer-row input:focus { border-color: #3498db; }
+  .answer-row select.correct, .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row select.wrong, .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+</style>
+</head>
+<body>
+<style>
+  .kq-screen { display: none; }
+  .kq-screen.active { display: block; }
+
+  .big-q {
+    text-align: center;
+    font-size: 56px;
+    font-weight: 900;
+    color: #2c3e50;
+    padding: 26px 10px 14px;
+    letter-spacing: 2px;
+  }
+  .big-input {
+    display: block;
+    margin: 0 auto;
+    width: 170px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 40px;
+    font-weight: 900;
+    text-align: center;
+    border: 3px solid #ddd;
+    border-radius: 12px;
+    padding: 10px;
+    outline: none;
+    background: #fff;
+    color: #2c3e50;
+  }
+  .big-input:focus { border-color: #3498db; }
+
+  .progress-outer {
+    height: 10px; background: #eee; border-radius: 5px;
+    overflow: hidden; margin: 18px 0 6px;
+  }
+  .progress-inner {
+    height: 100%; background: #3498db; width: 0%;
+    transition: width 0.2s;
+  }
+  .progress-label { text-align: center; font-size: 13px; color: #888; }
+
+  .flash { text-align: center; font-size: 18px; font-weight: 900; min-height: 26px; margin-top: 10px; }
+  .flash.ok { color: #27ae60; }
+  .flash.ng { color: #e74c3c; }
+
+  .start-btn {
+    display: block; margin: 18px auto 0;
+    font-family: 'Nunito', sans-serif;
+    background: #e67e22; color: #fff; border: none; border-radius: 12px;
+    padding: 14px 40px; font-size: 18px; font-weight: 900; cursor: pointer;
+  }
+  .start-btn:hover { background: #d35400; }
+
+  .fact-grid { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .fact-chip {
+    border-radius: 8px; padding: 6px 10px;
+    font-size: 14px; font-weight: 700; border: 2px solid;
+  }
+  .fact-chip.ng { background: #fff5f5; border-color: #e74c3c; color: #c0392b; }
+  .fact-chip.slow { background: #fffaf0; border-color: #e67e22; color: #c46a10; }
+  .fact-chip.ok { background: #eafff0; border-color: #27ae60; color: #1e8449; }
+
+  .stat-row { display: flex; gap: 8px; text-align: center; margin: 14px 0; }
+  .stat-box { flex: 1; background: #f7fbff; border-radius: 12px; padding: 12px 6px; }
+  .stat-box .n { font-size: 26px; font-weight: 900; color: #2c3e50; }
+  .stat-box .l { font-size: 12px; color: #888; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">DIAGNÓSTICO</div>
+    <h1>⚡ 九九スピード診断</h1>
+    <div class="sub">Tabuada — どこが遅いか、3分で見つける</div>
+  </div>
+
+  <!-- ===== スタート画面 ===== -->
+  <div class="kq-screen active" id="screen-start">
+    <div class="card">
+      <div class="card-title">🎯 これはテストじゃない</div>
+      <p>点数をつけるためのものじゃなくて、<b>どこを練習すればいちばん得か</b>を見つけるための診断。<br>
+      間違えても減点なし。むしろ間違いが見つかった方が<b>得</b>。</p>
+
+      <div class="tip">
+        <b>ルール:</b><br>
+        ・36問。ぜんぶで3分くらい<br>
+        ・答えを打って <b>Enter</b> で次へ<br>
+        ・<b>わからなかったら空っぽのまま Enter</b>（とばしてOK、それも大事な情報）<br>
+        ・指で数えたり、となりの段から計算して出すのはナシ。<b>パッと出るかどうか</b>を見たい
+      </div>
+
+      <div class="callout-orange">
+        <b>⚠️ 大事:</b> ゆっくり考えて正解するより、<b>パッと出た方が価値がある</b>。<br>
+        時間も測ってるから、迷ったら無理せず次へ。
+      </div>
+
+      <button class="start-btn" onclick="startTest()">はじめる ▶</button>
+    </div>
+  </div>
+
+  <!-- ===== 出題画面 ===== -->
+  <div class="kq-screen" id="screen-quiz">
+    <div class="card">
+      <div class="big-q" id="q-display">— × —</div>
+      <input type="text" class="big-input" id="q-input" inputmode="numeric" autocomplete="off">
+      <div class="flash" id="q-flash"></div>
+      <div class="progress-outer"><div class="progress-inner" id="q-progress"></div></div>
+      <div class="progress-label" id="q-count">0 / 36</div>
+    </div>
+  </div>
+
+  <!-- ===== 結果画面 ===== -->
+  <div class="kq-screen" id="screen-result">
+    <div class="card">
+      <div class="card-title">📊 結果</div>
+
+      <div class="stat-row">
+        <div class="stat-box"><div class="n" id="r-fast">0</div><div class="l">パッと出た</div></div>
+        <div class="stat-box"><div class="n" id="r-slow">0</div><div class="l">おそい</div></div>
+        <div class="stat-box"><div class="n" id="r-ng">0</div><div class="l">まちがい</div></div>
+      </div>
+
+      <p id="r-comment" style="font-weight:700;"></p>
+
+      <div id="r-weak-wrap" style="display:none;">
+        <p style="font-weight:900; color:#c0392b; margin-top:16px;">🔴 これを練習すればいい（優先）</p>
+        <div class="fact-grid" id="r-weak"></div>
+      </div>
+
+      <div id="r-slowlist-wrap" style="display:none;">
+        <p style="font-weight:900; color:#c46a10; margin-top:16px;">🟠 出るけど、ちょっと遅い</p>
+        <div class="fact-grid" id="r-slowlist"></div>
+      </div>
+
+      <div class="callout-green" style="margin-top:18px;">
+        <b>✅ この結果は とうさんに とどいてる。</b><br>
+        苦手だったやつだけを集めた <b>KEY QUEST の新しいDLC</b> を作るから、ちょっと待ってて。
+      </div>
+
+      <div class="tip">
+        <b>💡 覚え方のコツ（覚えるのは実はこれだけ）:</b><br>
+        ・<b>7 × 8 = 56</b> → 「<b>5 6 7 8</b>」が順番に並ぶ（56 = 7×8）<br>
+        ・<b>6 × 8 = 48</b> → ろくは よんじゅうはち<br>
+        ・<b>9の段</b> → 答えの2つの数字を足すと必ず <b>9</b>（9×6=54 → 5+4=9）<br>
+        ・<b>a × b = b × a</b> → 片方おぼえれば両方できる。覚える数は<b>半分</b>
+      </div>
+
+      <button class="start-btn" onclick="location.reload()">もう1回やる ↺</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+// 2〜9 の組み合わせ（a <= b）36問。交換法則があるので重複は省く
+const FACTS = [];
+for (let a = 2; a <= 9; a++) {
+  for (let b = a; b <= 9; b++) FACTS.push([a, b]);
+}
+
+// 段ごとに並ぶと「唱え」で出せてしまい、単発の想起力が測れないのでシャッフル
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const SLOW_MS = 3000;
+let queue = [];
+let idx = 0;
+let shownAt = 0;
+let records = [];
+let locked = false;
+
+const elQ = document.getElementById('q-display');
+const elIn = document.getElementById('q-input');
+const elFlash = document.getElementById('q-flash');
+const elProg = document.getElementById('q-progress');
+const elCount = document.getElementById('q-count');
+
+function show(screenId) {
+  document.querySelectorAll('.kq-screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+}
+
+function startTest() {
+  queue = shuffle(FACTS.slice());
+  idx = 0;
+  records = [];
+  show('screen-quiz');
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (idx >= queue.length) { finish(); return; }
+  const [a, b] = queue[idx];
+  elQ.textContent = a + ' × ' + b;
+  elIn.value = '';
+  elIn.disabled = false;
+  elIn.focus();
+  elProg.style.width = (idx / queue.length * 100) + '%';
+  elCount.textContent = idx + ' / ' + queue.length;
+  shownAt = performance.now();
+  locked = false;
+}
+
+function submitAnswer() {
+  if (locked) return;
+  locked = true;
+  const ms = Math.round(performance.now() - shownAt);
+  const [a, b] = queue[idx];
+  const expected = a * b;
+  const raw = elIn.value.trim();
+  const val = raw === '' ? null : parseInt(raw, 10);
+  const correct = val === expected;
+  const skipped = raw === '';
+
+  records.push({ a: a, b: b, expected: expected, answer: raw, correct: correct, skipped: skipped, ms: ms });
+
+  if (skipped) {
+    elFlash.className = 'flash ng';
+    elFlash.textContent = a + ' × ' + b + ' = ' + expected;
+  } else if (correct) {
+    elFlash.className = 'flash ok';
+    elFlash.textContent = ms < SLOW_MS ? '⭕' : '⭕ （でも、ちょっと おそい）';
+  } else {
+    elFlash.className = 'flash ng';
+    elFlash.textContent = '❌ ' + a + ' × ' + b + ' = ' + expected;
+  }
+
+  elIn.disabled = true;
+  const wait = (correct && ms < SLOW_MS) ? 220 : 900;
+  idx++;
+  setTimeout(() => { elFlash.textContent = ''; nextQuestion(); }, wait);
+}
+
+elIn.addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitAnswer();
+});
+
+function label(r) { return r.a + '×' + r.b; }
+
+function finish() {
+  elProg.style.width = '100%';
+  const ng = records.filter(r => !r.correct);
+  const slow = records.filter(r => r.correct && r.ms >= SLOW_MS);
+  const fast = records.filter(r => r.correct && r.ms < SLOW_MS);
+
+  document.getElementById('r-fast').textContent = fast.length;
+  document.getElementById('r-slow').textContent = slow.length;
+  document.getElementById('r-ng').textContent = ng.length;
+
+  const comment = document.getElementById('r-comment');
+  if (ng.length === 0 && slow.length === 0) {
+    comment.textContent = '完璧！ 36問ぜんぶ一瞬で出てる。九九はもう武器になってる。';
+  } else if (ng.length + slow.length <= 5) {
+    comment.textContent = 'ほとんど入ってる！ あと ' + (ng.length + slow.length) + ' 個だけ。すぐ終わる。';
+  } else if (ng.length + slow.length <= 12) {
+    comment.textContent = '大部分はできてる。あと ' + (ng.length + slow.length) + ' 個。ここだけやれば全部つながるよ。';
+  } else {
+    comment.textContent = '今わかってよかった。ここを埋めると、わり算も約数も分数も一気にラクになる。';
+  }
+
+  if (ng.length) {
+    document.getElementById('r-weak-wrap').style.display = 'block';
+    document.getElementById('r-weak').innerHTML = ng
+      .sort((x, y) => (x.a * x.b) - (y.a * y.b))
+      .map(r => '<span class="fact-chip ng">' + label(r) + ' = ' + r.expected + '</span>').join('');
+  }
+  if (slow.length) {
+    document.getElementById('r-slowlist-wrap').style.display = 'block';
+    document.getElementById('r-slowlist').innerHTML = slow
+      .sort((x, y) => y.ms - x.ms)
+      .map(r => '<span class="fact-chip slow">' + label(r) + ' = ' + r.expected + ' <span style="font-size:11px;">(' + (r.ms / 1000).toFixed(1) + 's)</span></span>').join('');
+  }
+
+  show('screen-result');
+  sendToSheet(fast.length, slow.length, ng.length);
+}
+
+function sendToSheet(fast, slow, ng) {
+  const answers = {};
+  records.forEach(r => {
+    answers[r.a + 'x' + r.b] = {
+      answer: r.answer,
+      expected: r.expected,
+      correct: r.correct,
+      skipped: r.skipped,
+      ms: r.ms
+    };
+  });
+  const times = records.map(r => r.ms).sort((x, y) => x - y);
+  const median = times.length ? times[Math.floor(times.length / 2)] : 0;
+  // GAS receiver は data.answers しか保存しないので、サマリも answers に入れる
+  answers._summary = { fast: fast, slow: slow, wrong: ng, median_ms: median, total: records.length };
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'kuku_shindan',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>
