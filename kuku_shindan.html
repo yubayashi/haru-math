@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>九九スピード診断 (Tabuada — teste de velocidade)</title>
+<title>九九チェック（口頭）— Tabuada</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -162,59 +162,70 @@
 
   .big-q {
     text-align: center;
-    font-size: 56px;
+    font-size: 68px;
     font-weight: 900;
     color: #2c3e50;
-    padding: 26px 10px 14px;
-    letter-spacing: 2px;
+    padding: 30px 10px 6px;
+    letter-spacing: 3px;
   }
-  .big-input {
-    display: block;
-    margin: 0 auto;
-    width: 170px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 40px;
-    font-weight: 900;
-    text-align: center;
-    border: 3px solid #ddd;
-    border-radius: 12px;
-    padding: 10px;
-    outline: none;
-    background: #fff;
-    color: #2c3e50;
+  .ans-peek {
+    text-align: center; font-size: 22px; font-weight: 900;
+    color: #bbb; min-height: 30px; letter-spacing: 1px;
   }
-  .big-input:focus { border-color: #3498db; }
+  .ans-peek.hidden-mode { visibility: hidden; }
+
+  .judge-row { display: flex; gap: 8px; margin: 18px 0 6px; }
+  .judge-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    border: none; border-radius: 14px; padding: 18px 6px;
+    font-size: 16px; font-weight: 900; color: #fff; cursor: pointer;
+    line-height: 1.35;
+  }
+  .judge-btn .key { display: block; font-size: 11px; opacity: 0.75; font-weight: 700; }
+  .judge-btn.ok { background: #27ae60; }
+  .judge-btn.ok:hover { background: #1e8449; }
+  .judge-btn.mid { background: #e67e22; }
+  .judge-btn.mid:hover { background: #ca6510; }
+  .judge-btn.ng { background: #e74c3c; }
+  .judge-btn.ng:hover { background: #c0392b; }
 
   .progress-outer {
     height: 10px; background: #eee; border-radius: 5px;
-    overflow: hidden; margin: 18px 0 6px;
+    overflow: hidden; margin: 16px 0 6px;
   }
-  .progress-inner {
-    height: 100%; background: #3498db; width: 0%;
-    transition: width 0.2s;
-  }
+  .progress-inner { height: 100%; background: #3498db; width: 0%; transition: width 0.2s; }
   .progress-label { text-align: center; font-size: 13px; color: #888; }
 
-  .flash { text-align: center; font-size: 18px; font-weight: 900; min-height: 26px; margin-top: 10px; }
-  .flash.ok { color: #27ae60; }
-  .flash.ng { color: #e74c3c; }
+  .mini-btn {
+    display: block; margin: 14px auto 0; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #888; border: 2px solid #ddd; border-radius: 10px;
+    padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .mini-btn:hover { border-color: #bbb; color: #555; }
 
   .start-btn {
-    display: block; margin: 18px auto 0;
+    display: block; width: 100%; margin: 10px 0 0;
     font-family: 'Nunito', sans-serif;
     background: #e67e22; color: #fff; border: none; border-radius: 12px;
-    padding: 14px 40px; font-size: 18px; font-weight: 900; cursor: pointer;
+    padding: 16px 20px; font-size: 17px; font-weight: 900; cursor: pointer;
   }
   .start-btn:hover { background: #d35400; }
+  .start-btn.sub { background: #3498db; }
+  .start-btn.sub:hover { background: #2980b9; }
+
+  .toggle-row {
+    display: flex; align-items: center; gap: 10px;
+    background: #f7fbff; border-radius: 10px; padding: 10px 14px; margin: 12px 0;
+    font-size: 14px; font-weight: 700; color: #2c3e50;
+  }
 
   .fact-grid { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
   .fact-chip {
     border-radius: 8px; padding: 6px 10px;
-    font-size: 14px; font-weight: 700; border: 2px solid;
+    font-size: 15px; font-weight: 700; border: 2px solid;
   }
   .fact-chip.ng { background: #fff5f5; border-color: #e74c3c; color: #c0392b; }
-  .fact-chip.slow { background: #fffaf0; border-color: #e67e22; color: #c46a10; }
-  .fact-chip.ok { background: #eafff0; border-color: #27ae60; color: #1e8449; }
+  .fact-chip.mid { background: #fffaf0; border-color: #e67e22; color: #c46a10; }
 
   .stat-row { display: flex; gap: 8px; text-align: center; margin: 14px 0; }
   .stat-box { flex: 1; background: #f7fbff; border-radius: 12px; padding: 12px 6px; }
@@ -225,33 +236,45 @@
 <div class="page">
 
   <div class="header">
-    <div class="badge">DIAGNÓSTICO</div>
-    <h1>⚡ 九九スピード診断</h1>
-    <div class="sub">Tabuada — どこが遅いか、3分で見つける</div>
+    <div class="badge">とうさん用</div>
+    <h1>⚡ 九九チェック（口頭）</h1>
+    <div class="sub">Tabuada — 声で答えてもらって、ボタンで記録</div>
   </div>
 
   <!-- ===== スタート画面 ===== -->
   <div class="kq-screen active" id="screen-start">
     <div class="card">
-      <div class="card-title">🎯 これはテストじゃない</div>
-      <p>点数をつけるためのものじゃなくて、<b>どこを練習すればいちばん得か</b>を見つけるための診断。<br>
-      間違えても減点なし。むしろ間違いが見つかった方が<b>得</b>。</p>
+      <div class="card-title">🎙 使い方</div>
+
+      <p><b>この画面を操作するのは とうさん。</b><br>
+      問題を読み上げて、はるに<b>声で</b>答えてもらう。打たせない。</p>
 
       <div class="tip">
-        <b>ルール:</b><br>
-        ・36問。ぜんぶで3分くらい<br>
-        ・答えを打って <b>Enter</b> で次へ<br>
-        ・<b>わからなかったら空っぽのまま Enter</b>（とばしてOK、それも大事な情報）<br>
-        ・指で数えたり、となりの段から計算して出すのはナシ。<b>パッと出るかどうか</b>を見たい<br>
-        ・<b>あわてなくていい</b>。ふつうに打てる速さでOK
+        ① 画面の問題を読む（「ななかけるはち」）<br>
+        ② はるが声で答える<br>
+        ③ とうさんが3つのボタンのどれかを押す<br>
+        <b>1</b> = すぐ出た ／ <b>2</b> = 考えてた ／ <b>3</b> = 出なかった・まちがえた<br>
+        <span style="font-size:13px; color:#666;">キーボードの 1 / 2 / 3 でも押せる</span>
+      </div>
+
+      <div class="callout-green">
+        <b>✅ 判定は耳でOK。</b><br>
+        「詰まったか」は聞けば一瞬でわかる。ストップウォッチは要らない。<br>
+        迷ったら <b>2（考えてた）</b>。そこは後で練習に入れる。
       </div>
 
       <div class="callout-orange">
-        <b>⚠️ 大事:</b> これは できないところを <b>見つける</b> ための診断。<br>
-        できなかった数が多いほど、のびしろが見つかったってこと。
+        <b>⚠️ 途中でやめてOK。</b> 「ここまでで終わる」を押せば、そこまでの結果が残る。<br>
+        集中が切れたら無理に最後までやらない。
       </div>
 
-      <button class="start-btn" onclick="startTest()">はじめる ▶</button>
+      <div class="toggle-row">
+        <input type="checkbox" id="opt-hide" style="width:20px; height:20px;">
+        <label for="opt-hide">画面をはるに見せる（答えを隠す）</label>
+      </div>
+
+      <button class="start-btn" onclick="startTest('hard')">むずかしいところだけ（21問・2分）▶</button>
+      <button class="start-btn sub" onclick="startTest('all')">2〜9の段ぜんぶ（36問・4分）▶</button>
     </div>
   </div>
 
@@ -259,10 +282,17 @@
   <div class="kq-screen" id="screen-quiz">
     <div class="card">
       <div class="big-q" id="q-display">— × —</div>
-      <input type="text" class="big-input" id="q-input" inputmode="numeric" autocomplete="off">
-      <div class="flash" id="q-flash"></div>
+      <div class="ans-peek" id="q-answer">= —</div>
+
+      <div class="judge-row">
+        <button class="judge-btn ok" onclick="judge('fast')">すぐ出た<span class="key">キー 1</span></button>
+        <button class="judge-btn mid" onclick="judge('slow')">考えてた<span class="key">キー 2</span></button>
+        <button class="judge-btn ng" onclick="judge('ng')">出なかった<span class="key">キー 3</span></button>
+      </div>
+
       <div class="progress-outer"><div class="progress-inner" id="q-progress"></div></div>
-      <div class="progress-label" id="q-count">0 / 36</div>
+      <div class="progress-label" id="q-count">0 / 0</div>
+      <button class="mini-btn" onclick="finish()">ここまでで終わる</button>
     </div>
   </div>
 
@@ -279,31 +309,22 @@
 
       <p id="r-comment" style="font-weight:700;"></p>
 
-      <div id="r-weak-wrap" style="display:none;">
+      <div id="r-ng-wrap" style="display:none;">
         <p style="font-weight:900; color:#c0392b; margin-top:16px;">🎯 ここをやれば一気に伸びる</p>
-        <div class="fact-grid" id="r-weak"></div>
+        <div class="fact-grid" id="r-ng"></div>
       </div>
 
-      <div id="r-slowlist-wrap" style="display:none;">
+      <div id="r-slow-wrap" style="display:none;">
         <p style="font-weight:900; color:#c46a10; margin-top:16px;">🟡 出てる。あとは慣れるだけ</p>
         <div class="fact-grid" id="r-slowlist"></div>
       </div>
 
       <div class="callout-green" style="margin-top:18px;">
-        <b>✅ この結果は とうさんに とどいてる。</b><br>
-        まだのやつだけを集めた <b>KEY QUEST の新しいDLC</b> を作るから、ちょっと待ってて。<br>
-        できてるやつは出さない。<b>やる分だけ</b>にするから安心して。
+        <b>✅ 結果はスプレッドシートに送信済み。</b><br>
+        このリストから KEY QUEST の九九DLCを作る。<b>できてるやつは出さない。</b>
       </div>
 
-      <div class="tip">
-        <b>💡 覚え方のコツ（覚えるのは実はこれだけ）:</b><br>
-        ・<b>7 × 8 = 56</b> → 「<b>5 6 7 8</b>」が順番に並ぶ（56 = 7×8）<br>
-        ・<b>6 × 8 = 48</b> → ろくは よんじゅうはち<br>
-        ・<b>9の段</b> → 答えの2つの数字を足すと必ず <b>9</b>（9×6=54 → 5+4=9）<br>
-        ・<b>a × b = b × a</b> → 片方おぼえれば両方できる。覚える数は<b>半分</b>
-      </div>
-
-      <button class="start-btn" onclick="location.reload()">もう1回やる ↺</button>
+      <button class="start-btn" onclick="location.reload()">もう1回 ↺</button>
     </div>
   </div>
 
@@ -312,13 +333,12 @@
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
 
-// 2〜9 の組み合わせ（a <= b）36問。交換法則があるので重複は省く
-const FACTS = [];
-for (let a = 2; a <= 9; a++) {
-  for (let b = a; b <= 9; b++) FACTS.push([a, b]);
-}
+// 2〜9 の組み合わせ（a <= b）。a×b = b×a なので重複は省く
+const ALL = [];
+for (let a = 2; a <= 9; a++) for (let b = a; b <= 9; b++) ALL.push([a, b]);
+// 2・5の段と二乗は落ちにくいので、短縮版では外す
+const HARD = ALL.filter(([a, b]) => a !== 2 && b !== 2 && a !== 5 && b !== 5);
 
-// 段ごとに並ぶと「唱え」で出せてしまい、単発の想起力が測れないのでシャッフル
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -327,28 +347,24 @@ function shuffle(arr) {
   return arr;
 }
 
-const SLOW_MS = 4500; // 想起 + 2桁タイピング + Enter の合計時間。純粋な想起だけなら2-3秒だが、打鍵分を足している
-let queue = [];
-let idx = 0;
-let shownAt = 0;
-let records = [];
-let locked = false;
+let queue = [], idx = 0, records = [], shownAt = 0, mode = 'hard', hideAnswer = false, done = false;
 
 const elQ = document.getElementById('q-display');
-const elIn = document.getElementById('q-input');
-const elFlash = document.getElementById('q-flash');
+const elA = document.getElementById('q-answer');
 const elProg = document.getElementById('q-progress');
 const elCount = document.getElementById('q-count');
 
-function show(screenId) {
+function show(id) {
   document.querySelectorAll('.kq-screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
+  document.getElementById(id).classList.add('active');
 }
 
-function startTest() {
-  queue = shuffle(FACTS.slice());
-  idx = 0;
-  records = [];
+function startTest(which) {
+  mode = which;
+  hideAnswer = document.getElementById('opt-hide').checked;
+  if (hideAnswer) elA.classList.add('hidden-mode');
+  queue = shuffle((which === 'all' ? ALL : HARD).slice());
+  idx = 0; records = []; done = false;
   show('screen-quiz');
   nextQuestion();
 }
@@ -357,82 +373,67 @@ function nextQuestion() {
   if (idx >= queue.length) { finish(); return; }
   const [a, b] = queue[idx];
   elQ.textContent = a + ' × ' + b;
-  elIn.value = '';
-  elIn.disabled = false;
-  elIn.focus();
+  elA.textContent = '= ' + (a * b);
   elProg.style.width = (idx / queue.length * 100) + '%';
   elCount.textContent = idx + ' / ' + queue.length;
   shownAt = performance.now();
-  locked = false;
 }
 
-function submitAnswer() {
-  if (locked) return;
-  locked = true;
-  const ms = Math.round(performance.now() - shownAt);
+function judge(result) {
+  if (done || idx >= queue.length) return;
   const [a, b] = queue[idx];
-  const expected = a * b;
-  const raw = elIn.value.trim();
-  const val = raw === '' ? null : parseInt(raw, 10);
-  const correct = val === expected;
-  const skipped = raw === '';
-
-  records.push({ a: a, b: b, expected: expected, answer: raw, correct: correct, skipped: skipped, ms: ms });
-
-  if (skipped) {
-    elFlash.className = 'flash ng';
-    elFlash.textContent = a + ' × ' + b + ' = ' + expected;
-  } else if (correct) {
-    elFlash.className = 'flash ok';
-    elFlash.textContent = '⭕';
-  } else {
-    elFlash.className = 'flash ng';
-    elFlash.textContent = '❌ ' + a + ' × ' + b + ' = ' + expected;
-  }
-
-  elIn.disabled = true;
-  const wait = (correct && ms < SLOW_MS) ? 220 : 900;
+  records.push({
+    a: a, b: b, expected: a * b, result: result,
+    ms: Math.round(performance.now() - shownAt)  // 参考値。判定の主体はとうさんの耳
+  });
   idx++;
-  setTimeout(() => { elFlash.textContent = ''; nextQuestion(); }, wait);
+  nextQuestion();
 }
 
-elIn.addEventListener('keydown', e => {
-  if (e.key === 'Enter') submitAnswer();
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('screen-quiz').classList.contains('active')) return;
+  if (e.key === '1') judge('fast');
+  else if (e.key === '2') judge('slow');
+  else if (e.key === '3') judge('ng');
 });
 
-function label(r) { return r.a + '×' + r.b; }
+function label(r) { return r.a + '×' + r.b + ' = ' + r.expected; }
 
 function finish() {
+  if (done) return;
+  done = true;
   elProg.style.width = '100%';
-  const ng = records.filter(r => !r.correct);
-  const slow = records.filter(r => r.correct && r.ms >= SLOW_MS);
-  const fast = records.filter(r => r.correct && r.ms < SLOW_MS);
+
+  const fast = records.filter(r => r.result === 'fast');
+  const slow = records.filter(r => r.result === 'slow');
+  const ng = records.filter(r => r.result === 'ng');
 
   document.getElementById('r-fast').textContent = fast.length;
   document.getElementById('r-slow').textContent = slow.length;
   document.getElementById('r-ng').textContent = ng.length;
 
-  const comment = document.getElementById('r-comment');
-  const done = fast.length;
-  if (ng.length === 0 && slow.length === 0) {
-    comment.textContent = '完璧！ 36問ぜんぶ出てる。九九はもう武器になってる。';
+  const c = document.getElementById('r-comment');
+  if (!records.length) {
+    c.textContent = 'まだ1問も記録がないよ。';
+  } else if (ng.length === 0 && slow.length === 0) {
+    c.textContent = '完璧。' + records.length + '問ぜんぶ すぐ出てる。九九はもう武器になってる。';
   } else if (ng.length === 0) {
-    comment.textContent = '全問正解！ ' + done + ' 個はスラスラ。あとは ' + slow.length + ' 個が速くなるだけ。';
+    c.textContent = '全部答えられてる！ あとは ' + slow.length + ' 個が速くなるだけ。';
   } else {
-    comment.textContent = done + ' 個はもう自分のものになってる。残りは ' + (ng.length + slow.length) + ' 個だけ。';
+    c.textContent = fast.length + ' 個はもう自分のもの。残りは ' + (ng.length + slow.length) + ' 個だけ。';
   }
 
   if (ng.length) {
-    document.getElementById('r-weak-wrap').style.display = 'block';
-    document.getElementById('r-weak').innerHTML = ng
-      .sort((x, y) => (x.a * x.b) - (y.a * y.b))
-      .map(r => '<span class="fact-chip ng">' + label(r) + ' = ' + r.expected + '</span>').join('');
+    document.getElementById('r-ng-wrap').style.display = 'block';
+    document.getElementById('r-ng').innerHTML = ng
+      .sort((x, y) => x.a * x.b - y.a * y.b)
+      .map(r => '<span class="fact-chip ng">' + label(r) + '</span>').join('');
   }
   if (slow.length) {
-    document.getElementById('r-slowlist-wrap').style.display = 'block';
+    document.getElementById('r-slow-wrap').style.display = 'block';
     document.getElementById('r-slowlist').innerHTML = slow
-      .sort((x, y) => y.ms - x.ms)
-      .map(r => '<span class="fact-chip slow">' + label(r) + ' = ' + r.expected + ' <span style="font-size:11px;">(' + (r.ms / 1000).toFixed(1) + 's)</span></span>').join('');
+      .sort((x, y) => x.a * x.b - y.a * y.b)
+      .map(r => '<span class="fact-chip mid">' + label(r) + '</span>').join('');
   }
 
   show('screen-result');
@@ -442,25 +443,20 @@ function finish() {
 function sendToSheet(fast, slow, ng) {
   const answers = {};
   records.forEach(r => {
-    answers[r.a + 'x' + r.b] = {
-      answer: r.answer,
-      expected: r.expected,
-      correct: r.correct,
-      skipped: r.skipped,
-      ms: r.ms
-    };
+    answers[r.a + 'x' + r.b] = { expected: r.expected, result: r.result, ms: r.ms };
   });
-  const times = records.map(r => r.ms).sort((x, y) => x - y);
-  const median = times.length ? times[Math.floor(times.length / 2)] : 0;
   // GAS receiver は data.answers しか保存しないので、サマリも answers に入れる
-  answers._summary = { fast: fast, slow: slow, wrong: ng, median_ms: median, total: records.length };
+  answers._summary = {
+    mode: mode, judged_by: 'parent_oral',
+    fast: fast, slow: slow, ng: ng, total: records.length
+  };
 
   fetch(GAS_URL, {
     method: 'POST',
     mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      lesson: 'kuku_shindan',
+      lesson: 'kuku_check_oral',
       timestamp: new Date().toISOString(),
       answers: answers
     })
