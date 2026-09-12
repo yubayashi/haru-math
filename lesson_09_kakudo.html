@@ -156,171 +156,208 @@
 </style>
 </head>
 <body>
+<style>
+  .angle-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  /* height:auto で viewBox のアスペクト比を維持（座標変換が width/height 比に依存するため） */
+  .angle-svg { display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+               -webkit-user-select: none; user-select: none; }
+  .angle-svg.static { cursor: default; }
+  .angle-svg:active { cursor: grabbing; }
+
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.hit { color: #27ae60; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 22px; color: #e67e22; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 16px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+
+  .slider-wrap { padding: 4px 4px 0; }
+  input[type=range] { width: 100%; height: 34px; accent-color: #3498db; }
+  .slider-scale { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+
 <div class="page">
 
   <div class="header">
     <div class="badge">LIÇÃO 9</div>
     <h1>📐 角度</h1>
-    <div class="sub">Ângulos — 分度器と、計算で出す角</div>
+    <div class="sub">Ângulos — 手で動かして おぼえる</div>
   </div>
 
-  <!-- ===== 1. 角とは ===== -->
+  <!-- ===== 1. さわってみる ===== -->
   <div class="card">
-    <div class="card-title">🔍 角の大きさ＝「開き具合」</div>
+    <div class="card-title">✋ まず さわってみよう</div>
+    <p>青い点を<b>ドラッグ</b>して、角を開いたり閉じたりしてみて。<br>
+    数字がどう変わるか、よく見て。</p>
 
-    <p>角の大きさは、2本の線がどれだけ<b>開いているか</b>。<br>
-    <b>線の長さはまったく関係ない</b>。ここ、みんな間違えるところ。</p>
+    <div class="angle-host" id="play-host"></div>
+    <div class="deg-readout" id="play-deg">45<span class="unit">°</span></div>
 
-    <svg viewBox="0 0 300 110" style="width:100%; max-width:320px; display:block; margin:10px auto;">
-      <line x1="20" y1="90" x2="130" y2="90" stroke="#3498db" stroke-width="3"/>
-      <line x1="20" y1="90" x2="110" y2="38" stroke="#3498db" stroke-width="3"/>
-      <path d="M 55 90 A 35 35 0 0 0 48 71" fill="none" stroke="#e67e22" stroke-width="2.5"/>
-      <text x="62" y="78" font-size="13" font-weight="700" fill="#e67e22">30°</text>
-      <line x1="175" y1="90" x2="230" y2="90" stroke="#27ae60" stroke-width="3"/>
-      <line x1="175" y1="90" x2="220" y2="64" stroke="#27ae60" stroke-width="3"/>
-      <path d="M 205 90 A 30 30 0 0 0 201 74" fill="none" stroke="#e67e22" stroke-width="2.5"/>
-      <text x="212" y="82" font-size="13" font-weight="700" fill="#e67e22">30°</text>
-      <text x="150" y="107" font-size="12" fill="#888" text-anchor="middle">線が短くても長くても、開きが同じなら同じ角度</text>
-    </svg>
+    <div class="row-btns">
+      <button class="act-btn ghost" onclick="playToggleLen()">線の ながさを かえる</button>
+    </div>
 
     <div class="tip">
-      <b>💡 覚え方:</b> 角度は「ドアがどれだけ開いてるか」。<br>
-      ドアが大きくても小さくても、開き具合が同じなら同じ角度。
+      <b>💡 気づいた？</b> 線を長くしても短くしても、<b>数字は変わらない</b>。<br>
+      角度は「線の長さ」じゃなくて「<b>開き具合</b>」だから。ドアと同じ。
     </div>
-  </div>
-
-  <!-- ===== 2. 角の種類 ===== -->
-  <div class="card">
-    <div class="card-title">🏷️ 角の種類（Tipos de ângulos）</div>
-
-    <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
-      <div style="text-align:center;">
-        <svg viewBox="0 0 120 90" style="width:110px;">
-          <line x1="15" y1="70" x2="100" y2="70" stroke="#3498db" stroke-width="3"/>
-          <line x1="15" y1="70" x2="85" y2="21" stroke="#3498db" stroke-width="3"/>
-          <path d="M 45 70 A 30 30 0 0 0 39 53" fill="none" stroke="#e67e22" stroke-width="2"/>
-        </svg>
-        <div style="font-size:13px; font-weight:700; color:#2c3e50;">agudo（鋭角）</div>
-        <div style="font-size:12px; color:#888;">90°より小さい</div>
-      </div>
-      <div style="text-align:center;">
-        <svg viewBox="0 0 120 90" style="width:110px;">
-          <line x1="25" y1="70" x2="95" y2="70" stroke="#3498db" stroke-width="3"/>
-          <line x1="25" y1="70" x2="25" y2="12" stroke="#3498db" stroke-width="3"/>
-          <rect x="25" y="56" width="14" height="14" fill="none" stroke="#e67e22" stroke-width="2"/>
-        </svg>
-        <div style="font-size:13px; font-weight:700; color:#2c3e50;">reto（直角）</div>
-        <div style="font-size:12px; color:#888;">ちょうど 90°</div>
-      </div>
-      <div style="text-align:center;">
-        <svg viewBox="0 0 120 90" style="width:110px;">
-          <line x1="60" y1="70" x2="112" y2="70" stroke="#3498db" stroke-width="3"/>
-          <line x1="60" y1="70" x2="35" y2="27" stroke="#3498db" stroke-width="3"/>
-          <path d="M 88 70 A 28 28 0 0 0 46 46" fill="none" stroke="#e67e22" stroke-width="2"/>
-        </svg>
-        <div style="font-size:13px; font-weight:700; color:#2c3e50;">obtuso（鈍角）</div>
-        <div style="font-size:12px; color:#888;">90°より大きく180°未満</div>
-      </div>
-      <div style="text-align:center;">
-        <svg viewBox="0 0 120 90" style="width:110px;">
-          <line x1="10" y1="60" x2="110" y2="60" stroke="#3498db" stroke-width="3"/>
-          <circle cx="60" cy="60" r="4" fill="#3498db"/>
-          <path d="M 88 60 A 28 28 0 0 0 32 60" fill="none" stroke="#e67e22" stroke-width="2"/>
-        </svg>
-        <div style="font-size:13px; font-weight:700; color:#2c3e50;">raso（直線の角）</div>
-        <div style="font-size:12px; color:#888;">ちょうど 180°</div>
-      </div>
-    </div>
-
-    <div class="tip" style="margin-top:16px;">
-      <b>💡 判定の順番:</b> まず「90°より大きい？小さい？」を目で見る。<br>
-      これだけで agudo か obtuso かが決まる。数字を読むのはそのあと。
-    </div>
-  </div>
-
-  <!-- ===== 3. 分度器 ===== -->
-  <div class="card">
-    <div class="card-title">🎯 分度器（transferidor）— 数字が2列ある問題</div>
-
-    <p>分度器には数字が<b>2列</b>ある。どっちを読むかで迷うよね。<br>
-    でも、迷う必要はない。<b>先に目で見て決める</b>。</p>
-
-    <svg viewBox="0 0 300 140" style="width:100%; max-width:340px; display:block; margin:10px auto;">
-      <path d="M 60 120 A 90 90 0 0 1 240 120" fill="#f7fbff" stroke="#bbb" stroke-width="2"/>
-      <line x1="55" y1="120" x2="245" y2="120" stroke="#bbb" stroke-width="2"/>
-      <line x1="150" y1="120" x2="240" y2="120" stroke="#999" stroke-width="2"/>
-      <line x1="150" y1="120" x2="205" y2="24.7" stroke="#e74c3c" stroke-width="3"/>
-      <circle cx="150" cy="120" r="4" fill="#e74c3c"/>
-      <text x="220" y="124" font-size="11" fill="#2980b9" text-anchor="middle">0</text>
-      <text x="210" y="89" font-size="11" fill="#2980b9" text-anchor="middle">30</text>
-      <text x="185" y="63" font-size="11" fill="#2980b9" text-anchor="middle">60</text>
-      <text x="150" y="54" font-size="11" fill="#2980b9" text-anchor="middle">90</text>
-      <text x="115" y="63" font-size="11" fill="#2980b9" text-anchor="middle">120</text>
-      <text x="89" y="89" font-size="11" fill="#2980b9" text-anchor="middle">150</text>
-      <text x="80" y="124" font-size="11" fill="#2980b9" text-anchor="middle">180</text>
-      <text x="255" y="124" font-size="11" fill="#aaa" text-anchor="middle">180</text>
-      <text x="240" y="72" font-size="11" fill="#aaa" text-anchor="middle">150</text>
-      <text x="203" y="35" font-size="11" fill="#aaa" text-anchor="middle">120</text>
-      <text x="150" y="21" font-size="11" fill="#aaa" text-anchor="middle">90</text>
-      <text x="97" y="35" font-size="11" fill="#aaa" text-anchor="middle">60</text>
-      <text x="60" y="72" font-size="11" fill="#aaa" text-anchor="middle">30</text>
-      <text x="45" y="124" font-size="11" fill="#aaa" text-anchor="middle">0</text>
-      <text x="213" y="15" font-size="12" font-weight="700" fill="#e74c3c">この角は？</text>
-    </svg>
-
-    <p>この赤い角、<b>90°より小さい</b>よね（見ればわかる）。<br>
-    読めるのは「60」と「120」。90より小さいんだから、答えは <b>60°</b>。</p>
 
     <div class="callout-green">
-      <b>✅ 分度器の3ステップ:</b><br>
-      ① 分度器の<b>中心（穴）を角の頂点</b>に合わせる<br>
-      ② 片方の線を <b>0</b> に合わせる<br>
-      ③ <b>0から数え始めた方の列</b>を読む（＝ 90より大きいか小さいかで確認）
-    </div>
-
-    <div class="callout-orange">
-      <b>⚠️ よくあるミス:</b> 60°の角を「120°」と書いてしまう。<br>
-      書いたあとに「これ、直角より小さく見える？」と1回だけ見返せば防げる。
+      <b>✅ この4つだけ覚える:</b><br>
+      90° より小さい → <b>agudo</b>（鋭角）／ ちょうど90° → <b>reto</b>（直角）<br>
+      90°より大きく180°未満 → <b>obtuso</b>（鈍角）／ ちょうど180° → <b>raso</b>
     </div>
   </div>
 
-  <!-- ===== 4. 計算で出す ===== -->
+  <!-- ===== 2. ミッション: 角を作る ===== -->
   <div class="card">
-    <div class="card-title">🧮 はからなくても、計算で出せる角</div>
+    <div class="card-title">🎯 ミッション — その角度を作れ</div>
+    <p style="color:#666; font-size:14px;">ドラッグして、言われた角度にぴったり合わせよう（±4°までセーフ）。</p>
 
-    <p><b>まっすぐな線の上は 180°</b>（ângulos suplementares）</p>
+    <div class="step-dots" id="m-dots"></div>
+    <div class="mission-bar">
+      <span>つくる角度</span>
+      <span class="target" id="m-target">30°</span>
+    </div>
 
-    <svg viewBox="0 0 280 80" style="width:100%; max-width:300px; display:block; margin:8px auto;">
+    <div class="angle-host" id="m-host"></div>
+    <div class="deg-readout" id="m-deg">45<span class="unit">°</span></div>
+
+    <div class="row-btns">
+      <button class="act-btn" id="m-btn" onclick="missionCheck()">これで決定</button>
+    </div>
+    <div class="feedback" id="m-fb"></div>
+  </div>
+
+  <!-- ===== 3. 目測 ===== -->
+  <div class="card">
+    <div class="card-title">👀 目で見て あてる</div>
+    <p style="color:#666; font-size:14px;">
+      分度器なし。何度くらいに見える？ スライダーで答えよう（±10°までセーフ）。<br>
+      <b>これができると、分度器の読みまちがいが自分で気づけるようになる。</b>
+    </p>
+
+    <div class="step-dots" id="g-dots"></div>
+    <div class="angle-host" id="g-host"></div>
+
+    <div class="slider-wrap">
+      <input type="range" id="g-slider" min="0" max="180" step="5" value="90">
+      <div class="slider-scale"><span>0°</span><span>90°</span><span>180°</span></div>
+    </div>
+    <div class="deg-readout" id="g-deg">90<span class="unit">°</span></div>
+
+    <div class="row-btns">
+      <button class="act-btn" id="g-btn" onclick="guessCheck()">これで決定</button>
+    </div>
+    <div class="feedback" id="g-fb"></div>
+  </div>
+
+  <!-- ===== 4. 分度器 ===== -->
+  <div class="card">
+    <div class="card-title">🎯 分度器 — 数字が2つ 読めるとき</div>
+    <p>分度器には数字が<b>2列</b>ある。読めるのは2つ。でも正解は1つ。</p>
+
+    <div class="callout-green">
+      <b>✅ 迷わないコツ:</b> 数字を読む<b>前</b>に、目で見て決める。<br>
+      「これ、直角より <b>大きい？小さい？</b>」← これだけで答えは1つに決まる。
+    </div>
+
+    <div class="step-dots" id="p-dots"></div>
+    <div class="angle-host" id="p-host"></div>
+    <p style="text-align:center; font-weight:900; color:#2c3e50; margin:6px 0;">赤い角は何度？</p>
+
+    <div class="row-btns" id="p-choices"></div>
+    <div class="feedback" id="p-fb"></div>
+  </div>
+
+  <!-- ===== 5. 計算 ===== -->
+  <div class="card">
+    <div class="card-title">🧮 はからずに 計算で出す</div>
+
+    <svg viewBox="0 0 280 78" style="width:100%; max-width:300px; display:block; margin:8px auto;">
       <line x1="20" y1="60" x2="260" y2="60" stroke="#333" stroke-width="3"/>
       <line x1="140" y1="60" x2="205" y2="12" stroke="#3498db" stroke-width="3"/>
-      <text x="175" y="52" font-size="13" font-weight="700" fill="#27ae60">50°</text>
-      <text x="95" y="52" font-size="13" font-weight="700" fill="#e74c3c">?</text>
-      <text x="140" y="78" font-size="11" fill="#888" text-anchor="middle">? = 180 − 50 = 130°</text>
-    </svg>
-
-    <p style="margin-top:14px;"><b>直角を分けたら 90°</b>（ângulos complementares）</p>
-
-    <svg viewBox="0 0 280 90" style="width:100%; max-width:300px; display:block; margin:8px auto;">
-      <line x1="60" y1="70" x2="200" y2="70" stroke="#333" stroke-width="3"/>
-      <line x1="60" y1="70" x2="60" y2="12" stroke="#333" stroke-width="3"/>
-      <line x1="60" y1="70" x2="132" y2="18" stroke="#3498db" stroke-width="3"/>
-      <text x="105" y="62" font-size="13" font-weight="700" fill="#27ae60">35°</text>
-      <text x="72" y="35" font-size="13" font-weight="700" fill="#e74c3c">?</text>
-      <text x="200" y="40" font-size="11" fill="#888">? = 90 − 35 = 55°</text>
-    </svg>
-
-    <p style="margin-top:14px;"><b>三角形の3つの角を足すと、必ず 180°</b></p>
-
-    <svg viewBox="0 0 220 120" style="width:100%; max-width:240px; display:block; margin:8px auto;">
-      <polygon points="20,100 190,100 75,20" fill="#f0f7ff" stroke="#3498db" stroke-width="3"/>
-      <text x="34" y="92" font-size="13" font-weight="700" fill="#27ae60">50°</text>
-      <text x="160" y="92" font-size="13" font-weight="700" fill="#27ae60">60°</text>
-      <text x="70" y="42" font-size="13" font-weight="700" fill="#e74c3c">?</text>
-      <text x="110" y="116" font-size="11" fill="#888" text-anchor="middle">? = 180 − 50 − 60 = 70°</text>
+      <text x="173" y="52" font-size="13" font-weight="700" fill="#27ae60">50°</text>
+      <text x="100" y="52" font-size="13" font-weight="700" fill="#e74c3c">?</text>
+      <text x="140" y="76" font-size="11" fill="#888" text-anchor="middle">まっすぐな線の上 = 180°　→　? = 180 − 50 = 130°</text>
     </svg>
 
     <div class="tip">
-      <b>💡 四角形なら 360°</b>（三角形2つ分だから）
+      ・まっすぐな線の上 = <b>180°</b>（suplementares）<br>
+      ・直角を分けたら = <b>90°</b>（complementares）<br>
+      ・三角形の3つの角 = <b>180°</b>　・四角形の4つの角 = <b>360°</b>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">1</div>
+      <div class="q-text">一直線の上で、片方が <b>130°</b>。もう片方は？</div>
+      <div class="answer-row">
+        <input type="text" id="c1" placeholder="数字">
+        <button class="check-btn" onclick="calcCheck('c1',50,'180 − 130 = 50°')">確認</button>
+      </div>
+      <div class="feedback" id="c1-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">2</div>
+      <div class="q-text">直角を2つに分けて、片方が <b>35°</b>。もう片方は？</div>
+      <div class="answer-row">
+        <input type="text" id="c2" placeholder="数字">
+        <button class="check-btn" onclick="calcCheck('c2',55,'90 − 35 = 55°')">確認</button>
+      </div>
+      <div class="feedback" id="c2-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">3</div>
+      <div class="q-text">三角形の2つの角が <b>50°</b> と <b>60°</b>。残りは？</div>
+      <div class="answer-row">
+        <input type="text" id="c3" placeholder="数字">
+        <button class="check-btn" onclick="calcCheck('c3',70,'180 − 50 − 60 = 70°')">確認</button>
+      </div>
+      <div class="feedback" id="c3-fb"></div>
+    </div>
+
+    <div class="practice-q">
+      <div class="q-num">4</div>
+      <div class="q-text">四角形の4つの角のうち3つが <b>90°、90°、120°</b>。残りは？</div>
+      <div class="answer-row">
+        <input type="text" id="c4" placeholder="数字">
+        <button class="check-btn" onclick="calcCheck('c4',60,'360 − 90 − 90 − 120 = 60°')">確認</button>
+      </div>
+      <div class="feedback" id="c4-fb"></div>
     </div>
 
     <div class="vocab">
@@ -329,177 +366,15 @@
       <span class="vocab-chip"><span class="pt">agudo</span> 鋭角</span>
       <span class="vocab-chip"><span class="pt">reto</span> 直角</span>
       <span class="vocab-chip"><span class="pt">obtuso</span> 鈍角</span>
-      <span class="vocab-chip"><span class="pt">raso</span> 180°の角</span>
       <span class="vocab-chip"><span class="pt">vértice</span> 頂点</span>
       <span class="vocab-chip"><span class="pt">suplementares</span> 合わせて180°</span>
       <span class="vocab-chip"><span class="pt">complementares</span> 合わせて90°</span>
     </div>
-  </div>
-
-  <!-- ===== 5. 説明テンプレ ===== -->
-  <div class="card">
-    <div class="card-title">📝 テストでの書き方（Explica como pensaste）</div>
 
     <div class="callout-green">
-      "Os dois ângulos estão sobre uma reta, por isso são <b>suplementares</b>.<br>
-      A soma dos dois é <b>180°</b>.<br>
-      Então calculei 180° − 50° = <b>130°</b>."<br><br>
-      <span style="font-size:13px; color:#666;">（2つの角は一直線の上にあるので補角です。2つの合計は180°です。だから 180−50=130° と計算しました。）</span>
-    </div>
-
-    <div class="tip">
-      三角形なら: "A soma dos ângulos internos de um triângulo é <b>180°</b>. Então 180° − 50° − 60° = <b>70°</b>."
-    </div>
-  </div>
-
-  <!-- ===== 練習 ===== -->
-  <div class="card">
-    <div class="card-title">✏️ 練習 — Prática</div>
-    <p style="margin-bottom:14px; color:#666; font-size:14px;">
-      角度は<b>数字だけ</b>（130 など）。種類はポルトガル語で（agudo / reto / obtuso）。
-    </p>
-
-    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ1: 種類を見分ける</p>
-
-    <div class="practice-q">
-      <div class="q-num">1</div>
-      <div class="q-text">45° の角は？</div>
-      <div class="answer-row">
-        <input type="text" id="q1" placeholder="agudo / reto / obtuso">
-        <button class="check-btn" onclick="check('q1',['agudo','鋭角'],'90より小さい → agudo')">確認</button>
-      </div>
-      <div class="feedback" id="q1-fb"></div>
-    </div>
-
-    <div class="practice-q">
-      <div class="q-num">2</div>
-      <div class="q-text">120° の角は？</div>
-      <div class="answer-row">
-        <input type="text" id="q2" placeholder="agudo / reto / obtuso">
-        <button class="check-btn" onclick="check('q2',['obtuso','鈍角'],'90より大きくて180未満 → obtuso')">確認</button>
-      </div>
-      <div class="feedback" id="q2-fb"></div>
-    </div>
-
-    <div class="practice-q">
-      <div class="q-num">3</div>
-      <div class="q-text">90° の角は？</div>
-      <div class="answer-row">
-        <input type="text" id="q3" placeholder="agudo / reto / obtuso">
-        <button class="check-btn" onclick="check('q3',['reto','直角'],'ちょうど90 → reto')">確認</button>
-      </div>
-      <div class="feedback" id="q3-fb"></div>
-    </div>
-
-    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ2: 分度器の読み方</p>
-
-    <div class="practice-q">
-      <div class="q-num">4</div>
-      <div class="q-text">
-        分度器を当てたら <b>70</b> と <b>110</b> の両方が読めた。<br>
-        見た目は<b>直角より小さい</b>。正しいのは？
-      </div>
-      <div class="answer-row">
-        <input type="text" id="q4" placeholder="数字">
-        <button class="check-btn" onclick="check('q4',['70'],'90より小さい方 → 70°')">確認</button>
-      </div>
-      <div class="feedback" id="q4-fb"></div>
-    </div>
-
-    <div class="practice-q">
-      <div class="q-num">5</div>
-      <div class="q-text">
-        分度器で <b>45</b> と <b>135</b> が読めた。<br>
-        見た目は<b>直角より大きい</b>。正しいのは？
-      </div>
-      <div class="answer-row">
-        <input type="text" id="q5" placeholder="数字">
-        <button class="check-btn" onclick="check('q5',['135'],'90より大きい方 → 135°')">確認</button>
-      </div>
-      <div class="feedback" id="q5-fb"></div>
-    </div>
-
-    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ステージ3: 計算で出す</p>
-
-    <div class="practice-q">
-      <div class="q-num">6</div>
-      <div class="q-text">一直線の上で、片方が <b>130°</b>。もう片方は？</div>
-      <div class="answer-row">
-        <input type="text" id="q6" placeholder="数字">
-        <button class="check-btn" onclick="check('q6',['50'],'180 − 130 = 50°（suplementares）')">確認</button>
-      </div>
-      <div class="feedback" id="q6-fb"></div>
-    </div>
-
-    <div class="practice-q">
-      <div class="q-num">7</div>
-      <div class="q-text">直角を2つに分けて、片方が <b>35°</b>。もう片方は？</div>
-      <div class="answer-row">
-        <input type="text" id="q7" placeholder="数字">
-        <button class="check-btn" onclick="check('q7',['55'],'90 − 35 = 55°（complementares）')">確認</button>
-      </div>
-      <div class="feedback" id="q7-fb"></div>
-    </div>
-
-    <div class="practice-q">
-      <div class="q-num">8</div>
-      <div class="q-text">三角形の2つの角が <b>50°</b> と <b>60°</b>。残りは？</div>
-      <div class="answer-row">
-        <input type="text" id="q8" placeholder="数字">
-        <button class="check-btn" onclick="check('q8',['70'],'180 − 50 − 60 = 70°')">確認</button>
-      </div>
-      <div class="feedback" id="q8-fb"></div>
-    </div>
-
-    <div class="practice-q">
-      <div class="q-num">9</div>
-      <div class="q-text">直角三角形（90°がある）で、もう1つが <b>35°</b>。残りは？</div>
-      <div class="answer-row">
-        <input type="text" id="q9" placeholder="数字">
-        <button class="check-btn" onclick="check('q9',['55'],'180 − 90 − 35 = 55°')">確認</button>
-      </div>
-      <div class="feedback" id="q9-fb"></div>
-    </div>
-
-    <div class="practice-q">
-      <div class="q-num">10</div>
-      <div class="q-text">
-        正三角形（triângulo equilátero）の1つの角は？<br>
-        <span style="color:#888; font-size:14px;">3つとも同じ大きさ</span>
-      </div>
-      <div class="answer-row">
-        <input type="text" id="q10" placeholder="数字">
-        <button class="check-btn" onclick="check('q10',['60'],'180 ÷ 3 = 60°')">確認</button>
-      </div>
-      <div class="feedback" id="q10-fb"></div>
-    </div>
-
-    <p style="font-weight:900; color:#2c3e50; margin:18px 0 8px;">▸ ボス戦</p>
-
-    <div class="practice-q">
-      <div class="q-num">11</div>
-      <div class="q-text">
-        四角形の4つの角のうち、3つが <b>90°、90°、120°</b>。<br>
-        残りの1つは？<span style="color:#888; font-size:14px;">（四角形は合計360°）</span>
-      </div>
-      <div class="answer-row">
-        <input type="text" id="q11" placeholder="数字">
-        <button class="check-btn" onclick="check('q11',['60'],'360 − 90 − 90 − 120 = 60°')">確認</button>
-      </div>
-      <div class="feedback" id="q11-fb"></div>
-    </div>
-
-    <div class="practice-q">
-      <div class="q-num">12</div>
-      <div class="q-text">
-        時計が <b>3時ちょうど</b>のとき、長い針と短い針が作る角は？<br>
-        <span style="color:#888; font-size:14px;">1周360°を12等分</span>
-      </div>
-      <div class="answer-row">
-        <input type="text" id="q12" placeholder="数字">
-        <button class="check-btn" onclick="check('q12',['90'],'360 ÷ 12 = 30°。3つ分で 30×3 = 90°')">確認</button>
-      </div>
-      <div class="feedback" id="q12-fb"></div>
+      <b>📝 テストでの書き方:</b><br>
+      "Os dois ângulos estão sobre uma reta, por isso são <b>suplementares</b>.
+      A soma é <b>180°</b>. Então 180° − 50° = <b>130°</b>."
     </div>
 
     <div class="result-box" id="result-box">
@@ -513,86 +388,307 @@
 <script>
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
 
-let tracking = {};
-const totalQ = 12;
+const tracking = {};
+const TOTAL_Q = 18;   // ミッション4 + 目測5 + 分度器5 + 計算4
 let submitted = false;
 
-function check(id, accepted, explanation) {
-  if (submitted) return;
-  const input = document.getElementById(id);
-  const fb = document.getElementById(id + '-fb');
-  const val = input.value.trim().replace(/\s/g, '').replace(/°/g, '').toLowerCase();
-  if (!val) return;
-
-  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, answer: '', result: '', wrong_answers: [] };
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
   const t = tracking[id];
-  if (t.correct) return;
-
+  if (t.correct) return t;
   t.attempts++;
-  t.answer = val;
-
-  const ok = accepted.map(a => String(a).replace(/\s/g, '').toLowerCase()).includes(val);
+  t.answer = String(detail.answer);
   if (ok) {
     t.correct = true;
     t.result = t.attempts === 1 ? 'first' : 'retry';
-    input.className = 'correct';
-    input.disabled = true;
-    fb.className = 'feedback correct';
-    fb.textContent = (t.attempts === 1 ? '⭕ 一発正解！ ' : '⭕ 正解！ ') + explanation;
   } else {
     t.result = 'wrong';
-    t.wrong_answers.push(val);
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ============ ドラッグできる角 ============ */
+function AngleWidget(hostId, opts) {
+  opts = opts || {};
+  this.host = document.getElementById(hostId);
+  this.angle = opts.angle != null ? opts.angle : 45;
+  this.draggable = opts.draggable !== false;
+  this.rayLen = opts.rayLen || 155;
+  this.onChange = opts.onChange || function () {};
+  this.showDeg = !!opts.showDeg;
+  this.cx = 55; this.cy = 165;
+
+  this.host.innerHTML =
+    '<svg class="angle-svg' + (this.draggable ? '' : ' static') + '" viewBox="0 0 320 200">' +
+      '<line class="fixed" stroke="#8fa6bd" stroke-width="4" stroke-linecap="round"/>' +
+      '<path class="arc" fill="rgba(52,152,219,0.12)" stroke="#e67e22" stroke-width="2.5"/>' +
+      '<line class="move" stroke="#3498db" stroke-width="4" stroke-linecap="round"/>' +
+      '<circle class="vtx" r="5" fill="#2c3e50"/>' +
+      (this.draggable ? '<circle class="hdl" r="11" fill="#3498db" stroke="#fff" stroke-width="3"/>' : '') +
+      (this.showDeg ? '<text class="deg" font-size="16" font-weight="900" fill="#e67e22"></text>' : '') +
+    '</svg>';
+
+  this.svg = this.host.querySelector('svg');
+  this.elFixed = this.svg.querySelector('.fixed');
+  this.elMove = this.svg.querySelector('.move');
+  this.elArc = this.svg.querySelector('.arc');
+  this.elVtx = this.svg.querySelector('.vtx');
+  this.elHdl = this.svg.querySelector('.hdl');
+  this.elDeg = this.svg.querySelector('.deg');
+
+  if (this.draggable) {
+    const self = this;
+    const move = e => {
+      const r = self.svg.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width * 320;
+      const y = (e.clientY - r.top) / r.height * 200;
+      let deg = Math.atan2(self.cy - y, x - self.cx) * 180 / Math.PI;
+      deg = Math.max(0, Math.min(180, Math.round(deg)));
+      self.setAngle(deg);
+      e.preventDefault();
+    };
+    this.svg.addEventListener('pointerdown', e => {
+      self.svg.setPointerCapture(e.pointerId);
+      self.dragging = true; move(e);
+    });
+    this.svg.addEventListener('pointermove', e => { if (self.dragging) move(e); });
+    this.svg.addEventListener('pointerup', e => { self.dragging = false; });
+    this.svg.addEventListener('pointercancel', e => { self.dragging = false; });
+  }
+  this.render();
+}
+AngleWidget.prototype.setAngle = function (deg) {
+  this.angle = deg; this.render(); this.onChange(deg);
+};
+AngleWidget.prototype.setLen = function (len) { this.rayLen = len; this.render(); };
+AngleWidget.prototype.render = function () {
+  const rad = this.angle * Math.PI / 180;
+  const px = this.cx + this.rayLen * Math.cos(rad);
+  const py = this.cy - this.rayLen * Math.sin(rad);
+  this.elFixed.setAttribute('x1', this.cx); this.elFixed.setAttribute('y1', this.cy);
+  this.elFixed.setAttribute('x2', this.cx + this.rayLen); this.elFixed.setAttribute('y2', this.cy);
+  this.elMove.setAttribute('x1', this.cx); this.elMove.setAttribute('y1', this.cy);
+  this.elMove.setAttribute('x2', px); this.elMove.setAttribute('y2', py);
+  this.elVtx.setAttribute('cx', this.cx); this.elVtx.setAttribute('cy', this.cy);
+  if (this.elHdl) { this.elHdl.setAttribute('cx', px); this.elHdl.setAttribute('cy', py); }
+  const ar = 42;
+  const ax = this.cx + ar * Math.cos(rad), ay = this.cy - ar * Math.sin(rad);
+  this.elArc.setAttribute('d',
+    'M ' + this.cx + ' ' + this.cy + ' L ' + (this.cx + ar) + ' ' + this.cy +
+    ' A ' + ar + ' ' + ar + ' 0 0 0 ' + ax.toFixed(1) + ' ' + ay.toFixed(1) + ' Z');
+  if (this.elDeg) {
+    const hr = rad / 2, dr = ar + 22;
+    this.elDeg.setAttribute('x', this.cx + dr * Math.cos(hr));
+    this.elDeg.setAttribute('y', this.cy - dr * Math.sin(hr) + 5);
+    this.elDeg.textContent = this.angle + '°';
+  }
+};
+
+function setDeg(elId, deg, hit) {
+  const el = document.getElementById(elId);
+  el.innerHTML = deg + '<span class="unit">°</span>';
+  el.className = 'deg-readout' + (hit ? ' hit' : '');
+}
+function dots(hostId, total, now, doneSet) {
+  document.getElementById(hostId).innerHTML = Array.from({ length: total }, (_, i) =>
+    '<span class="step-dot ' + (doneSet.has(i) ? 'done' : (i === now ? 'now' : '')) + '"></span>').join('');
+}
+
+/* ---- 1. じゆうに さわる ---- */
+const playW = new AngleWidget('play-host', { angle: 45, onChange: d => setDeg('play-deg', d) });
+setDeg('play-deg', 45);
+let playLong = true;
+function playToggleLen() { playLong = !playLong; playW.setLen(playLong ? 155 : 85); }
+
+/* ---- 2. ミッション ---- */
+const M_TARGETS = [30, 90, 135, 170];
+let mIdx = 0; const mDone = new Set();
+const mW = new AngleWidget('m-host', { angle: 45, onChange: d => setDeg('m-deg', d) });
+function mRefresh() {
+  document.getElementById('m-target').textContent = M_TARGETS[mIdx] + '°';
+  dots('m-dots', M_TARGETS.length, mIdx, mDone);
+  setDeg('m-deg', mW.angle);
+}
+function missionCheck() {
+  const id = 'mission_' + M_TARGETS[mIdx];
+  const got = mW.angle, target = M_TARGETS[mIdx];
+  const ok = Math.abs(got - target) <= 4;
+  record(id, ok, { answer: got, target: target });
+  const fb = document.getElementById('m-fb');
+  if (ok) {
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ ぴったり！ ' + got + '°';
+    mDone.add(mIdx);
+    setTimeout(() => {
+      fb.textContent = '';
+      if (mIdx < M_TARGETS.length - 1) { mIdx++; mRefresh(); }
+      else { document.getElementById('m-btn').disabled = true; fb.className = 'feedback correct'; fb.textContent = '🏆 ミッション ぜんぶクリア！'; }
+    }, 900);
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = got > target ? '❌ ' + got + '° — ひらきすぎ。もう少し閉じて' : '❌ ' + got + '° — 閉じすぎ。もう少し開いて';
+  }
+}
+mRefresh();
+
+/* ---- 3. 目測 ---- */
+const G_ANGLES = [25, 60, 100, 140, 165].sort(() => Math.random() - 0.5);
+let gIdx = 0; const gDone = new Set();
+const gW = new AngleWidget('g-host', { draggable: false, angle: G_ANGLES[0] });
+const gSlider = document.getElementById('g-slider');
+gSlider.addEventListener('input', () => setDeg('g-deg', +gSlider.value));
+function gRefresh() {
+  gW.setAngle(G_ANGLES[gIdx]);
+  gSlider.value = 90; setDeg('g-deg', 90);
+  dots('g-dots', G_ANGLES.length, gIdx, gDone);
+}
+function guessCheck() {
+  const got = +gSlider.value, target = G_ANGLES[gIdx];
+  const ok = Math.abs(got - target) <= 10;
+  record('guess_' + target, ok, { answer: got, target: target });
+  const fb = document.getElementById('g-fb');
+  if (ok) {
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ 正解は ' + target + '°。いい目してる！';
+    gDone.add(gIdx);
+    setTimeout(() => {
+      fb.textContent = '';
+      if (gIdx < G_ANGLES.length - 1) { gIdx++; gRefresh(); }
+      else { document.getElementById('g-btn').disabled = true; fb.className = 'feedback correct'; fb.textContent = '🏆 目測クリア！'; }
+    }, 1100);
+  } else {
+    fb.className = 'feedback wrong';
+    const hint = target < 90 ? '直角より小さいよ' : target > 90 ? '直角より大きいよ' : 'ちょうど直角だよ';
+    fb.textContent = '❌ おしい。' + hint + '（いまの答え ' + got + '°）';
+  }
+}
+gRefresh();
+
+/* ---- 4. 分度器 ---- */
+function protractorSVG(deg) {
+  const cx = 150, cy = 132, r = 100;
+  let ticks = '', inner = '', outer = '';
+  for (let v = 0; v <= 180; v += 10) {
+    const t = v * Math.PI / 180;
+    const major = v % 30 === 0;
+    const r1 = major ? 88 : 93;
+    ticks += '<line x1="' + (cx + r1 * Math.cos(t)).toFixed(1) + '" y1="' + (cy - r1 * Math.sin(t)).toFixed(1) +
+             '" x2="' + (cx + r * Math.cos(t)).toFixed(1) + '" y2="' + (cy - r * Math.sin(t)).toFixed(1) +
+             '" stroke="#c3d2e0" stroke-width="' + (major ? 2 : 1) + '"/>';
+    if (major) {
+      const ir = 76, or_ = 113;
+      inner += '<text x="' + (cx + ir * Math.cos(t)).toFixed(1) + '" y="' + (cy - ir * Math.sin(t) + 4).toFixed(1) +
+               '" font-size="11" fill="#2980b9" text-anchor="middle" font-weight="700">' + v + '</text>';
+      outer += '<text x="' + (cx + or_ * Math.cos(t)).toFixed(1) + '" y="' + (cy - or_ * Math.sin(t) + 4).toFixed(1) +
+               '" font-size="11" fill="#aaa" text-anchor="middle">' + (180 - v) + '</text>';
+    }
+  }
+  const t = deg * Math.PI / 180;
+  return '<svg class="angle-svg static" viewBox="0 0 300 150">' +
+    '<path d="M ' + (cx - r) + ' ' + cy + ' A ' + r + ' ' + r + ' 0 0 1 ' + (cx + r) + ' ' + cy + '" fill="#f7fbff" stroke="#bbb" stroke-width="2"/>' +
+    ticks +
+    '<line x1="' + (cx - r - 8) + '" y1="' + cy + '" x2="' + (cx + r + 8) + '" y2="' + cy + '" stroke="#bbb" stroke-width="2"/>' +
+    '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + r) + '" y2="' + cy + '" stroke="#777" stroke-width="3"/>' +
+    '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + (r + 12) * Math.cos(t)).toFixed(1) + '" y2="' + (cy - (r + 12) * Math.sin(t)).toFixed(1) +
+      '" stroke="#e74c3c" stroke-width="3.5"/>' +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="4.5" fill="#e74c3c"/>' +
+    inner + outer + '</svg>';
+}
+const P_ANGLES = [60, 130, 40, 150, 70].sort(() => Math.random() - 0.5);
+let pIdx = 0; const pDone = new Set();
+function pRefresh() {
+  const deg = P_ANGLES[pIdx];
+  document.getElementById('p-host').innerHTML = protractorSVG(deg);
+  dots('p-dots', P_ANGLES.length, pIdx, pDone);
+  const opts = [deg, 180 - deg].sort(() => Math.random() - 0.5);
+  document.getElementById('p-choices').innerHTML = opts.map(o =>
+    '<button class="choice-btn" onclick="protCheck(' + o + ',' + deg + ',this)">' + o + '°</button>').join('');
+  document.getElementById('p-fb').textContent = '';
+}
+function protCheck(picked, deg, btn) {
+  const ok = picked === deg;
+  record('prot_' + deg, ok, { answer: picked, target: deg });
+  const fb = document.getElementById('p-fb');
+  if (ok) {
+    btn.className = 'choice-btn correct';
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ ' + deg + '°。' + (deg < 90 ? '直角より小さいから、小さい方の数字。' : '直角より大きいから、大きい方の数字。');
+    pDone.add(pIdx);
+    setTimeout(() => {
+      if (pIdx < P_ANGLES.length - 1) { pIdx++; pRefresh(); }
+      else {
+        document.getElementById('p-choices').innerHTML = '';
+        fb.className = 'feedback correct'; fb.textContent = '🏆 分度器マスター！';
+      }
+    }, 1300);
+  } else {
+    btn.className = 'choice-btn wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ 反対側の列を読んでる。まず「直角より大きい？小さい？」を見て。';
+    setTimeout(() => { btn.className = 'choice-btn'; }, 1400);
+  }
+}
+pRefresh();
+
+/* ---- 5. 計算 ---- */
+function calcCheck(id, expected, explanation) {
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  const raw = input.value.trim().replace(/°/g, '').replace(/\s/g, '');
+  if (!raw) return;
+  const ok = parseInt(raw, 10) === expected;
+  record(id, ok, { answer: raw, target: expected });
+  if (ok) {
+    input.className = 'correct'; input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ 正解！ ' + explanation;
+  } else {
     input.className = 'wrong';
     fb.className = 'feedback wrong';
-    fb.textContent = '❌ ちがう。まず「直角より大きい？小さい？」から考えよう！';
+    fb.textContent = '❌ ちがう。180°？ 90°？ 360°？ どれを使う場面かな。';
     setTimeout(() => { input.value = ''; input.className = ''; }, 1400);
   }
-
-  checkComplete();
 }
+document.querySelectorAll('.practice-q input').forEach(input => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
+  });
+});
 
-function checkComplete() {
-  const correctIds = Object.keys(tracking).filter(k => tracking[k].correct);
-  if (correctIds.length === totalQ) {
-    showResult();
-    sendToSheet();
-  }
-}
-
+/* ---- 結果 ---- */
 function showResult() {
   const box = document.getElementById('result-box');
   box.style.display = 'block';
   const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
-  document.getElementById('result-score').textContent = firstCount + ' / ' + totalQ + ' 一発正解';
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
   const msg = document.getElementById('result-msg');
-  if (firstCount === totalQ) {
-    msg.textContent = 'Perfeito! 💯 分度器も計算も完璧！角度はもう得意分野だね。';
-  } else if (firstCount >= 10) {
-    msg.textContent = 'Muito bom! 180°と90°の使い分けができてる！';
-  } else if (firstCount >= 6) {
-    msg.textContent = 'Bom! 「一直線=180°」「三角形=180°」「四角形=360°」の3つを覚えれば完成。';
-  } else {
-    msg.textContent = 'まず角の種類（agudo / reto / obtuso）から。図をもう一回見てみよう。';
-  }
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 作る・見る・読む・計算する、ぜんぶできてる！';
+  else if (firstCount >= 14) msg.textContent = 'Muito bom! 角度はもう得意分野だね。';
+  else if (firstCount >= 9) msg.textContent = 'Bom! 「まず直角と比べる」がクセになれば完成。';
+  else msg.textContent = 'ドラッグでもう一度あそんでみて。手で動かすと数字の感覚がつかめるよ。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function sendToSheet() {
   if (submitted) return;
   submitted = true;
-
   const answers = {};
   for (const [id, t] of Object.entries(tracking)) {
     answers[id] = {
-      answer: t.answer,
-      attempts: t.attempts,
-      result: t.result,
-      wrong_answers: t.wrong_answers
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
     };
   }
-
   fetch(GAS_URL, {
-    method: 'POST',
-    mode: 'no-cors',
+    method: 'POST', mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       lesson: 'lesson_09_kakudo',
@@ -601,12 +697,6 @@ function sendToSheet() {
     })
   }).catch(() => {});
 }
-
-document.querySelectorAll('.practice-q input').forEach(input => {
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') input.parentElement.querySelector('.check-btn').click();
-  });
-});
 </script>
 </body>
 </html>
