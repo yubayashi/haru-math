@@ -1,6 +1,6 @@
 {
   "catalogVersion": 2,
-  "updated": "2026-09-07",
+  "updated": "2026-09-20",
   "packs": [
     {
       "packId": "dlc_dakuon_youon",
@@ -28,6 +28,15 @@
       "order": 30,
       "desc": "スロットを まわして 3つ そろえる。1れつ目を 止めたら、あとは おなじ もじだけ 止まる。",
       "version": 2
+    },
+    {
+      "packId": "dlc_spirit",
+      "file": "dlc_spirit.kqpack",
+      "title": "せいれいの しんでん",
+      "stages": 4,
+      "order": 35,
+      "version": 1,
+      "desc": "ホームポジションの とっくん。にほんごで 出ない F J L ; を 生のキーで きたえる。"
     },
     {
       "packId": "dlc_english",

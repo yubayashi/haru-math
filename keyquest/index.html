@@ -1482,6 +1482,19 @@ function recordKey(key, ok, dt){
      一本指うちだと 遠いキーへの 移動が はっきり 遅くなるので、指づかいの めやすになる */
   if (ok && dt >= 60 && dt <= 3000){ k.ms = (k.ms||0) + dt; k.n = (k.n||0) + 1; }
 }
+/* キーの きろくは たまりつづけるので、ふるい ミスが いつまでも のこる。
+   （2026-09-19：れんだで F と J の 正確率が 実力より うんと 低く なった）
+   一定量を こえたら 半分に して、**いつも「さいきんの 実力」**が うつるようにする。 */
+const KEYSTAT_CAP = 3000;
+function decayKeyStats(){
+  const tot = Object.values(S.keyStats).reduce((a,v) => a + v.hit + v.miss, 0);
+  if (tot < KEYSTAT_CAP) return false;
+  Object.values(S.keyStats).forEach(v => {
+    v.hit = Math.round(v.hit/2); v.miss = Math.round(v.miss/2);
+    if (v.n){ v.n = Math.round(v.n/2); v.ms = Math.round(v.ms/2); }
+  });
+  return true;
+}
 function weakKeys(){
   return Object.entries(S.keyStats)
     .filter(([,v]) => v.hit + v.miss >= 12)
@@ -2535,9 +2548,18 @@ function shootKey(ch){
   lastKeyT = now;
   let i = -1, best = 1e9;
   B.ships.forEach((s,k) => { if (s.key === ch && s.x < best){ best = s.x; i = k; } });
-  if (i < 0){                       /* からうち：ミスは のこすが ダメージは なし */
+  if (i < 0){
+    /* からうち。**gen.penalty が true なら てきが 1たい にげる**（のこりが ふえる）。
+       これが ないと「ミスが のこるだけ」なので **れんだで 攻略できてしまう**
+       （2026-09-19 に そらの とりでで 実際に 起きた：正確率40%で クリア）。
+       いまの そらの とりでは penalty なしの まま（仕様を 変えない 方針）。 */
     recordKey(ch, false, dt); B.misses++; B.combo = 0;
     const q = $("b-q"); q.classList.remove("miss"); void q.offsetWidth; q.classList.add("miss");
+    if (shootGen().penalty && B.killed > 0){
+      B.killed--; B.qLeft = Math.max(0, B.qTotal - B.killed);
+      msg("からうち！　てきが 1たい にげた…");
+      popup("からうち", "var(--ng)");
+    }
     renderBattle(); return;
   }
   const s = B.ships[i];
@@ -2726,7 +2748,10 @@ function finishStage(){
   S.records.bestAcc = Math.max(S.records.bestAcc, acc);
   S.records.recent.push(cpm); if (S.records.recent.length > 10) S.records.recent.shift();
   const bondBefore = {}; SPIRITS.forEach(s => bondBefore[s.key] = S.spirits[s.key].bond);
-  SPIRITS.forEach(s => S.spirits[s.key].bond = bondOf(s.key));
+  /* きずなは **下がらない**（いちど おぼえた じゅもんを 失わせない）。
+     きろくを 半分に するので、そのままだと 下がってしまう */
+  SPIRITS.forEach(s => S.spirits[s.key].bond = Math.max(S.spirits[s.key].bond || 0, bondOf(s.key)));
+  decayKeyStats();
   save();
   let html = "";
   if (first) html += '<p style="color:var(--ok);font-size:19px">ステージ クリア！</p>';
@@ -3002,6 +3027,10 @@ const WORLD_STYLES = {
            rock:"#a08858", tree:"#5a7a3a", isle:[64,38,55,26],
            mnts:[[42,26,18,10],[58,24,12,7],[100,54,14,8]],
            trees:[[24,46],[86,58],[46,60],[108,40]]},
+  holy:   {sea:"#3e4e86", sea2:"#4e60a0", sand:"#f4ecc8", land:"#dcd4a8", land2:"#bcb488",
+           rock:"#f0e8cc", tree:"#6a9a5a", isle:[64,38,52,26],
+           mnts:[[46,26,16,10],[62,22,12,7],[96,54,14,9]],
+           trees:[[26,45],[32,41],[84,60],[92,55],[44,58],[106,39]]},
   stone:  {sea:"#26364a", sea2:"#33465e", sand:"#bab08e", land:"#8e8e82", land2:"#6c6c62",
            rock:"#aeaea4", tree:"#4a6a4a", isle:[64,38,54,26],
            mnts:[[44,26,17,10],[60,23,12,7],[98,54,15,9]],
@@ -3167,7 +3196,8 @@ const WORLD_DEFAULTS = {
   dlc_dakuon_youon: {order: 10, recLv:  8},   /* だくおん大陸：かなの ひろがり */
   dlc_shooting:     {order: 20, recLv: 10},   /* そらの とりで：新しいキーは ゼロ。速さだけ */
   dlc_casino:       {order: 30, recLv: 10},   /* カジノ：スロットだけ。たたかいは ない */
-  dlc_english:      {order: 40},              /* （予定）英語 */
+  dlc_spirit:       {order: 35, recLv: 12},   /* せいれいの しんでん：ホームポジション 特訓 */
+  dlc_english:      {order: 40, recLv: 14},   /* アルファベット王国：英語 */
   dlc_suuji:        {order: 90, recLv: 13}    /* すうじステーション：いったん 取り下げ中 */
 };
 const STYLE_CYCLE = ["dark","snow","desert","volcano"];
