@@ -1,5 +1,5 @@
 {
-  "catalogVersion": 2,
+  "catalogVersion": 3,
   "updated": "2026-09-20",
   "packs": [
     {
@@ -46,6 +46,15 @@
       "order": 40,
       "desc": "えいごを そのまま うつ。にほんごを 見て えいごを うつ。さいごは みじかい ぶん。",
       "version": 1
+    },
+    {
+      "packId": "dlc_kanji",
+      "file": "dlc_kanji.kqpack",
+      "title": "ことだまの もり",
+      "stages": 4,
+      "order": 50,
+      "version": 1,
+      "desc": "漢字を 見て よみを うつ。ローマ字ガイドは すこし おくれて 出る。じぶんで よめたら ボーナス。"
     },
     {
       "packId": "dlc_suuji",
