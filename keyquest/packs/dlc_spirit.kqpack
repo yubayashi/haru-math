@@ -1,6 +1,6 @@
 {
   "packId": "dlc_spirit",
-  "packVersion": 2,
+  "packVersion": 3,
   "title": "追加ぼうけん：せいれいの しんでん",
   "requiresEngine": ">=1.0.0",
   "author": "とうさん",
@@ -438,23 +438,27 @@
           "q": 36,
           "gen": {
             "pool": "fj",
+            "mix": "dk",
+            "mixRate": 0.2,
             "speed": 1.65,
             "spawn": 1200,
             "penalty": true
           },
-          "hint": "ぐっと はやくなる。からうちすると てきが にげるので ねらって うつ。"
+          "hint": "D と K が ときどき まざる。からうちは てきが にげて HPも へる。"
         },
         {
           "enemy": "spb_flare",
           "q": 44,
           "gen": {
-            "pool": "fjdk",
+            "pool": "fj",
+            "mix": "asdkl;",
+            "mixRate": 0.3,
             "speed": 1.9,
             "spawn": 1050,
             "penalty": true
           },
           "boss": true,
-          "hint": "フレアの しれん！ D と K も まざる。"
+          "hint": "フレアの しれん！ ときどき ほかの もじも とんでくる。"
         }
       ]
     },
@@ -488,24 +492,28 @@
           "enemy": "sp_tobira",
           "q": 36,
           "gen": {
-            "pool": "kl;",
+            "pool": "l;",
+            "mix": "jk",
+            "mixRate": 0.2,
             "speed": 1.6,
             "spawn": 1250,
             "penalty": true
           },
-          "hint": "K も まざる。みぎての 3ほん。"
+          "hint": "ときどき J と K も まざる。L と ; を ちゅうしんに。"
         },
         {
           "enemy": "spb_luna",
           "q": 44,
           "gen": {
-            "pool": "jkl;",
+            "pool": "l;",
+            "mix": "asdfjk",
+            "mixRate": 0.3,
             "speed": 1.85,
             "spawn": 1100,
             "penalty": true
           },
           "boss": true,
-          "hint": "ルーナの しれん！ みぎて ぜんぶ。"
+          "hint": "ルーナの しれん！ L と ; を はずさない。"
         }
       ]
     }

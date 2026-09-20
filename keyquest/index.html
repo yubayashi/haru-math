@@ -2489,9 +2489,14 @@ function bossFlash(){
   f.classList.remove("cast"); void f.offsetWidth; f.classList.add("cast");
   setTimeout(() => f.classList.remove("cast"), 280);
 }
+/* `gen.pool` が ふだん 出る もじ。`gen.mix` を 書くと **ときどき そちらが 出る**
+   （`gen.mixRate` は その かくりつ。きほん 0.25）。
+   「F と J を 中心に、ほかも たまに」を これで 書ける。 */
 function spawnShip(){
   const g = shootGen();
-  const key = g.pool[rnd(g.pool.length)];
+  const useMix = g.mix && g.mix.length && Math.random() < (g.mixRate || 0.25);
+  const src = useMix ? g.mix : g.pool;
+  const key = src[rnd(src.length)];
   const boss = !!(B.battle && B.battle.boss);
   const el = document.createElement("div");
   el.className = "ship";
@@ -2555,10 +2560,19 @@ function shootKey(ch){
        いまの そらの とりでは penalty なしの まま（仕様を 変えない 方針）。 */
     recordKey(ch, false, dt); B.misses++; B.combo = 0;
     const q = $("b-q"); q.classList.remove("miss"); void q.offsetWidth; q.classList.add("miss");
-    if (shootGen().penalty && B.killed > 0){
-      B.killed--; B.qLeft = Math.max(0, B.qTotal - B.killed);
-      msg("からうち！　てきが 1たい にげた…");
-      popup("からうち", "var(--ng)");
+    if (shootGen().penalty){
+      /* てきが 1たい にげる（すすみが もどる）＋ **HPが へる**。
+         「ミスが のこるだけ」だと れんだで 攻略できる（2026-09-19 の 反省）。 */
+      let m = "からうち！";
+      if (B.killed > 0){ B.killed--; B.qLeft = Math.max(0, B.qTotal - B.killed); m += "　てきが にげた"; }
+      const d = Math.max(2, Math.round(stats().maxHp * 0.05));
+      B.hp -= d; m += "　" + d + " の ダメージ";
+      msg(m); popup("-" + d, "var(--ng)"); flash();
+      if (B.hp <= 0){                       /* foeAttack と おなじ 救済。詰まないようにする */
+        B.hp = stats().maxHp * 0.6; B.combo = 0;
+        msg("せいれいたちが " + S.playerName + "を まもった！　HPが かいふくした！");
+        popup("せいれいの かご！", "var(--mp)");
+      }
     }
     renderBattle(); return;
   }
