@@ -1,6 +1,6 @@
 {
   "packId": "dlc_spirit",
-  "packVersion": 1,
+  "packVersion": 2,
   "title": "追加ぼうけん：せいれいの しんでん",
   "requiresEngine": ">=1.0.0",
   "author": "とうさん",
@@ -424,33 +424,33 @@
       "battles": [
         {
           "enemy": "sp_kage",
-          "q": 30,
+          "q": 32,
           "gen": {
             "pool": "fj",
-            "speed": 1.2,
-            "spawn": 1800,
+            "speed": 1.4,
+            "spawn": 1400,
             "penalty": true
           },
           "hint": "F と J だけ。でっぱりを ゆびで さがす。"
         },
         {
           "enemy": "sp_mayoi",
-          "q": 34,
+          "q": 36,
           "gen": {
             "pool": "fj",
-            "speed": 1.35,
-            "spawn": 1600,
+            "speed": 1.65,
+            "spawn": 1200,
             "penalty": true
           },
-          "hint": "はやくなった。からうちすると てきが にげるので ねらって うつ。"
+          "hint": "ぐっと はやくなる。からうちすると てきが にげるので ねらって うつ。"
         },
         {
           "enemy": "spb_flare",
-          "q": 40,
+          "q": 44,
           "gen": {
             "pool": "fjdk",
-            "speed": 1.5,
-            "spawn": 1450,
+            "speed": 1.9,
+            "spawn": 1050,
             "penalty": true
           },
           "boss": true,
@@ -475,33 +475,33 @@
       "battles": [
         {
           "enemy": "sp_mayoi",
-          "q": 30,
+          "q": 32,
           "gen": {
             "pool": "l;",
-            "speed": 1.2,
-            "spawn": 1800,
+            "speed": 1.35,
+            "spawn": 1450,
             "penalty": true
           },
           "hint": "くすりゆび と こゆび。いちばん うごかしにくい ところ。"
         },
         {
           "enemy": "sp_tobira",
-          "q": 34,
+          "q": 36,
           "gen": {
             "pool": "kl;",
-            "speed": 1.35,
-            "spawn": 1600,
+            "speed": 1.6,
+            "spawn": 1250,
             "penalty": true
           },
           "hint": "K も まざる。みぎての 3ほん。"
         },
         {
           "enemy": "spb_luna",
-          "q": 40,
+          "q": 44,
           "gen": {
             "pool": "jkl;",
-            "speed": 1.5,
-            "spawn": 1450,
+            "speed": 1.85,
+            "spawn": 1100,
             "penalty": true
           },
           "boss": true,
