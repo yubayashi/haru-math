@@ -164,7 +164,9 @@ input[type=text]{
   width:min(100%,428px);
   aspect-ratio:1;
   display:grid;
+  /* 行も 1fr で 固定する。これが ないと 駒のない行が つぶれて 升目が ふぞろいになる */
   grid-template-columns:repeat(5,1fr);
+  grid-template-rows:repeat(5,1fr);
   gap:4px;
   padding:9px;
   background:var(--frame);
@@ -173,6 +175,8 @@ input[type=text]{
 }
 .cell{
   position:relative;
+  min-width:0;min-height:0;      /* グリッドの 1fr を 中身に ひきのばされないように */
+  aspect-ratio:1;
   border:0;padding:0;margin:0;
   border-radius:5px;
   background:var(--sq-a);
