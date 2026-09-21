@@ -93,6 +93,19 @@ h1{
 }
 .modebar button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
 
+/* ── ルール（スタンダード / 王の奪還）─────── */
+.variantbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:-6px}
+.vlabel{font-size:.74em;font-weight:900;color:var(--ink-3);letter-spacing:.14em}
+.variantbar button{
+  padding:7px 13px;border-radius:999px;border:1px solid var(--line);
+  background:transparent;font-size:.82em;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.variantbar button i{font-style:normal;font-size:.78em;color:var(--gold);font-weight:900}
+.variantbar button[aria-pressed="true"]{background:var(--card);border-color:var(--ink-2);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.variantbar button:disabled{opacity:.42;cursor:not-allowed}
+.vnote{flex-basis:100%;font-size:.76em;color:var(--ink-2)}
+
 .panel{
   background:var(--card);
   border:1px solid var(--line);
@@ -232,6 +245,8 @@ details[open] summary{margin-bottom:9px}
 details ol{margin:0;padding-left:1.3em;font-size:.83em;color:var(--ink-2)}
 details li{margin-bottom:6px}
 details li b{color:var(--ink)}
+.vrule{margin:10px 0 0;font-size:.83em;color:var(--ink-2)}
+.vrule b{color:var(--ink)}
 .src{margin:10px 0 0;font-size:.72em;color:var(--ink-3)}
 .src a{color:inherit}
 
@@ -251,6 +266,13 @@ details li b{color:var(--ink)}
     <button id="m-local" aria-pressed="true">おなじ画面</button>
     <button id="m-net" aria-pressed="false">ネット対戦</button>
     <button id="m-code" aria-pressed="false">コード対戦</button>
+  </div>
+
+  <div class="variantbar" role="group" aria-label="ルール">
+    <span class="vlabel">ルール</span>
+    <button id="v-std" aria-pressed="true">スタンダード<i>★4</i></button>
+    <button id="v-res" aria-pressed="false">王の奪還<i>★7</i></button>
+    <span class="vnote" id="vnote">王は 自陣の まんなかから スタート。</span>
   </div>
 
   <!-- ネット対戦 -->
@@ -328,7 +350,8 @@ details li b{color:var(--ink)}
       <li><b>王を うごかせる手が なくなったら その人の まけ。</b>家臣が うごけても 関係ない。</li>
       <li>おなじ ばんめんが <b>3回</b> あらわれたら ひきわけ。</li>
     </ol>
-    <p class="src">ルールは 公式（Gift Box / Mitsuo Yamamoto）の スタンダードルールに あわせた。</p>
+    <p class="vrule"><b>「王の奪還」ルール（上級・★7）</b>　ちがうのは <b>初期配置だけ</b>。じぶんの 王が <b>敵陣の まんなか</b>に とらわれた 状態で はじまる。そこから 助け出して King's Valley まで つれて行く。ほかの ルールは 1〜8と まったく 同じ。<br>たった これだけの ちがいで、むずかしさは 公式で ★4 → ★7 に なる。</p>
+    <p class="src">ルールは 公式（Gift Box / Mitsuo Yamamoto）の スタンダードルール／「王の奪還」ルールに あわせた。</p>
   </details>
 
 </div>
@@ -349,13 +372,22 @@ const SAVE_KEY = "kv.v1";
 
 /* ---------- ルールエンジン ---------- */
 
-function startBoard(){
+/* variant:
+     "standard" … 王は 自陣の まんなか
+     "rescue"   … 王は 敵陣の まんなか（公式「王の奪還」ルール）
+   ちがうのは 初期配置だけ。ほかの ルールは まったく 同じ。 */
+function startBoard(variant){
   const b = new Array(25).fill(null);
   // 後手（あか）＝ うえの列 row0 / 先手（あお）＝ したの列 row4
   for (const c of [0,1,3,4]) b[0*N+c] = {o:1,k:false};
-  b[0*N+2] = {o:1,k:true};
   for (const c of [0,1,3,4]) b[4*N+c] = {o:0,k:false};
-  b[4*N+2] = {o:0,k:true};
+  if (variant === "rescue"){
+    b[0*N+2] = {o:0,k:true};   // あおの王が あかの陣に とらわれている
+    b[4*N+2] = {o:1,k:true};
+  } else {
+    b[0*N+2] = {o:1,k:true};
+    b[4*N+2] = {o:0,k:true};
+  }
   return b;
 }
 
@@ -368,10 +400,12 @@ function posKey(board, turn){
   return s + "|" + turn;
 }
 
-function newGame(){
-  const board = startBoard();
+function newGame(variant){
+  const v = variant === "rescue" ? "rescue" : "standard";
+  const board = startBoard(v);
   const st = {
     board, turn:0, moveNo:0, last:null, result:null,
+    variant: v,
     posCount:{}
   };
   st.posCount[posKey(board,0)] = 1;
@@ -454,6 +488,7 @@ function applyMove(st, from, to){
     moveNo: st.moveNo + 1,
     last: {from, to},
     result: null,
+    variant: st.variant,
     posCount: Object.assign({}, st.posCount)
   };
 
@@ -484,6 +519,7 @@ const SEAT  = ["先手","後手"];
 
 const ui = {
   mode: "local",        // local | net | code
+  variant: "standard",  // standard | rescue（王の奪還）
   st: newGame(),
   stack: [],            // まった用
   sel: -1,
@@ -612,6 +648,10 @@ function render(){
 
   $("undo").disabled = !(ui.mode === "local" && ui.stack.length > 0);
   $("outcode").textContent = ui.outCode || "----";
+  // ネット対戦では ルールは ホストが きめる（ゲストは さわれない）
+  const guestLocked = (ui.mode === "net" && net.role === "guest");
+  $("v-std").disabled = guestLocked;
+  $("v-res").disabled = guestLocked;
   save();
 }
 
@@ -743,14 +783,16 @@ function serialize(st){
   return {
     board: st.board.map(p => p ? {o:p.o,k:p.k} : null),
     turn: st.turn, moveNo: st.moveNo, last: st.last,
-    result: st.result, posCount: st.posCount
+    result: st.result, variant: st.variant, posCount: st.posCount
   };
 }
 function deserialize(o){
   return {
     board: o.board.map(p => p ? {o:p.o,k:!!p.k} : null),
     turn: o.turn, moveNo: o.moveNo, last: o.last || null,
-    result: o.result || null, posCount: o.posCount || {}
+    result: o.result || null,
+    variant: o.variant === "rescue" ? "rescue" : "standard",
+    posCount: o.posCount || {}
   };
 }
 
@@ -759,7 +801,7 @@ function wireConn(conn){
   conn.on("open", () => {
     netUI("open", net.role === "host" ? "あいてが はいった！" : "つながった！");
     if (net.role === "host"){
-      ui.st = newGame(); ui.stack = []; ui.outCode = "";
+      ui.st = newGame(ui.variant); ui.stack = []; ui.outCode = "";
       send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
     }
     render();
@@ -769,6 +811,7 @@ function wireConn(conn){
     if (d.t === "state"){
       // ホストが しんじつ。ゲストは そのまま うけとる
       ui.st = deserialize(d.st);
+      setVariant(ui.st.variant);          // ルールも ホストに あわせる
       if (typeof d.hostOwner === "number"){
         ui.hostOwner = d.hostOwner;
         ui.myOwner = net.role === "host" ? ui.hostOwner : 1 - ui.hostOwner;
@@ -786,7 +829,7 @@ function wireConn(conn){
       render();
     } else if (d.t === "reset"){
       if (net.role === "host"){
-        ui.st = newGame(); ui.stack = []; ui.outCode = "";
+        ui.st = newGame(ui.variant); ui.stack = []; ui.outCode = "";
         send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
         render();
       }
@@ -817,7 +860,7 @@ function makeRoom(){
     if (t === "unavailable-id"){ makeRoom(); return; }   // コードが かぶった → ひきなおす
     netUI("error", "つながらなかった（" + (t||"error") + "）。「コード対戦」でも あそべる。");
   });
-  ui.st = newGame(); ui.stack = []; ui.outCode = "";
+  ui.st = newGame(ui.variant); ui.stack = []; ui.outCode = "";
   render();
 }
 
@@ -877,6 +920,35 @@ function setCodeSide(o){
   render();
 }
 
+/* ---------- ルール（スタンダード / 王の奪還） ---------- */
+
+/* ボタンの見た目と 説明文だけを 合わせる（盤は いじらない） */
+function setVariant(v){
+  ui.variant = (v === "rescue") ? "rescue" : "standard";
+  $("v-std").setAttribute("aria-pressed", String(ui.variant === "standard"));
+  $("v-res").setAttribute("aria-pressed", String(ui.variant === "rescue"));
+  $("vnote").textContent = ui.variant === "rescue"
+    ? "じぶんの王が 敵陣の まんなかに とらわれた 状態から スタート。助け出して まんなかへ。"
+    : "王は 自陣の まんなかから スタート。";
+}
+
+/* ボタンを おしたとき ＝ ルールを かえて 最初から */
+function chooseVariant(v){
+  if (ui.mode === "net" && net.role === "guest"){
+    setMsg("ルールは へやを つくった 人が きめる。");
+    return;
+  }
+  setVariant(v);
+  ui.st = newGame(ui.variant);
+  ui.stack = []; ui.sel = -1; ui.dests = []; ui.msg = ""; ui.outCode = "";
+  if (ui.mode === "net" && net.role === "host" && net.state === "open"){
+    send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
+  }
+  render();
+}
+$("v-std").addEventListener("click", () => chooseVariant("standard"));
+$("v-res").addEventListener("click", () => chooseVariant("rescue"));
+
 /* ---------- モード ---------- */
 
 function setMode(m){
@@ -891,7 +963,7 @@ function setMode(m){
   if (m === "local") ui.myOwner = null;
   if (m === "code")  ui.myOwner = ui.codeSide;
 
-  ui.st = newGame(); ui.stack = []; ui.sel = -1; ui.dests = []; ui.msg = ""; ui.outCode = "";
+  ui.st = newGame(ui.variant); ui.stack = []; ui.sel = -1; ui.dests = []; ui.msg = ""; ui.outCode = "";
   render();
 }
 $("m-local").addEventListener("click", () => setMode("local"));
@@ -911,7 +983,7 @@ $("reset").addEventListener("click", () => {
     setMsg("さいしょから やろうと つたえた。");
     return;
   }
-  ui.st = newGame(); ui.stack = []; ui.sel = -1; ui.dests = []; ui.msg = ""; ui.outCode = "";
+  ui.st = newGame(ui.variant); ui.stack = []; ui.sel = -1; ui.dests = []; ui.msg = ""; ui.outCode = "";
   if (ui.mode === "net" && net.role === "host" && net.state === "open"){
     send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
   }
@@ -934,12 +1006,14 @@ function load(){
     if (o && o.st && Array.isArray(o.st.board) && o.st.board.length === 25){
       ui.st = deserialize(o.st);
       ui.stack = Array.isArray(o.stack) ? o.stack : [];
+      ui.variant = ui.st.variant;
     }
   } catch(_){}
 }
 
 /* ---------- はじめる ---------- */
 load();
+setVariant(ui.variant);
 if (!peerAvailable()) $("m-net").title = "よみこめなかった";
 render();
 </script>
