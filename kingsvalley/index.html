@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>キングスバレー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;900&family=Zen+Kaku+Gothic+New:wght@400;700;900&display=swap">
+<style>
+:root{
+  /* 石灰岩の盤 ── 少し青みのある中性色。クリーム＋テラコッタは避ける */
+  --stone:#E4E2D9;
+  --stone-2:#D8D5C8;
+  --frame:#B4AF9E;
+  --sq-a:#DCD9CB;
+  --sq-b:#CAC5B3;
+  --valley:#DCC271;
+  --valley-2:#C9A94C;
+  --valley-ring:#8A6A1C;
+  --p0:#1E4E8C;          /* あお ＝ ラピスラズリ（ピラミッド王） */
+  --p1:#A8322A;          /* あか ＝ カーネリアン（円墳王） */
+  --gold:#C9A227;
+  --ink:#25251E;
+  --ink-2:#5C5A4E;
+  --ink-3:#847F6D;
+  --line:#ABA592;
+  --card:#EFEDE5;
+  --ok:#2F6B4F;
+  --warn:#8C4A16;
+  --r:10px;
+  --fs: clamp(14px, 3.4vw, 16px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--stone);
+  color:var(--ink);
+  font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+  font-size:var(--fs);
+  line-height:1.7;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-text-size-adjust:100%;
+}
+img{max-width:100%}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--p0);outline-offset:2px}
+
+.wrap{
+  width:100%;
+  max-width:520px;
+  margin:0 auto;
+  padding-inline:16px;
+  padding-block:22px 40px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+/* ── みだし ───────────────────────────── */
+header{text-align:center;display:flex;flex-direction:column;gap:2px}
+.mark{
+  font-family:Archivo,system-ui,sans-serif;
+  font-weight:900;
+  font-size:clamp(11px,2.7vw,13px);
+  letter-spacing:.34em;
+  text-indent:.34em;
+  color:var(--ink-3);
+}
+h1{
+  margin:0;
+  font-size:clamp(25px,6.6vw,33px);
+  font-weight:900;
+  letter-spacing:.06em;
+  text-wrap:balance;
+}
+.sub{margin:0;font-size:.82em;color:var(--ink-2);letter-spacing:.04em}
+
+/* ── モードえらび ─────────────────────── */
+.modebar{display:flex;gap:6px;background:var(--stone-2);padding:5px;border-radius:var(--r);border:1px solid var(--line)}
+.modebar button{
+  flex:1;min-width:0;
+  padding:9px 4px;
+  border:0;border-radius:6px;
+  background:transparent;
+  font-size:.82em;font-weight:700;
+  color:var(--ink-2);
+  cursor:pointer;
+  transition:background .12s,color .12s;
+}
+.modebar button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:14px;
+  display:flex;flex-direction:column;gap:11px;
+}
+.panel h2{margin:0;font-size:.92em;font-weight:900;letter-spacing:.04em}
+.panel p{margin:0;font-size:.82em;color:var(--ink-2)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{
+  padding:9px 15px;border-radius:7px;
+  border:1px solid var(--ink-2);
+  background:var(--ink);color:var(--card);
+  font-weight:700;font-size:.85em;cursor:pointer;
+}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+input[type=text]{
+  padding:9px 11px;border:1px solid var(--line);border-radius:7px;
+  background:var(--stone);color:var(--ink);
+  font-family:Archivo,monospace;font-weight:700;
+  letter-spacing:.22em;text-transform:uppercase;
+  width:7.2em;min-width:0;
+}
+.code{
+  font-family:Archivo,monospace;font-weight:900;
+  font-size:1.9em;letter-spacing:.3em;text-indent:.3em;
+  color:var(--p0);
+  background:var(--stone);
+  border:2px dashed var(--line);
+  border-radius:8px;
+  padding:8px 10px;text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.side{display:flex;gap:6px}
+.side button{
+  padding:7px 13px;border-radius:999px;border:1px solid var(--line);
+  background:transparent;font-size:.8em;font-weight:700;cursor:pointer;
+}
+.side button[aria-pressed="true"]{border-color:currentColor;box-shadow:inset 0 0 0 1px currentColor}
+.side button.b0[aria-pressed="true"]{color:var(--p0)}
+.side button.b1[aria-pressed="true"]{color:var(--p1)}
+.net-state{font-size:.8em;font-weight:700;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ink-3);flex:0 0 auto}
+.dot.on{background:var(--ok)}
+.dot.wait{background:var(--gold)}
+.dot.off{background:var(--p1)}
+
+/* ── てばん ───────────────────────────── */
+.status{
+  display:flex;flex-direction:column;gap:3px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-left:5px solid var(--turn,var(--line));
+  border-radius:var(--r);
+  padding:11px 14px;
+  min-height:62px;
+  justify-content:center;
+}
+.status .turn{font-weight:900;font-size:.98em;letter-spacing:.03em}
+.status .msg{font-size:.8em;color:var(--ink-2);min-height:1.4em}
+.status.done{border-left-color:var(--gold);background:#F6F2E2}
+.status.done .turn{color:var(--ink)}
+
+/* ── ばん ─────────────────────────────── */
+.boardwrap{display:flex;justify-content:center}
+.board{
+  width:min(100%,428px);
+  aspect-ratio:1;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:4px;
+  padding:9px;
+  background:var(--frame);
+  border-radius:12px;
+  box-shadow:0 3px 0 #9E9987, 0 8px 22px rgba(40,36,20,.22);
+}
+.cell{
+  position:relative;
+  border:0;padding:0;margin:0;
+  border-radius:5px;
+  background:var(--sq-a);
+  cursor:default;
+  display:grid;place-items:center;
+  transition:background .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.cell.alt{background:var(--sq-b)}
+.cell.pick{cursor:pointer}
+.cell.pick:hover{background:#E7E3D2}
+.cell.valley{background:linear-gradient(160deg,var(--valley),var(--valley-2))}
+.cell.valley::before{
+  content:"";position:absolute;inset:16%;
+  border:2px solid var(--valley-ring);border-radius:50%;
+  opacity:.5;
+}
+.cell.valley::after{
+  content:"";position:absolute;
+  width:16%;aspect-ratio:1;border-radius:50%;
+  background:var(--valley-ring);opacity:.45;
+}
+.cell.valley.occupied::before,.cell.valley.occupied::after{display:none}
+.cell.from{box-shadow:inset 0 0 0 2px rgba(90,84,60,.4)}
+.cell.to{box-shadow:inset 0 0 0 3px var(--gold)}
+.cell.sel{box-shadow:inset 0 0 0 3px var(--ink)}
+.cell .dest{
+  position:absolute;width:26%;aspect-ratio:1;border-radius:50%;
+  background:rgba(37,37,30,.34);
+  pointer-events:none;
+}
+.cell.valley .dest{background:rgba(37,37,30,.5)}
+.pc{width:80%;height:80%;display:block;pointer-events:none}
+.pc.p0{--pcol:var(--p0)}
+.pc.p1{--pcol:var(--p1)}
+.pc .body{fill:var(--pcol)}
+.pc .rim{fill:none;stroke:rgba(0,0,0,.34);stroke-width:3.5}
+.pc .cap{fill:var(--gold);stroke:rgba(0,0,0,.28);stroke-width:2}
+.pc .sheen{fill:rgba(255,255,255,.2)}
+.cell.movable .pc{filter:drop-shadow(0 0 3px rgba(255,255,255,.85))}
+
+/* ── はんれい・そうさ ─────────────────── */
+.legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:.76em;color:var(--ink-2)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend svg{width:19px;height:19px}
+.legend .vbox{width:15px;height:15px;border-radius:3px;background:linear-gradient(160deg,var(--valley),var(--valley-2));border:1px solid var(--valley-ring)}
+.controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* ── ルール ───────────────────────────── */
+details{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+summary{cursor:pointer;font-weight:900;font-size:.9em;letter-spacing:.03em}
+details[open] summary{margin-bottom:9px}
+details ol{margin:0;padding-left:1.3em;font-size:.83em;color:var(--ink-2)}
+details li{margin-bottom:6px}
+details li b{color:var(--ink)}
+.src{margin:10px 0 0;font-size:.72em;color:var(--ink-3)}
+.src a{color:inherit}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="mark">KING'S VALLEY</div>
+    <h1>キングスバレー</h1>
+    <p class="sub">王家の谷を めぐる たたかい</p>
+  </header>
+
+  <div class="modebar" role="group" aria-label="あそびかた">
+    <button id="m-local" aria-pressed="true">おなじ画面</button>
+    <button id="m-net" aria-pressed="false">ネット対戦</button>
+    <button id="m-code" aria-pressed="false">コード対戦</button>
+  </div>
+
+  <!-- ネット対戦 -->
+  <div class="panel" id="netpanel" hidden>
+    <h2>ネットで たいせん</h2>
+    <p>ひとりが「へやを つくる」、もうひとりが 4文字コードを 入れる。アカウントは いらない。</p>
+    <div class="row" id="net-setup">
+      <span style="font-size:.82em;font-weight:700">つくる人の いろ</span>
+      <div class="side">
+        <button class="b0" id="host0" aria-pressed="true">あお（先手）</button>
+        <button class="b1" id="host1" aria-pressed="false">あか（後手）</button>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn" id="mkroom">へやを つくる</button>
+      <input type="text" id="joincode" maxlength="4" placeholder="CODE" inputmode="latin" autocomplete="off" spellcheck="false" aria-label="へやのコード">
+      <button class="btn ghost" id="joinroom">へやに はいる</button>
+    </div>
+    <div class="code" id="mycode" hidden>----</div>
+    <div class="net-state"><span class="dot" id="netdot"></span><span id="netmsg">まだ つながっていない</span></div>
+    <div class="row"><button class="btn ghost" id="netleave" hidden>やめる</button></div>
+  </div>
+
+  <!-- コード対戦 -->
+  <div class="panel" id="codepanel" hidden>
+    <h2>コードで たいせん</h2>
+    <p>ネットが うまく つながらない ときの ほけん。電話や 通話で 4けたの すうじを 読みあう。ふたりとも 同じ いろを えらばないように。</p>
+    <div class="row">
+      <span style="font-size:.82em;font-weight:700">あなたの いろ</span>
+      <div class="side">
+        <button class="b0" id="cs0" aria-pressed="true">あお（先手）</button>
+        <button class="b1" id="cs1" aria-pressed="false">あか（後手）</button>
+      </div>
+    </div>
+    <div class="row">
+      <span style="font-size:.82em;font-weight:700">あいてに つたえる</span>
+      <span class="code" id="outcode" style="font-size:1.4em">----</span>
+    </div>
+    <div class="row">
+      <input type="text" id="incode" maxlength="4" placeholder="0000" inputmode="numeric" autocomplete="off" aria-label="あいての手のコード">
+      <button class="btn" id="applycode">あいての手を いれる</button>
+    </div>
+  </div>
+
+  <div class="status" id="status">
+    <div class="turn" id="turn">じゅんび中</div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="boardwrap">
+    <div class="board" id="board" role="grid" aria-label="5かける5の ばん"></div>
+  </div>
+
+  <div class="legend">
+    <span><svg viewBox="0 0 100 100" class="pc p0"><path d="M50 16 L82 78 H18 Z" class="body"/><path d="M50 16 L82 78 H18 Z" class="rim"/><circle cx="50" cy="14" r="7" class="cap"/></svg>ピラミッド王</span>
+    <span><svg viewBox="0 0 100 100" class="pc p1"><path d="M18 78 A32 32 0 0 1 82 78 Z" class="body"/><path d="M18 78 A32 32 0 0 1 82 78 Z" class="rim"/><circle cx="50" cy="44" r="7" class="cap"/></svg>円墳王</span>
+    <span><svg viewBox="0 0 100 100" class="pc p0"><circle cx="50" cy="50" r="30" class="body"/><circle cx="50" cy="50" r="30" class="rim"/><circle cx="50" cy="42" r="12" class="sheen"/></svg>家臣</span>
+    <span><i class="vbox"></i>King's Valley</span>
+  </div>
+
+  <div class="controls">
+    <button class="btn ghost" id="undo">まった</button>
+    <button class="btn ghost" id="reset">さいしょから</button>
+  </div>
+
+  <details>
+    <summary>ルール</summary>
+    <ol>
+      <li>ばんは <b>5×5</b>。じぶんの 手前1列に <b>王1つと 家臣4つ</b>。王は 列の <b>まんなか</b>。</li>
+      <li>こうたいに 1つずつ 駒を うごかす。<b>パスは できない</b>。</li>
+      <li><b>先手の 1手目は かならず 家臣</b>。2手目からは どの駒でも いい。</li>
+      <li>駒は たて・よこ・ななめの 8方向。ただし <b>ぶつかるまで まっすぐ すすみきる</b>。とちゅうで 止まれない。駒は とびこせないし、とったりも しない。</li>
+      <li>まんなかの <b>King's Valley には 王しか 止まれない</b>。家臣が ちょうど そこで 止まってしまう 方向へは うごかせない（通りすぎるのは OK）。</li>
+      <li><b>王を King's Valley に ぴったり 止めた ほうの かち。</b>まんなかは 行きどまりでは ないので、むこう側に 駒を 回りこませて「かべ」を 作ってから ぶつける。</li>
+      <li><b>王を うごかせる手が なくなったら その人の まけ。</b>家臣が うごけても 関係ない。</li>
+      <li>おなじ ばんめんが <b>3回</b> あらわれたら ひきわけ。</li>
+    </ol>
+    <p class="src">ルールは 公式（Gift Box / Mitsuo Yamamoto）の スタンダードルールに あわせた。</p>
+  </details>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+<script>
+"use strict";
+/* ===================================================================
+   キングスバレー
+   - ルールエンジン（公式スタンダードルール）
+   - 3つの あそびかた: おなじ画面 / ネット対戦(WebRTC P2P) / コード対戦
+   =================================================================== */
+
+const N = 5;
+const CENTER = 12;                 // (2,2)
+const DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+const SAVE_KEY = "kv.v1";
+
+/* ---------- ルールエンジン ---------- */
+
+function startBoard(){
+  const b = new Array(25).fill(null);
+  // 後手（あか）＝ うえの列 row0 / 先手（あお）＝ したの列 row4
+  for (const c of [0,1,3,4]) b[0*N+c] = {o:1,k:false};
+  b[0*N+2] = {o:1,k:true};
+  for (const c of [0,1,3,4]) b[4*N+c] = {o:0,k:false};
+  b[4*N+2] = {o:0,k:true};
+  return b;
+}
+
+function posKey(board, turn){
+  let s = "";
+  for (let i=0;i<25;i++){
+    const p = board[i];
+    s += p ? (p.o===0 ? (p.k?"K":"s") : (p.k?"L":"t")) : ".";
+  }
+  return s + "|" + turn;
+}
+
+function newGame(){
+  const board = startBoard();
+  const st = {
+    board, turn:0, moveNo:0, last:null, result:null,
+    posCount:{}
+  };
+  st.posCount[posKey(board,0)] = 1;
+  return st;
+}
+
+/* 1方向に すすみきった さきの マス。うごけない方向は -1 */
+function slideTarget(board, from, d){
+  let r = Math.floor(from/N), c = from%N;
+  let tr = r, tc = c;
+  for(;;){
+    const nr = tr + d[0], nc = tc + d[1];
+    if (nr<0 || nr>=N || nc<0 || nc>=N) break;
+    if (board[nr*N+nc]) break;
+    tr = nr; tc = nc;
+  }
+  const to = tr*N + tc;
+  return to === from ? -1 : to;
+}
+
+/* その駒の 合法な行きさき */
+function movesFor(board, from){
+  const p = board[from];
+  if (!p) return [];
+  const out = [];
+  for (const d of DIRS){
+    const to = slideTarget(board, from, d);
+    if (to < 0) continue;
+    if (!p.k && to === CENTER) continue;   // 家臣は King's Valley に止まれない
+    out.push(to);
+  }
+  return out;
+}
+
+/* 先手の1手目は家臣だけ という しばり */
+function pieceLocked(st, from){
+  const p = st.board[from];
+  if (!p) return true;
+  if (p.o !== st.turn) return true;
+  if (st.moveNo === 0 && p.k) return true;
+  return false;
+}
+
+function legalFor(st, from){
+  if (st.result) return [];
+  if (pieceLocked(st, from)) return [];
+  return movesFor(st.board, from);
+}
+
+function kingIndex(board, owner){
+  for (let i=0;i<25;i++){
+    const p = board[i];
+    if (p && p.o===owner && p.k) return i;
+  }
+  return -1;
+}
+
+function kingMoveCount(board, owner){
+  const ki = kingIndex(board, owner);
+  return ki < 0 ? 0 : movesFor(board, ki).length;
+}
+
+function anyMove(st){
+  for (let i=0;i<25;i++){
+    if (legalFor(st,i).length) return true;
+  }
+  return false;
+}
+
+/* 1手すすめた あとの 状態を かえす（元の状態は こわさない） */
+function applyMove(st, from, to){
+  const board = st.board.slice();
+  const p = board[from];
+  board[from] = null;
+  board[to] = p;
+
+  const ns = {
+    board,
+    turn: 1 - st.turn,
+    moveNo: st.moveNo + 1,
+    last: {from, to},
+    result: null,
+    posCount: Object.assign({}, st.posCount)
+  };
+
+  // 1) 王が King's Valley に とうちゃく → そのひとの かち
+  if (p.k && to === CENTER){
+    ns.result = {type:"center", winner:p.o};
+    return ns;
+  }
+  // 2) おなじ ばんめんが 3回 → ひきわけ
+  const key = posKey(board, ns.turn);
+  ns.posCount[key] = (ns.posCount[key] || 0) + 1;
+  if (ns.posCount[key] >= 3){
+    ns.result = {type:"draw", winner:null};
+    return ns;
+  }
+  // 3) つぎの人の 王が うごけない → そのひとの まけ
+  if (kingMoveCount(board, ns.turn) === 0){
+    ns.result = {type:"trapped", winner:1-ns.turn};
+    return ns;
+  }
+  return ns;
+}
+
+/* ---------- がめんの じょうたい ---------- */
+
+const COLOR = ["あお","あか"];
+const SEAT  = ["先手","後手"];
+
+const ui = {
+  mode: "local",        // local | net | code
+  st: newGame(),
+  stack: [],            // まった用
+  sel: -1,
+  dests: [],
+  msg: "",
+  myOwner: null,        // net/code のとき じぶんの いろ（null = どちらも うごかせる）
+  hostOwner: 0,         // ネット対戦で「へやを つくる」人の いろ
+  codeSide: 0,          // コード対戦で じぶんの いろ
+  outCode: "",          // コード対戦で あいてに つたえる すうじ
+};
+
+const net = {
+  role:null,            // host | guest
+  peer:null,
+  conn:null,
+  code:null,
+  state:"idle",         // idle | waiting | open | closed | error
+};
+
+const $ = id => document.getElementById(id);
+const boardEl = $("board");
+
+/* ばんの ます（25こ）を 1回だけ つくる */
+const cells = [];
+for (let d=0; d<25; d++){
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "cell";
+  b.dataset.d = String(d);
+  b.addEventListener("click", onCellClick);
+  boardEl.appendChild(b);
+  cells.push(b);
+}
+
+/* じぶんの駒が 手前に くるように ばんを まわす */
+function flipped(){
+  return ui.myOwner === 1;
+}
+function dToB(d){ return flipped() ? 24 - d : d; }
+function bToD(b){ return flipped() ? 24 - b : b; }
+
+function pieceSVG(p){
+  const cls = p.o === 0 ? "p0" : "p1";
+  if (!p.k){
+    return '<svg viewBox="0 0 100 100" class="pc '+cls+'" aria-hidden="true">'
+      + '<circle cx="50" cy="50" r="30" class="body"/>'
+      + '<circle cx="50" cy="50" r="30" class="rim"/>'
+      + '<circle cx="50" cy="42" r="12" class="sheen"/></svg>';
+  }
+  const shape = p.o === 0
+    ? '<path d="M50 16 L82 78 H18 Z" class="body"/><path d="M50 16 L82 78 H18 Z" class="rim"/><circle cx="50" cy="14" r="7" class="cap"/>'
+    : '<path d="M18 78 A32 32 0 0 1 82 78 Z" class="body"/><path d="M18 78 A32 32 0 0 1 82 78 Z" class="rim"/><circle cx="50" cy="44" r="7" class="cap"/>';
+  return '<svg viewBox="0 0 100 100" class="pc '+cls+' king" aria-hidden="true">'+shape+'</svg>';
+}
+
+function pieceLabel(p){
+  if (!p) return "";
+  return COLOR[p.o] + "の" + (p.k ? "王" : "家臣");
+}
+
+/* わたしが いま うごかせるか */
+function myTurn(){
+  if (ui.st.result) return false;
+  if (ui.myOwner === null) return true;
+  return ui.st.turn === ui.myOwner;
+}
+
+function render(){
+  const st = ui.st;
+
+  for (let d=0; d<25; d++){
+    const b = dToB(d);
+    const el = cells[d];
+    const p = st.board[b];
+    const r = Math.floor(b/N), c = b%N;
+
+    let cls = "cell";
+    if ((r+c) % 2 === 1) cls += " alt";
+    if (b === CENTER) cls += " valley" + (p ? " occupied" : "");
+    if (st.last && b === st.last.from) cls += " from";
+    if (st.last && b === st.last.to) cls += " to";
+    if (b === ui.sel) cls += " sel";
+
+    const isDest = ui.dests.indexOf(b) >= 0;
+    const canPick = myTurn() && p && !pieceLocked(st, b) && movesFor(st.board, b).length > 0;
+    if (canPick) cls += " movable";
+    if (isDest || canPick) cls += " pick";
+    el.className = cls;
+
+    el.innerHTML = (p ? pieceSVG(p) : "") + (isDest ? '<i class="dest"></i>' : "");
+
+    const name = "たて" + (r+1) + " よこ" + (c+1);
+    el.setAttribute("aria-label", name + (p ? "、" + pieceLabel(p) : "、から") + (b===CENTER ? "、King's Valley" : ""));
+    el.disabled = !(isDest || canPick);
+  }
+
+  // てばん・メッセージ
+  const statusEl = $("status");
+  const turnEl = $("turn");
+  const msgEl = $("msg");
+
+  if (st.result){
+    statusEl.classList.add("done");
+    statusEl.style.setProperty("--turn", "var(--gold)");
+    if (st.result.type === "draw"){
+      turnEl.textContent = "ひきわけ";
+      msgEl.textContent = "おなじ ばんめんが 3回 あらわれた。";
+    } else {
+      const w = st.result.winner;
+      turnEl.textContent = COLOR[w] + "の かち！";
+      msgEl.textContent = st.result.type === "center"
+        ? "王が King's Valley に とうちゃくした。"
+        : COLOR[1-w] + "の 王が うごけなくなった。";
+    }
+  } else {
+    statusEl.classList.remove("done");
+    statusEl.style.setProperty("--turn", st.turn===0 ? "var(--p0)" : "var(--p1)");
+    let who = COLOR[st.turn] + "（" + SEAT[st.turn] + "）の ばん";
+    if (ui.myOwner !== null) who += st.turn === ui.myOwner ? " ── あなた" : " ── あいて";
+    turnEl.textContent = who;
+    let m = ui.msg;
+    if (!m && st.moveNo === 0) m = "先手の 1手目は 家臣だけ うごかせる。";
+    if (!m && ui.myOwner !== null && st.turn !== ui.myOwner) m = "あいての 手を まっている…";
+    msgEl.textContent = m;
+  }
+
+  $("undo").disabled = !(ui.mode === "local" && ui.stack.length > 0);
+  $("outcode").textContent = ui.outCode || "----";
+  save();
+}
+
+function setMsg(m){ ui.msg = m; render(); }
+
+/* ---------- そうさ ---------- */
+
+function onCellClick(e){
+  const d = Number(e.currentTarget.dataset.d);
+  const b = dToB(d);
+  const st = ui.st;
+  if (st.result) return;
+
+  // 行きさきを クリック → うごかす
+  if (ui.sel >= 0 && ui.dests.indexOf(b) >= 0){
+    doMove(ui.sel, b);
+    return;
+  }
+  // じぶんの駒を クリック → えらぶ
+  const p = st.board[b];
+  if (!p) { ui.sel = -1; ui.dests = []; setMsg(""); return; }
+
+  if (!myTurn()){
+    setMsg("いまは あいての ばん。");
+    return;
+  }
+  if (p.o !== st.turn){
+    setMsg("それは " + COLOR[p.o] + "の 駒。");
+    return;
+  }
+  if (st.moveNo === 0 && p.k){
+    setMsg("先手の 1手目は 家臣だけ。王は まだ うごかせない。");
+    return;
+  }
+  const ms = movesFor(st.board, b);
+  if (!ms.length){
+    setMsg("その駒は どこにも うごけない。");
+    return;
+  }
+  ui.sel = b; ui.dests = ms;
+  setMsg("");
+}
+
+function doMove(from, to){
+  // ネット対戦で わたしが ゲストなら ホストに おねがいする
+  if (ui.mode === "net" && net.role === "guest"){
+    if (net.state !== "open"){ setMsg("つながっていない。"); return; }
+    send({t:"move", from, to});
+    ui.sel = -1; ui.dests = [];
+    setMsg("おくった。");
+    return;
+  }
+
+  commit(from, to);
+
+  if (ui.mode === "net" && net.role === "host" && net.state === "open"){
+    send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
+  }
+  if (ui.mode === "code"){
+    ui.outCode = encodeMove(from, to);
+  }
+  render();
+}
+
+function commit(from, to){
+  ui.stack.push(serialize(ui.st));
+  if (ui.stack.length > 200) ui.stack.shift();
+  ui.st = applyMove(ui.st, from, to);
+  ui.sel = -1; ui.dests = [];
+  ui.msg = "";
+}
+
+/* ---------- コード対戦 ---------- */
+
+function encodeMove(from, to){
+  const fr = Math.floor(from/N), fc = from%N, tr = Math.floor(to/N), tc = to%N;
+  return "" + (fr+1) + (fc+1) + (tr+1) + (tc+1);
+}
+function decodeMove(s){
+  if (!/^[1-5]{4}$/.test(s)) return null;
+  const n = s.split("").map(Number);
+  return { from:(n[0]-1)*N + (n[1]-1), to:(n[2]-1)*N + (n[3]-1) };
+}
+
+$("applycode").addEventListener("click", () => {
+  const raw = $("incode").value.trim();
+  const mv = decodeMove(raw);
+  if (!mv){ setMsg("コードは 1〜5の すうじ 4けた（たて よこ たて よこ）。"); return; }
+  if (ui.st.result){ setMsg("もう しょうぶは ついている。"); return; }
+  if (myTurn()){ setMsg("いまは あなたの ばん。あいての手は まだ 入れられない。"); return; }
+  const ms = legalFor(ui.st, mv.from);
+  if (ms.indexOf(mv.to) < 0){ setMsg("その手は ルールに あわない。コードを たしかめて。"); return; }
+  commit(mv.from, mv.to);
+  $("incode").value = "";
+  ui.outCode = "";
+  render();
+});
+
+/* ---------- ネット対戦（WebRTC P2P） ---------- */
+
+const CODE_CHARS = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+function randCode(){
+  let s = "";
+  for (let i=0;i<4;i++) s += CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];
+  return s;
+}
+function peerId(code){ return "kv-hv-" + code; }
+
+function netUI(state, text){
+  net.state = state;
+  const dot = $("netdot");
+  dot.className = "dot" + (state==="open" ? " on" : state==="waiting" ? " wait" : (state==="error"||state==="closed") ? " off" : "");
+  $("netmsg").textContent = text;
+  $("netleave").hidden = (state === "idle");
+  $("net-setup").hidden = (state !== "idle");
+  $("mkroom").disabled = (state !== "idle");
+  $("joinroom").disabled = (state !== "idle");
+}
+
+function peerAvailable(){
+  return typeof window.Peer === "function";
+}
+
+function send(obj){
+  try { if (net.conn && net.conn.open) net.conn.send(obj); } catch(_){}
+}
+
+function serialize(st){
+  return {
+    board: st.board.map(p => p ? {o:p.o,k:p.k} : null),
+    turn: st.turn, moveNo: st.moveNo, last: st.last,
+    result: st.result, posCount: st.posCount
+  };
+}
+function deserialize(o){
+  return {
+    board: o.board.map(p => p ? {o:p.o,k:!!p.k} : null),
+    turn: o.turn, moveNo: o.moveNo, last: o.last || null,
+    result: o.result || null, posCount: o.posCount || {}
+  };
+}
+
+function wireConn(conn){
+  net.conn = conn;
+  conn.on("open", () => {
+    netUI("open", net.role === "host" ? "あいてが はいった！" : "つながった！");
+    if (net.role === "host"){
+      ui.st = newGame(); ui.stack = []; ui.outCode = "";
+      send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
+    }
+    render();
+  });
+  conn.on("data", d => {
+    if (!d || typeof d !== "object") return;
+    if (d.t === "state"){
+      // ホストが しんじつ。ゲストは そのまま うけとる
+      ui.st = deserialize(d.st);
+      if (typeof d.hostOwner === "number"){
+        ui.hostOwner = d.hostOwner;
+        ui.myOwner = net.role === "host" ? ui.hostOwner : 1 - ui.hostOwner;
+      }
+      ui.sel = -1; ui.dests = []; ui.msg = "";
+      render();
+    } else if (d.t === "move" && net.role === "host"){
+      const ms = legalFor(ui.st, d.from);
+      if (ui.st.turn !== (1 - ui.hostOwner) || ms.indexOf(d.to) < 0){
+        send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
+        return;
+      }
+      commit(d.from, d.to);
+      send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
+      render();
+    } else if (d.t === "reset"){
+      if (net.role === "host"){
+        ui.st = newGame(); ui.stack = []; ui.outCode = "";
+        send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
+        render();
+      }
+    }
+  });
+  conn.on("close", () => { netUI("closed", "つながりが きれた。もう一度 へやを つくって。"); render(); });
+  conn.on("error", () => { netUI("error", "つうしんエラー。"); render(); });
+}
+
+function makeRoom(){
+  if (!peerAvailable()){
+    netUI("error", "ネット対戦の しくみを よみこめなかった。「コード対戦」を つかって。");
+    return;
+  }
+  const code = randCode();
+  net.role = "host"; net.code = code;
+  ui.myOwner = ui.hostOwner;
+  $("mycode").hidden = false;
+  $("mycode").textContent = code;
+  netUI("waiting", "コードを あいてに おしえて まつ…");
+
+  try { if (net.peer) net.peer.destroy(); } catch(_){}
+  net.peer = new Peer(peerId(code), {debug:0});
+  net.peer.on("open", () => netUI("waiting", "コードを あいてに おしえて まつ…"));
+  net.peer.on("connection", c => wireConn(c));
+  net.peer.on("error", err => {
+    const t = err && err.type;
+    if (t === "unavailable-id"){ makeRoom(); return; }   // コードが かぶった → ひきなおす
+    netUI("error", "つながらなかった（" + (t||"error") + "）。「コード対戦」でも あそべる。");
+  });
+  ui.st = newGame(); ui.stack = []; ui.outCode = "";
+  render();
+}
+
+function joinRoom(){
+  if (!peerAvailable()){
+    netUI("error", "ネット対戦の しくみを よみこめなかった。「コード対戦」を つかって。");
+    return;
+  }
+  const code = ($("joincode").value || "").trim().toUpperCase();
+  if (code.length !== 4){ netUI("idle", "コードは 4文字。"); return; }
+  net.role = "guest"; net.code = code;
+  $("mycode").hidden = true;
+  netUI("waiting", "へやを さがしている…");
+
+  try { if (net.peer) net.peer.destroy(); } catch(_){}
+  net.peer = new Peer({debug:0});
+  net.peer.on("open", () => {
+    const c = net.peer.connect(peerId(code), {reliable:true});
+    wireConn(c);
+  });
+  net.peer.on("error", err => {
+    const t = err && err.type;
+    netUI("error", t === "peer-unavailable"
+      ? "その コードの へやが みつからない。コードを たしかめて。"
+      : "つながらなかった（" + (t||"error") + "）。");
+  });
+}
+
+function leaveRoom(){
+  try { if (net.conn) net.conn.close(); } catch(_){}
+  try { if (net.peer) net.peer.destroy(); } catch(_){}
+  net.conn = null; net.peer = null; net.role = null; net.code = null;
+  ui.myOwner = null;
+  $("mycode").hidden = true;
+  netUI("idle", "まだ つながっていない");
+  render();
+}
+
+$("mkroom").addEventListener("click", makeRoom);
+$("joinroom").addEventListener("click", joinRoom);
+$("netleave").addEventListener("click", leaveRoom);
+$("host0").addEventListener("click", () => setHostOwner(0));
+$("host1").addEventListener("click", () => setHostOwner(1));
+function setHostOwner(o){
+  ui.hostOwner = o;
+  $("host0").setAttribute("aria-pressed", String(o===0));
+  $("host1").setAttribute("aria-pressed", String(o===1));
+}
+$("cs0").addEventListener("click", () => setCodeSide(0));
+$("cs1").addEventListener("click", () => setCodeSide(1));
+function setCodeSide(o){
+  ui.codeSide = o;
+  ui.myOwner = o;
+  $("cs0").setAttribute("aria-pressed", String(o===0));
+  $("cs1").setAttribute("aria-pressed", String(o===1));
+  ui.sel = -1; ui.dests = [];
+  render();
+}
+
+/* ---------- モード ---------- */
+
+function setMode(m){
+  if (m !== "net") leaveRoom();
+  ui.mode = m;
+  $("m-local").setAttribute("aria-pressed", String(m==="local"));
+  $("m-net").setAttribute("aria-pressed", String(m==="net"));
+  $("m-code").setAttribute("aria-pressed", String(m==="code"));
+  $("netpanel").hidden = (m !== "net");
+  $("codepanel").hidden = (m !== "code");
+
+  if (m === "local") ui.myOwner = null;
+  if (m === "code")  ui.myOwner = ui.codeSide;
+
+  ui.st = newGame(); ui.stack = []; ui.sel = -1; ui.dests = []; ui.msg = ""; ui.outCode = "";
+  render();
+}
+$("m-local").addEventListener("click", () => setMode("local"));
+$("m-net").addEventListener("click", () => setMode("net"));
+$("m-code").addEventListener("click", () => setMode("code"));
+
+$("undo").addEventListener("click", () => {
+  if (ui.mode !== "local" || !ui.stack.length) return;
+  ui.st = deserialize(ui.stack.pop());
+  ui.sel = -1; ui.dests = []; ui.msg = "";
+  render();
+});
+
+$("reset").addEventListener("click", () => {
+  if (ui.mode === "net" && net.state === "open" && net.role === "guest"){
+    send({t:"reset"});
+    setMsg("さいしょから やろうと つたえた。");
+    return;
+  }
+  ui.st = newGame(); ui.stack = []; ui.sel = -1; ui.dests = []; ui.msg = ""; ui.outCode = "";
+  if (ui.mode === "net" && net.role === "host" && net.state === "open"){
+    send({t:"state", st: serialize(ui.st), hostOwner: ui.hostOwner});
+  }
+  render();
+});
+
+/* ---------- ほぞん（おなじ画面モードだけ） ---------- */
+
+function save(){
+  if (ui.mode !== "local") return;
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({st: serialize(ui.st), stack: ui.stack}));
+  } catch(_){}
+}
+function load(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return;
+    const o = JSON.parse(raw);
+    if (o && o.st && Array.isArray(o.st.board) && o.st.board.length === 25){
+      ui.st = deserialize(o.st);
+      ui.stack = Array.isArray(o.stack) ? o.stack : [];
+    }
+  } catch(_){}
+}
+
+/* ---------- はじめる ---------- */
+load();
+if (!peerAvailable()) $("m-net").title = "よみこめなかった";
+render();
+</script>
+</body>
+</html>
