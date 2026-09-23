@@ -1,6 +1,6 @@
 {
   "packId": "dlc_suuji",
-  "packVersion": 1,
+  "packVersion": 2,
   "title": "追加ぼうけん：すうじ と きごう",
   "requiresEngine": ">=1.0.0",
   "author": "とうさん",
@@ -525,7 +525,8 @@
           "boss": true,
           "hint": "ゲートキーパー！ てもとを 見ないで うてたら ほんもの。"
         }
-      ]
+      ],
+      "kbhelp": true
     },
     {
       "id": "n_s8",
@@ -592,7 +593,8 @@
           "boss": true,
           "hint": "テンキーの きょじん！ ながい すうじも おちついて。"
         }
-      ]
+      ],
+      "kbhelp": true
     },
     {
       "id": "n_s9",
@@ -678,7 +680,8 @@
           "boss": true,
           "hint": "まじんの しれん！ すうじと きごうを まぜて うつ。"
         }
-      ]
+      ],
+      "kbhelp": true
     },
     {
       "id": "n_s11",

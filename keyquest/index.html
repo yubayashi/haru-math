@@ -1488,7 +1488,7 @@ function recordKey(key, ok, dt){
 /* キーの きろくは たまりつづけるので、ふるい ミスが いつまでも のこる。
    （2026-09-19：れんだで F と J の 正確率が 実力より うんと 低く なった）
    一定量を こえたら 半分に して、**いつも「さいきんの 実力」**が うつるようにする。 */
-const KEYSTAT_CAP = 3000;
+const KEYSTAT_CAP = 1500;
 function decayKeyStats(){
   const tot = Object.values(S.keyStats).reduce((a,v) => a + v.hit + v.miss, 0);
   if (tot < KEYSTAT_CAP) return false;
@@ -2018,7 +2018,7 @@ const B = {
   stage:null, battle:null, bi:0, foe:null, hp:0, mp:0, totalDmg:0,
   combo:0, maxCombo:0, qLeft:0, qTotal:0, typer:null, cast:0, castT:null,
   hits:0, misses:0, perfect:0, qMiss:0, t0:0, active:false,
-  recallUntil:0, recallT:null, readOk:0, readAsk:0,
+  recallUntil:0, recallT:null, recallFirst:false, readOk:0, readAsk:0,
   guard:0, blind:0, mode:"type"
 };
 function startStage(stage){
@@ -2082,10 +2082,11 @@ function nextQuestion(){
      読めなくても 行きどまりに ならない。自力で 打ちきれたら ボーナス。
      早く 出すために キーを おす のは 損（ミス＝てきの こうげき）。
      3回 まちがえたら その問題は あきらめて 教える（typeKey の miss を 見ること）。 */
-  clearTimeout(B.recallT); B.recallT = null; B.recallUntil = 0;
+  clearTimeout(B.recallT); B.recallT = null; B.recallUntil = 0; B.recallFirst = false;
   if (B.stage.recall && p.ask){
     const ms = B.stage.recallMs || 2200;
     B.readAsk++;
+    B.recallFirst = true;            /* 合否は この問題の 1打目で 決める */
     B.recallUntil = Date.now() + ms;
     B.recallT = setTimeout(() => {
       B.recallT = null; B.recallUntil = 0;
@@ -2120,7 +2121,12 @@ function renderQuestion(){
   const mode = S.settings.kb;
   let op = 1;
   if (mode === "off") op = 0;
-  else if (mode === "auto") op = Math.max(0.2, 1 - (B.stage.no||0) * 0.2);
+  /* auto は ステージ番号が すすむほど キーボードを うすくする。
+     ただし **新しい キーを 教える面** では うすく しないこと。
+     すうじステーションの 1面目は no=7 なので 20%＝ **いちばん 助けが ほしい ときに
+     キーボードが 消えていた**（2026-09-24 に 気づいた。数字段は 1打も 練習していない）。
+     ステージに `"kbhelp": true` を 書くと、その面だけ はっきり 出す。 */
+  else if (mode === "auto") op = B.stage.kbhelp ? 1 : Math.max(0.2, 1 - (B.stage.no||0) * 0.2);
   $("b-kbwrap").style.opacity = op; $("b-legend").style.opacity = op;
   const lit = hiding ? null : t.nextKey();      /* ふせている あいだは キーも 光らせない */
   if (op > 0){ litKey(lit); pointHands(lit); }
@@ -2466,7 +2472,7 @@ const MODES = {
 };
 function modeDef(){ return MODES[(B.stage && B.stage.mode) || "kana"] || MODES.kana; }
 function stopModes(){
-  clearTimeout(B.recallT); B.recallT = null; B.recallUntil = 0;
+  clearTimeout(B.recallT); B.recallT = null; B.recallUntil = 0; B.recallFirst = false;
   Object.keys(MODES).forEach(k => MODES[k].stop && MODES[k].stop());
 }
 
@@ -2689,10 +2695,23 @@ function onKey(ch){
 function typeKey(ch){
   const now = Date.now(), dt = lastKeyT ? now - lastKeyT : 0;
   lastKeyT = now;
+  const want = B.typer.nextKey();        /* 打つべきだった キー */
+  /* recall の 合否は **この問題の 1打目だけ** で 決める。
+     「ガイドが 出るまえに 単語を 打ちきる」に すると、1打 約1びょうの 子には
+     2〜3びょうの あいだに 4打 など どうやっても 届かない
+     （2026-09-23 の ログで 0/95。よめて いなかったのでは なく 条件が 不可能だった）。
+     読めたかどうかは 1文字目が 出るかで 足りる。 */
+  const firstOfQ = B.recallFirst;
+  const readAlone = firstOfQ && B.recallUntil > 0 && now < B.recallUntil;
+  if (firstOfQ) B.recallFirst = false;
   const r = B.typer.input(ch);
-  if (r === "ignore") return;
+  if (r === "ignore"){ B.recallFirst = firstOfQ; return; }   /* ん の 二重うちは 1打目に 数えない */
   if (r === "miss"){
-    recordKey(ch, false, dt); B.misses++; B.qMiss++; B.combo = 0;
+    /* **ミスは「押した キー」では なく「打つべきだった キー」に つける。**
+       押した キーに つけると、ほとんど 出題されない キー（; など）に
+       となりを ねらった 打ちそこないだけが たまり、にがてキーの 判定が
+       逆さまに なる（2026-09-23：; は 出題 0 なのに 正確率 63% と 出ていた）。 */
+    recordKey(want || ch, false, dt); B.misses++; B.qMiss++; B.combo = 0;
     B.cast = Math.min(100, B.cast + 6);
     const q = $("b-q"); q.classList.remove("miss"); void q.offsetWidth; q.classList.add("miss");
     msg(S.playerName + "は うちまちがえた！");
@@ -2704,6 +2723,11 @@ function typeKey(ch){
     foeAttack(); renderQuestion(); return;
   }
   recordKey(ch, true, dt); B.hits++;
+  if (readAlone){          /* ガイドが 出るまえに 1文字目を 打てた＝じぶんで 読めた */
+    B.readOk++;
+    B.totalDmg += Math.round(stats().atk * 2);       /* けいけんちの ボーナスに なる */
+    popup("よめた！", "var(--acc)");
+  }
   B.combo++; B.maxCombo = Math.max(B.maxCombo, B.combo);
   B.mp = Math.min(stats().maxMp, B.mp + 0.35);
   B.totalDmg += Math.max(1, Math.round(stats().atk * comboMul() * (1 + bondOf(ch)/20)));
@@ -2711,13 +2735,6 @@ function typeKey(ch){
   if (B.combo > 0 && B.combo % 10 === 0) popup("COMBO ×" + comboMul().toFixed(1));
   renderQuestion(); renderBattle();
   if (r === "done"){
-    /* ガイドが 出るまえに 打ちきった＝自分で 読めた */
-    const readAlone = B.recallUntil > 0 && Date.now() < B.recallUntil;
-    if (readAlone){
-      B.readOk++;
-      B.totalDmg += Math.round(stats().atk * 2);       /* けいけんちの ボーナスに なる */
-      popup("よめた！", "var(--acc)");
-    }
     hitFoe();
     const dealt = Math.max(1, Math.round(stats().atk * comboMul() * B.typer.units.length));
     popup("-" + dealt, "#fff");
@@ -2757,7 +2774,11 @@ function defeatFoe(){
   S.gold += gainGold;
   const lvups = [];
   while (S.exp >= expToNext(S.lv)){ S.exp -= expToNext(S.lv); S.lv++; lvups.push(S.lv); }
-  SPIRITS.forEach(s => S.spirits[s.key].bond = bondOf(s.key));
+  /* きずなは **下がらない**。ここを 生の 代入に すると、finishStage の Math.max を
+     1体 たおすたびに 上書きしてしまい、decayKeyStats で 記録を 半分に した あと
+     覚えた じゅもんを 失う（2026-09-23 に セレネスター／ライトハンド・ストーム／
+     エイトスピリット・ノヴァ が 実際に 消えた）。**Math.max を はずさないこと。** */
+  SPIRITS.forEach(s => S.spirits[s.key].bond = Math.max(S.spirits[s.key].bond || 0, bondOf(s.key)));
   save();
   setTimeout(() => {
     B.bi++;
@@ -2837,6 +2858,10 @@ function finishStage(){
                ids:   allCards().filter(c => haveCard(c.id)).map(c => c.id).join(" "),
                names: allCards().filter(c => haveCard(c.id)).map(c => c.name).join(" / ") },
       bonds: SPIRITS.map(x => x.key + ":" + S.spirits[x.key].bond).join(" "),
+      /* せっていも 送る。2026-09-23 の「いみの とびら」（正確率46%）が
+         ガイドを 消して 遊んだ せいなのか 分からず じまいに なったため。 */
+      settings: { hint: S.settings.hint, kb: S.settings.kb,
+                  homecheck: S.settings.homecheck, layout: S.settings.layout },
       home: HOME_LAST, keyStats: S.keyStats,
       recall: B.readAsk ? { ok: B.readOk, n: B.readAsk } : null }
   );

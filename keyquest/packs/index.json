@@ -1,6 +1,6 @@
 {
-  "catalogVersion": 3,
-  "updated": "2026-09-20",
+  "catalogVersion": 4,
+  "updated": "2026-09-24",
   "packs": [
     {
       "packId": "dlc_dakuon_youon",
@@ -62,9 +62,8 @@
       "title": "すうじステーション",
       "stages": 5,
       "order": 90,
-      "hidden": true,
-      "desc": "すうじ 1〜0 と きごう . , - 。アルファベットに なれてから 出す（2026-09-07 いったん 取り下げ）",
-      "version": 1
+      "desc": "すうじ 1〜0 と きごう . , - 。アルファベット王国を こえた きみへ。",
+      "version": 2
     }
   ]
 }
