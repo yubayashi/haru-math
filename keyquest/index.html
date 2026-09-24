@@ -363,8 +363,10 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
 .wm-node .mdl1{border-color:#a86a3a;color:#d89a5a}
 .wm-node .mdl2{border-color:#9aa0b8;color:#d8dcec}
 .wm-node .mdl3{border-color:#c8a018;color:#ffe14a}
+/* **名前の 下に 置くこと（display:block）。** よこ に ならべると 地図の 右はしの
+   地点で 画面の そとに 切れて、メダルが 付いていない ように 見える（2026-09-24） */
 .wm-node .lb2{font-size:10px;background:#000;border:2px solid #4a4a78;padding:0 5px;
-  white-space:nowrap;margin-top:2px;display:inline-block;color:var(--sub)}
+  white-space:nowrap;margin:2px auto 0;display:block;width:fit-content;color:var(--sub)}
 .wm-node.ghost .lb{border-color:#4a4a78;color:#8a8ab0}
 .wm-node.ghost .qm{font-size:25px;line-height:1;color:#5f6f96;text-shadow:2px 2px 0 #000}
 .wm-node.ghost.soon{cursor:default}
@@ -1102,7 +1104,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.2.0";
+const ENGINE_VERSION = "1.3.0";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -1521,7 +1523,11 @@ function decayKeyStats(){
    （recall つきの 漢字面は 待ち時間が あるので 構造的に 43もじ/分 あたりが 上限、
     みじかい ポルトガル語なら 100を こえる）。同じ ものさしで 切ると 一生 金が 出ない面が できる。
    速さは「じぶんの さいこう記録」として **自分と くらべる**。 */
-function medalOf(acc){ return acc >= 1 ? 3 : acc >= 0.95 ? 2 : 1; }
+/* しきい値は 息子の 実測から 決める。23回ぶんの 正確率は 中央値94%、
+   ノーミスは **23回に 2回**しか 出なかった＝金が 遠すぎた（2026-09-24 に 下げた）。
+   いま：ぎん93% は だいたい 取れる、きん97% は ねらえば 届く。 */
+const MEDAL_ACC = [0, 0, 0.93, 0.97];      /* [_, どう, ぎん, きん] */
+function medalOf(acc){ return acc >= MEDAL_ACC[3] ? 3 : acc >= MEDAL_ACC[2] ? 2 : 1; }
 const MEDAL_NAME = ["", "どう", "ぎん", "きん"];
 function stageBest(stageId){
   const st = CONTENT.stages.filter(x => x.id === stageId)[0];
@@ -2884,6 +2890,10 @@ function finishStage(){
     MEDAL_NAME[medalOf(acc)] + "</b> に なった！</p>";
   if (!first && !newCpm) html += '<p class="muted">この面の さいこう そくどは ' + bst.cpm +
     " もじ/ふん（メダル " + MEDAL_NAME[medalOf(bst.acc)] + "）</p>";
+  /* つぎの めあてを 出す。あと どれだけで 上がるか 分からないと ねらえない */
+  const m = medalOf(bst.acc);
+  if (m < 3) html += '<p class="muted">せいかくさ ' + (MEDAL_ACC[m+1]*100) + "% で メダルが " +
+    MEDAL_NAME[m+1] + " に なる（いまの さいこうは " + (bst.acc*100).toFixed(1) + "%）</p>";
   SPIRITS.filter(s => S.spirits[s.key].bond > bondBefore[s.key]).forEach(s =>
     html += '<p style="color:var(--acc)">◆ ' + s.name + " との きずなが Lv." + S.spirits[s.key].bond + " に あがった！</p>");
   allSpells().filter(sp => spellUsable(sp) && !Array.from(sp.seq).every(k => bondBefore[k] >= sp.bond))
@@ -3729,7 +3739,8 @@ function renderStatus(){
     "<tr><th>もちきん</th><td>Ｇ " + S.gold + "</td></tr>" +
     "<tr><th>さいこう そくど</th><td>" + S.records.bestWpm + " もじ/ふん</td></tr>" +
     "<tr><th>さいこう せいかくさ</th><td>" + (S.records.bestAcc*100).toFixed(1) + " %</td></tr>" +
-    "<tr><th>いままでに うった かず</th><td>" + lifeKeys().toLocaleString() + " だげん</td></tr>";
+    "<tr><th>いままでに うった かず</th><td>" + lifeKeys().toLocaleString() + " だげん</td></tr>" +
+    '<tr><th>バージョン</th><td class="muted">' + ENGINE_VERSION + "</td></tr>";
 
   $("st-equip").innerHTML = ["weapon","armor","accessory"].map(slot => {
     const jp = {weapon:"ぶき", armor:"ぼうぐ", accessory:"アクセサリ"}[slot];
@@ -3834,7 +3845,7 @@ function installPack(text){
   if (!mergePack(p)){ toast("その コンテンツは もう はいっているよ"); return; }
   const list = storedPacks().filter(x => x.packId !== p.packId);
   list.push(p); persistPacks(list);
-  if (!S.packProgress[p.packId]) S.packProgress[p.packId] = {cleared:[]};
+  if (!S.packProgress[p.packId]) S.packProgress[p.packId] = {cleared:[], best:{}};
   curWorld = p.packId; mapMode = "global";     /* 世界が広がったことが 見てわかるように */
   if (typeof CATALOG !== "undefined" && CATALOG) showNewPackBanner();
   save(); renderPacks(); renderMap();
