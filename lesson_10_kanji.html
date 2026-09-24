@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ことばの ちから チェック</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d; background: #f5f5f5;
+    font-size: 15px; line-height: 1.8; padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #8e6bd4, #5aa9e6);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title { font-size: 17px; font-weight: 900; margin-bottom: 12px; }
+  .card p { margin-bottom: 10px; }
+  .note { font-size: 13px; color: #777; line-height: 2; }
+  code { background: #f2f2f2; padding: 1px 6px; border-radius: 4px; font-size: 13px; }
+
+  .progress-wrap { margin: 10px 0 0; }
+  .progress-bar { height: 8px; background: #e6e6e6; border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #8e6bd4, #5aa9e6); transition: width .25s; }
+  .progress-text { font-size: 12px; color: #888; text-align: right; margin-top: 4px; }
+
+  .stage-tag {
+    display: inline-block; background: #f0eaff; border: 1px solid #d9c9f5;
+    border-radius: 6px; padding: 2px 12px; font-size: 12px;
+    font-weight: 700; color: #6b4fa8; margin-bottom: 14px;
+  }
+
+  .word {
+    text-align: center; font-size: 64px; font-weight: 900;
+    color: #2c3e50; letter-spacing: 6px;
+    margin: 18px 0 8px; line-height: 1.2;
+    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  }
+  .word-hint { text-align: center; font-size: 13px; color: #aaa; margin-bottom: 18px; }
+
+  input[type=text] {
+    width: 100%; font-family: 'Nunito', sans-serif; font-size: 22px;
+    padding: 12px 14px; border: 2px solid #ddd; border-radius: 10px;
+    text-align: center; outline: none;
+  }
+  input[type=text]:focus { border-color: #8e6bd4; }
+  .kana-preview { text-align: center; font-size: 20px; color: #5aa9e6; font-weight: 700; min-height: 30px; margin-top: 8px; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+  button {
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 16px;
+    border: none; border-radius: 10px; padding: 14px; cursor: pointer;
+    transition: transform .06s;
+  }
+  button:active { transform: scale(.98); }
+  .btn-next { flex: 2; background: linear-gradient(135deg, #8e6bd4, #5aa9e6); color: #fff; }
+  .btn-skip { flex: 1; background: #eee; color: #888; }
+  .btn-start { width: 100%; background: linear-gradient(135deg, #8e6bd4, #5aa9e6); color: #fff; padding: 16px; font-size: 17px; }
+
+  .done-emoji { text-align: center; font-size: 56px; margin: 10px 0; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <span class="badge">よみかた チェック</span>
+    <h1>ことばの ちから チェック</h1>
+    <div class="sub">ぜんぶで 80もん ／ じかん せいげん なし</div>
+  </div>
+
+  <div class="card" id="intro">
+    <div class="card-title">📝 やりかた</div>
+    <p class="note">
+      ・かんじの <strong>よみかた</strong>を うちます。ローマじ でも ひらがな でも OK<br>
+      ・れい： <strong>完成</strong> → <code>kansei</code> または <code>かんせい</code><br>
+      ・1もんずつ すすみます。もどれません。まちがえても きにしないで<br>
+      ・こたえは おしえません（テストじゃないので）<br>
+      ・じかんは はかりません。ゆっくりで だいじょうぶ<br>
+      ・<strong>しらべるのは なし</strong>。しらべちゃうと はかれなくなっちゃう
+    </p>
+    <button class="btn-start" onclick="start()">はじめる</button>
+  </div>
+
+  <div class="card hidden" id="interstitial">
+    <div class="done-emoji" id="inter-emoji">🎈</div>
+    <div class="card-title" style="text-align:center" id="inter-title"></div>
+    <p style="text-align:center" class="note" id="inter-sub"></p>
+    <button class="btn-start" onclick="nextStage()">つぎへ</button>
+  </div>
+
+  <div class="card hidden" id="quiz">
+    <span class="stage-tag" id="stage-tag"></span>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="fill"></div></div>
+      <div class="progress-text" id="ptext"></div>
+    </div>
+    <div class="word" id="word"></div>
+    <div class="word-hint">この ことばの よみかたを うってね</div>
+    <input type="text" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ローマじ または ひらがな">
+    <div class="kana-preview" id="preview"></div>
+    <div class="btn-row">
+      <button class="btn-skip" onclick="skip()">わからない</button>
+      <button class="btn-next" onclick="next()">つぎへ →</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="done">
+    <div class="done-emoji">🎉</div>
+    <div class="card-title" style="text-align:center">おつかれさま！</div>
+    <p style="text-align:center">ぜんぶ おくったよ。ありがとう。</p>
+    <p style="text-align:center" class="note" id="done-note"></p>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+/* ---------- 出題データ ---------- */
+const STAGES = [
+  { key: 'g4', tag: '小4のことば', emoji: '🌿', items: [
+    ['完成','かんせい'],['努力','どりょく'],['観察','かんさつ'],['結果','けっか'],
+    ['必要','ひつよう'],['季節','きせつ'],['印刷','いんさつ'],['協力','きょうりょく'],
+    ['改良','かいりょう'],['機械','きかい'],['健康','けんこう'],['関連','かんれん'],
+    ['競争','きょうそう'],['貯金','ちょきん'],['順番','じゅんばん'],['徒歩','とほ'],
+    ['満足','まんぞく'],['給食','きゅうしょく'],['希望','きぼう'],['卒業','そつぎょう']
+  ]},
+  { key: 'g5', tag: '小5のことば', emoji: '🌳', items: [
+    ['貿易','ぼうえき'],['講演','こうえん'],['適切','てきせつ'],['志望','しぼう'],
+    ['複雑','ふくざつ'],['許可','きょか'],['効率','こうりつ'],['統計','とうけい'],
+    ['義務','ぎむ'],['判断','はんだん'],['保護','ほご'],['資格','しかく'],
+    ['態度','たいど'],['豊富','ほうふ'],['情報','じょうほう'],['限界','げんかい'],
+    ['解決','かいけつ'],['経験','けいけん'],['確認','かくにん'],['輸入','ゆにゅう']
+  ]},
+  { key: 'g6', tag: '小6のことば', emoji: '⛰️', items: [
+    ['供給','きょうきゅう'],['批判','ひはん'],['憲法','けんぽう'],['誤差','ごさ'],
+    ['従来','じゅうらい'],['遺産','いさん'],['沿岸','えんがん'],['認識','にんしき'],
+    ['専門','せんもん'],['単純','たんじゅん'],['優先','ゆうせん'],['系統','けいとう'],
+    ['探検','たんけん'],['蒸気','じょうき'],['垂直','すいちょく'],['討論','とうろん'],
+    ['著者','ちょしゃ'],['呼吸','こきゅう'],['磁石','じしゃく'],['模型','もけい']
+  ]},
+  { key: 'jh', tag: 'おとなの ことば', emoji: '🌌', items: [
+    ['把握','はあく'],['概念','がいねん'],['顕著','けんちょ'],['抑制','よくせい'],
+    ['頻繁','ひんぱん'],['漠然','ばくぜん'],['曖昧','あいまい'],['妥当','だとう'],
+    ['緻密','ちみつ'],['循環','じゅんかん'],['促進','そくしん'],['矛盾','むじゅん'],
+    ['抽象','ちゅうしょう'],['普遍','ふへん'],['慎重','しんちょう'],['隔離','かくり'],
+    ['崩壊','ほうかい'],['逸脱','いつだつ'],['遭遇','そうぐう'],['累積','るいせき']
+  ]}
+];
+
+/* ---------- ローマ字 → ひらがな ---------- */
+const R3 = {
+  kya:'きゃ', kyu:'きゅ', kyo:'きょ', gya:'ぎゃ', gyu:'ぎゅ', gyo:'ぎょ',
+  sha:'しゃ', shu:'しゅ', sho:'しょ', sya:'しゃ', syu:'しゅ', syo:'しょ',
+  cha:'ちゃ', chu:'ちゅ', cho:'ちょ', tya:'ちゃ', tyu:'ちゅ', tyo:'ちょ',
+  nya:'にゃ', nyu:'にゅ', nyo:'にょ', hya:'ひゃ', hyu:'ひゅ', hyo:'ひょ',
+  mya:'みゃ', myu:'みゅ', myo:'みょ', rya:'りゃ', ryu:'りゅ', ryo:'りょ',
+  bya:'びゃ', byu:'びゅ', byo:'びょ', pya:'ぴゃ', pyu:'ぴゅ', pyo:'ぴょ',
+  jya:'じゃ', jyu:'じゅ', jyo:'じょ', zya:'じゃ', zyu:'じゅ', zyo:'じょ',
+  shi:'し', chi:'ち', tsu:'つ'
+};
+const R2 = {
+  ka:'か', ki:'き', ku:'く', ke:'け', ko:'こ',
+  sa:'さ', si:'し', su:'す', se:'せ', so:'そ',
+  ta:'た', ti:'ち', tu:'つ', te:'て', to:'と',
+  na:'な', ni:'に', nu:'ぬ', ne:'ね', no:'の',
+  ha:'は', hi:'ひ', hu:'ふ', fu:'ふ', he:'へ', ho:'ほ',
+  ma:'ま', mi:'み', mu:'む', me:'め', mo:'も',
+  ya:'や', yu:'ゆ', yo:'よ',
+  ra:'ら', ri:'り', ru:'る', re:'れ', ro:'ろ',
+  wa:'わ', wo:'を',
+  ga:'が', gi:'ぎ', gu:'ぐ', ge:'げ', go:'ご',
+  za:'ざ', zi:'じ', ji:'じ', zu:'ず', ze:'ぜ', zo:'ぞ',
+  da:'だ', di:'ぢ', du:'づ', de:'で', do:'ど',
+  ba:'ば', bi:'び', bu:'ぶ', be:'べ', bo:'ぼ',
+  pa:'ぱ', pi:'ぴ', pu:'ぷ', pe:'ぺ', po:'ぽ',
+  ja:'じゃ', ju:'じゅ', jo:'じょ'
+};
+const R1 = { a:'あ', i:'い', u:'う', e:'え', o:'お' };
+const VOWELS = ['a','i','u','e','o','n'];
+
+function toKana(src) {
+  var s = (src || '')
+    .replace(/[Ａ-Ｚａ-ｚ]/g, function (c) {
+      return String.fromCharCode(c.charCodeAt(0) - 0xFEE0);
+    })
+    .replace(/[\s・ー－-]/g, '')
+    .toLowerCase();
+  var out = '', i = 0;
+  while (i < s.length) {
+    var c = s.charAt(i);
+    if (/[ぁ-ゖ]/.test(c)) { out += c; i++; continue; }              // ひらがなは素通し
+    if (/[ァ-ヶ]/.test(c)) {                                          // カタカナはひらがなへ
+      out += String.fromCharCode(c.charCodeAt(0) - 0x60); i++; continue;
+    }
+    if (i + 1 < s.length && c === s.charAt(i + 1) && VOWELS.indexOf(c) === -1) {
+      out += 'っ'; i++; continue;                                             // 促音
+    }
+    var t3 = s.substr(i, 3), t2 = s.substr(i, 2);
+    if (R3[t3]) { out += R3[t3]; i += 3; continue; }
+    if (R2[t2]) { out += R2[t2]; i += 2; continue; }
+    if (c === 'n') {
+      // n の扱い：na/ni/nya 等は上の R2/R3 で確定済み。ここに来るのは「ん」のケース
+      if (s.charAt(i + 1) === 'n') {
+        var after = s.charAt(i + 2);
+        // "nna" のように母音/y が続くなら「ん」＋な行（n を1つだけ消費）
+        if (after && 'aiueoy'.indexOf(after) !== -1) { out += 'ん'; i += 1; }
+        else { out += 'ん'; i += 2; }   // IME式の "nn" = ん
+      } else { out += 'ん'; i += 1; }   // 子音の前 / 語末の n = ん
+      continue;
+    }
+    if (R1[c]) { out += R1[c]; i++; continue; }
+    out += c; i++;                                                            // 判定不能はそのまま
+  }
+  return out;
+}
+
+/* ---------- 進行 ---------- */
+var si = 0, qi = 0, qno = 0, t0 = 0;
+var TOTAL = STAGES.reduce(function (n, s) { return n + s.items.length; }, 0);
+var results = {};
+
+function $(id) { return document.getElementById(id); }
+function show(id) { $(id).classList.remove('hidden'); }
+function hide(id) { $(id).classList.add('hidden'); }
+
+function start() { hide('intro'); si = 0; qi = 0; show('quiz'); render(); }
+
+function render() {
+  var st = STAGES[si], it = st.items[qi];
+  $('stage-tag').textContent = st.tag;
+  $('word').textContent = it[0];
+  $('ans').value = '';
+  $('preview').textContent = '';
+  $('fill').style.width = (qno / TOTAL * 100) + '%';
+  $('ptext').textContent = (qno + 1) + ' / ' + TOTAL;
+  $('ans').focus();
+  t0 = Date.now();
+}
+
+function record(skipped) {
+  var st = STAGES[si], it = st.items[qi];
+  var raw = $('ans').value.trim();
+  var kana = skipped ? '' : toKana(raw);
+  results['q' + (qno + 1)] = {
+    grade: st.key,
+    word: it[0],
+    expect: it[1],
+    raw: skipped ? '' : raw,
+    kana: kana,
+    ok: (!skipped && kana === it[1]),
+    skipped: !!skipped,
+    ms: Date.now() - t0
+  };
+  qno++;
+  qi++;
+  if (qi >= st.items.length) {
+    qi = 0; si++;
+    if (si >= STAGES.length) { finish(); return; }
+    hide('quiz');
+    $('inter-emoji').textContent = STAGES[si].emoji;
+    $('inter-title').textContent = STAGES[si].tag + 'に すすむよ';
+    $('inter-sub').textContent = 'ここから すこし むずかしくなります。わからなくて ふつうです。';
+    show('interstitial');
+    return;
+  }
+  render();
+}
+
+function next() { if ($('ans').value.trim() === '') { skip(); return; } record(false); }
+function skip() { record(true); }
+function nextStage() { hide('interstitial'); show('quiz'); render(); }
+
+$('ans').addEventListener('input', function (e) { $('preview').textContent = toKana(e.target.value); });
+$('ans').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); next(); }   // IME変換中のEnterは無視
+});
+
+function finish() {
+  hide('quiz'); hide('interstitial');
+  var sum = {};
+  STAGES.forEach(function (s) { sum[s.key] = { ok: 0, skipped: 0, n: s.items.length }; });
+  Object.keys(results).forEach(function (k) {
+    var r = results[k];
+    if (r.ok) sum[r.grade].ok++;
+    if (r.skipped) sum[r.grade].skipped++;
+  });
+  results['_summary'] = sum;
+  results['_meta'] = { total: TOTAL, finishedAt: new Date().toISOString() };
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      lesson: 'lesson_10_kanji',
+      timestamp: new Date().toISOString(),
+      answers: results
+    })
+  }).catch(function () {});
+
+  $('done-note').textContent = '80もん ぜんぶ こたえたよ。';
+  show('done');
+}
+</script>
+</body>
+</html>
