@@ -359,6 +359,9 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
 .wm-node .ico{position:relative}
 .wm-node .star{position:absolute;right:-9px;top:-11px;font-size:18px;color:#ffe14a;
   text-shadow:2px 2px 0 #000, 0 0 7px rgba(255,225,74,.85);pointer-events:none}
+/* メダルは ★と おなじ かどに 出す（★の かわり） */
+.wm-node .mdlb{position:absolute;right:-11px;top:-13px;line-height:0;pointer-events:none;
+  filter:drop-shadow(1px 1px 0 #000) drop-shadow(0 0 4px rgba(0,0,0,.8))}
 /* メダル（正確率で 決まる）。どう / ぎん / きん */
 .wm-node .mdl1{border-color:#a86a3a;color:#d89a5a}
 .wm-node .mdl2{border-color:#9aa0b8;color:#d8dcec}
@@ -1104,7 +1107,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.3.0";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
+const ENGINE_VERSION = "1.3.1";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -1529,6 +1532,19 @@ function decayKeyStats(){
 const MEDAL_ACC = [0, 0, 0.93, 0.97];      /* [_, どう, ぎん, きん] */
 function medalOf(acc){ return acc >= MEDAL_ACC[3] ? 3 : acc >= MEDAL_ACC[2] ? 2 : 1; }
 const MEDAL_NAME = ["", "どう", "ぎん", "きん"];
+/* メダルの ドット絵。1=ふちどり 2=リボン 3=メダル本体 4=ハイライト。
+   ミラーは つかわない（m なし）＝8列 そのまま。地図では scale 2 で 16×18px。 */
+const MEDAL_ART = [null,
+  /* リボンは 2ドット幅。1ドットだと 16pxに して 見えない（2026-09-24 に 太くした） */
+  {c:["#4a2a12","#2a6a3a","#c87a3a","#e8a868"], d:[     /* どう */
+   "22....22","22....22",".22..22.","..1111..",".134431.",
+   "13443331","13333331",".133331.","..1111.."]},
+  {c:["#3a4050","#3a6ab0","#d8dce8","#ffffff"], d:[     /* ぎん */
+   "22....22","22....22",".22..22.","..1111..",".134431.",
+   "13443331","13333331",".133331.","..1111.."]},
+  {c:["#6a4a00","#c03030","#ffd24a","#fff0a0"], d:[     /* きん */
+   "22....22","22....22",".22..22.","..1111..",".134431.",
+   "13443331","13333331",".133331.","..1111.."]}];
 function stageBest(stageId){
   const st = CONTENT.stages.filter(x => x.id === stageId)[0];
   const pp = st && S.packProgress[st.packId];
@@ -3460,13 +3476,18 @@ function renderWorld(){
     html += '<div class="wm-node ' + (o.cleared ? "done" : o.open ? (isNext ? "next" : "") : "lock") +
       '" data-s="' + st.id + '" style="left:' + st.pos[0] + '%;top:' + st.pos[1] + '%">' +
       '<div class="ico">' + (e ? pixelArt(e.px, 2) : "") +
-        (o.cleared ? '<b class="star">★</b>' : "") + "</div>" +
+        (function(){
+          /* メダルが あれば **★の かわりに** メダル。まだ 記録の ない面（この しくみを
+             入れる まえに クリアした面）は これまでどおり ★ を 出す */
+          const b = o.cleared && stageBest(st.id);
+          if (b) return '<b class="mdlb">' + pixelArt(MEDAL_ART[medalOf(b.acc)], 2) + "</b>";
+          return o.cleared ? '<b class="star">★</b>' : "";
+        })() + "</div>" +
       '<div class="lb">' + (o.cleared ? "✔ " : o.open ? "" : "× ") + st.name + "</div>" +
-      (function(){                       /* クリアずみの面だけ メダルと じぶんの さいこう そくど */
+      (function(){                       /* じぶんの さいこう そくど（メダルの 種類は 絵で 分かる） */
         const b = o.cleared && stageBest(st.id);
         if (!b) return "";
-        const m = medalOf(b.acc);
-        return '<div class="lb2 mdl' + m + '">' + MEDAL_NAME[m] + " ・ " + b.cpm + "</div>";
+        return '<div class="lb2 mdl' + medalOf(b.acc) + '">' + b.cpm + " もじ</div>";
       })() + "</div>";
   });
   /* 主人公は「次に挑む地点」に立つ。全部クリアなら最後の地点 */
