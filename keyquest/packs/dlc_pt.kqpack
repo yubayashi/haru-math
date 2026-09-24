@@ -1,0 +1,627 @@
+{
+  "packId": "dlc_pt",
+  "packVersion": 1,
+  "title": "ポルトガルの みち",
+  "requiresEngine": ">=1.2.0",
+  "author": "とうさん",
+  "world": {
+    "name": "ポルトガルの みち",
+    "style": "azul",
+    "recLv": 14,
+    "order": 60
+  },
+  "enemies": [
+    {
+      "id": "pt_sardinha",
+      "name": "いわしの ばけもの",
+      "hp": 100,
+      "atk": 20,
+      "exp": 96,
+      "gold": 60,
+      "px": {
+        "c": [
+          "#0e2430",
+          "#8ac0d8",
+          "#4a8aa8",
+          "#ffffff"
+        ],
+        "m": true,
+        "d": [
+          "........",
+          "........",
+          "......11",
+          "....1122",
+          "...12222",
+          "..122222",
+          "11224422",
+          "11224422",
+          "11222222",
+          ".1233332",
+          "..122222",
+          "...12222",
+          "....1122",
+          "......11",
+          "........",
+          "........"
+        ]
+      }
+    },
+    {
+      "id": "pt_galo",
+      "name": "バルセロスの おんどり",
+      "hp": 108,
+      "atk": 22,
+      "exp": 104,
+      "gold": 64,
+      "px": {
+        "c": [
+          "#1a1010",
+          "#f0f0f0",
+          "#e03a3a",
+          "#f0c030"
+        ],
+        "m": true,
+        "d": [
+          "......13",
+          ".....133",
+          "....1333",
+          "....1111",
+          "...11111",
+          "...12111",
+          "...11144",
+          "...11111",
+          "..111111",
+          ".1111111",
+          ".1111111",
+          ".1111111",
+          "..111111",
+          "...11111",
+          "....4..4",
+          "....4..4"
+        ]
+      }
+    },
+    {
+      "id": "pt_azulejo",
+      "name": "タイルの まもの",
+      "hp": 94,
+      "atk": 19,
+      "exp": 90,
+      "gold": 58,
+      "px": {
+        "c": [
+          "#1a3a6a",
+          "#e8f0f8",
+          "#3a6ab0",
+          "#7aa8e0"
+        ],
+        "m": true,
+        "d": [
+          "11111111",
+          "12222222",
+          "12222222",
+          "12222332",
+          "12223443",
+          "12233444",
+          "12234444",
+          "12234444",
+          "12234444",
+          "12233444",
+          "12223443",
+          "12222332",
+          "12222222",
+          "12222222",
+          "12222222",
+          "11111111"
+        ]
+      }
+    },
+    {
+      "id": "ptb_caravela",
+      "name": "カラベルせん",
+      "hp": 225,
+      "atk": 27,
+      "exp": 245,
+      "gold": 160,
+      "boss": true,
+      "px": {
+        "c": [
+          "#2a1a0e",
+          "#e8e0d0",
+          "#a8845a",
+          "#c03030"
+        ],
+        "m": true,
+        "d": [
+          "......11",
+          ".....122",
+          "....1222",
+          "...12222",
+          "..122222",
+          ".1224422",
+          "..122222",
+          "...12222",
+          "....1222",
+          ".....122",
+          "......11",
+          "33333333",
+          "33333333",
+          ".3333333",
+          "..333333",
+          "...11111"
+        ]
+      }
+    },
+    {
+      "id": "ptb_polvo",
+      "name": "たこの ぬし",
+      "hp": 240,
+      "atk": 29,
+      "exp": 262,
+      "gold": 172,
+      "boss": true,
+      "px": {
+        "c": [
+          "#2a0e28",
+          "#c05ab0",
+          "#8a2a78",
+          "#ffe8a0"
+        ],
+        "m": true,
+        "d": [
+          "....1111",
+          "..112222",
+          ".1222222",
+          ".1222222",
+          ".1244222",
+          ".1244222",
+          ".1222222",
+          ".1233332",
+          ".1222222",
+          "..122222",
+          "..122222",
+          ".1212122",
+          "12121212",
+          "1.1.1.12",
+          "1.1.1.11",
+          ".1.1.1.1"
+        ]
+      }
+    },
+    {
+      "id": "ptb_torre",
+      "name": "ベレンの とう",
+      "hp": 255,
+      "atk": 30,
+      "exp": 280,
+      "gold": 182,
+      "boss": true,
+      "px": {
+        "c": [
+          "#3a3a30",
+          "#e0dcc8",
+          "#a8a490",
+          "#6a8ab0"
+        ],
+        "m": true,
+        "d": [
+          "...1..1.",
+          "...1111.",
+          "..111111",
+          "..122222",
+          "..123322",
+          "..122222",
+          ".1222222",
+          ".1222222",
+          ".1233322",
+          ".1222222",
+          "12222222",
+          "12222222",
+          "12233322",
+          "12222222",
+          "12222222",
+          "11111111"
+        ]
+      }
+    },
+    {
+      "id": "ptb_navegador",
+      "name": "だいこうかいの ふなのり",
+      "hp": 290,
+      "atk": 32,
+      "exp": 330,
+      "gold": 220,
+      "boss": true,
+      "px": {
+        "c": [
+          "#1a1420",
+          "#2a4a8a",
+          "#e0b088",
+          "#f0e8d0"
+        ],
+        "m": true,
+        "d": [
+          "....1111",
+          "..112222",
+          ".1222222",
+          ".1111111",
+          "...13333",
+          "...13133",
+          "...13333",
+          "...11333",
+          "..122222",
+          ".1222222",
+          "12222222",
+          "12244222",
+          "12222222",
+          ".1222222",
+          "..12..12",
+          "..11..11"
+        ]
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "w_espada",
+      "type": "weapon",
+      "name": "カラベルの けん",
+      "atk": 33,
+      "price": 5600
+    },
+    {
+      "id": "a_azulejo",
+      "type": "armor",
+      "name": "アズレージョの よろい",
+      "def": 24,
+      "price": 5200
+    },
+    {
+      "id": "ac_bussola",
+      "type": "accessory",
+      "name": "ふるい コンパス",
+      "agi": 24,
+      "price": 4900
+    },
+    {
+      "id": "i_nata",
+      "type": "tool",
+      "name": "パステル・デ・ナタ",
+      "effect": "full",
+      "power": 1,
+      "price": 300,
+      "desc": "HPとMPを ぜんかいふく"
+    }
+  ],
+  "cards": [
+    {
+      "id": "cd_pt_l",
+      "name": "L の キー",
+      "rarity": "SR",
+      "type": "キーボード",
+      "art": "enemy:ptb_caravela",
+      "tip": "日本語を ローマ字で うつと、L は ほとんど 出てこない。でも ポルトガル語や 英語では とても よく 出る。だから L が 苦手な まま に なりやすい。この島で かせいでおくと あとが らく。"
+    },
+    {
+      "id": "cd_pt_galo",
+      "name": "バルセロスの おんどり",
+      "rarity": "R",
+      "type": "ポルトガル",
+      "art": "enemy:pt_galo",
+      "tip": "ポルトガルの おみやげで いちばん 有名な おんどり。むかし、ころされそうな 人の むじつを しょうめいするため、こんがり やけた おんどりが 立ちあがって ないた、という はなしから。"
+    },
+    {
+      "id": "cd_pt_azulejo",
+      "name": "アズレージョ",
+      "rarity": "R",
+      "type": "ポルトガル",
+      "art": "enemy:pt_azulejo",
+      "tip": "ポルトガルの まちの かべを おおう 青い タイル。もとは アラビア語の「みがいた 小石」から きた ことば。駅や 教会の かべに 大きな 絵が かいてある。"
+    },
+    {
+      "id": "cd_pt_nata",
+      "name": "パステル・デ・ナタ",
+      "rarity": "SR",
+      "type": "ポルトガル",
+      "art": "enemy:ptb_torre",
+      "tip": "ベレンの しゅうどういんで 生まれた たまごの タルト。しゅうどうしが 服に のりを つけるのに 卵白を つかい、あまった 黄身で おかしを 作ったのが はじまり。"
+    }
+  ],
+  "wordlists": [
+    {
+      "id": "wl_pt1",
+      "entries": [
+        "bola",
+        "sol",
+        "azul",
+        "flor",
+        "livro",
+        "leite",
+        "lua",
+        "luz",
+        "sal",
+        "mel",
+        "gelo",
+        "fila",
+        "vela",
+        "mala",
+        "cola",
+        "pele",
+        "vale",
+        "bolo",
+        "lata",
+        "lago",
+        "lado",
+        "letra",
+        "faca",
+        "fogo",
+        "fruta",
+        "fome",
+        "vaca",
+        "voz"
+      ]
+    },
+    {
+      "id": "wl_pt2",
+      "entries": [
+        "coelho",
+        "cavalo",
+        "girafa",
+        "formiga",
+        "abelha",
+        "macaco",
+        "galinha",
+        "ovelha",
+        "baleia",
+        "lobo",
+        "raposa",
+        "cegonha",
+        "camelo",
+        "zebra",
+        "aranha",
+        "minhoca",
+        "peixe",
+        "corvo",
+        "elefante",
+        "borboleta",
+        "golfinho",
+        "tartaruga",
+        "crocodilo",
+        "escaravelho",
+        "javali",
+        "gaivota",
+        "caracol",
+        "lagarto",
+        "morcego",
+        "esquilo"
+      ]
+    },
+    {
+      "id": "wl_pt3",
+      "entries": [
+        "casaco",
+        "cadeira",
+        "caderno",
+        "borracha",
+        "carteira",
+        "mochila",
+        "estojo",
+        "panela",
+        "toalha",
+        "garrafa",
+        "castelo",
+        "planeta",
+        "piscina",
+        "padaria",
+        "hospital",
+        "telefone",
+        "camisola",
+        "sapatilha",
+        "almofada",
+        "livraria",
+        "aeroporto",
+        "bombeiro",
+        "guarda-chuva",
+        "computador",
+        "bicicleta",
+        "biblioteca",
+        "chocolate",
+        "basquetebol",
+        "brincadeira",
+        "calculadora",
+        "carpinteiro",
+        "eletricidade",
+        "supermercado",
+        "cabeleireiro"
+      ]
+    },
+    {
+      "id": "wl_pt4",
+      "entries": [
+        "o gato bebe leite",
+        "eu deixo o livro na mesa",
+        "o sol brilha no mar",
+        "a flor cresce no jardim",
+        "eu vou para a escola",
+        "o cavalo corre no campo",
+        "a abelha voa no jardim",
+        "eu leio um livro grande",
+        "muito obrigado pelo bolo",
+        "vamos jogar futebol",
+        "o peixe nada no lago",
+        "a chuva cai na floresta"
+      ]
+    }
+  ],
+  "stages": [
+    {
+      "id": "pt_s32",
+      "no": 32,
+      "name": "みなとの ことば",
+      "teach": "みじかい ポルトガル語",
+      "mode": "kana",
+      "bg": "plain",
+      "pos": [
+        20,
+        60
+      ],
+      "timed": true,
+      "desc": "見たまま うつ。日本語に しなくて いい。L の キーが たくさん 出てくる。",
+      "unlockSkill": null,
+      "battles": [
+        {
+          "enemy": "pt_sardinha",
+          "q": 8,
+          "wordlist": "wl_pt1",
+          "hint": "L は みぎての くすりゆび。日本語では ほとんど 出ない キー。"
+        },
+        {
+          "enemy": "pt_galo",
+          "q": 8,
+          "wordlist": "wl_pt1",
+          "hint": "F と V を 見まちがえない。faca と vaca は べつの ことば。"
+        },
+        {
+          "enemy": "pt_sardinha",
+          "q": 8,
+          "wordlist": "wl_pt1",
+          "hint": "てもとを 見ないで うてたら すごい。"
+        },
+        {
+          "enemy": "ptb_caravela",
+          "q": 12,
+          "wordlist": "wl_pt1",
+          "hint": "カラベルせん！ うみへ 出る ふねだ。",
+          "boss": true
+        }
+      ],
+      "kbhelp": true
+    },
+    {
+      "id": "pt_s33",
+      "no": 33,
+      "name": "もりの いきもの",
+      "teach": "いきものの なまえ",
+      "mode": "kana",
+      "bg": "forest",
+      "pos": [
+        44,
+        32
+      ],
+      "timed": true,
+      "desc": "lh と nh が よく 出てくる。coelho、galinha、minhoca。",
+      "unlockSkill": null,
+      "battles": [
+        {
+          "enemy": "pt_galo",
+          "q": 5,
+          "wordlist": "wl_pt2",
+          "hint": "ことばが ながくなる。あわてない。"
+        },
+        {
+          "enemy": "pt_azulejo",
+          "q": 5,
+          "wordlist": "wl_pt2",
+          "hint": "lh は L と H。ゆびを つづけて うごかす。"
+        },
+        {
+          "enemy": "pt_galo",
+          "q": 5,
+          "wordlist": "wl_pt2",
+          "hint": "リズムを そろえると はやくなる。"
+        },
+        {
+          "enemy": "ptb_polvo",
+          "q": 7,
+          "wordlist": "wl_pt2",
+          "hint": "たこの ぬし！ 8ほんの あしで せめてくる。",
+          "boss": true
+        }
+      ]
+    },
+    {
+      "id": "pt_s34",
+      "no": 34,
+      "name": "まちの みせ",
+      "teach": "ながい ことば",
+      "mode": "kana",
+      "bg": "hill",
+      "pos": [
+        68,
+        28
+      ],
+      "timed": true,
+      "desc": "supermercado、biblioteca、cabeleireiro。ながい ほど リズムが たいせつ。",
+      "unlockSkill": null,
+      "battles": [
+        {
+          "enemy": "pt_azulejo",
+          "q": 4,
+          "wordlist": "wl_pt3",
+          "hint": "ながい ことばは かたまりで 見る。"
+        },
+        {
+          "enemy": "pt_sardinha",
+          "q": 4,
+          "wordlist": "wl_pt3",
+          "hint": "C が たくさん 出る。ひだり手の なかゆび。"
+        },
+        {
+          "enemy": "pt_azulejo",
+          "q": 4,
+          "wordlist": "wl_pt3",
+          "hint": "1もじずつ おいかけると おそくなる。"
+        },
+        {
+          "enemy": "ptb_torre",
+          "q": 5,
+          "wordlist": "wl_pt3",
+          "hint": "ベレンの とう！ いちばん ながい ことばが くる。",
+          "boss": true
+        }
+      ]
+    },
+    {
+      "id": "pt_s35",
+      "no": 35,
+      "name": "ふたつの ことばの とう",
+      "teach": "みじかい ぶんを まるごと",
+      "mode": "kana",
+      "bg": "rocky",
+      "pos": [
+        88,
+        60
+      ],
+      "timed": true,
+      "desc": "ことばと ことばの あいだは スペース（おやゆび）。ぶんが うてたら いちにんまえ。",
+      "unlockSkill": null,
+      "battles": [
+        {
+          "enemy": "pt_galo",
+          "q": 2,
+          "wordlist": "wl_pt4",
+          "hint": "スペースは おやゆび。手を うごかさない。"
+        },
+        {
+          "enemy": "pt_azulejo",
+          "q": 2,
+          "wordlist": "wl_pt4",
+          "hint": "ことばの かたまりで うつ。"
+        },
+        {
+          "enemy": "pt_sardinha",
+          "q": 2,
+          "wordlist": "wl_pt4",
+          "hint": "ここまで くれば ぶんも うてる。"
+        },
+        {
+          "enemy": "ptb_navegador",
+          "q": 2,
+          "wordlist": "wl_pt4",
+          "hint": "だいこうかいの ふなのり！ さいごの しれん。",
+          "boss": true
+        }
+      ]
+    }
+  ]
+}

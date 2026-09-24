@@ -3093,6 +3093,11 @@ $("toollayer").onclick = e => { if (e.target.id === "toollayer") closeTools(); }
 /* ---------- ワールドマップ ---------- */
 /* 島の見た目のプリセット。DLCは自分の島（＝新しい大陸）を持てる */
 const WORLD_STYLES = {
+  /* ポルトガル：青い海・白い砂・赤い屋根（rock を テラコッタに つかう） */
+  azul:   {sea:"#0e4a7a", sea2:"#1a6aa8", sand:"#efe6d2", land:"#7aa84a", land2:"#5c8a38",
+           rock:"#c85a3a", tree:"#2a6a3a", isle:[64,38,56,26],
+           mnts:[[40,26,16,10],[58,24,12,7],[98,54,15,9]],
+           trees:[[24,44],[30,40],[82,60],[90,56],[38,58],[110,38]]},
   green:  {sea:"#12305a", sea2:"#1c4478", sand:"#d8c88a", land:"#3a8a3a", land2:"#2d6e2d",
            rock:"#6a6a5a", tree:"#1f5a24", isle:[64,38,54,27],
            mnts:[[44,26,16,9],[58,24,12,7],[100,54,14,8]],
@@ -3285,7 +3290,9 @@ const WORLD_DEFAULTS = {
   dlc_spirit:       {order: 35, recLv: 12},   /* せいれいの しんでん：ホームポジション 特訓 */
   dlc_english:      {order: 40, recLv: 14},   /* アルファベット王国：英語 */
   dlc_kanji:        {order: 50, recLv: 12},   /* ことだまの もり：漢字の よみ。新しいキーは ゼロ */
-  dlc_suuji:        {order: 90, recLv: 13}    /* すうじステーション：いったん 取り下げ中 */
+  dlc_suuji:        {order: 90, recLv: 13},   /* すうじステーション：2026-09-24 に 公開 */
+  dlc_pt:           {order: 60, recLv: 14},   /* ポルトガルの みち：速さの島。L C F V B を かせぐ */
+  dlc_math:         {order: 95, recLv: 15}    /* けいさんの とう：数字段を つかう。すうじの あと */
 };
 const STYLE_CYCLE = ["dark","snow","desert","volcano"];
 function worldList(){
