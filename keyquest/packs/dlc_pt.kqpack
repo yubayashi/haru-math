@@ -1,6 +1,6 @@
 {
   "packId": "dlc_pt",
-  "packVersion": 1,
+  "packVersion": 2,
   "title": "ポルトガルの みち",
   "requiresEngine": ">=1.2.0",
   "author": "とうさん",
@@ -8,7 +8,7 @@
     "name": "ポルトガルの みち",
     "style": "azul",
     "recLv": 14,
-    "order": 60
+    "order": 92
   },
   "enemies": [
     {

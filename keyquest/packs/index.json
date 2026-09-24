@@ -1,5 +1,5 @@
 {
-  "catalogVersion": 6,
+  "catalogVersion": 7,
   "updated": "2026-09-24",
   "packs": [
     {
@@ -57,15 +57,6 @@
       "desc": "漢字を 見て よみを うつ。ローマ字ガイドは すこし おくれて 出る。じぶんで よめたら ボーナス。"
     },
     {
-      "packId": "dlc_pt",
-      "file": "dlc_pt.kqpack",
-      "title": "ポルトガルの みち",
-      "stages": 4,
-      "order": 60,
-      "version": 1,
-      "desc": "ポルトガル語を そのまま うつ。日本語では 出てこない L C F V B を きたえる 速さの島。"
-    },
-    {
       "packId": "dlc_suuji",
       "file": "dlc_suuji.kqpack",
       "title": "すうじステーション",
@@ -73,6 +64,15 @@
       "order": 90,
       "desc": "すうじ 1〜0 と きごう . , - 。アルファベット王国を こえた きみへ。",
       "version": 2
+    },
+    {
+      "packId": "dlc_pt",
+      "file": "dlc_pt.kqpack",
+      "title": "ポルトガルの みち",
+      "stages": 4,
+      "order": 92,
+      "version": 2,
+      "desc": "ポルトガル語を そのまま うつ。日本語では 出てこない L C F V B を きたえる 速さの島。"
     },
     {
       "packId": "dlc_math",
