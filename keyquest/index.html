@@ -129,7 +129,19 @@ svg.px{display:block;image-rendering:pixelated;shape-rendering:crispEdges}
 #msgwin{min-height:84px;font-size:14px}
 #msgwin p{margin:0}
 
-.q{text-align:center;padding:10px 0 2px}
+.q{text-align:center;padding:10px 0 2px;position:relative}
+/* お題つきの 面（算数・漢字・えいご）で **合っていたか** を はっきり 見せる。
+   ダメージの 数字だけでは 合図に ならず「合ってるのか わからない」と なった（2026-09-24） */
+.q .mark{position:absolute;left:50%;top:-6px;transform:translateX(-50%);
+  font-size:74px;line-height:1;opacity:0;pointer-events:none;z-index:3;
+  text-shadow:3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000}
+.q .mark.ok{color:#4ae06a}
+.q .mark.ng{color:#ff5a6a}
+.q .mark.go{animation:qmark .6s steps(4) forwards}
+@keyframes qmark{0%{opacity:1;transform:translateX(-50%) scale(.6)}
+  40%{opacity:1;transform:translateX(-50%) scale(1.12)}
+  70%{opacity:1;transform:translateX(-50%) scale(1)}
+  100%{opacity:0;transform:translateX(-50%) scale(1)}}
 .q .kana{font-size:clamp(24px,5vw,38px);letter-spacing:.14em;word-break:break-all}
 .q .kana .done{color:#55557a}
 .q .kana .cur{color:var(--acc);border-bottom:4px solid var(--acc)}
@@ -652,6 +664,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
       </div>
 
       <div class="q" id="b-q">
+        <b class="mark" id="b-mark"></b>
         <div class="kana" id="b-kana"></div>
         <div class="roma" id="b-roma"></div>
       </div>
@@ -1120,7 +1133,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.3.2";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
+const ENGINE_VERSION = "1.4.0";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -2177,7 +2190,9 @@ function renderQuestion(){
   }
   const hiding = B.recallUntil > 0 && Date.now() < B.recallUntil;
   if (hiding){
-    $("b-roma").innerHTML = '<span class="recalling">よみを おもいだそう…</span>';
+    /* 算数の面で「よみを おもいだそう」は おかしい。ステージで 上書きできる ように する */
+    $("b-roma").innerHTML = '<span class="recalling">' +
+      (B.stage.recallHint || "よみを おもいだそう…") + "</span>";
   } else if (S.settings.hint === "on"){
     const g = t.guide();
     $("b-roma").innerHTML = '<span class="done">'+g.done+'</span><span class="next">'+g.nextCh+
@@ -2688,6 +2703,15 @@ function shootKey(ch){
   if (B.qLeft <= 0){ clearInterval(B.shootT); clearShips(); defeatFoe(); }
 }
 
+/* まる / ばつ を ぱっと 出す。**お題つきの 面だけ**（ふつうの 書きうつしには 合否が ない） */
+function showMark(ok){
+  if (!B.problem || !B.problem.ask) return;
+  const m = $("b-mark");
+  m.textContent = ok ? "○" : "✕";
+  m.className = "mark " + (ok ? "ok" : "ng");
+  void m.offsetWidth;                       /* アニメを 出しなおす */
+  m.className = "mark " + (ok ? "ok" : "ng") + " go";
+}
 function popup(txt, color){
   const p = $("b-popup"); p.textContent = txt; p.style.color = color || "var(--acc)";
   p.classList.remove("go"); void p.offsetWidth; p.classList.add("go");
@@ -2777,6 +2801,7 @@ function typeKey(ch){
        となりを ねらった 打ちそこないだけが たまり、にがてキーの 判定が
        逆さまに なる（2026-09-23：; は 出題 0 なのに 正確率 63% と 出ていた）。 */
     recordKey(want || ch, false, dt); B.misses++; B.qMiss++; B.combo = 0;
+    showMark(false);
     B.cast = Math.min(100, B.cast + 6);
     const q = $("b-q"); q.classList.remove("miss"); void q.offsetWidth; q.classList.add("miss");
     msg(S.playerName + "は うちまちがえた！");
@@ -2791,7 +2816,7 @@ function typeKey(ch){
   if (readAlone){          /* ガイドが 出るまえに 1文字目を 打てた＝じぶんで 読めた */
     B.readOk++;
     B.totalDmg += Math.round(stats().atk * 2);       /* けいけんちの ボーナスに なる */
-    popup("よめた！", "var(--acc)");
+    popup(B.stage.recallOk || "よめた！", "var(--acc)");
   }
   B.combo++; B.maxCombo = Math.max(B.maxCombo, B.combo);
   B.mp = Math.min(stats().maxMp, B.mp + 0.35);
@@ -2800,6 +2825,7 @@ function typeKey(ch){
   if (B.combo > 0 && B.combo % 10 === 0) popup("COMBO ×" + comboMul().toFixed(1));
   renderQuestion(); renderBattle();
   if (r === "done"){
+    showMark(true);
     hitFoe();
     const dealt = Math.max(1, Math.round(stats().atk * comboMul() * B.typer.units.length));
     popup("-" + dealt, "#fff");

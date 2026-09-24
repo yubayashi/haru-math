@@ -1,5 +1,5 @@
 {
-  "catalogVersion": 9,
+  "catalogVersion": 10,
   "updated": "2026-09-24",
   "packs": [
     {
@@ -80,7 +80,7 @@
       "title": "けいさんの とう",
       "stages": 4,
       "order": 95,
-      "version": 3,
+      "version": 4,
       "desc": "九九・けいさん・漢数字・たんい。答えを 出してから うつ 島。"
     }
   ]

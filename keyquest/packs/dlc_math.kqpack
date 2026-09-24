@@ -1,6 +1,6 @@
 {
   "packId": "dlc_math",
-  "packVersion": 3,
+  "packVersion": 4,
   "title": "けいさんの とう",
   "requiresEngine": ">=1.2.0",
   "author": "とうさん",
@@ -1040,6 +1040,8 @@
       "timed": true,
       "recall": true,
       "recallMs": 4000,
+      "recallHint": "こたえを かんがえよう…",
+      "recallOk": "せいかい！",
       "desc": "まずは 九九。ゆびは ホームポジション、目は がめん。4の だんと 9が でたら ようちゅうい。",
       "unlockSkill": null,
       "battles": [
@@ -1086,6 +1088,8 @@
       "timed": true,
       "recall": true,
       "recallMs": 4500,
+      "recallHint": "こたえを かんがえよう…",
+      "recallOk": "せいかい！",
       "desc": "くりあがり、くりさがり、そして わりざん。あたまの なかで けたを そろえる。",
       "unlockSkill": null,
       "battles": [
@@ -1131,6 +1135,8 @@
       "timed": true,
       "recall": true,
       "recallMs": 3500,
+      "recallHint": "すうじに なおそう…",
+      "recallOk": "よめた！",
       "desc": "計算では ない。読んで 数字に するだけ。0の かずを まちがえない。",
       "unlockSkill": null,
       "battles": [
@@ -1176,6 +1182,8 @@
       "timed": true,
       "recall": true,
       "recallMs": 5000,
+      "recallHint": "こたえを おもいだそう…",
+      "recallOk": "せいかい！",
       "desc": "km と m、kg と g、じかんと ぷん。さいごの たたかいは ここまでの ぜんぶが 出る。",
       "unlockSkill": null,
       "battles": [
