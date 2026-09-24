@@ -1,6 +1,6 @@
 {
   "packId": "dlc_dakuon_youon",
-  "packVersion": 1,
+  "packVersion": 2,
   "title": "追加ぼうけん：だくおん・ようおん・つまるおん",
   "requiresEngine": ">=1.0.0",
   "author": "とうさん",
@@ -567,6 +567,40 @@
           "hint": "さいごの しれん！ ここまで こられたら もう ほんもの。"
         }
       ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "cd_dk_ten",
+      "name": "てんてん",
+      "rarity": "R",
+      "type": "もじ",
+      "art": "enemy:d_kumo",
+      "tip": "「か」に てんてんで「が」。でも キーボードに てんてんの キーは ない。K を G に かえるだけ。さ→ざ は S→Z、た→だ は T→D。"
+    },
+    {
+      "id": "cd_dk_maru",
+      "name": "まる",
+      "rarity": "N",
+      "type": "もじ",
+      "art": "enemy:d_kinoko",
+      "tip": "「は」に まるで「ぱ」。は行だけに ある。てんてんが B で「ば」、まるが P で「ぱ」。H・B・P の 3きょうだい。"
+    },
+    {
+      "id": "cd_dk_sokuon",
+      "name": "ちいさい っ",
+      "rarity": "SR",
+      "type": "もじ",
+      "art": "enemy:db_sokuon",
+      "tip": "「きって」は kitte。**つぎの 子音を 2回 うつ**と ちいさい っ に なる。これを 知ると 一気に らくに なる。"
+    },
+    {
+      "id": "cd_dk_2way",
+      "name": "2とおりの ローマ字",
+      "rarity": "UR",
+      "type": "でんせつ",
+      "art": "enemy:db_youon",
+      "tip": "「し」は si でも shi でも 打てる。「じ」は zi でも ji でも いい。**みじかい ほうが 1打 すくない**＝速い。"
     }
   ]
 }

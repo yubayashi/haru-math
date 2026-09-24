@@ -1133,7 +1133,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.4.0";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
+const ENGINE_VERSION = "1.5.0";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -1623,11 +1623,17 @@ function drawCard(minRarity){
     if (f.length) pool = f;
   }
   if (!pool.length) return null;
+  /* **まだ もっていない カードを 出やすく する。**
+     2026-09-25 に カードを 42→66枚に ふやした。まったくの ランダムだと
+     さいごの 数枚が いつまでも 出てこない。
+     もっている カードは 重みを 1/4 に する。**0に しない**のは、
+     ダブりで Ｇが もどる しくみ（カードやの 使い道）を 残すため。 */
+  const wOf = c => (RARITY[c.rarity] || RARITY.N).weight * (haveCard(c.id) ? 0.25 : 1);
   let total = 0;
-  pool.forEach(c => total += (RARITY[c.rarity] || RARITY.N).weight);
+  pool.forEach(c => total += wOf(c));
   let r = Math.random() * total;
   for (const c of pool){
-    r -= (RARITY[c.rarity] || RARITY.N).weight;
+    r -= wOf(c);
     if (r <= 0) return c;
   }
   return pool[pool.length-1];

@@ -1,6 +1,6 @@
 {
-  "catalogVersion": 10,
-  "updated": "2026-09-24",
+  "catalogVersion": 11,
+  "updated": "2026-09-25",
   "packs": [
     {
       "packId": "dlc_dakuon_youon",
@@ -9,7 +9,7 @@
       "stages": 3,
       "order": 10,
       "desc": "だくおん・ようおん・つまるおん。てんてん と まる、ちいさい ゃゅょ、ちいさい っ の せかい。",
-      "version": 1
+      "version": 2
     },
     {
       "packId": "dlc_shooting",
@@ -18,7 +18,7 @@
       "stages": 3,
       "order": 20,
       "desc": "ひこうきに のって、ながれてくる てきを うちおとす。ホームポジションの 8キーだけ。",
-      "version": 1
+      "version": 2
     },
     {
       "packId": "dlc_casino",
@@ -27,7 +27,7 @@
       "stages": 1,
       "order": 30,
       "desc": "スロットを まわして 3つ そろえる。1れつ目を 止めたら、あとは おなじ もじだけ 止まる。",
-      "version": 2
+      "version": 3
     },
     {
       "packId": "dlc_spirit",
@@ -35,7 +35,7 @@
       "title": "せいれいの しんでん",
       "stages": 4,
       "order": 35,
-      "version": 3,
+      "version": 4,
       "desc": "ホームポジションの とっくん。にほんごで 出ない F J L ; を 生のキーで きたえる。"
     },
     {
@@ -45,7 +45,7 @@
       "stages": 5,
       "order": 40,
       "desc": "えいごを そのまま うつ。にほんごを 見て えいごを うつ。さいごは みじかい ぶん。",
-      "version": 1
+      "version": 2
     },
     {
       "packId": "dlc_kanji",
@@ -63,7 +63,7 @@
       "stages": 5,
       "order": 90,
       "desc": "すうじ 1〜0 と きごう . , - 。アルファベット王国を こえた きみへ。",
-      "version": 2
+      "version": 3
     },
     {
       "packId": "dlc_pt",

@@ -1,6 +1,6 @@
 {
   "packId": "dlc_english",
-  "packVersion": 1,
+  "packVersion": 2,
   "title": "追加ぼうけん：アルファベット王国",
   "requiresEngine": ">=1.0.0",
   "author": "とうさん",
@@ -881,6 +881,39 @@
           "hint": "ことばの おうさま！ さいごの しれん。"
         }
       ]
+    }
+  ],
+  "cards": [
+    {
+      "id": "cd_en_space",
+      "name": "スペースキー",
+      "rarity": "R",
+      "type": "そうび",
+      "art": "enemy:enb_word",
+      "tip": "キーボードで いちばん 大きい キー。**りょうほうの おやゆび**の どちらで 打っても いい。文を 打つときは ここが いちばん 出番に なる。"
+    },
+    {
+      "id": "cd_en_shift",
+      "name": "シフト",
+      "rarity": "N",
+      "type": "そうび",
+      "tip": "大文字は Shift を おしながら。**Shift は 左右に 2つ**ある。打つ 文字と 反対がわの Shift を つかうと、手が からまない。"
+    },
+    {
+      "id": "cd_en_touch",
+      "name": "タッチタイプ",
+      "rarity": "UR",
+      "type": "でんせつ",
+      "art": "enemy:enb_king",
+      "tip": "手もとを 見ないで 打つこと。コツは たった 1つ、**打ったら すぐ ホームポジションに もどす**。よく 出る キーから 手が おぼえていく。"
+    },
+    {
+      "id": "cd_en_owl",
+      "name": "ふくろう せんせい",
+      "rarity": "N",
+      "type": "モンスター",
+      "art": "enemy:en_owl",
+      "tip": "えいごの つづりは 見た目と おとが ずれる。teacher の ea、school の ch。**おとで おぼえず、形で おぼえる**ほうが 打つには らく。"
     }
   ]
 }
