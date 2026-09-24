@@ -424,6 +424,15 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
 .tcg-type{display:inline-block;font-size:10px;background:var(--rc);color:#000;
   padding:0 6px;margin:6px 0 4px}
 .tcg-text{font-size:10px;line-height:1.65;color:#b8b8d8;min-height:66px}
+/* ---- 第2弾（2026-09-25 に 足した 24枚）----
+   本編30枚（第1弾）と ひとめで 見わけが つくように する。
+   わくを 二重に して、絵の うしろに ななめの しまを 入れる。 */
+.tcg.s2{background:#0b1020;box-shadow:inset 0 0 0 2px #000, inset 0 0 0 4px var(--rc)}
+.tcg.s2 .tcg-art{background:#05080f;background-image:
+  repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 5px, rgba(255,255,255,0) 5px 10px)}
+.tcg.s2 .tcg-head{border-bottom-style:dashed}
+.tcg-ser{background:var(--rc);color:#000;padding:0 4px;margin-left:3px;font-size:9px}
+.tcg.mini .tcg-ser{font-size:8px;padding:0 3px}
 .tcg.ur{animation:urframe 1.4s steps(6) infinite}
 @keyframes urframe{0%{border-color:#ffd23f}33%{border-color:#ff8ad8}66%{border-color:#7ad8ff}100%{border-color:#ffd23f}}
 
@@ -1133,7 +1142,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.5.0";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
+const ENGINE_VERSION = "1.5.1";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -1648,15 +1657,21 @@ function gainCard(id){
   return {card:c, dup:dup, back:back};
 }
 /* カード1枚をトレカ風に組む。mini はずかんの一覧用 */
+/* だん（シリーズ）ごとに 1から 数える。第1弾＝本編30枚、第2弾＝2026-09-25 に 足した24枚 */
+function cardSeries(c){ return c.series || 1; }
 function cardNo(c){
-  const i = allCards().map(x => x.id).indexOf(c.id);
-  return "No." + String(i + 1).padStart(2, "0");
+  const list = allCards().filter(x => cardSeries(x) === cardSeries(c));
+  const i = list.map(x => x.id).indexOf(c.id);
+  return (cardSeries(c) === 2 ? "No.Ⅱ-" : "No.") + String(i + 1).padStart(2, "0");
 }
 function cardHTML(c, mini){
   const r = RARITY[c.rarity] || RARITY.N;
+  const s2 = cardSeries(c) === 2;
   return '<div class="tcg' + (mini ? " mini" : "") + (c.rarity === "UR" ? " ur" : "") +
-    '" style="--rc:' + r.color + '">' +
-    '<div class="tcg-head"><span>' + cardNo(c) + '</span><span class="tcg-rar">' + r.label + "</span></div>" +
+    (s2 ? " s2" : "") + '" style="--rc:' + r.color + '">' +
+    '<div class="tcg-head"><span>' + cardNo(c) +
+      (s2 ? ' <b class="tcg-ser">Ⅱ</b>' : "") +
+      '</span><span class="tcg-rar">' + r.label + "</span></div>" +
     '<div class="tcg-name">' + c.name + "</div>" +
     '<div class="tcg-art">' + cardArt(c, mini ? 3 : 6) + "</div>" +
     '<div class="tcg-type">' + (c.type || "カード") + "</div>" +
