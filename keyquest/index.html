@@ -359,9 +359,22 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
 .wm-node .ico{position:relative}
 .wm-node .star{position:absolute;right:-9px;top:-11px;font-size:18px;color:#ffe14a;
   text-shadow:2px 2px 0 #000, 0 0 7px rgba(255,225,74,.85);pointer-events:none}
-/* メダルは ★と おなじ かどに 出す（★の かわり） */
-.wm-node .mdlb{position:absolute;right:-11px;top:-13px;line-height:0;pointer-events:none;
+/* メダルは ★と おなじ かどに 出す（★の かわり）。scale 3 ＝ 24×27px */
+.wm-node .mdlb{position:absolute;right:-14px;top:-16px;line-height:0;pointer-events:none;
   filter:drop-shadow(1px 1px 0 #000) drop-shadow(0 0 4px rgba(0,0,0,.8))}
+/* ひかり。steps() で カクカクさせる（ファミコン風に そろえる） */
+.wm-node .mdlb.g2{animation:mgl2 1.8s steps(2) infinite}
+.wm-node .mdlb.g3{animation:mgl3 1.4s steps(2) infinite}
+@keyframes mgl2{0%{filter:drop-shadow(1px 1px 0 #000) drop-shadow(0 0 4px rgba(0,0,0,.8))}
+  50%{filter:drop-shadow(1px 1px 0 #000) drop-shadow(0 0 6px rgba(226,232,248,.95))}}
+@keyframes mgl3{0%{filter:drop-shadow(1px 1px 0 #000) drop-shadow(0 0 4px rgba(0,0,0,.8))}
+  50%{filter:drop-shadow(1px 1px 0 #000) drop-shadow(0 0 8px rgba(255,225,74,1))}}
+/* きらめき。まん中＋上下左右の 5ドットで 十字を つくる（ドット絵の お約束） */
+.wm-node .spk{position:absolute;width:2px;height:2px;background:#fff;opacity:0;
+  box-shadow:0 -2px 0 #fff, 0 2px 0 #fff, -2px 0 0 #fff, 2px 0 0 #fff}
+@keyframes spk{0%,55%{opacity:0}62%,78%{opacity:1}85%,100%{opacity:0}}
+.wm-node .spk1{top:2px;right:2px;animation:spk 1.8s steps(1) infinite}
+.wm-node .spk2{bottom:6px;left:1px;animation:spk 1.8s steps(1) infinite .9s}
 /* メダル（正確率で 決まる）。どう / ぎん / きん */
 .wm-node .mdl1{border-color:#a86a3a;color:#d89a5a}
 .wm-node .mdl2{border-color:#9aa0b8;color:#d8dcec}
@@ -1107,7 +1120,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.3.1";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
+const ENGINE_VERSION = "1.3.2";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -3480,7 +3493,14 @@ function renderWorld(){
           /* メダルが あれば **★の かわりに** メダル。まだ 記録の ない面（この しくみを
              入れる まえに クリアした面）は これまでどおり ★ を 出す */
           const b = o.cleared && stageBest(st.id);
-          if (b) return '<b class="mdlb">' + pixelArt(MEDAL_ART[medalOf(b.acc)], 2) + "</b>";
+          if (b){
+            const m = medalOf(b.acc);
+            /* きらめきは メダルが 上がるほど ふえる（どう=なし／ぎん=1つ／きん=2つ＋ひかり）。
+               「つぎの メダルが ほしい」と 思わせる のが ねらい */
+            const spk = m >= 3 ? '<i class="spk spk1"></i><i class="spk spk2"></i>'
+                      : m >= 2 ? '<i class="spk spk1"></i>' : "";
+            return '<b class="mdlb g' + m + '">' + pixelArt(MEDAL_ART[m], 3) + spk + "</b>";
+          }
           return o.cleared ? '<b class="star">★</b>' : "";
         })() + "</div>" +
       '<div class="lb">' + (o.cleared ? "✔ " : o.open ? "" : "× ") + st.name + "</div>" +
