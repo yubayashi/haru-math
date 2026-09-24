@@ -359,6 +359,10 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
 .wm-node .ico{position:relative}
 .wm-node .star{position:absolute;right:-9px;top:-11px;font-size:18px;color:#ffe14a;
   text-shadow:2px 2px 0 #000, 0 0 7px rgba(255,225,74,.85);pointer-events:none}
+/* メダル（正確率で 決まる）。どう / ぎん / きん */
+.wm-node .mdl1{border-color:#a86a3a;color:#d89a5a}
+.wm-node .mdl2{border-color:#9aa0b8;color:#d8dcec}
+.wm-node .mdl3{border-color:#c8a018;color:#ffe14a}
 .wm-node .lb2{font-size:10px;background:#000;border:2px solid #4a4a78;padding:0 5px;
   white-space:nowrap;margin-top:2px;display:inline-block;color:var(--sub)}
 .wm-node.ghost .lb{border-color:#4a4a78;color:#8a8ab0}
@@ -1358,7 +1362,7 @@ function newSave(name){
     equipment:{weapon:null, armor:null, accessory:null},
     inventory:[], tools:{}, cosmetics:[], look:null, title:null, cards:{},
     spirits: sp, keyStats: {},
-    packProgress: { core:{cleared:[]} },
+    packProgress: { core:{cleared:[], best:{}} },
     daily:{streak:0, best:0, lastDate:null, todayCount:0},
     records:{bestWpm:0, bestAcc:0, recent:[]},
     settings:{layout:"US", kb:"auto", hint:"on", log:"on", homecheck:"on"}
@@ -1372,6 +1376,10 @@ function migrate(s){
   if (!s.keyStats) s.keyStats = {};
   if (!s.spirits){ s.spirits = {}; SPIRITS.forEach(x => s.spirits[x.key] = {bond:0}); }
   if (!s.records) s.records = {bestWpm:0, bestAcc:0, recent:[]};
+  /* v6: 面ごとの さいこう記録。むかしの セーブには 無いので 空で 足す */
+  Object.values(s.packProgress || {}).forEach(pp => { if (!pp.best) pp.best = {}; });
+  /* v6: 生涯の 打鍵数。むかしの セーブは いまの hit を 種に する（すこし 少なめに 出る） */
+  Object.values(s.keyStats || {}).forEach(v => { if (v.tot == null) v.tot = v.hit || 0; });
   if (!s.daily) s.daily = {streak:0, best:0, lastDate:null, todayCount:0};
   if (!s.inventory) s.inventory = [];
   if (!s.tools) s.tools = {};                       /* v3: どうぐ（消耗品） */
@@ -1469,18 +1477,28 @@ function stats(){
   return { maxHp: 30 + lv*6, maxMp: 10 + lv*3,
     atk: Math.round(5 + lv*2 + b.atk), def: Math.round(3 + lv*1.5 + b.def), agi: Math.round(5 + lv*1.2 + b.agi) };
 }
+/* 生涯の 打鍵数（減衰しない）。練習量の めやす。マイルストーンを 足すなら ここを 見る */
+function lifeKeys(){
+  return Object.values(S.keyStats || {}).reduce((a,v) => a + (v.tot != null ? v.tot : v.hit || 0), 0);
+}
 function bondOf(key){
   const k = S.keyStats[key];
   if (!k || k.hit < 6) return 0;
   const acc = k.hit / (k.hit + k.miss);
-  const vol = Math.min(1, k.hit / 120);
+  /* 量は **減衰しない tot** で 見る。hit で 見ると 記録を 半分に した とたんに
+     きずなが 落ちて、覚えた じゅもんが 消える（2026-09-23 の 事故の 根っこ） */
+  const vol = Math.min(1, (k.tot != null ? k.tot : k.hit) / 120);
   return Math.max(0, Math.min(10, Math.round(acc * vol * 10 + (acc>0.95 ? 1 : 0))));
 }
 let lastKeyT = 0;              /* 前の打鍵の時刻。問題の切れ目でリセットする */
 function recordKey(key, ok, dt){
   if (!/^[a-z0-9;\-,.]$/.test(key)) return;
-  const k = S.keyStats[key] || (S.keyStats[key] = {hit:0, miss:0});
+  const k = S.keyStats[key] || (S.keyStats[key] = {hit:0, miss:0, tot:0});
   ok ? k.hit++ : k.miss++;
+  /* tot は **減衰させない 生涯の 打鍵数**。hit/miss は「さいきんの 実力」を 映すために
+     半分に するが、それを きずなや 練習量の めやすに 使うと、へらすたびに
+     覚えた じゅもんを 失う（2026-09-23 に 実際に 起きた）。用途を 分ける。 */
+  if (ok) k.tot = (k.tot || 0) + 1;
   /* 60ms未満（同時押し）と 3秒超（考えこみ）は のぞいて 平均を出す。
      一本指うちだと 遠いキーへの 移動が はっきり 遅くなるので、指づかいの めやすになる */
   if (ok && dt >= 60 && dt <= 3000){ k.ms = (k.ms||0) + dt; k.n = (k.n||0) + 1; }
@@ -1495,8 +1513,20 @@ function decayKeyStats(){
   Object.values(S.keyStats).forEach(v => {
     v.hit = Math.round(v.hit/2); v.miss = Math.round(v.miss/2);
     if (v.n){ v.n = Math.round(v.n/2); v.ms = Math.round(v.ms/2); }
+    /* v.tot は さわらない（生涯の 打鍵数） */
   });
   return true;
+}
+/* メダルは **正確率だけ**で 決める。速さは 面に よって 上限が まるで ちがう
+   （recall つきの 漢字面は 待ち時間が あるので 構造的に 43もじ/分 あたりが 上限、
+    みじかい ポルトガル語なら 100を こえる）。同じ ものさしで 切ると 一生 金が 出ない面が できる。
+   速さは「じぶんの さいこう記録」として **自分と くらべる**。 */
+function medalOf(acc){ return acc >= 1 ? 3 : acc >= 0.95 ? 2 : 1; }
+const MEDAL_NAME = ["", "どう", "ぎん", "きん"];
+function stageBest(stageId){
+  const st = CONTENT.stages.filter(x => x.id === stageId)[0];
+  const pp = st && S.packProgress[st.packId];
+  return (pp && pp.best && pp.best[stageId]) || null;
 }
 function weakKeys(){
   return Object.entries(S.keyStats)
@@ -2822,6 +2852,14 @@ function finishStage(){
   S.records.bestWpm = Math.max(S.records.bestWpm, cpm);
   S.records.bestAcc = Math.max(S.records.bestAcc, acc);
   S.records.recent.push(cpm); if (S.records.recent.length > 10) S.records.recent.shift();
+  /* ---- 面ごとの さいこう記録。**クリアした面に もういちど 挑む 理由**を つくる ----
+     島を 足しつづけるのは 供給が つづかない（息子は 1時間で 13面 すすむ）。
+     すでに ある面が やりなおす 価値を 持つほうが 効く。 */
+  if (!pp.best) pp.best = {};
+  const prev = pp.best[B.stage.id] || {cpm:0, acc:0};
+  const newCpm = cpm > prev.cpm, newAcc = acc > prev.acc;
+  const medalUp = medalOf(acc) > medalOf(prev.acc);
+  pp.best[B.stage.id] = {cpm: Math.max(prev.cpm, cpm), acc: Math.max(prev.acc, acc)};
   const bondBefore = {}; SPIRITS.forEach(s => bondBefore[s.key] = S.spirits[s.key].bond);
   /* きずなは **下がらない**（いちど おぼえた じゅもんを 失わせない）。
      きろくを 半分に するので、そのままだと 下がってしまう */
@@ -2838,6 +2876,14 @@ function finishStage(){
     "<tr><th>ミス</th><td>" + B.misses + " かい</td></tr>" +
     (B.readAsk ? "<tr><th>じぶんで よめた</th><td>" + B.readOk + " / " + B.readAsk + "</td></tr>" : "") +
     "</table>";
+  /* じぶんの さいこう記録。やぶったら はっきり ほめる */
+  const bst = pp.best[B.stage.id];
+  if (!first && newCpm) html += '<p style="color:var(--acc)">◆ さいこう そくどを こうしん！　' +
+    prev.cpm + " → <b>" + cpm + "</b> もじ/ふん</p>";
+  if (medalUp) html += '<p style="color:var(--acc)">◆ メダルが <b>' +
+    MEDAL_NAME[medalOf(acc)] + "</b> に なった！</p>";
+  if (!first && !newCpm) html += '<p class="muted">この面の さいこう そくどは ' + bst.cpm +
+    " もじ/ふん（メダル " + MEDAL_NAME[medalOf(bst.acc)] + "）</p>";
   SPIRITS.filter(s => S.spirits[s.key].bond > bondBefore[s.key]).forEach(s =>
     html += '<p style="color:var(--acc)">◆ ' + s.name + " との きずなが Lv." + S.spirits[s.key].bond + " に あがった！</p>");
   allSpells().filter(sp => spellUsable(sp) && !Array.from(sp.seq).every(k => bondBefore[k] >= sp.bond))
@@ -2862,6 +2908,9 @@ function finishStage(){
          ガイドを 消して 遊んだ せいなのか 分からず じまいに なったため。 */
       settings: { hint: S.settings.hint, kb: S.settings.kb,
                   homecheck: S.settings.homecheck, layout: S.settings.layout },
+      /* 生涯の 打鍵数（減衰しない）と この面の さいこう記録。
+         「島を 足す」から「もういちど 挑む」に 切りかえたので、その 効きめを 見る */
+      lifeKeys: lifeKeys(), best: pp.best[B.stage.id], medal: medalOf(acc),
       home: HOME_LAST, keyStats: S.keyStats,
       recall: B.readAsk ? { ok: B.readOk, n: B.readAsk } : null }
   );
@@ -3402,7 +3451,13 @@ function renderWorld(){
       '" data-s="' + st.id + '" style="left:' + st.pos[0] + '%;top:' + st.pos[1] + '%">' +
       '<div class="ico">' + (e ? pixelArt(e.px, 2) : "") +
         (o.cleared ? '<b class="star">★</b>' : "") + "</div>" +
-      '<div class="lb">' + (o.cleared ? "✔ " : o.open ? "" : "× ") + st.name + "</div></div>";
+      '<div class="lb">' + (o.cleared ? "✔ " : o.open ? "" : "× ") + st.name + "</div>" +
+      (function(){                       /* クリアずみの面だけ メダルと じぶんの さいこう そくど */
+        const b = o.cleared && stageBest(st.id);
+        if (!b) return "";
+        const m = medalOf(b.acc);
+        return '<div class="lb2 mdl' + m + '">' + MEDAL_NAME[m] + " ・ " + b.cpm + "</div>";
+      })() + "</div>";
   });
   /* 主人公は「次に挑む地点」に立つ。全部クリアなら最後の地点 */
   const here = you || placed[placed.length-1];
@@ -3411,8 +3466,13 @@ function renderWorld(){
   const cleared = placed.filter(st => openOf[st.id].cleared).length;
   const need = world.recLv;
   const short = need && S.lv < need;
+  /* メダルの かず も 出す。出しておかないと 面ごとの 記録に 気づかない */
+  const gold = placed.filter(st => { const b = stageBest(st.id); return b && medalOf(b.acc) === 3; }).length;
+  const silv = placed.filter(st => { const b = stageBest(st.id); return b && medalOf(b.acc) === 2; }).length;
   html += '<div class="wm-prog">' + world.name +
     ' <b style="color:var(--acc)">★' + cleared + "</b> / " + placed.length +
+    (gold || silv ? '　<span style="color:#ffe14a">きん' + gold + '</span>' +
+                    '<span style="color:#d8dcec"> ぎん' + silv + "</span>" : "") +
     (need ? '　<span style="color:var(--' + (short ? "ng" : "sub") + ')">めやす Lv.' + need +
             (short ? "（まだ はやいかも）" : "") + "</span>" : "") + "</div>";
   el.insertAdjacentHTML("beforeend", html);
@@ -3668,7 +3728,8 @@ function renderStatus(){
     "<tr><th>すばやさ</th><td>" + st.agi + "</td></tr>" +
     "<tr><th>もちきん</th><td>Ｇ " + S.gold + "</td></tr>" +
     "<tr><th>さいこう そくど</th><td>" + S.records.bestWpm + " もじ/ふん</td></tr>" +
-    "<tr><th>さいこう せいかくさ</th><td>" + (S.records.bestAcc*100).toFixed(1) + " %</td></tr>";
+    "<tr><th>さいこう せいかくさ</th><td>" + (S.records.bestAcc*100).toFixed(1) + " %</td></tr>" +
+    "<tr><th>いままでに うった かず</th><td>" + lifeKeys().toLocaleString() + " だげん</td></tr>";
 
   $("st-equip").innerHTML = ["weapon","armor","accessory"].map(slot => {
     const jp = {weapon:"ぶき", armor:"ぼうぐ", accessory:"アクセサリ"}[slot];
