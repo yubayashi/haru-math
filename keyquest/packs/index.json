@@ -1,5 +1,5 @@
 {
-  "catalogVersion": 7,
+  "catalogVersion": 9,
   "updated": "2026-09-24",
   "packs": [
     {
@@ -78,11 +78,10 @@
       "packId": "dlc_math",
       "file": "dlc_math.kqpack",
       "title": "けいさんの とう",
-      "stages": 5,
+      "stages": 4,
       "order": 95,
-      "version": 1,
-      "desc": "答えを 出してから うつ。九九・たしひき・わりざん・小数・たんい。（ポルトガルの みちの あとで 出す）",
-      "hidden": true
+      "version": 3,
+      "desc": "九九・けいさん・漢数字・たんい。答えを 出してから うつ 島。"
     }
   ]
 }
