@@ -213,7 +213,7 @@
       </div>
       <div>
         <canvas id="side" width="600" height="600"></canvas>
-        <div class="canvas-cap">太陽の横から見た地球（その日のお昼）</div>
+        <div class="canvas-cap">ななめ横から見た図（漫画の図と同じ）</div>
       </div>
     </div>
 
@@ -493,65 +493,84 @@ function drawTop(doy) {
   ctx.textAlign = 'left';
 }
 
+// ななめ横から見た図（カメラは固定。漫画の図と同じ見え方）
+// 世界座標: X=右, Y=奥, Z=上。太陽は原点。上から見た図と同じ θ で回る
+const SIDE = { cx: 150, cy: 135, R: 105, er: 23, elev: rad(32) };
+const earthBuf = document.createElement('canvas');
+function axisVec() {
+  const t = tiltOn() ? rad(TILT) : 0;
+  return [-Math.sin(t), 0, Math.cos(t)]; // 1年中おなじ向き（上から見た図の「北極」と同じ左向き）
+}
+function project(X, Y, Z) {
+  const e = SIDE.elev;
+  return [SIDE.cx + X, SIDE.cy - (Y * Math.sin(e) + Z * Math.cos(e))];
+}
+function drawAxis(ctx, x, y, N, len, color, width) {
+  const e = SIDE.elev;
+  const dx = N[0], dy = -(N[1] * Math.sin(e) + N[2] * Math.cos(e));
+  ctx.strokeStyle = color; ctx.lineWidth = width;
+  ctx.beginPath(); ctx.moveTo(x - dx * len, y - dy * len); ctx.lineTo(x + dx * len, y + dy * len); ctx.stroke();
+  ctx.lineWidth = 1;
+}
+function drawEarthSphere(ctx, x, y, th, N) {
+  const e = SIDE.elev, rPx = SIDE.er * 2, size = rPx * 2 + 1;
+  earthBuf.width = size; earthBuf.height = size;
+  const bctx = earthBuf.getContext('2d');
+  const img = bctx.createImageData(size, size);
+  const s = [-Math.cos(th), -Math.sin(th), 0];            // 地球 → 太陽
+  const up = [0, Math.sin(e), Math.cos(e)], cam = [0, -Math.cos(e), Math.sin(e)];
+  const bands = [[41, [241, 196, 15]], [-34, [46, 204, 113]], [0, [255, 255, 255]]];
+  for (let j = 0; j < size; j++) for (let i = 0; i < size; i++) {
+    const u = (i - rPx) / rPx, w = -(j - rPx) / rPx, q = 1 - u * u - w * w;
+    if (q < 0) continue;
+    const d = Math.sqrt(q);
+    const P = [u, w * up[1] + d * cam[1], w * up[2] + d * cam[2]];
+    const lit = P[0] * s[0] + P[1] * s[1] + P[2] * s[2] > 0;
+    const lat = Math.asin(Math.max(-1, Math.min(1, P[0] * N[0] + P[1] * N[1] + P[2] * N[2]))) * 180 / Math.PI;
+    let col = lit ? [52, 152, 219] : [22, 38, 72];
+    for (const [bl, bc] of bands) if (Math.abs(lat - bl) < 2.6) col = lit ? bc : bc.map(c => c * 0.35);
+    const k = (j * size + i) * 4;
+    img.data[k] = col[0]; img.data[k + 1] = col[1]; img.data[k + 2] = col[2]; img.data[k + 3] = 255;
+  }
+  bctx.putImageData(img, 0, 0);
+  ctx.drawImage(earthBuf, x - SIDE.er, y - SIDE.er, SIDE.er * 2, SIDE.er * 2);
+}
+
 function drawSide(doy) {
   const ctx = sc;
   drawSpace(ctx);
-  const dec = declination(doy);
-  const cx = 175, cy = 150, R = 85;
-  // 太陽の光
-  ctx.strokeStyle = 'rgba(255,210,63,0.8)'; ctx.fillStyle = 'rgba(255,210,63,0.8)';
-  for (let y = 75; y <= 225; y += 30) {
-    ctx.beginPath(); ctx.moveTo(8, y); ctx.lineTo(70, y); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(70, y - 4); ctx.lineTo(78, y); ctx.lineTo(70, y + 4); ctx.fill();
-  }
-  ctx.font = 'bold 11px Nunito, sans-serif';
-  ctx.fillText('☀️ 太陽の光', 8, 60);
-  // 地球
-  ctx.fillStyle = '#3498db';
-  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
-  // 夜（太陽と反対側）
-  ctx.save();
-  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
-  ctx.fillStyle = 'rgba(5,10,30,0.72)';
-  ctx.fillRect(cx, cy - R, R, 2 * R);
-  ctx.restore();
-  // 北極の向き n と 赤道の向き p
-  const d = rad(dec);
-  const n = [-Math.sin(d), -Math.cos(d)];
-  const p = [Math.cos(d), -Math.sin(d)];
-  // 地軸
-  ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2.5;
+  const N = axisVec();
+  // 軌道（ななめから見るので つぶれた円）
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
   ctx.beginPath();
-  ctx.moveTo(cx - n[0] * (R + 18), cy - n[1] * (R + 18));
-  ctx.lineTo(cx + n[0] * (R + 18), cy + n[1] * (R + 18));
-  ctx.stroke(); ctx.lineWidth = 1;
-  ctx.fillStyle = '#ff8a80';
-  ctx.fillText('北極', cx + n[0] * (R + 26) - 12, cy + n[1] * (R + 26) + 4);
-  // 緯線
-  function latLine(lat, color, dash) {
-    const s = Math.sin(rad(lat)), c = Math.cos(rad(lat));
-    const mx = cx + R * s * n[0], my = cy + R * s * n[1];
-    ctx.strokeStyle = color; ctx.setLineDash(dash || []);
-    ctx.beginPath();
-    ctx.moveTo(mx - R * c * p[0], my - R * c * p[1]);
-    ctx.lineTo(mx + R * c * p[0], my + R * c * p[1]);
-    ctx.stroke(); ctx.setLineDash([]);
-    return [mx - R * c * p[0], my - R * c * p[1]]; // 太陽側の端 = お昼の場所
+  for (let a = 0; a <= 64; a++) {
+    const t = a / 64 * Math.PI * 2, p = project(SIDE.R * Math.cos(t), SIDE.R * Math.sin(t), 0);
+    a ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]);
   }
-  latLine(0, 'rgba(255,255,255,0.7)', [4, 4]);
-  ctx.fillStyle = 'rgba(255,255,255,0.8)';
-  ctx.fillText('赤道', cx + R * p[0] - 30, cy + R * p[1] - 4);
-  const pt = latLine(41, '#f1c40f');
-  const au = latLine(-34, '#2ecc71');
-  [[pt, '#f1c40f', 'ポルトガル'], [au, '#2ecc71', 'オーストラリア']].forEach(([q, col, name]) => {
-    ctx.fillStyle = col;
-    ctx.beginPath(); ctx.arc(q[0], q[1], 5, 0, Math.PI * 2); ctx.fill();
-    ctx.font = 'bold 10px Nunito, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(name, q[0] - 8, q[1] + 4);
-    ctx.textAlign = 'left';
+  ctx.stroke();
+  // 季節の4か所に うすい地軸（どこでも同じ向き）
+  ctx.font = 'bold 11px Nunito, sans-serif'; ctx.textAlign = 'center';
+  [[172, '6月'], [266, '9月'], [355, '12月'], [80, '3月']].forEach(([d, l]) => {
+    const t = 2 * Math.PI * (d - 172) / 365, p = project(SIDE.R * Math.cos(t), SIDE.R * Math.sin(t), 0);
+    drawAxis(ctx, p[0], p[1], N, 16, 'rgba(231,76,60,0.35)', 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText(l, p[0], p[1] + (Math.sin(t) < 0 ? 30 : -22));
   });
-  ctx.font = 'bold 11px Nunito, sans-serif';
+  const th = 2 * Math.PI * (doy - 172) / 365;
+  const ep = project(SIDE.R * Math.cos(th), SIDE.R * Math.sin(th), 0);
+  const earthFront = Math.sin(th) < 0;       // 手前にいるときは太陽より前に描く
+  if (earthFront) drawSun(ctx, SIDE.cx, SIDE.cy, 15);
+  drawEarthSphere(ctx, ep[0], ep[1], th, N);
+  drawAxis(ctx, ep[0], ep[1], N, SIDE.er + 12, '#e74c3c', 2.5);
+  ctx.fillStyle = '#ff8a80';
+  ctx.fillText('北極', ep[0] + N[0] * (SIDE.er + 20), ep[1] - N[2] * (SIDE.er + 20));
+  if (!earthFront) drawSun(ctx, SIDE.cx, SIDE.cy, 15);
+  // 凡例
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#f1c40f'; ctx.fillText('━ ポルトガル', 10, 270);
+  ctx.fillStyle = '#2ecc71'; ctx.fillText('━ オーストラリア', 100, 270);
+  ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillText('┅ 赤道', 215, 270);
+  ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fillText('明るい側 = 昼', 10, 288);
 }
 
 function updateSeasons() {
