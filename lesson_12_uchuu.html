@@ -178,8 +178,13 @@
     <div class="sim-msg" id="orbit-msg">まずは 0% のまま発射してみよう</div>
 
     <div class="tip">
-      <b>💡 ためしてほしい順番:</b> 0% → 100% → 60% → 150%<br>
+      <b>💡 ためしてほしい順番:</b> 0% → 100% → 80% → 110% → 150%<br>
       速すぎても おそすぎても ダメ。今の地球は <b>ちょうどいい速さ</b>（秒速 約30km！）で走っているから、落ちずに回り続けている。
+    </div>
+    <div class="callout-green">
+      <b>🤔 80% や 110% で「うずまき」にならないのは なぜ？</b><br>
+      宇宙には空気がないので、<b>ブレーキがかからない</b>。1周すると、出発したときと同じ場所に同じ速さでもどってくるから、何周しても同じ輪（<b>だ円</b>）を回る。<br>
+      うずまきになるのは、空気にこすれて 少しずつ おそくなるとき（地球のすぐ近くを回る人工衛星は、何年もかけて うずまきで落ちてくる）。
     </div>
   </div>
 
@@ -347,7 +352,7 @@ function drawSun(ctx, x, y, r) {
 
 /* ============ 公転シミュレーター ============ */
 const oc = setupCanvas('orbit');
-const O = { cx: 150, cy: 150, r0: 110, vc: 110, sunR: 18, earthR: 6 };
+const O = { cx: 150, cy: 150, r0: 75, vc: 75, sunR: 13, earthR: 5 };
 O.GM = O.vc * O.vc * O.r0;
 O.period = 2 * Math.PI * O.r0 / O.vc;
 let orb = null, orbRaf = null;
@@ -405,10 +410,14 @@ function orbStep() {
     msg.textContent = orb.pct === 0
       ? '☀️ まっすぐ太陽に落ちた！ 漫画と同じ。たった ' + Math.floor(orb.t / O.period * 365) + ' 日で！'
       : '☀️ 太陽に落ちた！ 速さが足りない';
-  } else if (r > 250) {
+  } else if (r > 215) {
     done = true;
-    msg.textContent = '🚀 太陽から はなれて、遠くへ飛んでいった！ 速すぎ';
-  } else if (orb.t > O.period * 1.6) {
+    // 勢い（エネルギー）が足りていれば、画面の外に出てもいつか戻ってくる
+    const energy = (orb.vx * orb.vx + orb.vy * orb.vy) / 2 - O.GM / r;
+    msg.textContent = energy >= 0
+      ? '🚀 太陽から はなれて、二度と もどってこない！ 速すぎ'
+      : '☄️ 画面の外まで行ったけど、何年もかけて もどってくる（ほうき星みたい）';
+  } else if (orb.t > O.period * 2.3) {
     done = true;
     if (Math.abs(orb.pct - 1) < 0.01) msg.textContent = '🌍 ちゃんと回り続ける！ これが今の地球';
     else if (orb.minR < O.r0 * 0.5) msg.textContent = '🔥 落ちなかったけど、太陽にすごく近づく ゆがんだ輪。これじゃ暑すぎる！';
