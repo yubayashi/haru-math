@@ -309,6 +309,7 @@
   </section>
   <footer class="credits">
     軌道：NASA JPL「惑星の近似位置」（Standish・1800〜2050年版）／地軸：IAU／惑星の大きさは見やすく拡大<br>
+    自転：1日/秒までは本物の速さ（それより速いときは見やすく遅くしている）<br>
     ドラッグ：回転／右ドラッグ：移動<br>ズーム：右のバー・ホイール・ピンチ・＋−キー<br>
     <em>惑星をクリック → 追いかけモード（ESCで解除）</em>
   </footer>
@@ -1217,7 +1218,8 @@ function spinStep(b, dt) {
   }
   if (!state.playing) return;
   const rate = 2 * Math.PI * state.speed / Math.abs(b.d.rot);
-  b.spin += Math.sign(b.d.rot) * Math.min(rate, 2 * Math.PI * 0.5) * dt;
+  // 1日/秒までは本物の速さ（いちばん速い木星でも1秒に2.4回転）。それより速いと車輪が止まって見えるのと同じ現象が起きるので、1秒に2.5回転までにおさえる
+  b.spin += Math.sign(b.d.rot) * Math.min(rate, 2 * Math.PI * 2.5) * dt;
   b.mesh.rotation.y = b.spin;
 }
 function updateBodies(dt) {
