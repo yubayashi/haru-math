@@ -194,6 +194,34 @@ svg.px{display:block;image-rendering:pixelated;shape-rendering:crispEdges}
 .stage .no{font-size:22px;color:var(--acc);min-width:46px;text-align:center}
 .stage .clear{color:var(--ok)}
 
+/* せいちょう きろく（2026-09-27）。まえの じぶんと くらべる 画面 */
+.gr-top{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.gr-top .big{font-size:26px;color:var(--acc)}
+.gr-isl{color:var(--sub);font-size:13px;margin:12px 0 4px}
+.gr-row{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 116px;gap:4px 10px;align-items:center;
+  padding:5px 0;border-bottom:1px solid #26264a}
+.gr-name{font-size:14px;line-height:1.3}
+.gr-bars{display:grid;gap:3px}
+.gr-bar{height:9px;background:#000;border:1px solid #3a3a60;position:relative}
+.gr-bar>i{position:absolute;left:0;top:0;bottom:0}
+.gr-bar.f>i{background:#6a6a98} .gr-bar.b>i{background:var(--acc)}
+.gr-val{text-align:right;font-size:14px;white-space:nowrap}
+.gr-val em{font-style:normal;color:var(--ok);margin-left:4px}
+.gr-val.next{font-size:12.5px;color:var(--sub)}
+.gr-val.next b{color:var(--txt);font-weight:400}
+.gr-key-legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--sub);margin-top:8px}
+.gr-key-legend i{display:inline-block;width:18px;height:12px;border:1px solid #000;vertical-align:-1px;margin-right:4px}
+.gr-kb{--k:clamp(24px,7.2vw,40px);display:grid;gap:4px;overflow-x:auto}
+.gr-kbrow{display:flex;gap:4px}
+.gr-key{width:var(--k);height:var(--k);flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  text-transform:uppercase;font-size:calc(var(--k) * .42);border:2px solid #000;position:relative}
+.gr-key.l0{background:transparent;border:2px dashed #3a3a60;color:#5a5a88}
+.gr-key.l1{background:#3a2a05;color:#b8a878} .gr-key.l2{background:#6a4a08;color:#fff}
+.gr-key.l3{background:#9a6c0c;color:#fff} .gr-key.l4{background:#c98f14;color:#000}
+.gr-key.l5{background:#ffd23f;color:#000;box-shadow:0 0 8px rgba(255,210,63,.7)}
+.gr-key.bump::after{content:"";position:absolute;bottom:3px;left:35%;right:35%;height:2px;background:currentColor;opacity:.7}
+@media (max-width:560px){ .gr-row{grid-template-columns:minmax(0,1fr) 108px} .gr-name{grid-column:1 / -1} }
+
 /* ウィンドウ／メニュー */
 .dqmenu{list-style:none;margin:0;padding:0;min-width:140px}
 .dqmenu li{padding:1px 0 1px 21px;position:relative;cursor:pointer;white-space:nowrap}
@@ -567,6 +595,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
       <button class="sub" id="btn-cards">カードずかん</button>
       <button class="sub" id="btn-status">ステータス</button>
       <button class="sub" id="btn-menu">メニュー</button>
+      <button class="sub" id="btn-growth">せいちょう</button>
       <div class="sp"></div>
       <button class="sub sm" id="btn-title">タイトルへ</button>
     </div>
@@ -757,6 +786,27 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
     <div class="card"><h3>じゅもん</h3><div id="st-spells"></div></div>
     <div class="card"><h3>どうぐ</h3><div id="st-tools"></div></div>
     <button class="sub" id="btn-st-back">もどる</button>
+  </div>
+
+  <!-- ============ GROWTH（せいちょう きろく・2026-09-27） ============ -->
+  <div class="screen" id="sc-growth">
+    <div class="card">
+      <h3>せいちょう きろく</h3>
+      <p class="muted">まえの じぶんと くらべよう。</p>
+      <div class="gr-top" id="gr-top"></div>
+    </div>
+    <div class="card">
+      <h3>おなじ めんで くらべる</h3>
+      <p class="muted">はじめて クリアした とき（グレー）と、いちばん よかった とき（きいろ）。そくどは もじ/ふん。
+        シューティングは せいかくさ（%）で くらべる。</p>
+      <div id="gr-stages"></div>
+    </div>
+    <div class="card">
+      <h3>ゆびが おぼえた キー</h3>
+      <p class="muted">さがさずに はやく うてる キーほど ひかる。</p>
+      <div id="gr-kb"></div>
+    </div>
+    <button class="sub" id="btn-gr-back">もどる</button>
   </div>
 
   <!-- ============ MENU ============ -->
@@ -1142,7 +1192,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.5.1";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
+const ENGINE_VERSION = "1.6.0";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -1402,12 +1452,26 @@ function newSave(name){
     equipment:{weapon:null, armor:null, accessory:null},
     inventory:[], tools:{}, cosmetics:[], look:null, title:null, cards:{},
     spirits: sp, keyStats: {},
-    packProgress: { core:{cleared:[], best:{}} },
+    packProgress: { core:{cleared:[], best:{}, first:{}} },
     daily:{streak:0, best:0, lastDate:null, todayCount:0},
     records:{bestWpm:0, bestAcc:0, recent:[]},
     settings:{layout:"US", kb:"auto", hint:"on", log:"on", homecheck:"on"}
   };
 }
+/* 面ごとの「1かいめ」の きろく（せいちょう 画面で さいこう記録と くらべる）。
+   2026-09-27 より 前は セーブに 残して いなかったので、息子の 学習ログから 1回だけ 入れる。
+   名前は 入れない。入れるのは「ぼうけんしゃ」で 9/27 より 前に 作った セーブの、クリアずみの 面だけ */
+const FIRST_SEED = {
+  core:{s0:{cpm:34,acc:0.915,d:"2026-09-12"}, s1:{cpm:34,acc:0.927,d:"2026-09-12"}, s2:{cpm:33,acc:0.93,d:"2026-09-12"}, s3:{cpm:32,acc:0.935,d:"2026-09-12"}},
+  dlc_dakuon_youon:{d_s4:{cpm:41,acc:0.925,d:"2026-09-19"}, d_s5:{cpm:27,acc:0.941,d:"2026-09-19"}, d_s6:{cpm:48,acc:0.969,d:"2026-09-19"}},
+  dlc_shooting:{sh_s12:{cpm:28,acc:0.808,d:"2026-09-19"}, sh_s13:{cpm:30,acc:0.847,d:"2026-09-19"}, sh_s14:{cpm:36,acc:0.4,d:"2026-09-19"}},
+  dlc_spirit:{sp_s16:{cpm:50,acc:0.96,d:"2026-09-23"}, sp_s17:{cpm:49,acc:0.943,d:"2026-09-23"}, sp_s18:{cpm:39,acc:0.842,d:"2026-09-23"}, sp_s19:{cpm:42,acc:0.944,d:"2026-09-23"}},
+  dlc_english:{en_s18:{cpm:43,acc:0.932,d:"2026-09-23"}, en_s19:{cpm:41,acc:0.963,d:"2026-09-23"}, en_s20:{cpm:35,acc:0.461,d:"2026-09-23"}, en_s21:{cpm:30,acc:0.971,d:"2026-09-23"}, en_s22:{cpm:36,acc:0.984,d:"2026-09-23"}},
+  dlc_kanji:{kj_s23:{cpm:58,acc:1,d:"2026-09-23"}, kj_s24:{cpm:43,acc:0.956,d:"2026-09-23"}, kj_s25:{cpm:43,acc:0.953,d:"2026-09-23"}, kj_s26:{cpm:43,acc:0.899,d:"2026-09-23"}},
+  dlc_suuji:{n_s7:{cpm:55,acc:1,d:"2026-09-24"}, n_s8:{cpm:49,acc:0.982,d:"2026-09-24"}, n_s9:{cpm:52,acc:0.984,d:"2026-09-24"}, n_s10:{cpm:45,acc:0.98,d:"2026-09-24"}, n_s11:{cpm:58,acc:0.989,d:"2026-09-24"}},
+  dlc_pt:{pt_s32:{cpm:51,acc:1,d:"2026-09-24"}, pt_s33:{cpm:44,acc:0.969,d:"2026-09-25"}, pt_s34:{cpm:51,acc:0.987,d:"2026-09-25"}, pt_s35:{cpm:40,acc:0.934,d:"2026-09-25"}},
+  dlc_math:{m_s27:{cpm:34,acc:0.967,d:"2026-09-25"}, m_s28:{cpm:24,acc:0.989,d:"2026-09-25"}, m_s29:{cpm:54,acc:0.971,d:"2026-09-25"}, m_s30:{cpm:46,acc:0.965,d:"2026-09-25"}}
+};
 function migrate(s){
   if (!s.settings) s.settings = {layout:"US", kb:"auto", hint:"on", log:"on", homecheck:"on"};
   if (!s.settings.log) s.settings.log = "on";
@@ -1418,6 +1482,19 @@ function migrate(s){
   if (!s.records) s.records = {bestWpm:0, bestAcc:0, recent:[]};
   /* v6: 面ごとの さいこう記録。むかしの セーブには 無いので 空で 足す */
   Object.values(s.packProgress || {}).forEach(pp => { if (!pp.best) pp.best = {}; });
+  /* v7: 面ごとの 1かいめ。9/27 より 前の ぶんは FIRST_SEED から 1回だけ（上の コメント） */
+  Object.values(s.packProgress || {}).forEach(pp => { if (!pp.first) pp.first = {}; });
+  if (!s.firstSeeded){
+    s.firstSeeded = true;
+    if (s.playerName === "ぼうけんしゃ" && s.createdAt && s.createdAt < "2026-09-27"){
+      Object.keys(FIRST_SEED).forEach(pid => {
+        const pp = s.packProgress[pid]; if (!pp || !pp.cleared) return;
+        Object.keys(FIRST_SEED[pid]).forEach(sid => {
+          if (pp.cleared.includes(sid) && !pp.first[sid]) pp.first[sid] = Object.assign({}, FIRST_SEED[pid][sid]);
+        });
+      });
+    }
+  }
   /* v6: 生涯の 打鍵数。むかしの セーブは いまの hit を 種に する（すこし 少なめに 出る） */
   Object.values(s.keyStats || {}).forEach(v => { if (v.tot == null) v.tot = v.hit || 0; });
   if (!s.daily) s.daily = {streak:0, best:0, lastDate:null, todayCount:0};
@@ -2713,7 +2790,9 @@ function shootKey(ch){
   }
   const s = B.ships[i];
   B.ships.splice(i,1); s.el.remove();
-  recordKey(ch, true, dt); B.hits++;
+  /* 打鍵の 間隔は 記録しない（dt=0）。シューティングは 敵が 来るのを 待つ 時間が 入るので、
+     キーの はやさに 混ぜると ホームの 8キーだけ おそく 見える（1打 1,100〜1,300ms）。2026-09-27 */
+  recordKey(ch, true, 0); B.hits++;
   B.combo++; B.maxCombo = Math.max(B.maxCombo, B.combo);
   B.mp = Math.min(stats().maxMp, B.mp + 0.35);
   B.totalDmg += Math.max(1, Math.round(stats().atk * comboMul() * (1 + bondOf(ch)/20)));
@@ -2942,6 +3021,10 @@ function finishStage(){
   const newCpm = cpm > prev.cpm, newAcc = acc > prev.acc;
   const medalUp = medalOf(acc) > medalOf(prev.acc);
   pp.best[B.stage.id] = {cpm: Math.max(prev.cpm, cpm), acc: Math.max(prev.acc, acc)};
+  /* 1かいめは 上書きしない（せいちょう 画面で さいこう記録と くらべる もとに なる） */
+  if (!pp.first) pp.first = {};
+  if (first && !pp.first[B.stage.id])
+    pp.first[B.stage.id] = {cpm, acc: Math.round(acc*1000)/1000, d: new Date().toISOString().slice(0,10)};
   const bondBefore = {}; SPIRITS.forEach(s => bondBefore[s.key] = S.spirits[s.key].bond);
   /* きずなは **下がらない**（いちど おぼえた じゅもんを 失わせない）。
      きろくを 半分に するので、そのままだと 下がってしまう */
@@ -4090,6 +4173,74 @@ $("btn-new").onclick = () => {
 };
 $("btn-import-title").onclick = () => { S = loadSave() || newSave("ぼうけんしゃ"); openMenu(); };
 $("btn-title").onclick = () => { save(); refreshTitle(); show("sc-title"); };
+/* ---------- せいちょう きろく（2026-09-27） ----------
+   まえの じぶんと くらべる 画面。**1打の ms や「おそい キー」の じゅんいは 出さない**：
+   数字を 下げる ために かんたんな 面を まわす 動機に なり、とうさんの 計測も ゆがむ
+   （「たくさん 打つ」ほうびを 入れなかったのと おなじ 理由）。
+   くらべるのは「おなじ 面の 1かいめ と さいこう」だけ。中身が おなじ なので そのまま くらべられる。
+   キーボードは ひかり かただけ（数字は 出さない）。 */
+const GR_MS = [1000, 800, 600, 450];             /* 1打の ms。これ いかで ひかりが 1だん あがる */
+function growthLevel(k){
+  const v = S.keyStats[k];
+  if (!v || !v.n || v.n < 5) return 0;          /* まだ あまり うっていない */
+  const ms = v.ms / v.n;
+  return 1 + GR_MS.filter(x => ms <= x).length;  /* 1〜5 */
+}
+function growthRows(){
+  const rows = [];
+  worldList().forEach(w => {
+    const pp = S.packProgress[w.packId]; if (!pp || !pp.first) return;
+    CONTENT.stages.filter(st => st.packId === w.packId && pp.first[st.id]).forEach(st =>
+      rows.push({world: w.name, st, first: pp.first[st.id], best: (pp.best || {})[st.id] || null,
+                 shoot: st.mode === "shoot"}));
+  });
+  return rows;
+}
+function renderGrowth(){
+  const rows = growthRows();
+  /* シューティングは 敵しだいで 速さが きまるので 正確さで くらべる */
+  const val = (r, x) => r.shoot ? Math.round(x.acc * 100) : x.cpm;
+  const grown = r => r.best && val(r, r.best) > val(r, r.first);
+  const up = rows.filter(r => !r.shoot && grown(r)).sort((a, b) => b.best.cpm / b.first.cpm - a.best.cpm / a.first.cpm);
+  const top = up[0];
+  $("gr-top").innerHTML =
+    (top ? '<div>いちばん のびた めん：<b>' + top.st.name + '</b><br>' + top.first.cpm + ' → <span class="big">' +
+             top.best.cpm + '</span> もじ/ふん（' + (top.best.cpm / top.first.cpm).toFixed(1) + 'ばい）</div>'
+         : '<div class="muted">クリアした 面を もういちど あそぶと、ここで くらべられるよ。</div>') +
+    '<div>のびた めん<br><span class="big">' + rows.filter(grown).length + '</span> / ' + rows.length + '</div>' +
+    '<div>いままでに うった かず<br><span class="big">' + lifeKeys().toLocaleString() + '</span> だげん</div>';
+
+  const maxCpm = Math.max(40, ...rows.filter(r => !r.shoot).map(r => Math.max(r.first.cpm, r.best ? r.best.cpm : 0)));
+  let h = "", lastW = null;
+  rows.forEach(r => {
+    if (r.world !== lastW){ h += '<div class="gr-isl">' + r.world + '</div>'; lastW = r.world; }
+    const a = val(r, r.first), b = r.best ? val(r, r.best) : null, g = grown(r);
+    const W = v => Math.max(2, Math.min(100, v / (r.shoot ? 100 : maxCpm) * 100));
+    const u = r.shoot ? "%" : "";
+    h += '<div class="gr-row"><div class="gr-name">' + r.st.name + '</div><div class="gr-bars">' +
+      '<div class="gr-bar f"><i style="width:' + W(a) + '%"></i></div>' +
+      (g ? '<div class="gr-bar b"><i style="width:' + W(b) + '%"></i></div>' : '') + '</div>' +
+      (g ? '<div class="gr-val">' + a + u + ' → <b>' + b + u + '</b>' +
+             (!r.shoot && b / a >= 1.05 ? '<em>' + (b / a).toFixed(1) + 'ばい</em>' : '') + '</div>'
+         : '<div class="gr-val next"><b>' + a + u + '</b> を こえよう！</div>') +
+      '</div>';
+  });
+  $("gr-stages").innerHTML = h || '<p class="muted">まだ クリアした 面が ないよ。</p>';
+
+  const IND = [0, .5, .75, 1.25];
+  let kb = '<div class="gr-kb">';
+  [KB_NUM].concat(KB_ROWS).forEach((row, ri) => {
+    kb += '<div class="gr-kbrow" style="padding-left:calc(var(--k) * ' + IND[ri] + ')">';
+    row.forEach(k => kb += '<div class="gr-key l' + growthLevel(k) + (k === "f" || k === "j" ? " bump" : "") + '">' + k + '</div>');
+    kb += '</div>';
+  });
+  kb += '</div><div class="gr-key-legend"><span>さがしている</span>' +
+    ['#3a2a05', '#6a4a08', '#9a6c0c', '#c98f14', '#ffd23f'].map(c => '<i style="background:' + c + '"></i>').join('') +
+    '<span>ゆびが おぼえた</span><span><i style="border:1px dashed #3a3a60"></i>まだ あまり うっていない</span></div>';
+  $("gr-kb").innerHTML = kb;
+}
+$("btn-growth").onclick = () => { renderGrowth(); show("sc-growth"); };
+$("btn-gr-back").onclick = () => { renderMap(); show("sc-map"); };
 $("btn-status").onclick = () => { renderStatus(); show("sc-status"); };
 $("btn-st-back").onclick = () => { renderMap(); show("sc-map"); };
 $("btn-shop").onclick = openShop;
