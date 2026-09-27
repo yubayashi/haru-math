@@ -1,9 +1,9 @@
 {
   "packId": "dlc_suuji",
-  "packVersion": 7,
+  "packVersion": 8,
   "title": "追加ぼうけん：すうじ と きごう",
   "requiresEngine": ">=1.0.0",
-  "author": "とうさん",
+  "author": "ゆーさん",
   "world": {
     "name": "すうじステーション",
     "style": "snow",

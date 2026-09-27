@@ -1,9 +1,9 @@
 {
   "packId": "dlc_shooting",
-  "packVersion": 6,
+  "packVersion": 7,
   "title": "追加ぼうけん：そらの とりで",
   "requiresEngine": ">=1.0.0",
-  "author": "とうさん",
+  "author": "ゆーさん",
   "world": {
     "name": "そらの とりで",
     "style": "sky",

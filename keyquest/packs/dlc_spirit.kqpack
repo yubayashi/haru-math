@@ -1,9 +1,9 @@
 {
   "packId": "dlc_spirit",
-  "packVersion": 8,
+  "packVersion": 9,
   "title": "追加ぼうけん：せいれいの しんでん",
   "requiresEngine": ">=1.0.0",
-  "author": "とうさん",
+  "author": "ゆーさん",
   "world": {
     "name": "せいれいの しんでん",
     "style": "holy",

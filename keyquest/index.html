@@ -860,7 +860,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
     </div>
     <div class="card">
       <h3>DLC（あたらしい ぼうけん）</h3>
-      <p class="muted">とうさんが つくった ついかコンテンツ（.kqpack）を ここに ドラッグ＆ドロップ。
+      <p class="muted">ゆーさんが つくった ついかコンテンツ（.kqpack）を ここに ドラッグ＆ドロップ。
       レベル・そうび・せいれいは そのままで、あたらしい ステージが ふえます。</p>
       <div class="row" style="margin-bottom:10px">
         <button class="sm" id="btn-remote">ネットから さがす</button>
@@ -906,7 +906,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
       <div class="row">
         <label style="min-width:180px">がくしゅうきろくを おくる</label>
         <select id="set-log" style="max-width:220px">
-          <option value="on">おくる（とうさんが みられる）</option>
+          <option value="on">おくる（ゆーさんが みられる）</option>
           <option value="off">おくらない</option>
         </select>
       </div>
@@ -1215,7 +1215,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.7.1";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
+const ENGINE_VERSION = "1.7.2";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -1485,7 +1485,7 @@ function newSave(name){
 /* せいちょう 画面の きろく（1かいめ・面ごとの 記録・日ごとの 速さ）。2026-09-27 に はじめた。
    それより 前は セーブに 残して いなかったので、息子の 学習ログから 1回だけ 入れる。
    名前は 入れない。入れるのは「ぼうけんしゃ」で 9/27 より 前に 作った セーブの、クリアずみの 面だけ。
-   days = [日, 1打の msの 合計, 打鍵数]（シューティングを のぞく。とうさんの ダッシュボードと おなじ 計算）
+   days = [日, 1打の msの 合計, 打鍵数]（シューティングを のぞく。ゆーさんの ダッシュボードと おなじ 計算）
    hist = 面ごとに [日, もじ/ふん, 正確さ] を クリアした じゅんに */
 const GROWTH_SEED = {
   days:[["2026-09-12",372138,367],["2026-09-19",379456,448],["2026-09-23",990448,1202],["2026-09-24",527052,789],["2026-09-25",565761,929]],
@@ -1552,7 +1552,7 @@ function loadSave(){
 function save(){ if (!S) return; S.updatedAt = new Date().toISOString(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }
 setInterval(save, 30000);
 
-/* ---------- 学習きろくの送信（とうさんの スプレッドシートへ） ----------
+/* ---------- 学習きろくの送信（ゆーさんの スプレッドシートへ） ----------
    ステージをクリアしたときだけ送る。失敗しても遊びには一切影響しない。
    設定でオフにできる。 */
 const LOG_URL = "https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec";
@@ -3124,7 +3124,7 @@ function finishStage(){
   const weak = weakKeys();
   if (weak.length) html += '<p class="muted">にがてな キー：<b style="color:var(--ng)">' +
     weak.map(k => k.toUpperCase()).join(" ") + "</b>　つぎから おおめに でます。</p>";
-  /* とうさんに きょうの けっかを おくる（失敗しても遊びに影響しない） */
+  /* ゆーさんに きょうの けっかを おくる（失敗しても遊びに影響しない） */
   sendLog(
     [ new Date().toLocaleString("ja-JP"), S.playerName, B.stage.name,
       cpm, +(acc*100).toFixed(1), B.maxCombo, B.perfect, B.misses, S.lv,
@@ -3791,7 +3791,7 @@ function renderGlobal(worlds){
     const w = worlds.filter(x => x.packId === nd.dataset.w)[0];
     if (w && w.ghost){
       nd.onclick = async () => {
-        if (w.soon){ toast("この しまは いま とうさんが つくっているよ"); return; }
+        if (w.soon){ toast("この しまは いま ゆーさんが つくっているよ"); return; }
         toast("よみこみ中…");
         try{ await installRemote(w.entry); }
         catch(err){ toast("よみこめませんでした。あとで もういちど"); }
@@ -4099,7 +4099,7 @@ function installPack(text){
 })();
 
 /* ---------- リモート配信（公開URLの packs/index.json を見にいく） ----------
-   とうさんが packs/ に .kqpack を置いて index.json に足すだけで、
+   ゆーさんが packs/ に .kqpack を置いて index.json に足すだけで、
    息子は「ここを おして ついかする」の1クリックで新しい島が増える。
    file:// で開いているときや オフラインのときは 何もしない（遊びには影響しない）。 */
 const CATALOG_PATH = "packs/index.json";
@@ -4239,12 +4239,12 @@ $("btn-import-title").onclick = () => { S = loadSave() || newSave("ぼうけん�
 $("btn-title").onclick = () => { save(); refreshTitle(); show("sc-title"); };
 /* ---------- せいちょう きろく（2026-09-27） ----------
    まえの じぶんと くらべる 画面。**1打の ms や「おそい キー」の じゅんいは 出さない**：
-   数字を 下げる ために かんたんな 面を まわす 動機に なり、とうさんの 計測も ゆがむ
+   数字を 下げる ために かんたんな 面を まわす 動機に なり、ゆーさんの 計測も ゆがむ
    （「たくさん 打つ」ほうびを 入れなかったのと おなじ 理由）。
    くらべるのは「おなじ 面の 1かいめ と さいこう」だけ。中身が おなじ なので そのまま くらべられる。
    キーボードは ひかり かただけ（数字は 出さない）。 */
 const GR_MS = [1000, 800, 600, 450];             /* 1打の ms。これ いかで ひかりが 1だん あがる */
-const GR_GOAL_MS = 450;                          /* もくひょう（とうさんの めやすと おなじ）。1ぷんに 133かい */
+const GR_GOAL_MS = 450;                          /* もくひょう（ゆーさんの めやすと おなじ）。1ぷんに 133かい */
 function growthLevel(k){
   const v = S.keyStats[k];
   if (!v || !v.n || v.n < 5) return 0;          /* まだ あまり うっていない */
@@ -4328,7 +4328,7 @@ function renderGrowth(){
     '<div>いままでに うった かず<br><span class="big">' + lifeKeys().toLocaleString() + '</span> だげん</div>';
 
   /* 日ごとの キーを おす はやさ（1ぷんに なんかい）。うえに いくほど はやい。
-     もくひょうは とうさんの めやす 1打 450ms（＝1ぷんに 133かい）。ゲージは いちばん はやかった 日で みたす
+     もくひょうは ゆーさんの めやす 1打 450ms（＝1ぷんに 133かい）。ゲージは いちばん はやかった 日で みたす
      （へらない。調子の わるい 日が あっても もどらない） */
   const allDays = ((S.growth || {}).days || []).filter(x => x[2] > 0);
   const kpm = x => Math.round(60000 / (x[1] / x[2]));

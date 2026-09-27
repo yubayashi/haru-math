@@ -1,9 +1,9 @@
 {
   "packId": "dlc_dakuon_youon",
-  "packVersion": 6,
+  "packVersion": 7,
   "title": "追加ぼうけん：だくおん・ようおん・つまるおん",
   "requiresEngine": ">=1.0.0",
-  "author": "とうさん",
+  "author": "ゆーさん",
   "world": {
     "name": "だくおん大陸",
     "style": "dark",

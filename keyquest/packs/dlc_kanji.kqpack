@@ -1,9 +1,9 @@
 {
   "packId": "dlc_kanji",
-  "packVersion": 2,
+  "packVersion": 3,
   "title": "追加ぼうけん：ことだまの もり",
   "requiresEngine": ">=1.0.0",
-  "author": "とうさん",
+  "author": "ゆーさん",
   "world": {
     "name": "ことだまの もり",
     "style": "autumn",

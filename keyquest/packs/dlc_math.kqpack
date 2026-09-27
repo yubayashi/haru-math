@@ -1,9 +1,9 @@
 {
   "packId": "dlc_math",
-  "packVersion": 6,
+  "packVersion": 7,
   "title": "けいさんの とう",
   "requiresEngine": ">=1.2.0",
-  "author": "とうさん",
+  "author": "ゆーさん",
   "world": {
     "name": "けいさんの とう",
     "style": "volcano",

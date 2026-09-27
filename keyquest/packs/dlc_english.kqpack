@@ -1,9 +1,9 @@
 {
   "packId": "dlc_english",
-  "packVersion": 6,
+  "packVersion": 7,
   "title": "追加ぼうけん：アルファベット王国",
   "requiresEngine": ">=1.0.0",
-  "author": "とうさん",
+  "author": "ゆーさん",
   "world": {
     "name": "アルファベット王国",
     "style": "stone",

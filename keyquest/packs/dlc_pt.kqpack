@@ -1,9 +1,9 @@
 {
   "packId": "dlc_pt",
-  "packVersion": 3,
+  "packVersion": 4,
   "title": "ポルトガルの みち",
   "requiresEngine": ">=1.2.0",
-  "author": "とうさん",
+  "author": "ゆーさん",
   "world": {
     "name": "ポルトガルの みち",
     "style": "azul",

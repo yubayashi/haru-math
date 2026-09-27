@@ -1,9 +1,9 @@
 {
   "packId": "dlc_casino",
-  "packVersion": 7,
+  "packVersion": 8,
   "title": "追加ぼうけん：カジノの しま",
   "requiresEngine": ">=1.0.0",
-  "author": "とうさん",
+  "author": "ゆーさん",
   "world": {
     "name": "カジノの しま",
     "style": "desert",
