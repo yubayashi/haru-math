@@ -224,6 +224,14 @@ svg.px{display:block;image-rendering:pixelated;shape-rendering:crispEdges}
 .gr-chart text{font-family:inherit;font-size:13px;fill:#8a8ab0}
 .gr-chart .v{fill:#fff;font-size:15px}
 .gr-chart .v.hi{fill:var(--acc)}
+.gr-chart .goal{fill:var(--ok)}
+.gr-goal{margin:6px 0 12px;max-width:620px}
+.gr-goal-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 14px;font-size:14px}
+.gr-goal-top b{color:var(--acc);font-weight:400;font-size:18px}
+.gr-goalbar{height:16px;margin-top:4px}
+.gr-goalbar>i{background:var(--acc)}
+.gr-goal-left{font-size:14px;margin-top:4px;color:var(--ok)}
+.gr-goal-left b{font-weight:400;font-size:18px}
 .gr-pick{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0 8px}
 .gr-pick select{width:auto;max-width:100%}
 .gr-empty{color:var(--sub);font-size:13px;padding:10px 0}
@@ -1207,7 +1215,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.7.0";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
+const ENGINE_VERSION = "1.7.1";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -4236,6 +4244,7 @@ $("btn-title").onclick = () => { save(); refreshTitle(); show("sc-title"); };
    くらべるのは「おなじ 面の 1かいめ と さいこう」だけ。中身が おなじ なので そのまま くらべられる。
    キーボードは ひかり かただけ（数字は 出さない）。 */
 const GR_MS = [1000, 800, 600, 450];             /* 1打の ms。これ いかで ひかりが 1だん あがる */
+const GR_GOAL_MS = 450;                          /* もくひょう（とうさんの めやすと おなじ）。1ぷんに 133かい */
 function growthLevel(k){
   const v = S.keyStats[k];
   if (!v || !v.n || v.n < 5) return 0;          /* まだ あまり うっていない */
@@ -4261,10 +4270,13 @@ function grLine(pts, o){
   o = o || {};
   const W = 600, H = 220, m = {l: 44, r: 30, t: 28, b: 32};
   const vs = pts.map(p => p.v), vmax = Math.max(...vs), vmin = Math.min(...vs);
-  const span = Math.max(10, vmax - vmin), st = span > 60 ? 20 : 10;
-  const lo = Math.max(0, Math.floor((vmin - span * 0.3) / st) * st);
-  let hi = Math.ceil((vmax + span * 0.2) / st) * st;
+  const span = Math.max(10, vmax - vmin);
+  let lo = Math.max(0, vmin - span * 0.3), hi = vmax + span * 0.2;
+  if (o.goal != null) hi = Math.max(hi, o.goal + span * 0.1);   /* もくひょうの 線が 入る ように */
   if (o.max != null) hi = Math.min(hi, o.max);
+  /* めもりは 6本 いかに なる きりの いい はば（つまると よめない） */
+  const st = [5, 10, 20, 25, 50, 100].find(x => (hi - lo) / x <= 6) || 200;
+  lo = Math.floor(lo / st) * st; hi = Math.ceil(hi / st) * st;
   if (hi <= lo) hi = lo + st;
   const X = i => pts.length < 2 ? (m.l + W - m.r) / 2 : m.l + i * (W - m.l - m.r) / (pts.length - 1);
   const Y = v => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
@@ -4273,6 +4285,10 @@ function grLine(pts, o){
     s += '<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(v) + '" y2="' + Y(v) +
          '" stroke="#26264a" stroke-width="1" shape-rendering="crispEdges"/>' +
          '<text x="' + (m.l - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + v + '</text>';
+  if (o.goal != null)
+    s += '<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(o.goal) + '" y2="' + Y(o.goal) +
+         '" stroke="var(--ok)" stroke-width="2" shape-rendering="crispEdges"/>' +
+         '<text class="goal" x="' + (m.l + 6) + '" y="' + (Y(o.goal) - 7) + '">もくひょう ' + o.goal + '</text>';
   const every = Math.max(1, Math.ceil(pts.length / 8));
   pts.forEach((p, i) => {
     if (i % every === 0 || i === pts.length - 1)
@@ -4311,12 +4327,24 @@ function renderGrowth(){
     '<div>のびた めん<br><span class="big">' + rows.filter(grown).length + '</span> / ' + withRef.length + '</div>' +
     '<div>いままでに うった かず<br><span class="big">' + lifeKeys().toLocaleString() + '</span> だげん</div>';
 
-  /* 日ごとの キーを おす はやさ（1ぷんに なんかい）。うえに いくほど はやい */
-  const days = ((S.growth || {}).days || []).filter(x => x[2] > 0).slice(-12);
-  $("gr-days").innerHTML = days.length
-    ? grLine(days.map(x => ({lab: (+x[0].slice(5, 7)) + "/" + (+x[0].slice(8, 10)), v: Math.round(60000 / (x[1] / x[2]))})),
-             {label: "あそんだ 日ごとの キーを おす はやさ"})
-    : '<p class="gr-empty">あそぶと ここに グラフが でるよ。</p>';
+  /* 日ごとの キーを おす はやさ（1ぷんに なんかい）。うえに いくほど はやい。
+     もくひょうは とうさんの めやす 1打 450ms（＝1ぷんに 133かい）。ゲージは いちばん はやかった 日で みたす
+     （へらない。調子の わるい 日が あっても もどらない） */
+  const allDays = ((S.growth || {}).days || []).filter(x => x[2] > 0);
+  const kpm = x => Math.round(60000 / (x[1] / x[2]));
+  const md = x => (+x[0].slice(5, 7)) + "/" + (+x[0].slice(8, 10));
+  const days = allDays.slice(-12), goal = Math.round(60000 / GR_GOAL_MS);
+  let gh = "";
+  if (allDays.length){
+    const bestDay = allDays.reduce((a, x) => kpm(x) > kpm(a) ? x : a), bv = kpm(bestDay);
+    const pct = Math.min(100, bv / goal * 100), left = goal - bv;
+    gh += '<div class="gr-goal"><div class="gr-goal-top"><span>もくひょう <b>' + goal + '</b> かい</span>' +
+          '<span>いちばん はやかった 日 <b>' + bv + '</b> かい（' + md(bestDay) + '）</span></div>' +
+          '<div class="bar gr-goalbar"><i style="width:' + pct.toFixed(1) + '%"></i></div>' +
+          '<div class="gr-goal-left">' + (left > 0 ? 'あと <b>' + left + '</b> かい！' : 'もくひょう たっせい！') + '</div></div>';
+    gh += grLine(days.map(x => ({lab: md(x), v: kpm(x)})), {goal, label: "あそんだ 日ごとの キーを おす はやさ"});
+  } else gh = '<p class="gr-empty">あそぶと ここに グラフが でるよ。</p>';
+  $("gr-days").innerHTML = gh;
 
   /* 面ごとの 折れ線：おなじ 面を 2かい いじょう クリアした ものから えらぶ */
   const pickable = rows.filter(r => r.hist.length >= 2), sel = $("gr-sel");
