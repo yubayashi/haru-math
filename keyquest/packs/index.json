@@ -1,6 +1,6 @@
 {
-  "catalogVersion": 15,
-  "updated": "2026-09-25",
+  "catalogVersion": 16,
+  "updated": "2026-09-27",
   "packs": [
     {
       "packId": "dlc_dakuon_youon",
@@ -80,7 +80,7 @@
       "title": "けいさんの とう",
       "stages": 4,
       "order": 95,
-      "version": 5,
+      "version": 6,
       "desc": "九九・けいさん・漢数字・たんい。答えを 出してから うつ 島。"
     }
   ]

@@ -1,6 +1,6 @@
 {
   "packId": "dlc_math",
-  "packVersion": 5,
+  "packVersion": 6,
   "title": "けいさんの とう",
   "requiresEngine": ">=1.2.0",
   "author": "とうさん",
@@ -1091,7 +1091,7 @@
       "numrow": true,
       "timed": true,
       "recall": true,
-      "recallMs": 4500,
+      "recallMs": 8000,
       "recallHint": "こたえを かんがえよう…",
       "recallOk": "せいかい！",
       "desc": "くりあがり、くりさがり、そして わりざん。あたまの なかで けたを そろえる。",
