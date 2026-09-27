@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 12 — 地球の公転と季節 (Rotação, Translação e Estações)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+  rt { font-size: 9px; color: #888; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #1e3c72, #f39c12);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .tip {
+    background: #fff8e6; border-left: 4px solid #f39c12; border-radius: 8px;
+    padding: 10px 14px; margin: 12px 0; font-size: 14px;
+  }
+  .callout-green {
+    background: #eafaf1; border-left: 4px solid #2ecc71; border-radius: 8px;
+    padding: 10px 14px; margin: 12px 0; font-size: 14px;
+  }
+
+  .two-move { display: flex; gap: 10px; margin: 10px 0; }
+  .two-move > div {
+    flex: 1; background: #f4f8fc; border-radius: 12px; padding: 12px; text-align: center;
+  }
+  .two-move .big { font-size: 30px; }
+  .two-move .name { font-weight: 900; font-size: 17px; color: #2c3e50; }
+  .two-move .time { font-weight: 900; color: #e67e22; }
+  .two-move .pt { font-size: 12px; color: #2980b9; }
+
+  canvas { display: block; width: 100%; max-width: 320px; margin: 8px auto; border-radius: 12px; }
+  .canvas-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .canvas-row > div { flex: 1 1 260px; max-width: 320px; }
+  .canvas-cap { text-align: center; font-size: 12px; color: #888; font-weight: 700; }
+
+  .slider-wrap { margin: 10px 0 4px; }
+  .slider-wrap input[type=range] { width: 100%; accent-color: #e67e22; }
+  .slider-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: #555; }
+  .slider-label .val { color: #e67e22; font-weight: 900; font-size: 16px; }
+
+  .row-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
+  .act-btn {
+    background: #e67e22; color: #fff; border: none; border-radius: 10px;
+    padding: 8px 18px; font-size: 15px; font-weight: 900; cursor: pointer; font-family: inherit;
+  }
+  .act-btn.sub { background: #ecf0f1; color: #2c3e50; }
+  .act-btn:active { transform: scale(0.97); }
+
+  .sim-msg {
+    text-align: center; font-weight: 900; min-height: 28px; margin-top: 6px; color: #2c3e50;
+  }
+  .toggle { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; margin: 6px 0; }
+  .toggle input { width: 18px; height: 18px; accent-color: #e67e22; }
+
+  .readout { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  .readout th, .readout td { padding: 6px 4px; border-bottom: 1px solid #eee; text-align: center; }
+  .readout th { color: #888; font-weight: 700; font-size: 12px; }
+  .readout td:first-child { text-align: left; font-weight: 900; }
+  .season-tag { display: inline-block; border-radius: 8px; padding: 0 8px; font-weight: 900; }
+  .s-haru { background: #fde2ef; color: #c0396b; }
+  .s-natsu { background: #fdebd0; color: #d35400; }
+  .s-aki { background: #f6e3cf; color: #935116; }
+  .s-fuyu { background: #dbeafe; color: #1f5fa8; }
+  .s-none { background: #eee; color: #666; }
+
+  .reveal-box { display: none; margin-top: 10px; }
+
+  .q { border-top: 1px dashed #ddd; padding: 14px 0 6px; }
+  .q:first-of-type { border-top: none; }
+  .q-text { font-weight: 900; margin-bottom: 8px; }
+  .q-num {
+    display: inline-block; width: 24px; height: 24px; border-radius: 50%;
+    background: #2c3e50; color: #fff; text-align: center; line-height: 24px;
+    font-size: 13px; margin-right: 6px;
+  }
+  .choices { display: flex; flex-direction: column; gap: 6px; }
+  .choice {
+    text-align: left; background: #f8f9fa; border: 2px solid #e5e8eb; border-radius: 10px;
+    padding: 8px 12px; font-size: 14px; font-family: inherit; cursor: pointer;
+  }
+  .choice.correct { background: #eafaf1; border-color: #2ecc71; font-weight: 900; }
+  .choice.wrong { background: #fdecea; border-color: #e74c3c; color: #999; }
+  .choice:disabled { cursor: default; }
+  .num-row { display: flex; gap: 8px; align-items: center; }
+  .num-row input {
+    width: 90px; font-size: 18px; font-weight: 900; text-align: center;
+    border: 2px solid #ccc; border-radius: 10px; padding: 4px; font-family: inherit;
+  }
+  .num-row input.correct { border-color: #2ecc71; background: #eafaf1; }
+  .num-row input.wrong { border-color: #e74c3c; background: #fdecea; }
+  .feedback { font-size: 13px; margin-top: 6px; min-height: 18px; }
+  .feedback.correct { color: #27ae60; font-weight: 700; }
+  .feedback.wrong { color: #c0392b; font-weight: 700; }
+
+  .vocab { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; font-size: 13px; }
+  .vocab b { color: #2980b9; }
+
+  #result-box { display: none; text-align: center; }
+  #result-score { font-size: 24px; font-weight: 900; color: #e67e22; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 12 · CIÊNCIAS</div>
+    <h1>🌍 地球はなぜ 太陽に落ちない？<br>季節はなぜ ある？</h1>
+    <div class="sub">ドラえもん41巻 159ページから</div>
+  </div>
+
+  <!-- ===== 1. 2つの動き ===== -->
+  <div class="card">
+    <div class="card-title">🌀 地球は 2つの回り方を している</div>
+    <div class="two-move">
+      <div>
+        <div class="big">🔄</div>
+        <div class="name"><ruby>自転<rt>じてん</rt></ruby></div>
+        <div>自分がコマみたいに回る</div>
+        <div class="time">1回 = 1日</div>
+        <div class="pt">rotação</div>
+      </div>
+      <div>
+        <div class="big">☀️🌍</div>
+        <div class="name"><ruby>公転<rt>こうてん</rt></ruby></div>
+        <div>太陽のまわりを回る</div>
+        <div class="time">1周 = 1年</div>
+        <div class="pt">translação</div>
+      </div>
+    </div>
+    <p>自転で <b>昼と夜</b> ができる。公転で <b>1年</b> ができる。<br>
+    漫画では、この2つが止まってしまって「太陽がぐんぐん近づいてくる」大さわぎになったね。</p>
+  </div>
+
+  <!-- ===== 2. 公転シミュレーター ===== -->
+  <div class="card">
+    <div class="card-title">🧪 実験 — 公転が止まると、本当に太陽に落ちる？</div>
+    <p>太陽は、地球を <b>引っぱっている</b>（<ruby>引力<rt>いんりょく</rt></ruby>）。<br>
+    それなのに地球が落ちないのは、<b>横にものすごい速さで走っている</b>から。</p>
+    <p style="color:#666; font-size:14px;">地球を横に走らせる速さを変えて「発射」してみよう。<br>
+    0% が漫画と同じ（公転が止まった地球）。</p>
+
+    <canvas id="orbit" width="600" height="600"></canvas>
+    <div class="slider-wrap">
+      <div class="slider-label"><span>横に走る速さ</span><span class="val" id="speed-val">0%</span></div>
+      <input type="range" id="speed" min="0" max="150" step="10" value="0">
+    </div>
+    <div class="row-btns">
+      <button class="act-btn" onclick="orbLaunch()">🚀 発射</button>
+    </div>
+    <div class="sim-msg" id="orbit-msg">まずは 0% のまま発射してみよう</div>
+
+    <div class="tip">
+      <b>💡 ためしてほしい順番:</b> 0% → 100% → 60% → 150%<br>
+      速すぎても おそすぎても ダメ。今の地球は <b>ちょうどいい速さ</b>（秒速 約30km！）で走っているから、落ちずに回り続けている。
+    </div>
+  </div>
+
+  <!-- ===== 3. 予想 ===== -->
+  <div class="card">
+    <div class="card-title">🤔 予想してみよう — 夏が暑いのは、太陽に近いから？</div>
+    <p>地球が太陽に <b>いちばん近づく</b> のは、何月ごろだと思う？<br>
+    答えを言ってから、ボタンを押してね。</p>
+    <div class="row-btns">
+      <button class="act-btn sub" onclick="document.getElementById('reveal1').style.display='block'; this.style.display='none'">答えを見る</button>
+    </div>
+    <div class="reveal-box" id="reveal1">
+      <div class="callout-green">
+        <b>答え：1月</b>（北半球は まん中の冬！）<br>
+        1月がいちばん近くて、7月がいちばん遠い。でも その差は たったの 3%くらい。<br>
+        だから <b>「近いから夏」ではない</b>。本当の理由は、次の実験で。
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 4. 季節シミュレーター ===== -->
+  <div class="card">
+    <div class="card-title">🌏 季節の実験 — 地軸の かたむき</div>
+    <p>地球の じく（<ruby>地軸<rt>ちじく</rt></ruby>）は、まっすぐじゃなくて <b>23.4° かたむいている</b>。<br>
+    しかも、1年中 <b>同じ方向</b> にかたむいたまま 太陽のまわりを回る。漫画の図と同じだね。</p>
+
+    <div class="canvas-row">
+      <div>
+        <canvas id="top" width="600" height="600"></canvas>
+        <div class="canvas-cap">上から見た図（北極の上から）</div>
+      </div>
+      <div>
+        <canvas id="side" width="600" height="600"></canvas>
+        <div class="canvas-cap">太陽の横から見た地球（その日のお昼）</div>
+      </div>
+    </div>
+
+    <div class="slider-wrap">
+      <div class="slider-label"><span>日にち</span><span class="val" id="date-val">9月27日</span></div>
+      <input type="range" id="doy" min="1" max="365" step="1" value="270">
+    </div>
+    <div class="row-btns">
+      <button class="act-btn sub" onclick="setDoy(270)">きょう</button>
+      <button class="act-btn sub" onclick="setDoy(172)">6月21日</button>
+      <button class="act-btn sub" onclick="setDoy(355)">12月21日</button>
+      <button class="act-btn" id="play-btn" onclick="togglePlay()">▶ 1年を回す</button>
+    </div>
+    <label class="toggle"><input type="checkbox" id="tilt" checked> 地軸を かたむける（23.4°）</label>
+
+    <table class="readout">
+      <tr><th></th><th>季節</th><th>お昼の太陽の高さ</th><th>昼の長さ</th></tr>
+      <tr id="r-pt"><td>🇵🇹 ポルトガル</td><td></td><td></td><td></td></tr>
+      <tr id="r-jp"><td>🇯🇵 日本</td><td></td><td></td><td></td></tr>
+      <tr id="r-au"><td>🇦🇺 オーストラリア</td><td></td><td></td><td></td></tr>
+    </table>
+
+    <div class="tip">
+      <b>💡 やってみて:</b><br>
+      ① 6月21日と12月21日で、ポルトガルの「太陽の高さ」と「昼の長さ」をくらべる<br>
+      ② オーストラリアは どうなっている？<br>
+      ③ チェックを外して、地軸を まっすぐにしてみる。季節は どうなる？
+    </div>
+  </div>
+
+  <!-- ===== 5. 懐中電灯 ===== -->
+  <div class="card">
+    <div class="card-title">🔦 なぜ「太陽が高い」と暑いの？</div>
+    <svg viewBox="0 0 320 150" style="width:100%; max-width:420px; display:block; margin:0 auto;">
+      <!-- 真上から -->
+      <rect x="55" y="10" width="30" height="18" rx="4" fill="#555"/>
+      <polygon points="60,28 80,28 95,120 45,120" fill="#f9d56e" opacity="0.75"/>
+      <line x1="10" y1="120" x2="150" y2="120" stroke="#8d6e63" stroke-width="4"/>
+      <line x1="45" y1="128" x2="95" y2="128" stroke="#e67e22" stroke-width="3"/>
+      <text x="70" y="145" text-anchor="middle" font-size="12" font-weight="900" fill="#d35400">せまい → あつい</text>
+      <!-- ななめから -->
+      <g transform="rotate(-50 215 20)">
+        <rect x="200" y="10" width="30" height="18" rx="4" fill="#555"/>
+      </g>
+      <polygon points="222,38 236,24 310,120 180,120" fill="#f9d56e" opacity="0.45"/>
+      <line x1="170" y1="120" x2="315" y2="120" stroke="#8d6e63" stroke-width="4"/>
+      <line x1="180" y1="128" x2="310" y2="128" stroke="#2980b9" stroke-width="3"/>
+      <text x="245" y="145" text-anchor="middle" font-size="12" font-weight="900" fill="#2980b9">ひろい → うすい</text>
+    </svg>
+    <p>同じライトでも、<b>真上から</b>当てると光が せまい所に集まって あつくなる。<br>
+    <b>ななめから</b>だと 光が広がって うすくなる。<br>
+    夏は太陽が高い（光が真上に近い）＋ 昼が長い。冬は その反対。<b>これが季節の正体。</b></p>
+    <div class="callout-green">
+      <b>✅ 家でできる実験:</b> 懐中電灯（スマホのライト）を 紙に 真上から当てたときと、ななめから当てたときで、明るい部分の大きさを くらべてみよう。
+    </div>
+  </div>
+
+  <!-- ===== 6. クイズ ===== -->
+  <div class="card">
+    <div class="card-title">✏️ たしかめクイズ</div>
+    <div id="quiz"></div>
+
+    <div class="q">
+      <div class="q-text"><span class="q-num">9</span>角度のレッスンを思い出して！ ポルトガル（北緯41°）で、秋分の日（9月23日ごろ）の お昼の太陽の高さは 何度？</div>
+      <p style="font-size:13px; color:#666;">ヒント：秋分の日は、赤道で太陽が真上（90°）。そこから北へ 41° 行くと、太陽はその分だけ低くなる。</p>
+      <div class="num-row">
+        <input type="text" id="q9" inputmode="numeric" placeholder="?"> <b>°</b>
+        <button class="act-btn" onclick="numCheck()">確認</button>
+      </div>
+      <div class="feedback" id="q9-fb"></div>
+    </div>
+  </div>
+
+  <div class="card" id="result-box">
+    <div id="result-score"></div>
+    <div id="result-msg"></div>
+  </div>
+
+  <!-- ===== 7. ことば ===== -->
+  <div class="card">
+    <div class="card-title">🇵🇹 学校で使うことば</div>
+    <div class="vocab">
+      <div><b>rotação</b> 自転</div>
+      <div><b>translação</b> 公転</div>
+      <div><b>eixo da Terra</b> 地軸</div>
+      <div><b>órbita</b> 公転の通り道</div>
+      <div><b>hemisfério norte</b> 北半球</div>
+      <div><b>hemisfério sul</b> 南半球</div>
+      <div><b>estações do ano</b> 季節</div>
+      <div><b>gravidade</b> 引力</div>
+      <div><b>solstício</b> 夏至・冬至</div>
+      <div><b>equinócio</b> 春分・秋分</div>
+    </div>
+    <div class="tip" style="margin-top:14px;">
+      <b>📝 テストでの書き方:</b><br>
+      "As estações do ano existem porque o eixo da Terra está inclinado.
+      Quando o hemisfério norte está inclinado para o Sol, é verão em Portugal."
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+/* ============ 共通 ============ */
+function setupCanvas(id) {
+  const c = document.getElementById(id);
+  const ctx = c.getContext('2d');
+  ctx.setTransform(2, 0, 0, 2, 0, 0); // 300x300 の座標で描く
+  return ctx;
+}
+const STARS = Array.from({ length: 50 }, (_, i) => ({
+  x: (i * 97) % 300, y: (i * 53 + (i * i) % 41) % 300, r: (i % 3) * 0.4 + 0.4
+}));
+function drawSpace(ctx) {
+  ctx.fillStyle = '#0b1733';
+  ctx.fillRect(0, 0, 300, 300);
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  STARS.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill(); });
+}
+function drawSun(ctx, x, y, r) {
+  const g = ctx.createRadialGradient(x, y, r * 0.3, x, y, r * 2);
+  g.addColorStop(0, 'rgba(255,200,60,0.9)');
+  g.addColorStop(1, 'rgba(255,160,0,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r * 2, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ffd23f';
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+}
+
+/* ============ 公転シミュレーター ============ */
+const oc = setupCanvas('orbit');
+const O = { cx: 150, cy: 150, r0: 110, vc: 110, sunR: 18, earthR: 6 };
+O.GM = O.vc * O.vc * O.r0;
+O.period = 2 * Math.PI * O.r0 / O.vc;
+let orb = null, orbRaf = null;
+
+function orbDraw() {
+  drawSpace(oc);
+  drawSun(oc, O.cx, O.cy, O.sunR);
+  // 今の地球の通り道（点線）
+  oc.setLineDash([3, 5]);
+  oc.strokeStyle = 'rgba(255,255,255,0.25)';
+  oc.beginPath(); oc.arc(O.cx, O.cy, O.r0, 0, Math.PI * 2); oc.stroke();
+  oc.setLineDash([]);
+  if (!orb) {
+    drawEarthDot(O.cx + O.r0, O.cy);
+    return;
+  }
+  oc.strokeStyle = '#5dade2'; oc.lineWidth = 2;
+  oc.beginPath();
+  orb.trail.forEach((p, i) => i ? oc.lineTo(p[0], p[1]) : oc.moveTo(p[0], p[1]));
+  oc.stroke(); oc.lineWidth = 1;
+  if (!orb.crashed) drawEarthDot(orb.x, orb.y);
+  oc.fillStyle = '#fff'; oc.font = 'bold 12px Nunito, sans-serif';
+  oc.fillText(Math.floor(orb.t / O.period * 365) + ' 日目', 10, 20);
+}
+function drawEarthDot(x, y) {
+  oc.fillStyle = '#3498db';
+  oc.beginPath(); oc.arc(x, y, O.earthR, 0, Math.PI * 2); oc.fill();
+  oc.fillStyle = '#2ecc71';
+  oc.beginPath(); oc.arc(x - 1.5, y - 1.5, 2.5, 0, Math.PI * 2); oc.fill();
+}
+function orbLaunch() {
+  cancelAnimationFrame(orbRaf);
+  const pct = +document.getElementById('speed').value / 100;
+  orb = { x: O.cx + O.r0, y: O.cy, vx: 0, vy: -O.vc * pct, t: 0, trail: [], minR: O.r0, crashed: false, pct };
+  document.getElementById('orbit-msg').textContent = '…';
+  orbRaf = requestAnimationFrame(orbStep);
+}
+function orbStep() {
+  const dt = 1 / 600;
+  for (let i = 0; i < 10; i++) {
+    const dx = orb.x - O.cx, dy = orb.y - O.cy;
+    const r = Math.hypot(dx, dy);
+    const a = -O.GM / (r * r * r);
+    orb.vx += a * dx * dt; orb.vy += a * dy * dt;
+    orb.x += orb.vx * dt; orb.y += orb.vy * dt;
+    orb.t += dt;
+    orb.minR = Math.min(orb.minR, r);
+  }
+  orb.trail.push([orb.x, orb.y]);
+  const r = Math.hypot(orb.x - O.cx, orb.y - O.cy);
+  const msg = document.getElementById('orbit-msg');
+  let done = false;
+  if (r < O.sunR + O.earthR) {
+    orb.crashed = true; done = true;
+    msg.textContent = orb.pct === 0
+      ? '☀️ まっすぐ太陽に落ちた！ 漫画と同じ。たった ' + Math.floor(orb.t / O.period * 365) + ' 日で！'
+      : '☀️ 太陽に落ちた！ 速さが足りない';
+  } else if (r > 250) {
+    done = true;
+    msg.textContent = '🚀 太陽から はなれて、遠くへ飛んでいった！ 速すぎ';
+  } else if (orb.t > O.period * 1.6) {
+    done = true;
+    if (Math.abs(orb.pct - 1) < 0.01) msg.textContent = '🌍 ちゃんと回り続ける！ これが今の地球';
+    else if (orb.minR < O.r0 * 0.5) msg.textContent = '🔥 落ちなかったけど、太陽にすごく近づく ゆがんだ輪。これじゃ暑すぎる！';
+    else msg.textContent = '🌀 回るけど、太陽に近づいたり はなれたり。暑すぎる時と 寒すぎる時が来る！';
+  }
+  orbDraw();
+  if (!done) orbRaf = requestAnimationFrame(orbStep);
+}
+document.getElementById('speed').addEventListener('input', e => {
+  document.getElementById('speed-val').textContent = e.target.value + '%';
+});
+orbDraw();
+
+/* ============ 季節シミュレーター ============ */
+const tc = setupCanvas('top');
+const sc = setupCanvas('side');
+const TILT = 23.44;
+const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const PLACES = [
+  { id: 'r-pt', lat: 41, label: 'ポルトガル', north: true },
+  { id: 'r-jp', lat: 35, label: '日本', north: true },
+  { id: 'r-au', lat: -34, label: 'オーストラリア', north: false },
+];
+const SEASONS_N = ['冬', '冬', '春', '春', '春', '夏', '夏', '夏', '秋', '秋', '秋', '冬'];
+const SEASON_CLASS = { '春': 's-haru', '夏': 's-natsu', '秋': 's-aki', '冬': 's-fuyu' };
+const rad = d => d * Math.PI / 180;
+let playTimer = null;
+
+function doyToDate(doy) {
+  let m = 0;
+  while (doy > MONTH_DAYS[m]) { doy -= MONTH_DAYS[m]; m++; }
+  return { month: m + 1, day: doy };
+}
+function tiltOn() { return document.getElementById('tilt').checked; }
+function declination(doy) {
+  return tiltOn() ? TILT * Math.sin(2 * Math.PI * (doy - 80) / 365) : 0;
+}
+function noonAltitude(lat, dec) { return 90 - Math.abs(lat - dec); }
+function dayLength(lat, dec) {
+  const x = -Math.tan(rad(lat)) * Math.tan(rad(dec));
+  if (x <= -1) return 24;
+  if (x >= 1) return 0;
+  return 2 * (Math.acos(x) * 180 / Math.PI) / 15;
+}
+function fmtHours(h) {
+  const hh = Math.floor(h), mm = Math.round((h - hh) * 60);
+  return mm === 60 ? (hh + 1) + '時間' : hh + '時間' + (mm ? mm + '分' : '');
+}
+
+function drawTop(doy) {
+  const ctx = tc;
+  drawSpace(ctx);
+  const cx = 150, cy = 150, R = 100;
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  drawSun(ctx, cx, cy, 16);
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.font = 'bold 11px Nunito, sans-serif';
+  ctx.textAlign = 'center';
+  [[172, '6月'], [266, '9月'], [355, '12月'], [80, '3月']].forEach(([d, l]) => {
+    const th = 2 * Math.PI * (d - 172) / 365;
+    ctx.fillText(l, cx + (R - 26) * Math.cos(th), cy - (R - 26) * Math.sin(th) + 4);
+  });
+  const th = 2 * Math.PI * (doy - 172) / 365;
+  const ex = cx + R * Math.cos(th), ey = cy - R * Math.sin(th);
+  const er = 13;
+  // 夜側
+  ctx.fillStyle = '#1b2a4a';
+  ctx.beginPath(); ctx.arc(ex, ey, er, 0, Math.PI * 2); ctx.fill();
+  // 昼側（太陽の方）
+  const a = Math.atan2(cy - ey, cx - ex);
+  ctx.fillStyle = '#3498db';
+  ctx.beginPath(); ctx.moveTo(ex, ey); ctx.arc(ex, ey, er, a - Math.PI / 2, a + Math.PI / 2); ctx.closePath(); ctx.fill();
+  // 北極の向き（1年中おなじ）
+  if (tiltOn()) {
+    ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex - 24, ey); ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#ff8a80';
+    ctx.fillText('北極', ex - 32, ey - 8);
+  }
+  ctx.textAlign = 'left';
+}
+
+function drawSide(doy) {
+  const ctx = sc;
+  drawSpace(ctx);
+  const dec = declination(doy);
+  const cx = 175, cy = 150, R = 85;
+  // 太陽の光
+  ctx.strokeStyle = 'rgba(255,210,63,0.8)'; ctx.fillStyle = 'rgba(255,210,63,0.8)';
+  for (let y = 75; y <= 225; y += 30) {
+    ctx.beginPath(); ctx.moveTo(8, y); ctx.lineTo(70, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(70, y - 4); ctx.lineTo(78, y); ctx.lineTo(70, y + 4); ctx.fill();
+  }
+  ctx.font = 'bold 11px Nunito, sans-serif';
+  ctx.fillText('☀️ 太陽の光', 8, 60);
+  // 地球
+  ctx.fillStyle = '#3498db';
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+  // 夜（太陽と反対側）
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
+  ctx.fillStyle = 'rgba(5,10,30,0.72)';
+  ctx.fillRect(cx, cy - R, R, 2 * R);
+  ctx.restore();
+  // 北極の向き n と 赤道の向き p
+  const d = rad(dec);
+  const n = [-Math.sin(d), -Math.cos(d)];
+  const p = [Math.cos(d), -Math.sin(d)];
+  // 地軸
+  ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(cx - n[0] * (R + 18), cy - n[1] * (R + 18));
+  ctx.lineTo(cx + n[0] * (R + 18), cy + n[1] * (R + 18));
+  ctx.stroke(); ctx.lineWidth = 1;
+  ctx.fillStyle = '#ff8a80';
+  ctx.fillText('北極', cx + n[0] * (R + 26) - 12, cy + n[1] * (R + 26) + 4);
+  // 緯線
+  function latLine(lat, color, dash) {
+    const s = Math.sin(rad(lat)), c = Math.cos(rad(lat));
+    const mx = cx + R * s * n[0], my = cy + R * s * n[1];
+    ctx.strokeStyle = color; ctx.setLineDash(dash || []);
+    ctx.beginPath();
+    ctx.moveTo(mx - R * c * p[0], my - R * c * p[1]);
+    ctx.lineTo(mx + R * c * p[0], my + R * c * p[1]);
+    ctx.stroke(); ctx.setLineDash([]);
+    return [mx - R * c * p[0], my - R * c * p[1]]; // 太陽側の端 = お昼の場所
+  }
+  latLine(0, 'rgba(255,255,255,0.7)', [4, 4]);
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.fillText('赤道', cx + R * p[0] - 30, cy + R * p[1] - 4);
+  const pt = latLine(41, '#f1c40f');
+  const au = latLine(-34, '#2ecc71');
+  [[pt, '#f1c40f', 'ポルトガル'], [au, '#2ecc71', 'オーストラリア']].forEach(([q, col, name]) => {
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(q[0], q[1], 5, 0, Math.PI * 2); ctx.fill();
+    ctx.font = 'bold 10px Nunito, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(name, q[0] - 8, q[1] + 4);
+    ctx.textAlign = 'left';
+  });
+  ctx.font = 'bold 11px Nunito, sans-serif';
+}
+
+function updateSeasons() {
+  const doy = +document.getElementById('doy').value;
+  const { month, day } = doyToDate(doy);
+  document.getElementById('date-val').textContent = month + '月' + day + '日';
+  const dec = declination(doy);
+  PLACES.forEach(pl => {
+    const row = document.getElementById(pl.id).children;
+    let season, cls;
+    if (!tiltOn()) { season = '季節なし'; cls = 's-none'; }
+    else {
+      season = SEASONS_N[pl.north ? month - 1 : (month + 5) % 12];
+      cls = SEASON_CLASS[season];
+    }
+    row[1].innerHTML = '<span class="season-tag ' + cls + '">' + season + '</span>';
+    row[2].textContent = Math.round(noonAltitude(pl.lat, dec)) + '°';
+    row[3].textContent = fmtHours(dayLength(pl.lat, dec));
+  });
+  drawTop(doy);
+  drawSide(doy);
+}
+function setDoy(d) {
+  stopPlay();
+  document.getElementById('doy').value = d;
+  updateSeasons();
+}
+function togglePlay() {
+  if (playTimer) { stopPlay(); return; }
+  document.getElementById('play-btn').textContent = '⏸ とめる';
+  playTimer = setInterval(() => {
+    const el = document.getElementById('doy');
+    el.value = (+el.value % 365) + 1;
+    updateSeasons();
+  }, 40);
+}
+function stopPlay() {
+  clearInterval(playTimer); playTimer = null;
+  document.getElementById('play-btn').textContent = '▶ 1年を回す';
+}
+document.getElementById('doy').addEventListener('input', () => { stopPlay(); updateSeasons(); });
+document.getElementById('tilt').addEventListener('change', updateSeasons);
+updateSeasons();
+
+/* ============ クイズ ============ */
+const QUIZ = [
+  { id: 'q1', text: '地球が1回 自転する（コマみたいに回る）のに かかる時間は？',
+    choices: ['1日', '1時間', '1か月', '1年'], why: '1回まわると、昼と夜が1回ずつ来る。' },
+  { id: 'q2', text: '地球が太陽のまわりを1周 公転するのに かかる時間は？',
+    choices: ['1年', '1日', '1か月', '10年'], why: '1周で季節がひとまわり。だから1年。' },
+  { id: 'q3', text: '漫画のように、公転が止まったら 地球はどうなる？',
+    choices: ['太陽に引っぱられて落ちていく', '宇宙のかなたへ飛んでいく', 'その場でずっと止まっている', '月にぶつかる'],
+    why: '横に走る速さがなくなると、太陽の引力に負けて まっすぐ落ちる。' },
+  { id: 'q4', text: '地球が落ちずに 太陽のまわりを回り続けられるのは なぜ？',
+    choices: ['横に ちょうどいい速さで走っているから', '太陽が地球を引っぱっていないから', '宇宙には空気がないから', '月がささえているから'],
+    why: '引っぱる力と 横に走る速さが つりあっている。' },
+  { id: 'q5', text: '季節があるのは なぜ？',
+    choices: ['地軸が かたむいているから', '夏は太陽に近づくから', '太陽が大きくなったり 小さくなったりするから', '雲の量が 変わるから'],
+    why: 'かたむいているので、太陽の高さと昼の長さが 1年で変わる。' },
+  { id: 'q6', text: 'ポルトガルが夏のとき、オーストラリアの季節は？',
+    choices: ['冬', '夏', '春', '秋'], why: '北半球と南半球は、太陽への かたむきが反対。だからクリスマスは真夏！' },
+  { id: 'q7', text: '地軸が かたむいていなかったら？',
+    choices: ['季節がなくなる', '1年中 夏になる', '1日が長くなる', '地球が止まる'],
+    why: '太陽の高さも昼の長さも 1年中おなじになる。' },
+  { id: 'q8', text: 'ポルトガルでは、今（9月の終わり）から12月にかけて 昼の長さは？',
+    choices: ['だんだん短くなる', 'だんだん長くなる', 'ずっと変わらない'],
+    why: '12月21日ごろ（冬至）が いちばん短い。そこから また長くなっていく。' },
+];
+const TOTAL_Q = QUIZ.length + 1;
+const tracking = {};
+let submitted = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  t.target = detail.target;
+  maybeFinish();
+  return t;
+}
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+function renderQuiz() {
+  const host = document.getElementById('quiz');
+  QUIZ.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'q';
+    div.innerHTML = '<div class="q-text"><span class="q-num">' + (i + 1) + '</span>' + q.text + '</div>'
+      + '<div class="choices"></div><div class="feedback"></div>';
+    const box = div.querySelector('.choices');
+    const fb = div.querySelector('.feedback');
+    const answer = q.choices[0];
+    shuffle(q.choices).forEach(c => {
+      const b = document.createElement('button');
+      b.className = 'choice';
+      b.textContent = c;
+      b.onclick = () => {
+        const ok = c === answer;
+        record(q.id, ok, { answer: c, target: answer });
+        if (ok) {
+          b.classList.add('correct');
+          box.querySelectorAll('.choice').forEach(x => x.disabled = true);
+          fb.className = 'feedback correct';
+          fb.textContent = '⭕ 正解！ ' + q.why;
+        } else {
+          b.classList.add('wrong'); b.disabled = true;
+          fb.className = 'feedback wrong';
+          fb.textContent = '❌ ざんねん。もう一回えらんでみて。';
+        }
+      };
+      box.appendChild(b);
+    });
+    host.appendChild(div);
+  });
+}
+renderQuiz();
+
+function numCheck() {
+  const input = document.getElementById('q9');
+  const fb = document.getElementById('q9-fb');
+  const raw = input.value.trim().replace(/[°度\s]/g, '')
+    .replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+  if (!raw) return;
+  const ok = parseInt(raw, 10) === 49;
+  record('q9', ok, { answer: raw, target: 49 });
+  if (ok) {
+    input.className = 'correct'; input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ 正解！ 90 − 41 = 49°。季節の実験で 9月23日にすると、ほぼ同じ数字が出るよ。';
+  } else {
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ちがう。90 から いくつ引く？';
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1400);
+  }
+}
+document.getElementById('q9').addEventListener('keydown', e => { if (e.key === 'Enter') numCheck(); });
+
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 もう学校の先生に説明できるレベル！';
+  else if (firstCount >= 7) msg.textContent = 'Muito bom! 地球の動き、ばっちりだね。';
+  else if (firstCount >= 5) msg.textContent = 'Bom! 季節の実験をもう一回 回してみよう。';
+  else msg.textContent = '実験のスライダーで あそんでから、もう一回 読んでみて。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_12_uchuu',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>よみとり チェック — ヤドカリの引っこし</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d; background: #f5f5f5;
+    font-size: 15px; line-height: 1.8; padding: 16px;
+  }
+  .page { max-width: 680px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #2e9e8f, #46b0d8);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title { font-size: 17px; font-weight: 900; margin-bottom: 12px; }
+  .note { font-size: 13px; color: #777; line-height: 2; }
+
+  /* 本文 */
+  .passage {
+    border-left: 4px solid #46b0d8; padding-left: 16px;
+    font-size: 16px; line-height: 2.1;
+    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  }
+  .passage p { margin-bottom: 14px; }
+  .passage strong { background: linear-gradient(transparent 62%, #ffe9a8 62%); font-weight: 700; }
+  ruby rt { font-size: 9px; color: #999; font-weight: 400; }
+  .keep {
+    font-size: 12px; color: #2e9e8f; font-weight: 700;
+    background: #eafaf7; border: 1px solid #c6ece5; border-radius: 6px;
+    padding: 6px 12px; display: inline-block; margin-bottom: 14px;
+  }
+
+  /* 問題 */
+  .q { border-top: 1px solid #eee; padding-top: 18px; margin-top: 18px; }
+  .q:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  .q-no {
+    display: inline-block; background: #eef6fa; color: #2b7a99;
+    border-radius: 6px; padding: 1px 9px; font-size: 12px; font-weight: 900; margin-right: 6px;
+  }
+  .q-text { font-weight: 700; margin-bottom: 10px; }
+  .opt { display: block; padding: 9px 12px; margin-bottom: 7px; border: 2px solid #e8e8e8;
+         border-radius: 9px; cursor: pointer; transition: .12s; }
+  .opt:hover { border-color: #bfe3ef; background: #fafdff; }
+  .opt input { margin-right: 8px; }
+  .opt.sel { border-color: #2e9e8f; background: #f2fbf9; }
+  textarea {
+    width: 100%; font-family: 'Nunito', sans-serif; font-size: 15px; line-height: 1.9;
+    padding: 12px 14px; border: 2px solid #ddd; border-radius: 10px; outline: none; resize: vertical;
+  }
+  textarea:focus { border-color: #2e9e8f; }
+  .hint { font-size: 12px; color: #999; margin-bottom: 8px; }
+
+  button {
+    font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 17px;
+    border: none; border-radius: 10px; padding: 16px; cursor: pointer; width: 100%;
+    background: linear-gradient(135deg, #2e9e8f, #46b0d8); color: #fff;
+  }
+  button:active { transform: scale(.99); }
+  .warn { color: #c0662a; font-size: 13px; margin-top: 10px; display: none; }
+  .done-emoji { text-align: center; font-size: 56px; margin: 10px 0; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <span class="badge">よみとり チェック</span>
+    <h1>ヤドカリの引っこし</h1>
+    <div class="sub">ぜんぶで 10もん ／ じかん せいげん なし</div>
+  </div>
+
+  <div class="card" id="intro">
+    <div class="card-title">📝 やりかた</div>
+    <p class="note">
+      ・はじめに 文章を 読みます。<strong>本文は ずっと 見たままで OK</strong>。何回でも 読みかえしていい<br>
+      ・そのあとの 10もんに 答えます。1〜8は えらぶ もんだい、9と10は 自分で 書く もんだい<br>
+      ・わからないときは 空らんの まま すすんで いい<br>
+      ・じかんは はかりません。ゆっくりで だいじょうぶ<br>
+      ・<strong>しらべるのは なし</strong>。答えは ぜんぶ 文章の 中に あります
+    </p>
+    <button onclick="start()">はじめる</button>
+  </div>
+
+  <div id="main" class="hidden">
+
+    <div class="card">
+      <span class="keep">この文章は ずっと ここに あります</span>
+      <div class="passage">
+        <p>ヤドカリは、自分の体を守るかたい貝がらを作ることができない。そのため、ほかの生き物が残した貝がらを見つけ、その中に入って生活している。</p>
+
+        <p>ヤドカリは育つにつれて体が大きくなる。すると、今までの貝がらではきゅうくつになり、もっと大きな空き家をさがし始める。ところが、ちょうどよい大きさの空き家は、そう<ruby>簡単<rt>かんたん</rt></ruby>には見つからない。海の底に落ちている貝がらの多くは、大きすぎるか、小さすぎるか、われてしまっているからだ。</p>
+
+        <p>ここで、おもしろいことが起きる。</p>
+
+        <p>ある一つの大きな貝がらが、新しく空き家になったとする。まず、その近くにいた最も大きなヤドカリが、そこへ<ruby>移<rt>うつ</rt></ruby>る。すると、そのヤドカリが今まで使っていた貝がらが空く。次に、その大きさを求めていたヤドカリが、そちらへ<ruby>移<rt>うつ</rt></ruby>る。さらに、そのヤドカリが出ていった貝がらへ、もっと小さなヤドカリが<ruby>移<rt>うつ</rt></ruby>っていく。</p>
+
+        <p>このように、一つの空き家から始まった引っこしが、次々につながっていく。研究者はこれを「空き家の行列」と<ruby>呼<rt>よ</rt></ruby>んでいる。</p>
+
+        <p>大切なのは、<strong>空き家は一つしかふえていないのに、何びきものヤドカリが前よりよい家に<ruby>移<rt>うつ</rt></ruby>れる</strong>という点だ。一つの変化が、多くの生き物に<ruby>利益<rt>りえき</rt></ruby>を運ぶことになる。</p>
+
+        <p>ただし、この行列が起きるには<ruby>条件<rt>じょうけん</rt></ruby>がある。近くに、さまざまな大きさのヤドカリが、大きさの順にそろっていなければならない。もし中くらいの大きさのヤドカリが一ぴきもいなければ、行列はそこで止まってしまう。それより小さなヤドカリたちは、よい家に<ruby>移<rt>うつ</rt></ruby>ることができない。</p>
+
+        <p><ruby>実際<rt>じっさい</rt></ruby>に海で調べると、一つの空き家から三びき以上が続けて引っこす様子も観察されている。</p>
+      </div>
+    </div>
+
+    <div class="card" id="qbox"></div>
+
+    <div class="card">
+      <button onclick="submitAll()">ぜんぶ おわった → おくる</button>
+      <div class="warn" id="warn">まだ 答えていない もんだいが あります。それでも おくるなら、もう一度 おしてね。</div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="done">
+    <div class="done-emoji">🎉</div>
+    <div class="card-title" style="text-align:center">おつかれさま！</div>
+    <p style="text-align:center">おくったよ。ありがとう。</p>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+/* layer: L1=事実の抽出 / L2=言い換え / L3=推論 / L4=自分の言葉で */
+const QS = [
+  { id:'q1', layer:'L1', text:'ヤドカリが、ほかの生き物が残した貝がらの中で生活しているのは、なぜですか。',
+    opts:['貝がらの中が海でいちばんあたたかい場所だから',
+          'ほかの生き物と貝がらを交かんする約束があるから',
+          '自分の体を守るかたい貝がらを作ることができないから',
+          '貝がらの中でしか食べ物を取ることができないから'], ans:2 },
+
+  { id:'q2', layer:'L1', text:'海の底に落ちている貝がらの多くは、どうなっていると書かれていますか。',
+    opts:['ほとんどが同じ大きさにそろっている',
+          '大きすぎるか、小さすぎるか、われてしまっている',
+          'ほとんどが砂の中にうまっている',
+          'どれもヤドカリが一度使ったあとのものである'], ans:1 },
+
+  { id:'q3', layer:'L1', text:'一つの空き家から、続けて何びき以上が引っこす様子が観察されていますか。',
+    opts:['二ひき以上', '三びき以上', '五ひき以上', '十ぴき以上'], ans:1 },
+
+  { id:'q4', layer:'L2', text:'「今までの貝がらではきゅうくつになり」とは、どういうことですか。',
+    opts:['貝がらがこわれて、使えなくなったということ',
+          '貝がらの色が変わって、目立つようになったということ',
+          '貝がらが重くなって、動けなくなったということ',
+          '体が大きくなって、貝がらがせまく感じられるということ'], ans:3 },
+
+  { id:'q5', layer:'L2', text:'この文章でいう「空き家の行列」とは、何のことですか。',
+    opts:['ヤドカリが列を作って海の底を歩いていくこと',
+          '一つの空き家から始まった引っこしが、次々につながっていくこと',
+          'ヤドカリが順番を待って、空き家の前に並ぶこと',
+          '空いた貝がらが、大きさの順に一列に並ぶこと'], ans:1 },
+
+  { id:'q6', layer:'L2', text:'「一つの変化が、多くの生き物に利益を運ぶ」の「一つの変化」とは、何を指していますか。',
+    opts:['ヤドカリの体が育って大きくなること',
+          '研究者が海に出て調べること',
+          '大きな貝がらが一つ、新しく空き家になること',
+          '中くらいの大きさのヤドカリがいなくなること'], ans:2 },
+
+  { id:'q7', layer:'L3', text:'近くにいるヤドカリが、大きいものと小さいものだけで、中くらいの大きさのものが一ぴきもいなかったとします。このとき、どうなると考えられますか。',
+    opts:['すべてのヤドカリが、ふだんより早く引っこせる',
+          '小さいヤドカリだけが引っこすことができる',
+          'どのヤドカリも、まったく引っこすことができない',
+          '大きいヤドカリは引っこせるが、小さいヤドカリは引っこせない'], ans:3 },
+
+  { id:'q8', layer:'L3', text:'この文章の考え方からすると、大きな貝がらが一つ空くことは、まわりのヤドカリ全体にとってどんな意味を持ちますか。',
+    opts:['一ぴきだけでなく、何びきもの住みかがよくなるきっかけになる',
+          'いちばん大きなヤドカリだけが得をする出来事である',
+          'ヤドカリどうしのあらそいがふえる原因になる',
+          'ヤドカリの数そのものがふえるきっかけになる'], ans:0 },
+
+  { id:'q9', layer:'L4', free:true, rows:4,
+    text:'「空き家の行列」がどういうものか、この文章を読んでいない人にもわかるように、自分の言葉で3〜4行で説明してください。',
+    hint:'※ 文章の言葉をそのまま写さないで、自分の言い方で書いてみて' },
+
+  { id:'q10', layer:'L4', free:true, rows:2,
+    text:'この行列が止まってしまうのは、どんなときですか。一文で書いてください。',
+    hint:'※ 「〜のとき。」の形で短く' }
+];
+
+var t0 = 0, tStart = {}, warned = false;
+
+function start() {
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('main').classList.remove('hidden');
+  t0 = Date.now();
+  render();
+  window.scrollTo(0, 0);
+}
+
+function render() {
+  var box = document.getElementById('qbox'), html = '';
+  QS.forEach(function (q, i) {
+    html += '<div class="q"><div class="q-text"><span class="q-no">' + (i + 1) + '</span>' + q.text + '</div>';
+    if (q.free) {
+      html += '<div class="hint">' + q.hint + '</div>';
+      html += '<textarea id="' + q.id + '" rows="' + q.rows + '" placeholder="ここに書いてね"></textarea>';
+    } else {
+      q.opts.forEach(function (o, j) {
+        html += '<label class="opt" id="' + q.id + '_l' + j + '">' +
+                '<input type="radio" name="' + q.id + '" value="' + j + '" ' +
+                'onchange="pick(\'' + q.id + '\',' + j + ',' + q.opts.length + ')">' + o + '</label>';
+      });
+    }
+    html += '</div>';
+  });
+  box.innerHTML = html;
+  QS.forEach(function (q) {
+    var el = document.getElementById(q.id);
+    if (el) el.addEventListener('focus', function () { if (!tStart[q.id]) tStart[q.id] = Date.now(); });
+  });
+}
+
+function pick(id, j, n) {
+  if (!tStart[id]) tStart[id] = Date.now();
+  for (var k = 0; k < n; k++) {
+    document.getElementById(id + '_l' + k).classList.toggle('sel', k === j);
+  }
+}
+
+function collect() {
+  var out = {}, blanks = 0;
+  QS.forEach(function (q) {
+    if (q.free) {
+      var v = (document.getElementById(q.id).value || '').trim();
+      if (v === '') blanks++;
+      out[q.id] = { layer: q.layer, type: 'free', text: v, chars: v.length,
+                    ms: tStart[q.id] ? Date.now() - tStart[q.id] : null };
+    } else {
+      var sel = document.querySelector('input[name="' + q.id + '"]:checked');
+      var pickIdx = sel ? parseInt(sel.value, 10) : null;
+      if (pickIdx === null) blanks++;
+      out[q.id] = { layer: q.layer, type: 'choice', pick: pickIdx,
+                    picked: pickIdx === null ? '' : q.opts[pickIdx],
+                    ok: pickIdx === q.ans, ms: tStart[q.id] ? Date.now() - tStart[q.id] : null };
+    }
+  });
+  return { out: out, blanks: blanks };
+}
+
+function submitAll() {
+  var c = collect();
+  if (c.blanks > 0 && !warned) {
+    warned = true;
+    document.getElementById('warn').style.display = 'block';
+    return;
+  }
+  var res = c.out;
+
+  var sum = { L1: { ok: 0, n: 0 }, L2: { ok: 0, n: 0 }, L3: { ok: 0, n: 0 }, L4: { chars: 0, n: 0 } };
+  QS.forEach(function (q) {
+    var r = res[q.id];
+    if (q.layer === 'L4') { sum.L4.n++; sum.L4.chars += r.chars; }
+    else { sum[q.layer].n++; if (r.ok) sum[q.layer].ok++; }
+  });
+  res['_summary'] = sum;
+  res['_meta'] = { passage: 'ヤドカリの引っこし（空き家の行列）', chars: 650,
+                   totalMs: Date.now() - t0, blanks: c.blanks,
+                   finishedAt: new Date().toISOString() };
+
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ lesson: 'lesson_11_dokkai', timestamp: new Date().toISOString(), answers: res })
+  }).catch(function () {});
+
+  document.getElementById('main').classList.add('hidden');
+  document.getElementById('done').classList.remove('hidden');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
