@@ -211,6 +211,10 @@ svg.px{display:block;image-rendering:pixelated;shape-rendering:crispEdges}
 .gr-val.next b{color:var(--txt);font-weight:400}
 .gr-key-legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--sub);margin-top:8px}
 .gr-key-legend i{display:inline-block;width:18px;height:12px;border:1px solid #000;vertical-align:-1px;margin-right:4px}
+/* 結果画面の「つぎの メダル」。灰色の 小さい 1行では 伝わらなかった（2026-09-27） */
+.r-next-medal{border:2px solid var(--acc);background:#2a2410;padding:8px 12px;margin:12px auto 4px;max-width:420px;
+  font-size:15px;line-height:1.7}
+.r-next-medal b{color:var(--acc)}
 .gr-kb{--k:clamp(24px,7.2vw,40px);display:grid;gap:4px;overflow-x:auto}
 .gr-kbrow{display:flex;gap:4px}
 .gr-key{width:var(--k);height:var(--k);flex:0 0 auto;display:flex;align-items:center;justify-content:center;
@@ -478,6 +482,56 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
 .tcg.mini .tcg-ser{font-size:8px;padding:0 3px}
 .tcg.ur{animation:urframe 1.4s steps(6) infinite}
 @keyframes urframe{0%{border-color:#ffd23f}33%{border-color:#ff8ad8}66%{border-color:#7ad8ff}100%{border-color:#ffd23f}}
+.tcg-text b{color:#fff;font-weight:inherit}
+
+/* ---- 第3弾（2026-09-28・パソコンで つかう キー 24枚）----
+   第2弾の 二重わくに くわえて、絵の うしろを 方眼（キーボードの ならび）に する */
+.tcg.s3{background:#0d1714;box-shadow:inset 0 0 0 2px #000, inset 0 0 0 4px var(--rc)}
+.tcg.s3 .tcg-art{background:#050c0a;background-image:
+  linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:9px 9px}
+.tcg.s3 .tcg-head{border-bottom-style:dotted}
+
+/* ---- 上級（2026-09-28・ショートカットの おうぎ 12枚）。高い ぶん いちばん リッチに ----
+   金の 二重わく ＋ 虹色に まわる わく ＋ ホロの 光が ながれる ＋ 星の 絵ばこ ＋ キーが しずむ 2コマ */
+.tcg.ex{overflow:hidden;border-color:#ffe27a;
+  background:linear-gradient(160deg,#241a06 0%,#0e0e1a 45%,#1c0f2c 100%);
+  box-shadow:inset 0 0 0 2px #000, inset 0 0 0 4px #ffe27a, 0 0 0 3px #000, 0 0 14px 3px rgba(255,226,122,.45);
+  animation:urframe 1.4s steps(6) infinite}
+.tcg.ex .tcg-name{color:#fff4c8}
+.tcg.ex .tcg-art{background:#07050f;border-color:#ffe27a;background-image:
+  radial-gradient(#ffe27a 1px,transparent 1.5px),radial-gradient(#7ad8ff 1px,transparent 1.5px);
+  background-size:22px 22px,31px 31px;background-position:3px 5px,14px 17px}
+.tcg-holo{position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;
+  background:linear-gradient(115deg,transparent 32%,rgba(255,138,216,.30) 42%,rgba(122,216,255,.34) 50%,
+    rgba(255,244,160,.30) 58%,transparent 68%);
+  background-size:320% 100%;animation:holo 2.6s steps(13) infinite}
+@keyframes holo{from{background-position:130% 0}to{background-position:-30% 0}}
+.tcg-stamp{position:absolute;right:6px;top:64px;z-index:3;transform:rotate(-12deg);
+  border:2px solid #ff6a6a;color:#ff6a6a;background:rgba(0,0,0,.6);padding:0 6px;font-size:13px;font-weight:400}
+.tcg.mini .tcg-stamp{top:42px;right:2px;font-size:9px;padding:0 3px;border-width:1px}
+
+/* キーの 絵（keys:）。ドット絵に あわせて 角は まるめず、下に かげを つける */
+.kcaps{display:flex;flex-wrap:wrap;gap:.35em .6em;align-items:center;justify-content:center;padding:0 4px;line-height:1}
+.kgrp{display:inline-flex;align-items:center;gap:.25em}
+.kc{display:inline-block;min-width:1.7em;padding:.4em .45em .35em;text-align:center;white-space:nowrap;
+  background:#dcdcec;color:#15152a;border:2px solid #000;box-shadow:inset -2px -3px 0 #9a9ab8, 0 .22em 0 #000}
+.kplus{color:#ffe27a}
+/* 上級：さいしょの キーを おさえた まま（hold）、さいごの キーを たたく（tap）。steps で 2コマ */
+.kcaps.anim .kc.hold{animation:khold 1.6s steps(1) infinite}
+.kcaps.anim .kc.tap{animation:ktap 1.6s steps(1) infinite}
+@keyframes khold{0%{transform:none}20%,85%{transform:translateY(.2em);box-shadow:inset -2px -2px 0 #9a9ab8, 0 .02em 0 #000;background:#fff4c8}}
+@keyframes ktap{0%,45%{transform:none}50%,70%{transform:translateY(.2em);box-shadow:inset -2px -2px 0 #9a9ab8, 0 .02em 0 #000;background:#ffe27a}75%{transform:none}}
+@media (prefers-reduced-motion: reduce){ .tcg-holo,.kcaps.anim .kc,.tcg.ex{animation:none} }
+
+/* ずかんの 説明・ためしうち */
+.cd-use{font-size:13px;line-height:1.8;margin:6px 0}
+.cd-use b{color:var(--acc);font-weight:400}
+.cd-try{border:2px solid #ffe27a;background:#221c08;padding:8px 10px;margin:8px 0;font-size:13px;line-height:1.7}
+.cd-try b{color:#ffe27a;font-weight:400}
+.cd-try-st{margin-top:4px;color:var(--sub)}
+.cd-try.done{border-color:#ff6a6a}
+.cd-try.done .cd-try-st{color:#ff6a6a}
 
 /* ずかん用の小さいカード */
 .tcg.mini{width:100%;padding:4px}
@@ -489,6 +543,10 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
 
 /* カードの かいふう */
 #openlayer{background:rgba(0,0,0,.92)}
+/* 上級を 引いたとき：画面を もっと 暗く して、うしろから 金の 光（2026-09-28） */
+#openlayer.exmode{background:radial-gradient(circle at 50% 45%,rgba(255,226,122,.30) 0,rgba(0,0,0,.97) 55%)}
+.op-exban{font-size:22px;color:#ffe27a;margin-bottom:8px;letter-spacing:.1em;
+  text-shadow:2px 2px 0 #000;animation:blink .5s steps(2) 4}
 .op-wrap{text-align:center;max-width:560px;width:96%}
 .op-choices{display:grid;gap:8px;justify-content:center;margin:8px 0}
 .op-pick{padding:5px;background:#000;border:4px solid #4a4a78;cursor:pointer;line-height:0;transition:none}
@@ -532,6 +590,8 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
 .packrow .nm{min-width:170px}
 .packrow .ds{font-size:12px;color:var(--sub);flex:1;min-width:150px}
 .packrow .pr{color:var(--acc);min-width:78px;text-align:right}
+.packrow.s3{border-color:#5aa88a}
+.packrow.ex{border-color:#ffe27a;background:#221c08;box-shadow:0 0 10px rgba(255,226,122,.35)}
 
 /* カードずかん */
 .cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
@@ -544,6 +604,8 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
 .cardbg svg{width:100%;height:100%;display:block}
 .cardsp{display:flex;align-items:center;justify-content:center;border:3px solid currentColor;line-height:1}
 .dupbadge{font-size:10px;color:var(--acc)}
+.cd-sell{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.cd-sell p{margin:0;flex-basis:100%;font-size:12px}
 
 /* ショップ */
 .shoprow{display:flex;gap:10px;align-items:center;background:var(--panel);border:2px solid #4a4a78;
@@ -741,9 +803,10 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
       <h2 id="r-title">たたかいに かった！</h2>
       <div id="r-body"></div>
       <div class="row" style="justify-content:center;margin-top:14px">
+        <button class="sub" id="btn-r-again" style="display:none">もういちど</button>
         <button id="btn-r-next">つぎへ</button>
       </div>
-      <p class="muted" style="margin-top:8px"><kbd>Space</kbd> または <kbd>Enter</kbd> で つぎへ</p>
+      <p class="muted" style="margin-top:8px"><kbd>Space</kbd> または <kbd>Enter</kbd> で つぎへ<span id="r-again-key" style="display:none">　<kbd>R</kbd> で もういちど</span></p>
     </div>
   </div>
 
@@ -773,7 +836,8 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
         <div class="muted">もちきん Ｇ <b style="color:var(--acc)" id="cd-gold">0</b></div>
         <button class="sm" id="btn-cd-pack">カードパックを かう</button>
       </div>
-      <p class="muted" style="margin:8px 0 0">カードには キーボードの ひみつが かいてある。クリックで よめるよ。</p>
+      <p class="muted" style="margin:8px 0 0">カードには キーボードの ひみつが かいてある。クリックで よめるよ。
+        2まい いじょう ある カードは、クリックして うれるよ。</p>
     </div>
     <div class="card" id="cd-detail" style="display:none"></div>
     <div class="card"><div class="cardgrid" id="cd-grid"></div></div>
@@ -1078,7 +1142,8 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
     {"id":"t_fast","type":"title","name":"はやうちの","price":300},
     {"id":"t_perfect","type":"title","name":"ミスしない","price":500},
     {"id":"t_spirit","type":"title","name":"せいれいつかいの","price":900},
-    {"id":"t_legend","type":"title","name":"でんせつの","price":2200}
+    {"id":"t_legend","type":"title","name":"でんせつの","price":2200},
+    {"id":"t_ougi","type":"title","name":"おうぎを きわめた","reward":true}
   ],
   "cards": [
     {"id":"cd_a","name":"アクア","rarity":"R","type":"せいれい","art":"spirit:a","tip":"ひだりの こゆびが おく キー。いちばん よわい ゆびなので、ここが うてると タイピングは ぐんと はやくなる。"},
@@ -1141,7 +1206,45 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
      "px":{"c":["#241c14","#f0c8a0","#ffd23f","#e0c040","#3a3a4a"],"m":true,"d":[
       "........","....1111","...12222","...12122","...12222","....1111","...13333","..133333",
       ".1333333","13333333","..133333","...13333","...11111","...15555","...11111","........"]}},
-    {"id":"cd_kingdom","name":"キーボード王国","rarity":"UR","type":"でんせつ","art":"bg:forest","tip":"文字が きえた 王国。ことばを うてる ように なる ことは、じぶんの 考えを 世界に とどける 力を 手に 入れる こと。"}
+    {"id":"cd_kingdom","name":"キーボード王国","rarity":"UR","type":"でんせつ","art":"bg:forest","tip":"文字が きえた 王国。ことばを うてる ように なる ことは、じぶんの 考えを 世界に とどける 力を 手に 入れる こと。"},
+
+    {"id":"cd3_enter","name":"Enter","rarity":"N","type":"キー","series":3,"art":"keys:Enter","tip":"日本語を うつと、1回目の Enter は「かんじを きめる」。2回目で やっと ぎょうが かわる。2回 おすのは そのため。"},
+    {"id":"cd3_bs","name":"BackSpace","rarity":"N","type":"キー","series":3,"art":"keys:BackSpace","tip":"カーソルの ひだりの 文字を けす。まちがえたら すぐ これ。みぎの 小ゆびで おす。"},
+    {"id":"cd3_del","name":"Delete","rarity":"N","type":"キー","series":3,"art":"keys:Delete","tip":"カーソルの みぎの 文字を けす。BackSpace は ひだり、Delete は みぎ。けす むきが ぎゃく。"},
+    {"id":"cd3_esc","name":"Esc","rarity":"N","type":"キー","series":3,"art":"keys:Esc","tip":"「やっぱり やめた」の キー。へんかんの とちゅうで おすと、かんじに する まえに もどる。ひだりうえの すみに ある。"},
+    {"id":"cd3_tab","name":"Tab","rarity":"N","type":"キー","series":3,"art":"keys:Tab","tip":"つぎの 入力らんへ ジャンプする。なまえを 書いたら Tab で つぎの らんへ。Shift＋Tab で ひとつ もどる。"},
+    {"id":"cd3_arrow","name":"やじるしキー","rarity":"N","type":"キー","series":3,"art":"keys:← ↑ ↓ →","tip":"カーソルを うごかす。まちがいを 見つけたら、ぜんぶ けさずに ← で もどって、そこだけ なおせば いい。"},
+    {"id":"cd3_touten","name":"「、」と「。」","rarity":"N","type":"にほんご","series":3,"art":"keys:, .","tip":"日本語入力では「,」の キーで「、」、「.」の キーで「。」が でる。M の みぎどなりと、その また みぎ。"},
+    {"id":"cd3_chouon","name":"のばしぼう「ー」","rarity":"N","type":"にほんご","series":3,"art":"keys:-","tip":"「ラーメン」の「ー」は、0 の みぎどなりの「-」キー。ローマ字の とちゅうで おすと、そのまま「ー」に なる。"},
+    {"id":"cd3_wo","name":"「を」は wo","rarity":"N","type":"にほんご","series":3,"art":"keys:W O","tip":"「を」は wo と うつ。o だけだと「お」に なって しまう。「えを かく」は e wo kaku。"},
+    {"id":"cd3_homeend","name":"Home と End","rarity":"R","type":"キー","series":3,"art":"keys:Home End","tip":"Home で ぎょうの いちばん はじめ、End で いちばん おわりに とぶ。やじるしを 何回も おさなくて いい。"},
+    {"id":"cd3_hankaku","name":"半角/全角","rarity":"R","type":"キー","series":3,"art":"keys:半角/全角","tip":"ひだりうえの キー。おすたびに 日本語 と えいじ が きりかわる。とつぜん えいじしか 出なく なったら、まず これ。"},
+    {"id":"cd3_henkan","name":"へんかん","rarity":"R","type":"キー","series":3,"art":"keys:Space 変換","tip":"よみを うって スペースを おすと かんじに なる。もう1回 おすと ほかの かんじ。えらんだら Enter で きまり。"},
+    {"id":"cd3_qex","name":"「？」と「！」","rarity":"R","type":"にほんご","series":3,"art":"keys:Shift+/ Shift+1","tip":"「？」は Shift を おしながら「/」、「！」は Shift を おしながら「1」。ぶんの おわりに きもちが つたわる。"},
+    {"id":"cd3_kagi","name":"かぎかっこ「」","rarity":"R","type":"にほんご","series":3,"art":"keys:[ ]","tip":"「 は P の 2つ みぎ、」は その ななめ下。日本語入力で「[」「]」の キーを おすと かぎかっこに なる。"},
+    {"id":"cd3_naka","name":"なかぐろ「・」","rarity":"R","type":"にほんご","series":3,"art":"keys:/","tip":"「パン・ぎゅうにゅう」の「・」は、日本語入力で「/」の キーを おすと でる。Shift と いっしょだと「？」に なる キー。"},
+    {"id":"cd3_didu","name":"「ぢ」と「づ」","rarity":"R","type":"にほんご","series":3,"art":"keys:D U","tip":"「ぢ」は di、「づ」は du。zi や zu だと「じ」「ず」に なって しまう。「つづく」は tuduku。"},
+    {"id":"cd3_fa","name":"「ふぁ」「ふぃ」","rarity":"R","type":"にほんご","series":3,"art":"keys:F A","tip":"fa で「ふぁ」、fi で「ふぃ」、fe で「ふぇ」。「ファイル」は fairu。にほんごでも F が かつやく する ばしょ。"},
+    {"id":"cd3_f6","name":"F6 ひらがな","rarity":"R","type":"キー","series":3,"art":"keys:F6","tip":"よみを うった あと、きめる まえに F6 を おすと ぜんぶ ひらがなに なる。かんじに したく ない ときに べんり。"},
+    {"id":"cd3_f7","name":"F7 カタカナ","rarity":"SR","type":"キー","series":3,"art":"keys:F7","tip":"よみを うった あと F7 を おすと ぜんぶ カタカナに なる。「ぽるとがる」が「ポルトガル」に。こうほを さがすより はやい。"},
+    {"id":"cd3_f10","name":"F10 えいじ","rarity":"SR","type":"キー","series":3,"art":"keys:F10","tip":"えいごの つもりが「はる」に なって しまったら、きめる まえに F10。「haru」に なおる。うちなおさなくて いい。"},
+    {"id":"cd3_caps","name":"Caps Lock の わな","rarity":"SR","type":"わな","series":3,"art":"keys:Shift+英数","tip":"とつぜん 大文字ばかり でる ときは Caps Lock が ついている。日本語キーボードなら Shift を おしながら 英数キーで もどる。"},
+    {"id":"cd3_ins","name":"Insert の わな","rarity":"SR","type":"わな","series":3,"art":"keys:Insert","tip":"文字を うつと みぎの 文字が きえて いく ときは「うわがき」に なっている。Insert を もう1回 おすと もとに もどる。"},
+    {"id":"cd3_small","name":"ちいさい もじ","rarity":"SR","type":"にほんご","series":3,"art":"keys:X A","tip":"x か l を 先に うつと、ちいさい もじ だけが でる。xa で「ぁ」、xtu で「っ」、xya で「ゃ」。"},
+    {"id":"cd3_vu","name":"「ヴ」","rarity":"SR","type":"にほんご","series":3,"art":"keys:V U","tip":"vu と うつと「ヴ」に なる。V は にほんごでは ほぼ ここでしか つかわない。「ヴァイオリン」は vaiorin。"},
+
+    {"id":"cdx_copy","name":"コピー","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+C","tip":"えらんだ 文字を「おぼえて」おく。もとの 文字は そのまま のこる。C は Copy（コピー）の C。","use":"おなじ ことばを なんども うつ とき。1回 うって コピーすれば、あとは はりつけるだけ。","try":{"mods":["ctrl"],"keys":["c"],"label":"Ctrl を おしながら C"}},
+    {"id":"cdx_paste","name":"はりつけ","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+V","tip":"おぼえて おいた 文字を、カーソルの ところに だす。何回でも だせる。V は C の となりで、ひだり手だけで とどく。","use":"コピーした あとに。ウェブの 文字を ノートに もってくる ときにも つかえる。","try":{"mods":["ctrl"],"keys":["v"],"label":"Ctrl を おしながら V"}},
+    {"id":"cdx_cut","name":"きりとり","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+X","tip":"えらんだ 文字を けして、おぼえて おく。べつの ところで Ctrl＋V を おせば「ひっこし」に なる。X は ハサミの 形。","use":"ぶんの じゅんばんを いれかえたい とき。けして うちなおすより ずっと はやい。","try":{"mods":["ctrl"],"keys":["x"],"label":"Ctrl を おしながら X"}},
+    {"id":"cdx_undo","name":"もとに もどす","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+Z","tip":"さっき やった ことを 1つ とりけす。まちがえて ぜんぶ けしても、あわてずに Ctrl＋Z。何回も さかのぼれる。","use":"まちがえて けした・うごかした とき。こわがらずに いろいろ ためせるように なる おうぎ。","try":{"mods":["ctrl"],"keys":["z"],"label":"Ctrl を おしながら Z"}},
+    {"id":"cdx_redo","name":"やりなおす","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+Y","tip":"Ctrl＋Z で もどしすぎたら、Ctrl＋Y で すすめる。もどす と すすめる は セット。Mac は ⌘＋Shift＋Z。","use":"もどしすぎた とき。Z と Y を いったり きたり すれば、ちょうど いい ところで とめられる。","try":{"mods":["ctrl"],"keys":["y"],"label":"Ctrl を おしながら Y","alt":[{"mods":["ctrl","shift"],"keys":["z"]}]}},
+    {"id":"cdx_all","name":"ぜんぶ えらぶ","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+A","tip":"入力らんや ページの 文字を ぜんぶ えらぶ。A は All（ぜんぶ）の A。つづけて Ctrl＋C で ぜんぶ コピー。","use":"ながい ぶんを まるごと コピーしたい・けしたい とき。","try":{"mods":["ctrl"],"keys":["a"],"label":"Ctrl を おしながら A"}},
+    {"id":"cdx_find","name":"さがす","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+F","tip":"ことばを 入れると、ページの 中から その ことばを さがして 光らせる。F は Find（さがす）の F。","use":"ながい ページで 見たい ところを さがす とき。スクロールして 目で さがすより ずっと はやい。","try":{"mods":["ctrl"],"keys":["f"],"label":"Ctrl を おしながら F"}},
+    {"id":"cdx_save","name":"ほぞん","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+S","tip":"いまの ファイルを ほぞん する。S は Save（ほぞん）の S。とちゅうで こまめに おすと、パソコンが とまっても あんしん。","use":"作文や しゅくだいを 書いている とき。ひと くぎり ごとに おす くせを つけると いい。","try":{"mods":["ctrl"],"keys":["s"],"label":"Ctrl を おしながら S"}},
+    {"id":"cdx_print","name":"いんさつ","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+P","tip":"いんさつの がめんを ひらく。P は Print（いんさつ）の P。ウェブの ページでも つかえる。","use":"紙で ほしい とき。おしても すぐには いんさつ されない。がめんで たしかめてから きめる。","try":{"mods":["ctrl"],"keys":["p"],"label":"Ctrl を おしながら P"}},
+    {"id":"cdx_select","name":"えらぶ","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Shift+→","tip":"Shift を おしたまま やじるしで、文字を 1つずつ えらべる。マウスを つかわず、キーボードだけで コピーの じゅんびが できる。","use":"コピーや きりとりの まえに。マウスより ぴったり えらべる。","try":{"mods":["shift"],"keys":["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"],"label":"Shift を おしながら やじるし"}},
+    {"id":"cdx_jump","name":"ことば ジャンプ","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+→","tip":"Ctrl を おしたまま やじるしで、1文字ずつ ではなく ことばごとに とぶ。Mac は option を おしながら。","use":"ながい ぶんの まんなかを なおしたい とき。← を 何回も おさなくて いい。","try":{"mods":["word"],"keys":["ArrowLeft","ArrowRight"],"label":"Ctrl を おしながら ← か →"}},
+    {"id":"cdx_wdel","name":"ことばごと けす","rarity":"EX","type":"おうぎ","series":3,"art":"keys:Ctrl+BackSpace","tip":"Ctrl を おしたまま BackSpace で、1文字ずつ ではなく ことばを まとめて けす。Mac は option＋delete。","use":"うちまちがえた ことばを まるごと うちなおしたい とき。","try":{"mods":["word"],"keys":["Backspace"],"label":"Ctrl を おしながら BackSpace"}}
   ],
   "spells": [
     {"id":"sp_a","seq":"a","name":"アクアヒール","spirit":"アクア","type":"heal","power":0.4,"mp":4,"bond":0,"desc":"HPを かいふく"},
@@ -1215,7 +1318,7 @@ td,th{padding:4px 3px;border-bottom:2px solid #33335c;text-align:left;font-weigh
    KEY QUEST — engine v1.2.0
    ドット絵 / 8精霊の呪文 / ショップ / セーブ / DLC
    ======================================================================= */
-const ENGINE_VERSION = "1.7.2";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
+const ENGINE_VERSION = "1.8.0";     /* きろく画面に 出る。キャッシュの 見わけに つかう */
 const SAVE_KEY = "keyquest.save.v1";
 const PACK_KEY = "keyquest.packs.v1";
 const SCHEMA   = 4;
@@ -1738,18 +1841,23 @@ function ownedTools(){
 
 /* ---------- カード ---------- */
 const RARITY = {
-  N:  {label:"N",  color:"#9a9ac0", weight:58, back:40},
-  R:  {label:"R",  color:"#60a5fa", weight:27, back:70},
-  SR: {label:"SR", color:"#c084fc", weight:12, back:130},
-  UR: {label:"UR", color:"#ffd23f", weight:3,  back:320}
+  N:  {label:"N",  color:"#9a9ac0", weight:58, sell:40},
+  R:  {label:"R",  color:"#60a5fa", weight:27, sell:70},
+  SR: {label:"SR", color:"#c084fc", weight:12, sell:130},
+  UR: {label:"UR", color:"#ffd23f", weight:3,  sell:320},
+  /* 上級（2026-09-28）。上級パックでしか 出ない（weight は つかわない）。ダブらないので 売りねは ほぼ 飾り */
+  EX: {label:"上級", color:"#ffe27a", weight:0, sell:1000}
 };
-const PACK_PRICE = 200;
+/* カードの「くみ」。どの パックから 出るかが ここで きまる。
+   base＝第1〜2弾（ボス・スロット・ふつうの パック）／s3＝第3弾（第3弾パック だけ）／ex＝上級（上級パック だけ）。
+   **第3弾と 上級を ボスや 安い パックから 出さない**のは、上級を 高くした 意味が なくなるため */
+function cardSet(c){ return c.rarity === "EX" ? "ex" : cardSeries(c) >= 3 ? "s3" : "base"; }
 const allCards = () => Object.values(CONTENT.cards);
 function haveCard(id){ return (S.cards[id]||0) > 0; }
 function cardCount(){ return allCards().filter(c => haveCard(c.id)).length; }
 /* レアリティの重みでランダムに1枚引く */
-function drawCard(minRarity){
-  let pool = allCards();
+function drawCard(minRarity, set){
+  let pool = allCards().filter(c => cardSet(c) === (set || "base"));
   if (minRarity){
     const need = {N:0, R:1, SR:2, UR:3}[minRarity] || 0;
     const f = pool.filter(c => ({N:0,R:1,SR:2,UR:3}[c.rarity] || 0) >= need);
@@ -1760,7 +1868,7 @@ function drawCard(minRarity){
      2026-09-25 に カードを 42→66枚に ふやした。まったくの ランダムだと
      さいごの 数枚が いつまでも 出てこない。
      もっている カードは 重みを 1/4 に する。**0に しない**のは、
-     ダブりで Ｇが もどる しくみ（カードやの 使い道）を 残すため。 */
+     ダブりを ずかんで 売れる（2026-09-28〜。まえは 引いた ときに Ｇが もどった）ので、ダブりにも 使い道が あるため。 */
   const wOf = c => (RARITY[c.rarity] || RARITY.N).weight * (haveCard(c.id) ? 0.25 : 1);
   let total = 0;
   pool.forEach(c => total += wOf(c));
@@ -1776,30 +1884,55 @@ function gainCard(id){
   if (!c) return null;
   const dup = haveCard(id);
   S.cards[id] = (S.cards[id]||0) + 1;
-  let back = 0;
-  if (dup){ back = (RARITY[c.rarity]||RARITY.N).back; S.gold += back; }
-  return {card:c, dup:dup, back:back};
+  return {card:c, dup:dup, num:S.cards[id]};
+}
+/* ---- カードを 売る（2026-09-28）----
+   まえは ダブりを 引いた しゅんかんに Ｇが もどっていた（のに カードも ふえていた）。
+   息子が ずかんの「×5」を 見て「売らせて」と 言ったので、**引いても Ｇは もどさず、売って かえる**形に した。
+   **さいごの 1まいは 売れない**（ずかんから 消えない）。売りねは まえに もどっていた Ｇと おなじ。 */
+function sellPrice(c){ return c.sellPrice || (RARITY[c.rarity] || RARITY.N).sell; }
+function canSell(id){ return (S.cards[id] || 0) >= 2; }
+function sellCard(id, all){
+  const c = CONTENT.cards[id];
+  if (!c || !canSell(id)) return 0;
+  const n = all ? S.cards[id] - 1 : 1;
+  S.cards[id] -= n;
+  const g = n * sellPrice(c);
+  S.gold += g;
+  S.records.cardsSold = (S.records.cardsSold || 0) + n;
+  save();
+  return g;
 }
 /* カード1枚をトレカ風に組む。mini はずかんの一覧用 */
 /* だん（シリーズ）ごとに 1から 数える。第1弾＝本編30枚、第2弾＝2026-09-25 に 足した24枚 */
 function cardSeries(c){ return c.series || 1; }
+/* だん（と 上級）ごとに 1から 数える。上級は 第3弾と おなじ だんだが、番号は べつ（No.★01〜） */
 function cardNo(c){
-  const list = allCards().filter(x => cardSeries(x) === cardSeries(c));
+  const ex = cardSet(c) === "ex";
+  const list = allCards().filter(x => cardSeries(x) === cardSeries(c) && (cardSet(x) === "ex") === ex);
   const i = list.map(x => x.id).indexOf(c.id);
-  return (cardSeries(c) === 2 ? "No.Ⅱ-" : "No.") + String(i + 1).padStart(2, "0");
+  const pre = ex ? "No.★" : cardSeries(c) === 3 ? "No.Ⅲ-" : cardSeries(c) === 2 ? "No.Ⅱ-" : "No.";
+  return pre + String(i + 1).padStart(2, "0");
 }
+/* tip の **ここ** を 太字に する。2026-09-25 に 足した 島の カードは ** を 書いて いたのに
+   ここで 変換して いなかったので、**記号が そのまま 画面に 出ていた**（21枚・2026-09-28 に 気づいた） */
+function tipHTML(t){ return String(t || "").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
 function cardHTML(c, mini){
   const r = RARITY[c.rarity] || RARITY.N;
-  const s2 = cardSeries(c) === 2;
+  const ser = cardSeries(c), ex = cardSet(c) === "ex";
+  const tag = ex ? "" : ser === 3 ? "Ⅲ" : ser === 2 ? "Ⅱ" : "";
+  const tried = ex && S && S.cardTry && S.cardTry[c.id];
   return '<div class="tcg' + (mini ? " mini" : "") + (c.rarity === "UR" ? " ur" : "") +
-    (s2 ? " s2" : "") + '" style="--rc:' + r.color + '">' +
+    (ser === 2 ? " s2" : "") + (ser === 3 && !ex ? " s3" : "") + (ex ? " ex" : "") + '" style="--rc:' + r.color + '">' +
     '<div class="tcg-head"><span>' + cardNo(c) +
-      (s2 ? ' <b class="tcg-ser">Ⅱ</b>' : "") +
+      (tag ? ' <b class="tcg-ser">' + tag + "</b>" : "") +
       '</span><span class="tcg-rar">' + r.label + "</span></div>" +
     '<div class="tcg-name">' + c.name + "</div>" +
     '<div class="tcg-art">' + cardArt(c, mini ? 3 : 6) + "</div>" +
     '<div class="tcg-type">' + (c.type || "カード") + "</div>" +
-    '<div class="tcg-text">' + c.tip + "</div></div>";
+    '<div class="tcg-text">' + tipHTML(c.tip) + "</div>" +
+    (ex ? '<i class="tcg-holo"></i>' : "") +
+    (tried ? '<b class="tcg-stamp">マスター</b>' : "") + "</div>";
 }
 /* うら面もカードの形に合わせる */
 function cardBackHTML(mini){
@@ -1828,7 +1961,21 @@ function cardArt(c, scale){
     return '<div class="cardsp" style="width:' + (16*scale) + 'px;height:' + (16*scale) +
            'px;color:var(--' + sp.finger + ');font-size:' + (10*scale) + 'px">' + label + "</div>";
   }
+  if (a.indexOf("keys:") === 0) return keysArt(a.slice(5), scale, cardSet(c) === "ex");
   return pixelArt(c.px, scale);
+}
+/* キーの 絵（第3弾・上級。2026-09-28）。"Ctrl+C" は いっしょに おす（＋で つなぐ）、
+   "W O" は じゅんに おす（ならべるだけ）。上級は キーが じっさいに しずむ 2コマ アニメ
+   （さいしょの キーを おさえた まま、さいごの キーを たたく） */
+function keysArt(spec, scale, anim){
+  const fs = Math.round(scale * 2.6);
+  return '<div class="kcaps' + (anim ? " anim" : "") + '" style="font-size:' + fs + 'px">' +
+    spec.split(" ").map(g => {
+      const ks = g.split("+");
+      return '<span class="kgrp">' + ks.map((k, i) =>
+        '<span class="kc' + (anim ? (i < ks.length - 1 ? " hold" : " tap") : "") + '">' + k + "</span>"
+      ).join('<span class="kplus">+</span>') + "</span>";
+    }).join("") + "</div>";
 }
 
 /* ---------- カードパック（お店で買う） ---------- */
@@ -1838,9 +1985,20 @@ const PACKS = [
   {id:"p_big",    name:"おとくパック",         price:520, n:3, choices:10, min:null,
    desc:"10まいの なかから 3まい えらぶ（1まいぶん おとく）"},
   {id:"p_shiny",  name:"キラキラパック",       price:800, n:1, choices:8,  min:"R",
-   desc:"8まいの なかから 1まい。ぜんぶ R いじょう"}
+   desc:"8まいの なかから 1まい。ぜんぶ R いじょう"},
+  /* 第3弾と 上級（2026-09-28）。ここの パックからしか 出ない（cardSet を 見よ）。
+     第3弾は UR を 入れない（UR が 1〜2まい あると そろえるのに 2ばい かかる。シミュレーションで 約6万Ｇ→約3万Ｇ）。
+     上級は 1まい Ｇ5,000。高い かわりに **まだ もっていない ものが かならず 出る** */
+  {id:"p_s3",     name:"第3弾パック",          price:500, n:1, choices:8,  min:null, set:"s3",
+   desc:"パソコンで つかう キーの カード。8まいから 1まい"},
+  {id:"p_s3big",  name:"第3弾 おとくパック",    price:1300, n:3, choices:10, min:null, set:"s3",
+   desc:"10まいから 3まい えらぶ（1まいぶん おとく）"},
+  {id:"p_ex",     name:"上級パック",           price:5000, n:1, choices:3,  min:null, set:"ex",
+   desc:"ショートカットの おうぎ。まだ もっていない カードが かならず 出る"}
 ];
-const RANK_ORDER = {N:0, R:1, SR:2, UR:3};
+const RANK_ORDER = {N:0, R:1, SR:2, UR:3, EX:4};
+/* まだ もっていない 上級カード */
+function exLeft(){ return allCards().filter(c => cardSet(c) === "ex" && !haveCard(c.id)); }
 /* カードの うら面 */
 const CARD_BACK = {c:["#20204a","#ffd23f","#4a4a9a","#12122a"],m:true,d:[
   "11111111","12222221","12333321","12311321","12313321","12313321","12313321","12313321",
@@ -1852,16 +2010,24 @@ let OP = {cards:[], picks:0, taken:[], cursor:0, mode:"choose", last:null, lastI
 function openPack(packId){
   const pk = PACKS.filter(x => x.id === packId)[0];
   if (!pk) return;
+  if (pk.set === "ex" && !exLeft().length){ toast("上級カードは ぜんぶ そろった！"); return; }
   if (S.gold < pk.price){ toast("おかねが たりない！"); return; }
   S.gold -= pk.price;
-  const cand = [];
+  let cand = [];
   const num = pk.choices || (pk.n + 2);       /* 伏せ札の枚数 */
-  for (let i=0;i<num;i++){
-    const c = drawCard(pk.min);
-    if (c) cand.push(c);
+  if (pk.set === "ex"){
+    /* 上級は もっていない ものだけを ふせる（ダブらない） */
+    const rest = exLeft();
+    for (let i=rest.length-1;i>0;i--){ const j = rnd(i+1); const t = rest[i]; rest[i] = rest[j]; rest[j] = t; }
+    cand = rest.slice(0, num);
+  } else {
+    for (let i=0;i<num;i++){
+      const c = drawCard(pk.min, pk.set);
+      if (c) cand.push(c);
+    }
   }
   save();
-  OP = {cards:cand, picks:pk.n, taken:[], cursor:0, mode:"choose", last:null, lastIdx:-1, got:[]};
+  OP = {cards:cand, picks:Math.min(pk.n, cand.length), taken:[], cursor:0, mode:"choose", last:null, lastIdx:-1, got:[]};
   renderOpen();
   $("openlayer").classList.add("on");
 }
@@ -1880,8 +2046,10 @@ function pickCard(i){
   /* 予兆：SR以上は必ず光る。R は半々、N もたまに光る（フェイク） */
   OP.omen = rank >= 2 ? true : rank === 1 ? Math.random() < 0.5 : Math.random() < 0.12;
   OP.mode = "hold";
+  /* 上級は 画面ごと 暗く して 金の 光を 出す（2026-09-28）。ためも いちばん 長い */
+  $("openlayer").classList.toggle("exmode", rank >= 4);
   renderOpen();
-  const holdMs = [600, 850, 1150, 1500][rank] || 600;
+  const holdMs = [600, 850, 1150, 1500, 2000][rank] || 600;
   setTimeout(() => {
     if (OP.mode !== "hold") return;
     OP.mode = "closing"; renderOpen();
@@ -1925,8 +2093,10 @@ function renderOpen(){
     const cls = OP.mode === "hold" ? "hold" + om : "close" + om;
     st.innerHTML = '<div class="op-card ' + cls + '" style="border:0;padding:0;display:inline-block;' +
       '--om:#ffd23f;position:relative">' + cardBackHTML(false) + "</div>";
+    const exm = OP.last && cardSet(OP.last.card) === "ex";
     hint.innerHTML = OP.mode === "hold"
-      ? (OP.omen ? '<span style="color:var(--acc)">なにか ひかっている…！</span>' : "なにが でるかな…")
+      ? (exm ? '<span style="color:#ffe27a">まぶしい ひかりが あふれてくる…！</span>'
+         : OP.omen ? '<span style="color:var(--acc)">なにか ひかっている…！</span>' : "なにが でるかな…")
       : "…";
     return;
   }
@@ -1939,10 +2109,13 @@ function renderOpen(){
   if (OP.mode === "reveal"){
     const g = OP.last;
     const r = RARITY[g.card.rarity] || RARITY.N;
-    st.innerHTML = '<div class="op-card" style="border:0;padding:0;display:inline-block">' +
+    st.innerHTML = (cardSet(g.card) === "ex" ? '<div class="op-exban">★ 上級カード！ ★</div>' : "") +
+      '<div class="op-card" style="border:0;padding:0;display:inline-block">' +
       cardHTML(g.card, false) + '<div class="op-burst" id="op-burst"></div></div>' +
-      (g.dup ? '<div class="op-count" style="margin-top:8px">おなじ カードだったので Ｇ' +
-        g.back + " に かえた</div>" : "");
+      (cardSet(g.card) === "ex" ? '<div class="op-count" style="margin-top:8px;color:#ffe27a">' +
+        "ずかんで ひらくと「ためしうち」が できるよ</div>" : "") +
+      (g.dup ? '<div class="op-count" style="margin-top:8px">' + g.num +
+        "まいめ！　ずかんで うれるよ（Ｇ" + sellPrice(g.card) + "）</div>" : "");
     hint.innerHTML = (OP.taken.length < OP.picks
       ? "クリック または <kbd>Space</kbd> で つぎを えらぶ"
       : "クリック または <kbd>Space</kbd> で とじる");
@@ -1996,6 +2169,7 @@ function burst(color, rank){
 }
 function closeOpen(){
   $("openlayer").classList.remove("on");
+  $("openlayer").classList.remove("exmode");
   OP = {cards:[], picks:0, taken:[], cursor:0, mode:"choose", last:null, lastIdx:-1, got:[]};
   if ($("sc-shop").classList.contains("on")) renderShop();
   if ($("sc-cards").classList.contains("on")) renderCards();
@@ -3033,7 +3207,7 @@ function defeatFoe(){
       html += '<div style="margin:10px 0"><div style="display:flex;justify-content:center">' +
         cardHTML(gotCard.card, false) + "</div>" +
         '<p style="color:' + rc.color + '">★ カード「' + gotCard.card.name + "」を てにいれた！" +
-        (gotCard.dup ? '<span class="muted">（ダブり → Ｇ' + gotCard.back + "）</span>" : "") + "</p></div>";
+        (gotCard.dup ? '<span class="muted">（' + gotCard.num + "まいめ。ずかんで うれるよ）</span>" : "") + "</p></div>";
     }
     lvups.forEach(l => html += '<p style="color:var(--ok)">★ レベルが ' + l + " に あがった！（" + rankOf(l) + "）</p>");
     if (more) html += '<p class="muted" style="margin-top:10px">つぎの てきが やってくる…</p>';
@@ -3041,8 +3215,16 @@ function defeatFoe(){
     $("r-body").innerHTML = html;
     $("btn-r-next").textContent = more ? "つぎの てきへ" : "ステージを クリア";
     $("btn-r-next").onclick = () => more ? startBattle() : finishStage();
+    showAgain(false);
     show("sc-result");
   }, 620);
+}
+/* 結果画面の「もういちど」。面を クリアした ときだけ 出す（たたかいの あいだの 結果では 出さない）。
+   途中で やりなおす ボタンは 作らない（2026-09-28 決定）：9/27 に 効いたのは
+   「さいごまで やって、すぐ もう1回」。その 1回を ボタン ひとつに する */
+function showAgain(on){
+  $("btn-r-again").style.display = on ? "" : "none";
+  $("r-again-key").style.display = on ? "" : "none";
 }
 function firstEquip(it){
   const cur = CONTENT.items[S.equipment[it.type]];
@@ -3113,10 +3295,13 @@ function finishStage(){
     MEDAL_NAME[medalOf(acc)] + "</b> に なった！</p>";
   if (!first && !newCpm) html += '<p class="muted">この面の さいこう そくどは ' + bst.cpm +
     " もじ/ふん（メダル " + MEDAL_NAME[medalOf(bst.acc)] + "）</p>";
-  /* つぎの めあてを 出す。あと どれだけで 上がるか 分からないと ねらえない */
+  /* つぎの めあてを 出す。あと どれだけで 上がるか 分からないと ねらえない。
+     2026-09-27 の 授業で、息子は「1回 ぎんを 取ったら もう 取りなおせない」と 思っていた。
+     灰色の 小さい 1行で「もういちど やれば」とも 書いて いなかったので、目立たせて はっきり 書く */
   const m = medalOf(bst.acc);
-  if (m < 3) html += '<p class="muted">せいかくさ ' + (MEDAL_ACC[m+1]*100) + "% で メダルが " +
-    MEDAL_NAME[m+1] + " に なる（いまの さいこうは " + (bst.acc*100).toFixed(1) + "%）</p>";
+  if (m < 3) html += '<div class="r-next-medal"><p>この 面は <b>もういちど</b> やれば メダルを とりなおせるよ</p>' +
+    "<p>せいかくさ <b>" + (MEDAL_ACC[m+1]*100) + "%</b> で " + MEDAL_NAME[m+1] +
+    "！（いまの さいこう " + (bst.acc*100).toFixed(1) + "%）</p></div>";
   SPIRITS.filter(s => S.spirits[s.key].bond > bondBefore[s.key]).forEach(s =>
     html += '<p style="color:var(--acc)">◆ ' + s.name + " との きずなが Lv." + S.spirits[s.key].bond + " に あがった！</p>");
   allSpells().filter(sp => spellUsable(sp) && !Array.from(sp.seq).every(k => bondBefore[k] >= sp.bond))
@@ -3135,7 +3320,9 @@ function finishStage(){
       lv: S.lv, gold: S.gold,
       cards: { n: cardCount(), all: allCards().length,
                ids:   allCards().filter(c => haveCard(c.id)).map(c => c.id).join(" "),
-               names: allCards().filter(c => haveCard(c.id)).map(c => c.name).join(" / ") },
+               names: allCards().filter(c => haveCard(c.id)).map(c => c.name).join(" / "),
+               /* 2026-09-28〜：上級の ためしうち（マスターした 数）と、売った 枚数 */
+               tried: Object.keys(S.cardTry || {}).length, sold: S.records.cardsSold || 0 },
       bonds: SPIRITS.map(x => x.key + ":" + S.spirits[x.key].bond).join(" "),
       /* せっていも 送る。2026-09-23 の「いみの とびら」（正確率46%）が
          ガイドを 消して 遊んだ せいなのか 分からず じまいに なったため。 */
@@ -3151,6 +3338,9 @@ function finishStage(){
   $("r-body").innerHTML = html;
   $("btn-r-next").textContent = "ちずへ もどる";
   $("btn-r-next").onclick = () => { renderMap(); show("sc-map"); };
+  const again = B.stage;
+  $("btn-r-again").onclick = () => enterStage(again);
+  showAgain(true);
   show("sc-result");
   checkNewPacks();      /* 遊んでいる あいだに 届いた DLC も ちずに 出す */
 }
@@ -3288,6 +3478,7 @@ function closeAllWindows(){ closeCmd(); closeSpells(); closeTools(); }
 
 /* ---------- 入力 ---------- */
 document.addEventListener("keydown", e => {
+  if (tryKey(e)) return;                  /* 上級カードの ためしうち（Ctrl つきを ここで うける） */
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   if (["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) return;
   if ($("sc-slot").classList.contains("on")){
@@ -3325,6 +3516,8 @@ document.addEventListener("keydown", e => {
   }
   if ($("sc-result").classList.contains("on")){
     if (e.key === " " || e.key === "Enter"){ e.preventDefault(); $("btn-r-next").click(); }
+    else if ((e.key === "r" || e.key === "R") && $("btn-r-again").style.display !== "none"){
+      e.preventDefault(); $("btn-r-again").click(); }
     return;
   }
   if (!$("sc-battle").classList.contains("on")) return;
@@ -3867,12 +4060,15 @@ function renderShop(){
       '<p class="muted">カードには キーボードの ひみつが かいてある。あつめると ものしりに なれるよ。</p>' +
       '<p class="muted" style="margin-bottom:10px">いま <b style="color:var(--acc)">' + cardCount() +
       " / " + allCards().length + "</b> まい あつめた</p>" +
-      PACKS.map(pk => '<div class="packrow">' +
+      PACKS.map(pk => {
+        const done = pk.set === "ex" && !exLeft().length;
+        const ds = pk.desc + (pk.set === "ex" ? (done ? "（ぜんぶ そろった！）" : "（のこり " + exLeft().length + " しゅるい）") : "");
+        return '<div class="packrow' + (pk.set ? " " + pk.set : "") + '">' +
         '<div class="px-wrap">' + pixelArt(CARD_BACK, 2) + "</div>" +
-        '<span class="nm">' + pk.name + '</span><span class="ds">' + pk.desc + "</span>" +
+        '<span class="nm">' + pk.name + '</span><span class="ds">' + ds + "</span>" +
         '<span class="pr">Ｇ ' + pk.price + "</span>" +
-        '<button class="sm" data-pack="' + pk.id + '"' + (S.gold < pk.price ? " disabled" : "") +
-        ">かう</button></div>").join("") +
+        '<button class="sm" data-pack="' + pk.id + '"' + (S.gold < pk.price || done ? " disabled" : "") +
+        ">かう</button></div>"; }).join("") +
       '<div class="row" style="margin-top:12px"><button class="sub sm" id="shop-to-cards">カードずかんを みる</button></div>';
     Array.from($("shop-list").querySelectorAll("[data-pack]")).forEach(b =>
       b.onclick = () => openPack(b.dataset.pack));
@@ -3880,7 +4076,8 @@ function renderShop(){
     if (link) link.onclick = openCards;
     return;
   }
-  const list = itemsOf(shopTab).filter(i => i.price).sort((a,b) => a.price - b.price);
+  const list = itemsOf(shopTab).filter(i => i.price || (i.reward && S.cosmetics.indexOf(i.id) >= 0))
+    .sort((a,b) => (a.price || 0) - (b.price || 0));
   $("shop-list").innerHTML = list.map(it => {
     let owned = false, equipped = false;
     if (it.type === "tool") owned = false;
@@ -3898,7 +4095,7 @@ function renderShop(){
     else btn = '<button class="sm" data-buy="' + it.id + '"' + (S.gold < it.price ? " disabled" : "") + ">かう</button>";
     return '<div class="shoprow' + (owned && !equipped ? " have" : "") + (equipped ? " equipped" : "") + '">' +
       art + '<span class="nm">' + it.name + '</span><span class="ds">' + eff + " " + cnt + '</span>' +
-      '<span class="pr">Ｇ ' + it.price + "</span>" + btn + "</div>";
+      '<span class="pr">' + (it.price ? "Ｇ " + it.price : "ごほうび") + "</span>" + btn + "</div>";
   }).join("") || '<p class="muted">うっているものが ありません。</p>';
   Array.from($("shop-list").querySelectorAll("[data-buy]")).forEach(b => b.onclick = () => buyItem(b.dataset.buy));
   Array.from($("shop-list").querySelectorAll("[data-use]")).forEach(b => b.onclick = () => equipItem(b.dataset.use));
@@ -3927,12 +4124,11 @@ function equipItem(id){
 }
 
 /* ---------- カードずかん ---------- */
-function openCards(){ $("cd-detail").style.display = "none"; renderCards(); show("sc-cards"); }
+function openCards(){ CD_TRY = null; $("cd-detail").style.display = "none"; renderCards(); show("sc-cards"); }
 function renderCards(){
   $("cd-gold").textContent = S.gold;
   $("cd-count").textContent = cardCount() + " / " + allCards().length + " まい";
-  $("btn-cd-pack").textContent = "カードパックを かう（Ｇ" + PACK_PRICE + "）";
-  $("btn-cd-pack").disabled = S.gold < PACK_PRICE;
+  $("btn-cd-pack").textContent = "カードやへ いく";
   $("cd-grid").innerHTML = allCards().map(c => {
     const have = haveCard(c.id);
     const num = S.cards[c.id] || 0;
@@ -3951,11 +4147,84 @@ function showCardDetail(id){
   const r = RARITY[c.rarity] || RARITY.N;
   const d = $("cd-detail");
   d.style.display = "";
+  const num = S.cards[c.id] || 0, pr = sellPrice(c);
   d.innerHTML = '<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">' +
     cardHTML(c, false) +
     '<div style="flex:1;min-width:200px">' +
-    '<p class="muted">もっている数：' + (S.cards[c.id] || 0) + " まい</p>" +
-    '<p class="muted" style="line-height:1.9">' + c.tip + "</p></div></div>";
+    '<p class="muted">もっている数：' + num + " まい</p>" +
+    '<p class="muted" style="line-height:1.9">' + tipHTML(c.tip) + "</p>" +
+    (c.use ? '<p class="cd-use"><b>つかいどころ</b>　' + c.use + "</p>" : "") +
+    (c.try ? tryBoxHTML(c) : "") +
+    '<div class="cd-sell">' +
+      (canSell(c.id)
+        ? '<button class="sm" id="btn-sell1">1まい うる（Ｇ' + pr + "）</button>" +
+          (num > 2 ? '<button class="sm sub" id="btn-sellall">ダブりを ぜんぶ うる（' + (num-1) +
+                     "まい・Ｇ" + ((num-1)*pr) + "）</button>" : "") +
+          '<p class="muted">1まいは かならず のこるよ</p>'
+        : '<button class="sm" disabled>うる</button><p class="muted">さいごの 1まいは うれないよ</p>') +
+    "</div></div></div>";
+  const sell = all => {
+    const g = sellCard(c.id, all);
+    if (g){ toast("Ｇ" + g + " で うった！"); renderCards(); showCardDetail(c.id); }
+  };
+  if ($("btn-sell1")) $("btn-sell1").onclick = () => sell(false);
+  if ($("btn-sellall")) $("btn-sellall").onclick = () => sell(true);
+  CD_TRY = c.try ? c.id : null;
+}
+
+/* ---------- 上級カードの ためしうち（2026-09-28）----------
+   ずかんで 上級カードを ひらいている あいだ、ほんものの キーで その おうぎを おすと「マスター」の はんこ。
+   あつめるだけで なく **じっさいに つかえる ように なる**のが ねらい。
+   mods：ctrl＝Ctrl か ⌘（Mac）／word＝Ctrl か option（Mac の ことばジャンプ）／shift。
+   書いていない Shift は「おしていない」を もとめる（Ctrl＋Shift＋Z を「もとに もどす」に しない） */
+let CD_TRY = null;
+function tryHit(t, e){
+  const m = t.mods || [];
+  const ctrl = e.ctrlKey || e.metaKey, word = e.ctrlKey || e.altKey;
+  if (m.indexOf("ctrl") >= 0 && !ctrl) return false;
+  if (m.indexOf("word") >= 0 && !word) return false;
+  if (m.indexOf("ctrl") < 0 && m.indexOf("word") < 0 && (e.ctrlKey || e.metaKey || e.altKey)) return false;
+  if ((m.indexOf("shift") >= 0) !== !!e.shiftKey) return false;
+  const k = String(e.key || "");
+  return t.keys.some(x => x === k || (x.length === 1 && x === k.toLowerCase()));
+}
+function tryMatch(t, e){ return tryHit(t, e) || (t.alt || []).some(a => tryHit(a, e)); }
+function tryBoxHTML(c){
+  const done = S.cardTry && S.cardTry[c.id];
+  return '<div class="cd-try' + (done ? " done" : "") + '">' +
+    "<b>ためしうち</b>　" + c.try.label + " を おしてみよう" +
+    (c.try.mods.indexOf("ctrl") >= 0 ? '<span class="muted">（Mac は ⌘）</span>' : "") +
+    '<div class="cd-try-st">' + (done ? "★ できた！ マスター ★" : "まだ") + "</div></div>";
+}
+/* 通ったら true（ほかの キー処理を しない） */
+function tryKey(e){
+  if (!CD_TRY || !$("sc-cards").classList.contains("on") || $("cd-detail").style.display === "none") return false;
+  const c = CONTENT.cards[CD_TRY];
+  if (!c || !c.try) return false;
+  if (tryMatch(c.try, e)){
+    e.preventDefault();
+    if (!S.cardTry) S.cardTry = {};
+    const first = !S.cardTry[c.id];
+    S.cardTry[c.id] = 1;
+    save();
+    if (first) toast("「" + c.name + "」を マスターした！");
+    checkOugi();
+    renderCards(); showCardDetail(c.id);
+    return true;
+  }
+  /* ちがう おうぎを おしても ブラウザの ほぞん・いんさつ・けんさく などを 出さない */
+  if ((e.ctrlKey || e.metaKey) && /^[acfpsvxyz]$/i.test(e.key || "")){ e.preventDefault(); return true; }
+  return false;
+}
+/* 上級を ぜんぶ もって、ぜんぶ ためしたら しょうごう「おうぎを きわめた」 */
+function checkOugi(){
+  const ex = allCards().filter(c => cardSet(c) === "ex");
+  if (!ex.length || !CONTENT.items.t_ougi) return false;
+  const all = ex.every(c => haveCard(c.id) && S.cardTry && S.cardTry[c.id]);
+  if (!all || S.cosmetics.indexOf("t_ougi") >= 0) return false;
+  S.cosmetics.push("t_ougi"); S.title = "t_ougi"; save();
+  toast("しょうごう「おうぎを きわめた」を てにいれた！");
+  return true;
 }
 function buyPack(){ openPack("p_normal"); }
 
@@ -4411,7 +4680,7 @@ $("btn-st-back").onclick = () => { renderMap(); show("sc-map"); };
 $("btn-shop").onclick = openShop;
 $("btn-cards").onclick = openCards;
 $("btn-cd-back").onclick = () => { renderMap(); show("sc-map"); };
-$("btn-cd-pack").onclick = buyPack;
+$("btn-cd-pack").onclick = () => { shopTab = "card"; renderShop(); show("sc-shop"); };
 $("openlayer").onclick = advanceOpen;
 $("btn-shop-back").onclick = () => { renderMap(); show("sc-map"); };
 $("btn-menu").onclick = openMenu;
