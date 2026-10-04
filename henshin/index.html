@@ -23,19 +23,22 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none !important}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%; height:100%}
 body{
-  margin:0; color:var(--ink);
+  margin:0; color:var(--ink); height:100%; overflow:hidden; overscroll-behavior:none;
   background:radial-gradient(1200px 600px at 50% -10%, #34497A, var(--bg) 60%);
   background-color:var(--bg);
   font-family:"Zen Maru Gothic", system-ui, -apple-system, "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
-  font-weight:500; font-size:17px; line-height:1.6; min-height:100vh;
+  font-weight:500; font-size:17px; line-height:1.6;
 }
 button{font:inherit; cursor:pointer}
 :focus-visible{outline:3px solid var(--sun); outline-offset:2px}
-.wrap{max-width:1000px; margin:0 auto; padding:14px 16px 40px}
+/* 1がめんに ぜんぶ おさめる。ページは スクロールしない（ゲームの えの 大きさは JS で きめる） */
+.wrap{height:100vh; height:100dvh; display:flex; flex-direction:column; padding:10px 16px 12px; max-width:1400px; margin:0 auto}
+.main{flex:1; min-height:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px}
+.main.side{flex-direction:row; align-items:center}
 
-.hud{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px}
+.hud{display:flex; align-items:center; justify-content:space-between; gap:8px 12px; margin-bottom:8px; flex-wrap:wrap}
 .title{font-size:26px; font-weight:900; letter-spacing:.06em; display:flex; align-items:center; gap:8px; margin:0}
 .title .mk{display:inline-grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--sun); color:#3A2A00; font-size:20px}
 .stat{display:flex; align-items:center; gap:10px}
@@ -45,14 +48,15 @@ button{font:inherit; cursor:pointer}
 .fd.got{filter:none; opacity:1}
 .timer{font-variant-numeric:tabular-nums; font-weight:900; font-size:26px; min-width:4.5em; text-align:right}
 .timer small{font-size:15px; color:var(--ink-2); margin-left:2px}
-.tbar{height:8px; border-radius:999px; background:var(--bg-2); overflow:hidden; margin-bottom:10px}
+.tbar{height:8px; border-radius:999px; background:var(--bg-2); overflow:hidden; margin-bottom:10px; flex:none}
 .tbar i{display:block; height:100%; width:0; background:linear-gradient(90deg, var(--sun), var(--sun-2))}
 
-.stagebox{position:relative; border-radius:18px; overflow:hidden; box-shadow:0 18px 40px -18px rgba(0,0,0,.6); background:#9FD3F5}
-canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-action:manipulation; cursor:pointer}
+.stagebox{position:relative; flex:none; border-radius:18px; overflow:hidden; box-shadow:0 18px 40px -18px rgba(0,0,0,.6); background:#9FD3F5; width:320px; height:220px}
+canvas{display:block; width:100%; height:100%; touch-action:manipulation; cursor:pointer}
 
-.over{position:absolute; inset:0; display:grid; place-items:center; background:rgba(20,26,44,.55); padding:16px}
-.card{background:var(--card); color:var(--card-ink); border-radius:22px; padding:22px 24px; max-width:520px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.35)}
+/* カードは がめん ぜんたいの うえに だす（えが ちいさい スマホでも きれない） */
+.over{position:fixed; inset:0; display:grid; place-items:center; background:rgba(20,26,44,.55); padding:16px; z-index:10}
+.card{background:var(--card); color:var(--card-ink); border-radius:22px; padding:22px 24px; max-width:540px; width:100%; max-height:calc(100dvh - 32px); overflow:auto; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.35)}
 .card h2{margin:0 0 6px; font-size:34px; font-weight:900; letter-spacing:.04em}
 .card .lead{margin:0 0 12px; font-weight:700; color:#5E574B}
 .card ul{list-style:none; padding:0; margin:0 0 16px; text-align:left; display:grid; gap:6px}
@@ -63,7 +67,13 @@ canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-actio
 .big.sub{background:#EDE7DA; color:#5E574B; box-shadow:0 5px 0 #D2C8B4; font-size:17px; padding:10px 22px}
 .btns{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
 
-.henshin{margin-top:14px; background:var(--bg-2); border-radius:18px; padding:12px 14px; display:grid; gap:10px}
+.henshin{flex:none; width:100%; max-width:960px; background:var(--bg-2); border-radius:18px; padding:10px 14px; display:grid; gap:8px}
+.main.side .henshin{width:224px; align-self:center}
+.main.side .henshin .hrow{flex-direction:column; align-items:stretch}
+.main.side .colors{display:grid; grid-template-columns:repeat(5, 34px); gap:7px; justify-content:start}
+.main.side #shapes{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+.main.side .sw{width:34px; height:34px}
+.main.side .key{align-self:flex-start}
 .hrow{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
 .hlab{font-weight:900; min-width:3.6em}
 .colors{gap:8px}
@@ -75,7 +85,7 @@ canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-actio
 .shp[aria-pressed=true]{background:var(--sun); color:#3A2A00}
 .hnote{margin:0; font-size:14px; color:var(--ink-2)}
 .hnote b{color:var(--sun)}
-@media (max-width:560px){ .hud{flex-wrap:wrap} .foods{font-size:18px} .title{font-size:21px} .timer{font-size:21px} .card h2{font-size:28px} .sw{width:34px; height:34px} }
+@media (max-width:560px){ .foods{font-size:18px} .title{font-size:21px} .timer{font-size:21px} .card h2{font-size:28px} .sw{width:34px; height:34px} }
 </style>
 </head>
 <body>
@@ -90,18 +100,20 @@ canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-actio
   </div>
   <div class="tbar"><i id="tbar"></i></div>
 
-  <div class="stagebox">
+  <div class="main" id="main">
+  <div class="stagebox" id="stagebox">
     <canvas id="cv" width="960" height="660" aria-label="3かいだての いえ。やじるしキーで あるく。クリックした ところへも あるく"></canvas>
-    <div class="over" id="over">
-      <div class="card" id="card"></div>
-    </div>
   </div>
 
-  <section class="henshin" aria-label="へんしん">
+  <section class="henshin" id="henshin" aria-label="へんしん">
     <div class="hrow"><span class="hlab">いろ</span><span class="hrow colors" id="colors"></span><span class="key">Shift で つぎの いろ</span></div>
     <div class="hrow"><span class="hlab">かたち</span><span class="hrow" id="shapes"></span></div>
     <p class="hnote">とまっていて <b>うしろと おなじ いろ</b>（かべ・かぐ・かいだん）なら みつからない。からだが うすく なったら かくれている。かたちの ちからは まだ ない</p>
   </section>
+  </div>
+</div>
+<div class="over" id="over">
+  <div class="card" id="card"></div>
 </div>
 
 <script>
@@ -312,6 +324,18 @@ function fit(){
   dpr = Math.min(2, window.devicePixelRatio || 1);
   cv.width = VW * dpr; cv.height = VH * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  layout();
+}
+// のこりの ばしょに おさまる いちばん 大きい えに する。よこながの がめんでは へんしんの らんを みぎに
+function layout(){
+  const main = $("main"), panel = $("henshin"), box = $("stagebox");
+  const side = window.innerWidth >= 760 && window.innerWidth / window.innerHeight > 1.25;
+  main.classList.toggle("side", side);
+  const r = main.getBoundingClientRect();
+  const pw = side ? panel.offsetWidth + 12 : 0, ph = side ? 0 : panel.offsetHeight + 12;
+  const sc = Math.max(0.15, Math.min((r.width - pw) / VW, (r.height - ph) / VH));
+  box.style.width = Math.floor(VW * sc) + "px";
+  box.style.height = Math.floor(VH * sc) + "px";
 }
 function rr(x, y, w, h, r){ ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
 function drawHouse(){
@@ -562,11 +586,14 @@ $("card").addEventListener("click", e => {
 });
 const keys = {left: false, right: false};
 function walkByKeys(){ walk(G, (keys.right ? 1 : 0) - (keys.left ? 1 : 0)); }
+const SCROLL_KEYS = [" ", "PageUp", "PageDown", "Home", "End"];
 window.addEventListener("keydown", e => {
   if (e.key === "Shift") {
+    if (running) e.preventDefault();
     if (!e.repeat && running) { nextColor(G); }
     return;
   }
+  if (running && SCROLL_KEYS.includes(e.key)) { e.preventDefault(); return; }
   const k = e.key;
   if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(k)) {
     if ((k === "Enter" || k === " ") && !$("over").hidden) { const b = $("card").querySelector("button[data-act]"); if (b) { e.preventDefault(); b.click(); } }
@@ -608,9 +635,10 @@ document.querySelector(".henshin").addEventListener("click", e => {
   syncHenshin();
 });
 
+buildHenshin();
 fit();
 window.addEventListener("resize", fit);
-buildHenshin();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
 showStart();
 requestAnimationFrame(loop);
 </script>
