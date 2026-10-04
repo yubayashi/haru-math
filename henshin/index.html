@@ -40,6 +40,9 @@ button{font:inherit; cursor:pointer}
 .title .mk{display:inline-grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--sun); color:#3A2A00; font-size:20px}
 .stat{display:flex; align-items:center; gap:10px}
 .stage{background:var(--bg-2); padding:4px 12px; border-radius:999px; font-weight:900; color:var(--ink-2)}
+.foods{display:flex; gap:2px; background:var(--bg-2); padding:2px 8px; border-radius:999px; font-size:22px; line-height:1.3}
+.fd{font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif; filter:grayscale(1); opacity:.4}
+.fd.got{filter:none; opacity:1}
 .timer{font-variant-numeric:tabular-nums; font-weight:900; font-size:26px; min-width:4.5em; text-align:right}
 .timer small{font-size:15px; color:var(--ink-2); margin-left:2px}
 .tbar{height:8px; border-radius:999px; background:var(--bg-2); overflow:hidden; margin-bottom:10px}
@@ -69,7 +72,7 @@ canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-actio
 .shp[aria-pressed=true]{background:var(--sun); color:#3A2A00}
 .hnote{margin:0; font-size:14px; color:var(--ink-2)}
 .hnote b{color:var(--sun)}
-@media (max-width:560px){ .title{font-size:21px} .timer{font-size:21px} .card h2{font-size:28px} .sw{width:34px; height:34px} }
+@media (max-width:560px){ .hud{flex-wrap:wrap} .foods{font-size:18px} .title{font-size:21px} .timer{font-size:21px} .card h2{font-size:28px} .sw{width:34px; height:34px} }
 </style>
 </head>
 <body>
@@ -77,6 +80,7 @@ canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-actio
   <div class="hud">
     <h1 class="title"><span class="mk" aria-hidden="true">？</span>へんしん</h1>
     <div class="stat">
+      <span class="foods" id="foods" role="img"></span>
       <span class="stage" id="stage">1めん</span>
       <span class="timer" id="timer" aria-live="off">60<small>びょう</small></span>
     </div>
@@ -93,7 +97,7 @@ canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-actio
   <section class="henshin" aria-label="へんしん">
     <div class="hrow"><span class="hlab">いろ</span><span class="hrow" id="colors"></span></div>
     <div class="hrow"><span class="hlab">かたち</span><span class="hrow" id="shapes"></span></div>
-    <p class="hnote">へんしんすると どう なる？ → <b>まだ きまってない（はるが きめる）</b></p>
+    <p class="hnote">とまっていて <b>かべと おなじ いろ</b>なら みつからない（からだが うすく なったら かくれている）。かたちの ちからは まだ ない</p>
   </section>
 </div>
 
@@ -101,7 +105,8 @@ canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-actio
 "use strict";
 /* ===== LOGIC START ===== */
 /* ここから LOGIC END までは がめんに さわらない。test/logic.test.js が そのまま 取り出して うごかす。
-   ルールは はるの こたえ（2026-10-04・8もん）だけで つくった。きまっていない ところは「かり」と かいてある。 */
+   ルールは はるの こたえ（2026-10-04・8もん）と、そのあとの はるの なおし（2026-10-04 よる）で つくった。
+   きまっていない ところは「かり」と かいてある。 */
 const VW = 960, VH = 660;
 const BASE = 610, FH = 160, FLOORS = 3;      // 1かいの ゆかの 高さ／1かいぶんの 高さ
 const XL = 56, XR = 904;                      // あるける はば
@@ -110,18 +115,39 @@ const STAIRS = [{x0: 820, x1: 680}, {x0: 140, x1: 280}];
 const SPEED = {player: 175, patrol: 70, chase: 145};   // かり：おいかける けいさつは はるより すこし おそい
 const VIEW = 320;                             // かり：けいさつが みえる きょり
 const CATCH = 26;
-const TIME = 60;                              // はる：1ぷん みつからなければ かち
-const STAGES = [                              // はる：2めんでは けいさつが ふえる
-  {police: [{f: 2, x: 820}]},
-  {police: [{f: 2, x: 820}, {f: 1, x: 320}]}
+const TIME = 60;                              // はる：1ぷん にげきる
+const PICK = 26;                              // たべものを とれる きょり
+// はる：2めんでは けいさつが ふえる／1めんごとに ミッション「たべものを ぜんぶ あつめて 1ぷん にげきる」
+// かり：たべものの かず（1めん 3こ・2めん 5こ）と ばしょ
+const STAGES = [
+  {police: [{f: 2, x: 820}],
+   foods: [{f: 0, x: 580, k: "🍜"}, {f: 1, x: 390, k: "🍙"}, {f: 2, x: 450, k: "🍰"}]},
+  {police: [{f: 2, x: 820}, {f: 1, x: 320}],
+   foods: [{f: 0, x: 600, k: "🍜"}, {f: 0, x: 270, k: "🍣"}, {f: 1, x: 390, k: "🍙"}, {f: 1, x: 760, k: "🍕"}, {f: 2, x: 170, k: "🍰"}]}
 ];
-const COLORS = ["#F28C28", "#E5484D", "#3E7BFA", "#30A46C", "#F5D90A", "#FFFFFF", "#8E4EC6", "#6B4F3A"];
+// へや：[かい, x0, x1, かべの いろ, なまえ]。かべの いろが「はいけいの いろ」
+const ROOMS = [
+  [0, 40, 480, "#F4D27A", "リビング"], [0, 480, 920, "#8FD1A6", "キッチン"],
+  [1, 40, 480, "#8DB4F0", "こどもべや"], [1, 480, 920, "#F09DB8", "しんしつ"],
+  [2, 40, 920, "#C9A27A", "やねうら"]
+];
+// へんしんの いろ：へやの かべの 5しょく ＋ 3しょく（さいしょは オレンジ ＝ どの かべとも ちがう）
+const COLORS = ["#F28C28", "#F4D27A", "#8FD1A6", "#8DB4F0", "#F09DB8", "#C9A27A", "#E5484D", "#FFFFFF"];
 const SHAPES = ["ひと", "まる", "しかく", "さんかく"];
 
 function floorY(f){ return BASE - f * FH; }
 function levelOf(y){ return Math.max(0, Math.min(FLOORS - 1, Math.round((BASE - y) / FH))); }
 function clampX(x){ return Math.max(XL, Math.min(XR, x)); }
 function floorAt(wy){ return Math.max(0, Math.min(FLOORS - 1, Math.floor((BASE - wy) / FH))); }
+function roomAt(level, x){
+  for (let i = 0; i < ROOMS.length; i++) { const r = ROOMS[i]; if (r[0] === level && x >= r[1] && x < r[2]) return i; }
+  for (let i = 0; i < ROOMS.length; i++) if (ROOMS[i][0] === level) return i;   // かべぎわ
+  return 0;
+}
+function wallColor(e){ return ROOMS[roomAt(levelOf(e.y), e.x)][3]; }
+// はる：うごいている か、とまっていても かべの いろと ちがうと みつかる
+//      → かべと おなじ いろに へんしんして とまっていれば みつからない
+function exposed(p){ return p.moving || COLORS[p.color] !== wallColor(p); }
 
 // fa かいの xa から fb かいの xb まで。かいだんを とおる ときは stair:true の てんを はさむ
 function plan(fa, xa, fb, xb){
@@ -163,8 +189,9 @@ function newGame(stage, rng){
   rng = rng || Math.random;
   const s = Math.max(0, Math.min(STAGES.length - 1, stage | 0));
   return {
-    stage: s, time: 0, status: "play", caught: -1,
+    stage: s, time: 0, status: "play", caught: -1, reason: "",
     player: {x: 150, y: floorY(0), path: [], face: 1, moving: false, color: 0, shape: 0},
+    foods: STAGES[s].foods.map(q => ({x: q.x, y: floorY(q.f), k: q.k, got: false, gotAt: -1})),
     police: STAGES[s].police.map(p => ({
       x: p.x, y: floorY(p.f), path: [], face: -1,
       mode: "patrol", wait: 0.8 + rng() * 0.8, alertT: 99, lastSeen: null, retarget: 0, lookT: 0
@@ -182,21 +209,26 @@ function step(g, dt, rng){
   g.time += dt;
   const P = g.player;
   P.moving = moveAlong(P, SPEED.player, dt) > 0;
+  // たべものを とる（おなじ かいで ちかく）
+  for (const q of g.foods) {
+    if (!q.got && levelOf(q.y) === levelOf(P.y) && Math.abs(q.x - P.x) < PICK) { q.got = true; q.gotAt = g.time; }
+  }
+  const vis = exposed(P);
   for (let i = 0; i < g.police.length; i++) {
     const c = g.police[i];
     c.alertT += dt;
-    // はる：うごいている ところを みられると、けいさつが きづく
-    if (c.mode !== "chase" && P.moving && sees(c, P)) { c.mode = "chase"; c.alertT = 0; c.retarget = 0; c.lastSeen = {f: levelOf(P.y), x: P.x}; }
+    // はる：みつかる ＝ みえる ところで、うごいている か かべの いろと ちがう
+    if (c.mode !== "chase" && vis && sees(c, P)) { c.mode = "chase"; c.alertT = 0; c.retarget = 0; c.lastSeen = {f: levelOf(P.y), x: P.x}; }
     if (c.mode === "chase") {
-      // はる：きづくと おいかける（みえて いる あいだは ついてくる。かり：みうしなったら さいごに みた ところまで いく）
-      if (sees(c, P)) c.lastSeen = {f: levelOf(P.y), x: P.x};
+      // はる：きづくと おいかける。かり：かべと おなじ いろで とまると みうしなう（さいごに みた ところまで いって さがす）
+      if (vis && sees(c, P)) c.lastSeen = {f: levelOf(P.y), x: P.x};
       c.retarget -= dt;
       if (c.retarget <= 0 && c.lastSeen) { setTarget(c, c.lastSeen.f, c.lastSeen.x); c.retarget = 0.25; }
       moveAlong(c, SPEED.chase, dt);
-      if (!c.path.length && !sees(c, P)) { c.mode = "search"; c.lookT = 1.8; }
-      // おいつかれたら つかまる（はるは「ぶつかったら みつかる」は えらばなかった ので、みまわり中は すりぬける）
-      if (levelOf(c.y) === levelOf(P.y) && Math.abs(c.x - P.x) < CATCH && Math.abs(c.y - P.y) < 40) {
-        g.status = "lose"; g.caught = i; return g;
+      if (!c.path.length && !(vis && sees(c, P))) { c.mode = "search"; c.lookT = 1.8; }
+      // おいつかれたら つかまる。かくれている（とまって かべと おなじ いろ）ときは つかまらない
+      if (vis && levelOf(c.y) === levelOf(P.y) && Math.abs(c.x - P.x) < CATCH && Math.abs(c.y - P.y) < 40) {
+        g.status = "lose"; g.caught = i; g.reason = "caught"; return g;
       }
     } else if (c.mode === "search") {
       // かり：みうしなったら すこし あたりを みまわして、みまわりに もどる
@@ -213,7 +245,11 @@ function step(g, dt, rng){
       }
     }
   }
-  if (g.time >= TIME) g.status = "win";
+  // はる：たべものを ぜんぶ あつめて 1ぷん にげきったら クリア。かり：1ぷんで のこっていたら じかんぎれ
+  if (g.time >= TIME) {
+    if (g.foods.every(q => q.got)) g.status = "win";
+    else { g.status = "lose"; g.reason = "food"; }
+  }
   return g;
 }
 /* ===== LOGIC END ===== */
@@ -227,11 +263,6 @@ function fit(){
   cv.width = VW * dpr; cv.height = VH * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-const ROOMS = [   // [かい, x0, x1, かべの いろ, なまえ]
-  [0, 40, 480, "#F7E6C4", "リビング"], [0, 480, 920, "#D9F0E1", "キッチン"],
-  [1, 40, 480, "#DCE6FA", "こどもべや"], [1, 480, 920, "#F6DDE6", "しんしつ"],
-  [2, 40, 920, "#E8D6BE", "やねうら"]
-];
 function rr(x, y, w, h, r){ ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
 function drawHouse(){
   // そら と じめん
@@ -251,9 +282,9 @@ function drawHouse(){
   for (const [f, x0, x1, col, name] of ROOMS) {
     const top = floorY(f) - FH + 24, h = FH - 24;
     ctx.fillStyle = col; ctx.fillRect(x0, top, x1 - x0, h);
-    ctx.fillStyle = "rgba(0,0,0,.04)";
+    ctx.fillStyle = "rgba(0,0,0,.05)";
     for (let x = x0 + 14; x < x1; x += 28) ctx.fillRect(x, top, 2, h);
-    ctx.fillStyle = "rgba(60,50,30,.35)"; ctx.font = "700 13px 'Zen Maru Gothic', sans-serif";
+    ctx.fillStyle = "rgba(40,30,20,.45)"; ctx.font = "700 13px 'Zen Maru Gothic', sans-serif";
     ctx.fillText(name, x0 + 10, top + 18);
   }
   // そとかべ と ゆか
@@ -304,16 +335,16 @@ function drawFurniture(){
   ctx.fillStyle = "#E9EEF2"; rr(856, y0 - 128, 54, 128, 8); ctx.fill(); ctx.fillStyle = "#C8D1D9"; ctx.fillRect(856, y0 - 80, 54, 3); ctx.fillRect(900, y0 - 116, 4, 26);
   // 2かい こどもべや：つくえ・ベッド
   ctx.fillStyle = "#9C6B45"; ctx.fillRect(56, y1 - 60, 70, 8); ctx.fillRect(60, y1 - 52, 6, 52); ctx.fillRect(116, y1 - 52, 6, 52);
-  ctx.fillStyle = "#5B8FD9"; rr(300, y1 - 40, 160, 34, 8); ctx.fill(); ctx.fillStyle = "#FFFFFF"; rr(306, y1 - 52, 40, 16, 6); ctx.fill();
+  ctx.fillStyle = "#E9895B"; rr(300, y1 - 40, 160, 34, 8); ctx.fill(); ctx.fillStyle = "#FFFFFF"; rr(306, y1 - 52, 40, 16, 6); ctx.fill();
   ctx.fillStyle = "#6B4F3A"; ctx.fillRect(296, y1 - 64, 8, 64); ctx.fillRect(456, y1 - 48, 8, 48);
   // 2かい しんしつ：ベッド・クローゼット・ライト
-  ctx.fillStyle = "#E49AB0"; rr(720, y1 - 40, 140, 34, 8); ctx.fill(); ctx.fillStyle = "#FFFFFF"; rr(820, y1 - 52, 36, 16, 6); ctx.fill();
+  ctx.fillStyle = "#9B7BD0"; rr(720, y1 - 40, 140, 34, 8); ctx.fill(); ctx.fillStyle = "#FFFFFF"; rr(820, y1 - 52, 36, 16, 6); ctx.fill();
   ctx.fillStyle = "#6B4F3A"; ctx.fillRect(856, y1 - 66, 8, 66);
   ctx.fillStyle = "#8E6A4E"; rr(868, y1 - 124, 48, 124, 4); ctx.fill(); ctx.fillStyle = "#7A5A40"; ctx.fillRect(891, y1 - 120, 2, 116); ctx.fillStyle = "#E2C49A"; ctx.fillRect(884, y1 - 66, 3, 10); ctx.fillRect(897, y1 - 66, 3, 10);
   ctx.fillStyle = "#F5D06B"; ctx.beginPath(); ctx.moveTo(500, y1 - 100); ctx.lineTo(540, y1 - 100); ctx.lineTo(530, y1 - 76); ctx.lineTo(510, y1 - 76); ctx.closePath(); ctx.fill();
   ctx.fillStyle = "#6B4F3A"; ctx.fillRect(518, y1 - 76, 4, 76);
   // 3かい やねうら：はこ・ながもち
-  ctx.fillStyle = "#C9A56E"; ctx.fillRect(560, y2 - 44, 60, 44); ctx.fillRect(626, y2 - 30, 40, 30); ctx.fillRect(574, y2 - 74, 40, 30);
+  ctx.fillStyle = "#EBCB93"; ctx.fillRect(560, y2 - 44, 60, 44); ctx.fillRect(626, y2 - 30, 40, 30); ctx.fillRect(574, y2 - 74, 40, 30);
   ctx.fillStyle = "#B08E58"; ctx.fillRect(560, y2 - 24, 60, 3); ctx.fillRect(574, y2 - 60, 40, 3);
   ctx.fillStyle = "#7A5A44"; rr(760, y2 - 48, 120, 48, 6); ctx.fill(); ctx.fillStyle = "#E2C49A"; ctx.fillRect(812, y2 - 32, 16, 10);
 }
@@ -321,6 +352,7 @@ function drawPlayer(p, t){
   const col = COLORS[p.color], bob = p.moving ? Math.abs(Math.sin(t * 14)) * 3 : 0;
   const x = p.x, y = p.y - bob;
   ctx.save();
+  if (!exposed(p)) ctx.globalAlpha = 0.55;
   ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.beginPath(); ctx.ellipse(p.x, p.y + 2, 16, 4, 0, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = col; ctx.strokeStyle = "rgba(0,0,0,.45)"; ctx.lineWidth = 2.5;
   let eyeY;
@@ -336,6 +368,19 @@ function drawPlayer(p, t){
   ctx.fillStyle = "#1E1E1E";
   ctx.beginPath(); ctx.arc(x + p.face * 3 - 4, eyeY, 2.6, 0, Math.PI * 2); ctx.arc(x + p.face * 3 + 4, eyeY, 2.6, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
+}
+function drawFoods(t){
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  for (const q of G.foods) {
+    let a = 1, sc = 1;
+    if (q.got) { const k = (G.time - q.gotAt) / 0.4; if (k >= 1) continue; a = 1 - k; sc = 1 + k * 0.8; }
+    const y = q.y - 34 + Math.sin(t * 3 + q.x) * 3;
+    ctx.globalAlpha = a;
+    ctx.fillStyle = "rgba(255,255,255,.75)"; ctx.beginPath(); ctx.arc(q.x, y, 20 * sc, 0, Math.PI * 2); ctx.fill();
+    ctx.font = `${Math.round(26 * sc)}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
+    ctx.fillText(q.k, q.x, y + 1);
+  }
+  ctx.globalAlpha = 1; ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
 }
 function drawPolice(c, t){
   const x = c.x, y = c.y;
@@ -379,13 +424,22 @@ function drawMarker(t){
 function render(t){
   drawHouse();
   drawMarker(t);
+  drawFoods(t);
   for (const c of G.police) drawPolice(c, t);
   drawPlayer(G.player, t);
   const left = Math.max(0, Math.ceil(TIME - G.time));
   $("timer").innerHTML = `${left}<small>びょう</small>`;
   $("tbar").style.width = Math.min(100, G.time / TIME * 100) + "%";
   $("stage").textContent = (G.stage + 1) + "めん";
+  if (G.player.color !== shownLook[0] || G.player.shape !== shownLook[1]) { shownLook = [G.player.color, G.player.shape]; syncHenshin(); }
+  const key = G.stage + ":" + G.foods.map(q => q.got ? 1 : 0).join("");
+  if (key !== foodKey) {
+    foodKey = key;
+    $("foods").innerHTML = G.foods.map(q => `<span class="fd${q.got ? " got" : ""}">${q.k}</span>`).join("");
+    $("foods").setAttribute("aria-label", `たべもの ${G.foods.filter(q => q.got).length} / ${G.foods.length}`);
+  }
 }
+let foodKey = "", shownLook = [-1, -1];
 
 /* ---------- すすめる ---------- */
 let G = newGame(0);
@@ -402,29 +456,38 @@ function loop(ts){
   requestAnimationFrame(loop);
 }
 function card(html){ $("card").innerHTML = html; $("over").hidden = false; }
+function mission(stage){
+  const st = STAGES[stage];
+  return `たべもの ${st.foods.map(q => q.k).join("")} を ぜんぶ あつめて、1ぷん にげきろう（けいさつ ${st.police.length}にん）`;
+}
 function showStart(){
   card(`<h2>へんしん</h2>
-    <p class="lead">けいさつから 1ぷん にげきったら かち！</p>
+    <p class="lead">ミッション：${mission(0)}</p>
     <ul>
-      <li>🏠 3かいだての いえの なか</li>
-      <li>🖱️ クリックした ところへ あるく</li>
-      <li>👀 うごいている ところを みられると、けいさつが おいかけて くる</li>
+      <li>🏠 3かいだての いえの なか。クリックした ところへ あるく</li>
+      <li>👀 うごいていると、けいさつに みつかる</li>
+      <li>🎨 とまっていても、かべの いろと ちがうと みつかる → へんしんで かべと おなじ いろに なろう</li>
       <li>🚓 2めんは けいさつが ふえる</li>
     </ul>
-    <p class="note">へんしんの ちからは まだ ない（はるが きめる）</p>
     <div class="btns"><button class="big" data-act="start">スタート</button></div>`);
+}
+function showIntro(stage){
+  card(`<h2>${stage + 1}めん</h2>
+    <p class="lead">ミッション：${mission(stage)}</p>
+    <div class="btns"><button class="big" data-act="go" data-stage="${stage}">スタート</button></div>`);
 }
 function showEnd(){
   if (G.status === "win") {
     const lastStage = G.stage >= STAGES.length - 1;
-    card(`<h2>${lastStage ? "ぜんぶ クリア！" : "にげきった！"}</h2>
+    card(`<h2>${lastStage ? "ぜんぶ クリア！" : "ミッション クリア！"}</h2>
       <p class="lead">${G.stage + 1}めん クリア</p>
       <div class="btns">${lastStage
         ? '<button class="big" data-act="first">1めんから</button>'
         : `<button class="big" data-act="next">${G.stage + 2}めんへ</button><button class="big sub" data-act="again">もういちど</button>`}</div>`);
   } else {
-    card(`<h2>つかまった…</h2>
-      <p class="lead">${Math.floor(G.time)}びょう にげた</p>
+    const left = G.foods.filter(q => !q.got);
+    card(`<h2>${G.reason === "food" ? "じかん ぎれ…" : "つかまった…"}</h2>
+      <p class="lead">${G.reason === "food" ? `たべもの ${left.map(q => q.k).join("")} が のこってる` : `${Math.floor(G.time)}びょう にげた`}</p>
       <div class="btns"><button class="big" data-act="again">もういちど</button></div>`);
   }
 }
@@ -440,7 +503,8 @@ $("card").addEventListener("click", e => {
   if (!b) return;
   const a = b.dataset.act;
   if (a === "start" || a === "first") begin(0);
-  else if (a === "next") begin(G.stage + 1);
+  else if (a === "next") { const keep = G.player; G = newGame(G.stage + 1); G.player.color = keep.color; G.player.shape = keep.shape; showIntro(G.stage); }
+  else if (a === "go") begin(+b.dataset.stage);
   else if (a === "again") begin(G.stage);
 });
 cv.addEventListener("pointerdown", e => {
