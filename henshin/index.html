@@ -66,7 +66,10 @@ canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-actio
 .henshin{margin-top:14px; background:var(--bg-2); border-radius:18px; padding:12px 14px; display:grid; gap:10px}
 .hrow{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
 .hlab{font-weight:900; min-width:3.6em}
-.sw{width:38px; height:38px; border-radius:50%; border:3px solid rgba(255,255,255,.25); padding:0}
+.colors{gap:8px}
+.key{font-size:13px; font-weight:700; color:var(--ink-2); background:#3A4B72; border-radius:8px; padding:2px 8px}
+.card li b{background:#2A2620; color:#fff; border-radius:6px; padding:0 6px; font-size:14px}
+.sw{width:36px; height:36px; border-radius:50%; border:3px solid rgba(255,255,255,.25); padding:0}
 .sw[aria-pressed=true]{border-color:#fff; box-shadow:0 0 0 3px var(--sun)}
 .shp{border:0; border-radius:12px; padding:6px 14px; background:#3A4B72; color:var(--ink); font-weight:900}
 .shp[aria-pressed=true]{background:var(--sun); color:#3A2A00}
@@ -88,16 +91,16 @@ canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-actio
   <div class="tbar"><i id="tbar"></i></div>
 
   <div class="stagebox">
-    <canvas id="cv" width="960" height="660" aria-label="3かいだての いえ。クリックした ところへ あるく"></canvas>
+    <canvas id="cv" width="960" height="660" aria-label="3かいだての いえ。やじるしキーで あるく。クリックした ところへも あるく"></canvas>
     <div class="over" id="over">
       <div class="card" id="card"></div>
     </div>
   </div>
 
   <section class="henshin" aria-label="へんしん">
-    <div class="hrow"><span class="hlab">いろ</span><span class="hrow" id="colors"></span></div>
+    <div class="hrow"><span class="hlab">いろ</span><span class="hrow colors" id="colors"></span><span class="key">Shift で つぎの いろ</span></div>
     <div class="hrow"><span class="hlab">かたち</span><span class="hrow" id="shapes"></span></div>
-    <p class="hnote">とまっていて <b>かべと おなじ いろ</b>なら みつからない（からだが うすく なったら かくれている）。かたちの ちからは まだ ない</p>
+    <p class="hnote">とまっていて <b>うしろと おなじ いろ</b>（かべ・かぐ・かいだん）なら みつからない。からだが うすく なったら かくれている。かたちの ちからは まだ ない</p>
   </section>
 </div>
 
@@ -125,14 +128,27 @@ const STAGES = [
   {police: [{f: 2, x: 820}, {f: 1, x: 320}],
    foods: [{f: 0, x: 600, k: "🍜"}, {f: 0, x: 270, k: "🍣"}, {f: 1, x: 390, k: "🍙"}, {f: 1, x: 760, k: "🍕"}, {f: 2, x: 170, k: "🍰"}]}
 ];
-// へや：[かい, x0, x1, かべの いろ, なまえ]。かべの いろが「はいけいの いろ」
+// いろ。へんしんで えらべる いろ ＝ いえの なかに ある いろ ぜんぶ（オレンジ だけは どこにも ない ＝ さいしょの いろ）
+const C = {orange: "#F28C28", yellow: "#F4D27A", green: "#8FD1A6", sky: "#8DB4F0", pink: "#F09DB8",
+           tan: "#C9A27A", red: "#E5484D", white: "#FFFFFF", purple: "#9B7BD0", brown: "#9A6B47"};
+const COLORS = [C.orange, C.yellow, C.green, C.sky, C.pink, C.tan, C.red, C.white, C.purple, C.brown];
+// へや：[かい, x0, x1, かべの いろ, なまえ]
 const ROOMS = [
-  [0, 40, 480, "#F4D27A", "リビング"], [0, 480, 920, "#8FD1A6", "キッチン"],
-  [1, 40, 480, "#8DB4F0", "こどもべや"], [1, 480, 920, "#F09DB8", "しんしつ"],
-  [2, 40, 920, "#C9A27A", "やねうら"]
+  [0, 40, 480, C.yellow, "リビング"], [0, 480, 920, C.green, "キッチン"],
+  [1, 40, 480, C.sky, "こどもべや"], [1, 480, 920, C.pink, "しんしつ"],
+  [2, 40, 920, C.tan, "やねうら"]
 ];
-// へんしんの いろ：へやの かべの 5しょく ＋ 3しょく（さいしょは オレンジ ＝ どの かべとも ちがう）
-const COLORS = ["#F28C28", "#F4D27A", "#8FD1A6", "#8DB4F0", "#F09DB8", "#C9A27A", "#E5484D", "#FFFFFF"];
+// かぐ：[かい, x0, x1, たかさ, いろ, なまえ]。からだの まんなか（ゆかから BODY）より たかい かぐは「うしろの いろ」に なる
+// （テーブル・つくえの あし、ライトの はしら など ほそい ものは かぞえない）
+const FURN = [
+  [0, 80, 250, 70, C.red, "ソファ"], [0, 300, 410, 30, C.brown, "テレビだい"], [0, 436, 462, 30, C.brown, "うえきばち"],
+  [0, 856, 910, 128, C.white, "れいぞうこ"],
+  [1, 300, 460, 40, C.red, "ベッド"],
+  [1, 720, 860, 40, C.purple, "ベッド"], [1, 868, 916, 124, C.brown, "クローゼット"],
+  [2, 560, 620, 44, C.yellow, "はこ"], [2, 626, 666, 30, C.yellow, "はこ"], [2, 760, 880, 48, C.brown, "ながもち"]
+];
+const STAIR_COLOR = C.brown, STEPS = 9;
+const BODY = 18;                              // うしろの いろを みる 高さ（からだの まんなか）
 const SHAPES = ["ひと", "まる", "しかく", "さんかく"];
 
 function floorY(f){ return BASE - f * FH; }
@@ -145,9 +161,25 @@ function roomAt(level, x){
   return 0;
 }
 function wallColor(e){ return ROOMS[roomAt(levelOf(e.y), e.x)][3]; }
-// はる：うごいている か、とまっていても かべの いろと ちがうと みつかる
-//      → かべと おなじ いろに へんしんして とまっていれば みつからない
-function exposed(p){ return p.moving || COLORS[p.color] !== wallColor(p); }
+// かいだんの だんの 高さ（f かいの ゆかから）。えと はんていで おなじ けいさんを つかう
+function stairHeightAt(f, x){
+  const s = STAIRS[f];
+  if (!s) return 0;
+  const t = (x - s.x0) / (s.x1 - s.x0);
+  if (t < 0 || t >= 1) return 0;
+  return (Math.floor(t * STEPS) + 1) * FH / STEPS;
+}
+// level かいの x で、からだの うしろに みえる いろ（かぐ → かいだん → かべ の じゅん）
+function backAt(level, x){
+  for (const [f, x0, x1, h, col] of FURN) if (f === level && x >= x0 && x < x1 && h > BODY) return col;
+  if (stairHeightAt(level, x) > BODY) return STAIR_COLOR;
+  return ROOMS[roomAt(level, x)][3];
+}
+function bgColor(e){ return backAt(levelOf(e.y), e.x); }
+// はる：うごいている か、とまっていても うしろの いろ（はいけい）と ちがうと みつかる
+//      → うしろと おなじ いろに へんしんして とまっていれば みつからない
+//      2026-10-04：はじめ かべの いろ だけで みていて、かぐの まえで みための いろと あわなかった（はるに「おかしい」と いわれた）
+function exposed(p){ return p.moving || COLORS[p.color] !== bgColor(p); }
 
 // fa かいの xa から fb かいの xb まで。かいだんを とおる ときは stair:true の てんを はさむ
 function plan(fa, xa, fb, xb){
@@ -198,6 +230,24 @@ function newGame(stage, rng){
     }))
   };
 }
+// はる（10/4 よる）：やじるしキーで いどう。← → は おしている あいだ あるく（dir＝-1/0/1。0 で とまる）
+function walk(g, dir){
+  const P = g.player;
+  if (g.status !== "play" || (P.path.length && P.path[0].stair)) return false;   // かいだんの とちゅうは のぼり（くだり）きる
+  P.path = dir ? [{x: dir < 0 ? XL : XR, y: floorY(levelOf(P.y))}] : [];
+  return true;
+}
+// ↑ ↓ は ひとつ うえ／した の かいへ（かいだんまで じどうで あるいて、のぼりきった ところで とまる）
+function climb(g, d){
+  const P = g.player;
+  if (g.status !== "play") return false;
+  const lv = levelOf(P.path.length && P.path[0].stair ? P.path[0].y : P.y);
+  if (d > 0 && lv < FLOORS - 1) { setTarget(P, lv + 1, STAIRS[lv].x1); return true; }
+  if (d < 0 && lv > 0) { setTarget(P, lv - 1, STAIRS[lv - 1].x0); return true; }
+  return false;
+}
+// はる（10/4 よる）：シフトで いろを かえる（つぎの いろへ。さいごの つぎは さいしょ）
+function nextColor(g){ g.player.color = (g.player.color + 1) % COLORS.length; return g.player.color; }
 function clickTo(g, wx, wy){
   if (g.status !== "play") return false;
   setTarget(g.player, floorAt(wy), wx);
@@ -298,17 +348,17 @@ function drawHouse(){
   STAIRS.forEach((s, f) => drawStairs(s, f));
 }
 function drawStairs(s, f){
-  const n = 9, yb = floorY(f), yt = floorY(f + 1);
+  const n = STEPS, yb = floorY(f), yt = floorY(f + 1);
   const dir = Math.sign(s.x1 - s.x0), w = Math.abs(s.x1 - s.x0) / n, hh = (yb - yt) / n;
   ctx.save();
   ctx.beginPath(); ctx.rect(Math.min(s.x0, s.x1) - 20, yt, Math.abs(s.x1 - s.x0) + 40, yb - yt); ctx.clip();   // てすりが うえの かいに つきでないように
-  ctx.fillStyle = "#C79A6B";
+  ctx.fillStyle = STAIR_COLOR;
   for (let i = 0; i < n; i++) {
     const x = s.x0 + dir * (i * w) + (dir < 0 ? -w : 0);
     const y = yb - (i + 1) * hh;
     ctx.fillRect(x, y, w + 1, (i + 1) * hh);
   }
-  ctx.fillStyle = "#A87B4F";
+  ctx.fillStyle = "rgba(255,255,255,.22)";   // だんの ふち（うえだけ）
   for (let i = 0; i < n; i++) {
     const x = s.x0 + dir * (i * w) + (dir < 0 ? -w : 0);
     ctx.fillRect(x, yb - (i + 1) * hh, w + 1, 3);
@@ -323,30 +373,32 @@ function drawStairs(s, f){
 }
 function drawFurniture(){
   const y0 = floorY(0), y1 = floorY(1), y2 = floorY(2);
-  // 1かい リビング：ソファ・テレビ・はちうえ
-  ctx.fillStyle = "#D9734E"; rr(90, y0 - 46, 150, 46, 10); ctx.fill();
-  ctx.fillStyle = "#C25F3D"; rr(90, y0 - 70, 150, 30, 10); ctx.fill(); rr(80, y0 - 52, 22, 52, 8); ctx.fill(); rr(228, y0 - 52, 22, 52, 8); ctx.fill();
-  ctx.fillStyle = "#6B4F3A"; ctx.fillRect(300, y0 - 30, 110, 30);
-  ctx.fillStyle = "#2A2F3A"; rr(310, y0 - 96, 90, 60, 6); ctx.fill(); ctx.fillStyle = "#5B8FD9"; ctx.fillRect(316, y0 - 90, 78, 48);
-  ctx.fillStyle = "#B4703E"; ctx.fillRect(436, y0 - 30, 26, 30);
-  ctx.fillStyle = "#3F9A54"; ctx.beginPath(); ctx.arc(449, y0 - 44, 20, 0, Math.PI * 2); ctx.fill();
-  // 1かい キッチン：テーブル・れいぞうこ
-  ctx.fillStyle = "#9C6B45"; ctx.fillRect(520, y0 - 52, 120, 10); ctx.fillRect(530, y0 - 42, 8, 42); ctx.fillRect(622, y0 - 42, 8, 42);
-  ctx.fillStyle = "#E9EEF2"; rr(856, y0 - 128, 54, 128, 8); ctx.fill(); ctx.fillStyle = "#C8D1D9"; ctx.fillRect(856, y0 - 80, 54, 3); ctx.fillRect(900, y0 - 116, 4, 26);
-  // 2かい こどもべや：つくえ・ベッド
-  ctx.fillStyle = "#9C6B45"; ctx.fillRect(56, y1 - 60, 70, 8); ctx.fillRect(60, y1 - 52, 6, 52); ctx.fillRect(116, y1 - 52, 6, 52);
-  ctx.fillStyle = "#E9895B"; rr(300, y1 - 40, 160, 34, 8); ctx.fill(); ctx.fillStyle = "#FFFFFF"; rr(306, y1 - 52, 40, 16, 6); ctx.fill();
-  ctx.fillStyle = "#6B4F3A"; ctx.fillRect(296, y1 - 64, 8, 64); ctx.fillRect(456, y1 - 48, 8, 48);
-  // 2かい しんしつ：ベッド・クローゼット・ライト
-  ctx.fillStyle = "#9B7BD0"; rr(720, y1 - 40, 140, 34, 8); ctx.fill(); ctx.fillStyle = "#FFFFFF"; rr(820, y1 - 52, 36, 16, 6); ctx.fill();
-  ctx.fillStyle = "#6B4F3A"; ctx.fillRect(856, y1 - 66, 8, 66);
-  ctx.fillStyle = "#8E6A4E"; rr(868, y1 - 124, 48, 124, 4); ctx.fill(); ctx.fillStyle = "#7A5A40"; ctx.fillRect(891, y1 - 120, 2, 116); ctx.fillStyle = "#E2C49A"; ctx.fillRect(884, y1 - 66, 3, 10); ctx.fillRect(897, y1 - 66, 3, 10);
+  const line = "rgba(0,0,0,.18)";
+  // ほそい もの（はんていには かぞえない）
+  ctx.fillStyle = C.brown;
+  ctx.fillRect(520, y0 - 52, 120, 10); ctx.fillRect(530, y0 - 42, 8, 42); ctx.fillRect(622, y0 - 42, 8, 42);   // テーブル
+  ctx.fillRect(56, y1 - 60, 70, 8); ctx.fillRect(60, y1 - 52, 6, 52); ctx.fillRect(116, y1 - 52, 6, 52);       // つくえ
+  ctx.fillRect(292, y1 - 64, 8, 64); ctx.fillRect(460, y1 - 48, 8, 48);                                         // ベッドの はしら
+  ctx.fillRect(712, y1 - 66, 8, 66); ctx.fillRect(860, y1 - 48, 8, 48);
+  ctx.fillRect(518, y1 - 76, 4, 76);                                                                            // ライトの はしら
   ctx.fillStyle = "#F5D06B"; ctx.beginPath(); ctx.moveTo(500, y1 - 100); ctx.lineTo(540, y1 - 100); ctx.lineTo(530, y1 - 76); ctx.lineTo(510, y1 - 76); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = "#6B4F3A"; ctx.fillRect(518, y1 - 76, 4, 76);
-  // 3かい やねうら：はこ・ながもち
-  ctx.fillStyle = "#EBCB93"; ctx.fillRect(560, y2 - 44, 60, 44); ctx.fillRect(626, y2 - 30, 40, 30); ctx.fillRect(574, y2 - 74, 40, 30);
-  ctx.fillStyle = "#B08E58"; ctx.fillRect(560, y2 - 24, 60, 3); ctx.fillRect(574, y2 - 60, 40, 3);
-  ctx.fillStyle = "#7A5A44"; rr(760, y2 - 48, 120, 48, 6); ctx.fill(); ctx.fillStyle = "#E2C49A"; ctx.fillRect(812, y2 - 32, 16, 10);
+  // かぐ（FURN の いろ・はば・たかさ どおりに かく ＝ みための いろ と はんていの いろが おなじ）
+  for (const [f, x0, x1, h, col] of FURN) {
+    const y = floorY(f);
+    ctx.fillStyle = col; ctx.strokeStyle = line; ctx.lineWidth = 2;
+    rr(x0, y - h, x1 - x0, h, 6); ctx.fill(); ctx.stroke();
+  }
+  // かざり（BODY より うえ だけ）
+  ctx.fillStyle = "rgba(0,0,0,.12)"; ctx.fillRect(86, y0 - 48, 158, 3);                               // ソファの ざぶとん
+  ctx.fillStyle = "#2A2F3A"; rr(310, y0 - 96, 90, 60, 6); ctx.fill(); ctx.fillStyle = "#5B8FD9"; ctx.fillRect(316, y0 - 90, 78, 48);   // テレビ
+  ctx.fillStyle = "#3F9A54"; ctx.beginPath(); ctx.arc(449, y0 - 50, 20, 0, Math.PI * 2); ctx.fill();   // はっぱ
+  ctx.fillStyle = "rgba(0,0,0,.15)"; ctx.fillRect(856, y0 - 80, 54, 3); ctx.fillRect(900, y0 - 116, 4, 26);   // れいぞうこ
+  ctx.fillStyle = C.white; rr(306, y1 - 52, 40, 14, 6); ctx.fill(); rr(816, y1 - 52, 40, 14, 6); ctx.fill();   // まくら
+  ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.fillRect(891, y1 - 120, 2, 80);                             // クローゼットの とびら（うえ だけ）
+  ctx.fillStyle = "#E2C49A"; ctx.fillRect(884, y1 - 70, 3, 10); ctx.fillRect(897, y1 - 70, 3, 10);
+  ctx.fillStyle = C.yellow; ctx.strokeStyle = line; rr(574, y2 - 74, 40, 30, 4); ctx.fill(); ctx.stroke();   // はこ（うえ）
+  ctx.fillStyle = "rgba(0,0,0,.12)"; ctx.fillRect(560, y2 - 30, 60, 3); ctx.fillRect(626, y2 - 26, 40, 3); ctx.fillRect(574, y2 - 60, 40, 3);
+  ctx.fillStyle = "#E2C49A"; ctx.fillRect(812, y2 - 36, 16, 10);                                     // ながもちの かぎ
 }
 function drawPlayer(p, t){
   const col = COLORS[p.color], bob = p.moving ? Math.abs(Math.sin(t * 14)) * 3 : 0;
@@ -448,6 +500,7 @@ function loop(ts){
   const t = ts / 1000;
   if (running) {
     const dt = Math.min(0.05, Math.max(0, t - last));
+    if ((keys.left || keys.right) && !G.player.path.length) walkByKeys();
     step(G, dt);
     if (G.status !== "play") { running = false; showEnd(); }
   }
@@ -464,9 +517,9 @@ function showStart(){
   card(`<h2>へんしん</h2>
     <p class="lead">ミッション：${mission(0)}</p>
     <ul>
-      <li>🏠 3かいだての いえの なか。クリックした ところへ あるく</li>
+      <li>⌨️ <b>← →</b> で あるく・<b>↑ ↓</b> で うえ／したの かいへ・<b>Shift</b> で いろを かえる（クリックでも あるける）</li>
       <li>👀 うごいていると、けいさつに みつかる</li>
-      <li>🎨 とまっていても、かべの いろと ちがうと みつかる → へんしんで かべと おなじ いろに なろう</li>
+      <li>🎨 とまっていても、うしろの いろ（かべ・かぐ・かいだん）と ちがうと みつかる → へんしんで おなじ いろに なろう</li>
       <li>🚓 2めんは けいさつが ふえる</li>
     </ul>
     <div class="btns"><button class="big" data-act="start">スタート</button></div>`);
@@ -507,6 +560,30 @@ $("card").addEventListener("click", e => {
   else if (a === "go") begin(+b.dataset.stage);
   else if (a === "again") begin(G.stage);
 });
+const keys = {left: false, right: false};
+function walkByKeys(){ walk(G, (keys.right ? 1 : 0) - (keys.left ? 1 : 0)); }
+window.addEventListener("keydown", e => {
+  if (e.key === "Shift") {
+    if (!e.repeat && running) { nextColor(G); }
+    return;
+  }
+  const k = e.key;
+  if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(k)) {
+    if ((k === "Enter" || k === " ") && !$("over").hidden) { const b = $("card").querySelector("button[data-act]"); if (b) { e.preventDefault(); b.click(); } }
+    return;
+  }
+  e.preventDefault();                                   // がめんが スクロールしないように
+  if (!running) return;
+  if (k === "ArrowLeft")  { keys.left = true;  walkByKeys(); }
+  if (k === "ArrowRight") { keys.right = true; walkByKeys(); }
+  if (!e.repeat && k === "ArrowUp")   climb(G, 1);
+  if (!e.repeat && k === "ArrowDown") climb(G, -1);
+});
+window.addEventListener("keyup", e => {
+  if (e.key === "ArrowLeft")  { keys.left = false;  if (running) walkByKeys(); }
+  if (e.key === "ArrowRight") { keys.right = false; if (running) walkByKeys(); }
+});
+window.addEventListener("blur", () => { keys.left = keys.right = false; if (running) walk(G, 0); });
 cv.addEventListener("pointerdown", e => {
   if (!running) return;
   const r = cv.getBoundingClientRect();
