@@ -68,7 +68,7 @@ h1{margin:0; font-size:clamp(28px,4.2vw,38px); font-weight:900; letter-spacing:.
 @keyframes blink{50%{opacity:.3}}
 .net-setup{display:flex; flex-wrap:wrap; align-items:center; gap:8px}
 .or{color:var(--ink-3); font-size:14px}
-#joincode{width:6.4em; text-transform:uppercase; letter-spacing:.2em; font-weight:900; text-align:center; padding:7px 8px; border-radius:10px; border:2px solid var(--line); background:var(--paper)}
+#joincode{width:6.4em; letter-spacing:.2em; font-weight:900; text-align:center; padding:7px 8px; border-radius:10px; border:2px solid var(--line); background:var(--paper)}
 .mycode-box{font-weight:700; font-size:15px}
 .mycode-box b{font-family:ui-monospace, Menlo, Consolas, monospace; font-size:26px; letter-spacing:.18em; background:var(--sun); padding:1px 10px; border-radius:10px; margin:0 6px; vertical-align:-2px}
 .net-note{flex-basis:100%; margin:0; font-size:13px; color:var(--ink-3)}
@@ -266,13 +266,12 @@ dialog .btn{margin-top:10px}
   <div id="net-setup" class="net-setup">
     <button type="button" id="mkroom" class="btn small">へやを つくる</button>
     <span class="or">または</span>
-    <input id="joincode" maxlength="4" placeholder="コード" autocomplete="off" spellcheck="false" aria-label="へやの コード">
+    <input id="joincode" maxlength="12" placeholder="1234" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="へやの コード（すうじ 4けた）">
     <button type="button" id="joinroom" class="btn small">はいる</button>
   </div>
   <div id="mycode-box" class="mycode-box" hidden>へやの コード<b id="mycode"></b>← あいてに おしえてね</div>
-  <button type="button" id="netretry" class="btn small" hidden>もういちど はいる</button>
   <button type="button" id="netleave" class="btn ghost small" hidden>ぬける</button>
-  <p class="net-note">へやを つくるのは ひとりだけ（ゆーさん）。もう ひとりは コードを いれて はいる。つながらない ときは、ゆーさんが がめんきょうゆう して かいてね。</p>
+  <p class="net-note">へやを つくるのは ひとりだけ（ゆーさん）。もう ひとりは すうじ 4けたの コードを いれて はいる。つながらない ときは、ゆーさんが がめんきょうゆう して かいてね。</p>
 </section>
 
 <nav class="tabs" role="tablist" aria-label="すすめかた">
@@ -389,7 +388,6 @@ dialog .btn{margin-top:10px}
   <button type="button" class="btn small" id="sumclose">とじる</button>
 </dialog>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
 <script>
 "use strict";
 /* ===== LOGIC START ===== */
@@ -772,7 +770,7 @@ function doOp(op){
   if (op.k === "chip" || op.k === "card" || op.k === "idea") op.id = rid();
   op.at = Date.now();
   if (!op.by) op.by = me || "";
-  const remote = net.role === "guest" && net.conn && net.conn.open;
+  const remote = net.role === "guest" && linkUp();
   if (op.k === "reset" && net.role === "guest") return false;
   if (remote && op.k === "draw") { send({t: "op", op}); return true; }   // くじは ホストが ひく
   const r = applyOp(S, op);
@@ -1043,21 +1041,33 @@ function restoreBoard(){
   toast("まえの ボードに もどした");
 }
 
-/* ---------- つなぐ（WebRTC・アカウント いらず） ---------- */
-const CODE_CHARS = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-const CODE_RE = /^[2-9A-HJ-NP-Z]{4}$/;
-function randCode(){
-  let s = "";
-  for (let i = 0; i < 4; i++) s += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
-  return s;
-}
-function peerId(code){ return "gametane-hv-" + code; }
-const net = {peer: null, conn: null, role: null, code: null, state: "idle"};
-function peerAvailable(){ return typeof window.Peer === "function"; }
-function send(obj){ try { if (net.conn && net.conn.open) net.conn.send(obj); } catch (_) {} }
+/* ---------- つなぐ（Cloudflare の 中継・アカウント いらず） ---------- */
+/* 2026-10-04：PeerJS（WebRTC）を やめた。PeerJS の 中継サーバー（TURN）が なくなっていて、
+   回線しだいで つながらなかった（9/27 キングスバレー・10/4 ゲームのたね）。
+   いまは ふたりとも 中継（haru-relay・relay/ フォルダ）に WebSocket で つなぐ。ふつうの https と おなじ 道なので どの 回線でも とおる。 */
+const RELAY_DEFAULT = "wss://haru-relay.solar3d.workers.dev";   // ../relay（ゆーさんの 個人の Cloudflare）
+const RELAY = (() => {
+  try {   // テスト用：?relay=ws://127.0.0.1:8787（手元の 中継だけ ゆるす）
+    const q = new URLSearchParams(location.search).get("relay");
+    if (q && /^ws:\/\/(127\.0\.0\.1|localhost):\d+$/.test(q)) return q;
+  } catch (_) {}
+  return RELAY_DEFAULT;
+})();
+const APP = "gt";
+const CODE_RE = /^[0-9]{4}$/;
+// 全角（１２３４）や「コード：1234」でも 4けたを ひろう ── 日本語入力の まま 打っても 通るように
+function normCode(s){ const d = String(s || "").normalize("NFKC").replace(/[^0-9]/g, ""); return d.length === 4 ? d : null; }
+function randCode(){ return String(Math.floor(Math.random() * 10000)).padStart(4, "0"); }
+const CID = (() => {   // タブごとの ID（よみなおしても おなじ → 中継が つなぎなおしと わかる）
+  try { let v = sessionStorage.getItem("gametane_cid"); if (!v) { v = rid(); sessionStorage.setItem("gametane_cid", v); } return v; }
+  catch (_) { return rid(); }
+})();
+const net = {ws: null, role: null, code: null, state: "idle", partner: false, guests: 0, retry: 0, tries: 0, rejected: null, timer: null, ping: null};
+function linkUp(){ return !!(net.ws && net.ws.readyState === 1 && net.partner); }
+function send(obj){ try { if (net.ws && net.ws.readyState === 1) net.ws.send(JSON.stringify(obj)); } catch (_) {} }
 function setNet(state, text){
   net.state = state;
-  $("netdot").className = "dot" + (state === "open" ? " on" : state === "waiting" ? " wait" : (state === "error" || state === "closed") ? " off" : "");
+  $("netdot").className = "dot" + (state === "open" ? " on" : state === "waiting" ? " wait" : state === "error" ? " off" : "");
   $("netmsg").textContent = text;
   refreshNetUI();
 }
@@ -1066,32 +1076,96 @@ function refreshNetUI(){
   $("net-setup").hidden = !!r;
   $("mycode-box").hidden = r !== "host";
   $("netleave").hidden = !r;
-  $("netretry").hidden = !(r === "guest" && net.state === "closed");
   $("reset").disabled = r === "guest";
   $("restore").disabled = r === "guest" || !store.get(K_BACK);
 }
+function remember(){ try { sessionStorage.setItem("gametane_net", net.role ? JSON.stringify({role: net.role, code: net.code}) : ""); } catch (_) {} }
 function teardown(){
-  const c = net.conn, p = net.peer;
-  net.conn = null; net.peer = null; net.role = null; net.code = null;
-  try { if (c) c.close(); } catch (_) {}
-  try { if (p) p.destroy(); } catch (_) {}
+  clearTimeout(net.timer); clearInterval(net.ping);
+  const ws = net.ws;
+  Object.assign(net, {ws: null, role: null, code: null, partner: false, guests: 0, retry: 0, tries: 0, rejected: null});
+  try { if (ws) ws.close(1000, "leave"); } catch (_) {}
 }
-function wireConn(c){
-  net.conn = c;
-  c.on("open", () => {
-    if (net.conn !== c) return;
-    ui.warnedSame = false;
-    if (net.role === "host") { setNet("open", "つながった！ あいてが はいったよ"); send({t: "state", st: S, me}); }
-    else { setNet("open", "つながった！"); send({t: "hello", st: S, me}); }
-  });
-  c.on("data", d => { if (net.conn === c) onData(d); });
-  c.on("close", () => {
-    if (net.conn !== c) return;
-    net.conn = null;
-    if (net.role === "host") setNet("waiting", "あいてが ぬけた。おなじ コードで また はいれるよ");
-    else if (net.role === "guest") setNet("closed", "つながりが きれた。「もういちど はいる」を おしてね（かいた ものは のこってる）");
-  });
-  c.on("error", () => {});
+function connect(){
+  clearTimeout(net.timer);
+  let ws;
+  try { ws = new WebSocket(`${RELAY}/room/${APP}-${net.code}?role=${net.role}&cid=${CID}`); }
+  catch (_) { onDrop(0); return; }
+  net.ws = ws;
+  ws.onopen = () => {
+    if (net.ws !== ws) return;
+    clearInterval(net.ping);
+    net.ping = setInterval(() => { try { ws.send("ping"); } catch (_) {} }, 25000);
+  };
+  ws.onmessage = ev => {
+    if (net.ws !== ws || ev.data === "pong") return;
+    let d; try { d = JSON.parse(ev.data); } catch (_) { return; }
+    if (d && d.sys) onSys(d); else onData(d);
+  };
+  ws.onclose = ev => {
+    if (net.ws !== ws) return;
+    clearInterval(net.ping);
+    net.ws = null; net.partner = false; net.guests = 0;
+    if (ev.code === 4001 && ev.reason && !net.rejected) net.rejected = ev.reason;   // ことわりの 知らせが とどかなくても 理由は わかる
+    onDrop(ev.code);
+  };
+  ws.onerror = () => {};
+}
+function onSys(d){
+  if (d.sys === "welcome") {
+    net.retry = 0; net.tries = 0;
+    remember();
+    if (net.role === "host") {
+      store.set(K_CODE, net.code);
+      net.guests = d.guests || 0; net.partner = net.guests > 0;
+      if (net.partner) { setNet("open", "つながった！"); send({t: "state", st: S, me}); }   // つなぎなおし：あいては まだ いる
+      else setNet("waiting", "コードを あいてに おしえて、まってね");
+    } else {
+      net.partner = !!d.host; ui.warnedSame = false;
+      setNet("open", "つながった！");
+      send({t: "hello", st: S, me});
+    }
+  } else if (d.sys === "reject") {
+    net.rejected = d.reason;                      // このあと 中継が しめる → onDrop
+  } else if (d.sys === "peer-join") {
+    if (net.role === "host" && d.role === "guest") {
+      net.guests++; net.partner = true; ui.warnedSame = false;
+      setNet("open", "つながった！ あいてが はいったよ");
+      send({t: "state", st: S, me});
+    } else if (net.role === "guest" && d.role === "host") {
+      net.partner = true;
+      setNet("open", "つながった！");
+      send({t: "hello", st: S, me});
+    }
+  } else if (d.sys === "peer-leave") {
+    if (net.role === "host" && d.role === "guest") {
+      net.guests = Math.max(0, net.guests - 1); net.partner = net.guests > 0;
+      if (!net.partner) setNet("waiting", "あいてが ぬけた。おなじ コードで また はいれるよ");
+    } else if (net.role === "guest" && d.role === "host") {
+      net.partner = false;
+      setNet("waiting", "へやを つくった ひとが ぬけた。もどるのを まってるよ（かいた ものは のこる）");
+    }
+  }
+}
+function onDrop(code){
+  const r = net.rejected; net.rejected = null;
+  if (!net.role) return;                                        // じぶんで ぬけた
+  if (r === "host-exists" && net.role === "host" && net.tries < 3) {
+    net.tries++; net.code = randCode(); $("mycode").textContent = net.code;   // コードが つかわれていた → ひきなおす
+    connect(); return;
+  }
+  if (r === "no-host" && (net.retry === 0 || net.retry >= 4)) {
+    const c = net.code; teardown(); remember();
+    setNet("error", `その コード（${c}）の へやが みつからない。コードを たしかめてね。`); return;
+  }
+  if (r === "full") { teardown(); remember(); setNet("error", "その へやは いっぱい。"); return; }
+  net.retry++;
+  if (net.retry > 8) {
+    teardown(); remember();
+    setNet("error", `つながらなかった（しらべる用：${code || "-"}）。がめんきょうゆうで つづけてね。`); return;
+  }
+  setNet("waiting", net.retry === 1 ? "つなぎなおしてる…" : `つなぎなおしてる…（${net.retry}かいめ）`);
+  net.timer = setTimeout(connect, Math.min(1000 * net.retry, 5000));
 }
 function onData(d){
   if (!d || typeof d !== "object") return;
@@ -1114,63 +1188,39 @@ function onData(d){
     }
   }
 }
-function makeRoom(retry){
-  if (!peerAvailable()) { setNet("error", "つなぐ しくみを よみこめなかった。ゆーさんが がめんきょうゆう して かいてね。"); return; }
+function makeRoom(){
   teardown();
   const saved = store.get(K_CODE);
-  const code = !retry && saved && CODE_RE.test(saved) ? saved : randCode();   // まえと おなじ コードを つかいまわす
-  net.role = "host"; net.code = code;
-  $("mycode").textContent = code;
+  net.role = "host";
+  net.code = saved && CODE_RE.test(saved) ? saved : randCode();   // まえと おなじ コードを つかいまわす
+  $("mycode").textContent = net.code;
   setNet("waiting", "へやを じゅんび ちゅう…");
-  const peer = new Peer(peerId(code), {debug: 0});
-  net.peer = peer;
-  peer.on("open", () => { if (net.peer !== peer) return; store.set(K_CODE, code); setNet("waiting", "コードを あいてに おしえて、まってね"); });
-  peer.on("connection", c => {
-    if (net.peer !== peer) { try { c.close(); } catch (_) {} return; }
-    const old = net.conn;
-    wireConn(c);
-    try { if (old) old.close(); } catch (_) {}
-  });
-  peer.on("disconnected", () => { if (net.peer === peer && !peer.destroyed) { try { peer.reconnect(); } catch (_) {} } });
-  peer.on("error", err => {
-    if (net.peer !== peer) return;
-    const t = err && err.type;
-    if (t === "unavailable-id" && !retry) { makeRoom(true); return; }   // コードが つかわれていた → ひきなおす
-    if (net.conn && net.conn.open) return;                               // つながって いれば つづける
-    teardown();
-    setNet("error", "へやを つくれなかった（" + (t || "error") + "）。もういちど おしてみて。");
-  });
+  connect();
 }
-function joinRoom(){
-  const code = ($("joincode").value || "").trim().toUpperCase();
-  if (!CODE_RE.test(code)) { toast("コードは 4もじ（すうじと アルファベット）"); return; }
-  if (!peerAvailable()) { setNet("error", "つなぐ しくみを よみこめなかった。ゆーさんが がめんきょうゆう して かいてね。"); return; }
+function joinRoom(codeArg){
+  const code = normCode(typeof codeArg === "string" ? codeArg : $("joincode").value);
+  if (!code) { toast("コードは すうじ 4けた"); return; }
   teardown();
   $("joincode").value = code;
   store.set(K_JOIN, code);
   net.role = "guest"; net.code = code;
   setNet("waiting", "へやを さがしてる…");
-  const peer = new Peer({debug: 0});
-  net.peer = peer;
-  peer.on("open", () => { if (net.peer === peer) wireConn(peer.connect(peerId(code), {reliable: true})); });
-  peer.on("disconnected", () => { if (net.peer === peer && !peer.destroyed) { try { peer.reconnect(); } catch (_) {} } });
-  peer.on("error", err => {
-    if (net.peer !== peer) return;
-    const t = err && err.type;
-    if (net.conn && net.conn.open) return;
-    teardown();
-    setNet("error", t === "peer-unavailable" ? "その コードの へやが みつからない。コードを たしかめてね。" : "つながらなかった（" + (t || "error") + "）。もういちど ためしてね。");
-  });
-  setTimeout(() => {
-    if (net.peer === peer && net.state === "waiting") {
-      teardown();
-      setNet("error", "つながらなかった。もういちど ためしてね。だめなら がめんきょうゆうで。");
-    }
-  }, 15000);
+  connect();
 }
-function leaveRoom(){ teardown(); setNet("idle", "ひとりで つかっている（まだ つながっていない）"); }
-// ページを とじる・よみなおす ときは きちんと きる（あいてが すぐ きづける）
-window.addEventListener("pagehide", teardown);
+function leaveRoom(){ teardown(); remember(); setNet("idle", "ひとりで つかっている（まだ つながっていない）"); }
+// ページを とじる・よみなおす ときは きちんと きる（あいてが すぐ きづける）。よみなおしたら もとの へやに もどる
+window.addEventListener("pagehide", () => {
+  const keep = net.role ? {role: net.role, code: net.code} : null;
+  teardown();
+  try { sessionStorage.setItem("gametane_net", keep ? JSON.stringify(keep) : ""); } catch (_) {}
+});
+function resumeNet(){
+  let o = null;
+  try { o = JSON.parse(sessionStorage.getItem("gametane_net") || "null"); } catch (_) {}
+  if (!o || !CODE_RE.test(o.code || "")) return;
+  if (o.role === "host") { store.set(K_CODE, o.code); makeRoom(); }
+  else if (o.role === "guest") joinRoom(o.code);
+}
 
 /* ---------- ボタンと キー ---------- */
 document.addEventListener("click", e => {
@@ -1221,8 +1271,7 @@ $("me-y").addEventListener("click", () => setMe("y"));
 $("pick-h").addEventListener("click", () => setMe("h"));
 $("pick-y").addEventListener("click", () => setMe("y"));
 $("mkroom").addEventListener("click", () => makeRoom(false));
-$("joinroom").addEventListener("click", joinRoom);
-$("netretry").addEventListener("click", joinRoom);
+$("joinroom").addEventListener("click", () => joinRoom());
 $("netleave").addEventListener("click", leaveRoom);
 $("drawbtn").addEventListener("click", () => doOp({k: "draw"}));
 $("idea-add").addEventListener("click", addDrawIdea);
@@ -1238,6 +1287,7 @@ $("joincode").value = store.get(K_JOIN) || "";
 setTab("1");
 render();
 if (!me) $("whoask").hidden = false;
+resumeNet();
 if (window.ResizeObserver) new ResizeObserver(() => drawLines()).observe($("map"));
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawLines);
 </script>
