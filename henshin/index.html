@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>へんしん</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+:root{
+  --bg:#1F2A44;
+  --bg-2:#2B3A5C;
+  --ink:#FFFFFF;
+  --ink-2:#C9D3EA;
+  --card:#FFFFFF;
+  --card-ink:#2A2620;
+  --sun:#F6C744;
+  --sun-2:#E2A91A;
+  --red:#E5484D;
+  --ok:#2F9D62;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink);
+  background:radial-gradient(1200px 600px at 50% -10%, #34497A, var(--bg) 60%);
+  background-color:var(--bg);
+  font-family:"Zen Maru Gothic", system-ui, -apple-system, "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  font-weight:500; font-size:17px; line-height:1.6; min-height:100vh;
+}
+button{font:inherit; cursor:pointer}
+:focus-visible{outline:3px solid var(--sun); outline-offset:2px}
+.wrap{max-width:1000px; margin:0 auto; padding:14px 16px 40px}
+
+.hud{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px}
+.title{font-size:26px; font-weight:900; letter-spacing:.06em; display:flex; align-items:center; gap:8px; margin:0}
+.title .mk{display:inline-grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--sun); color:#3A2A00; font-size:20px}
+.stat{display:flex; align-items:center; gap:10px}
+.stage{background:var(--bg-2); padding:4px 12px; border-radius:999px; font-weight:900; color:var(--ink-2)}
+.timer{font-variant-numeric:tabular-nums; font-weight:900; font-size:26px; min-width:4.5em; text-align:right}
+.timer small{font-size:15px; color:var(--ink-2); margin-left:2px}
+.tbar{height:8px; border-radius:999px; background:var(--bg-2); overflow:hidden; margin-bottom:10px}
+.tbar i{display:block; height:100%; width:0; background:linear-gradient(90deg, var(--sun), var(--sun-2))}
+
+.stagebox{position:relative; border-radius:18px; overflow:hidden; box-shadow:0 18px 40px -18px rgba(0,0,0,.6); background:#9FD3F5}
+canvas{display:block; width:100%; height:auto; aspect-ratio:960/660; touch-action:manipulation; cursor:pointer}
+
+.over{position:absolute; inset:0; display:grid; place-items:center; background:rgba(20,26,44,.55); padding:16px}
+.card{background:var(--card); color:var(--card-ink); border-radius:22px; padding:22px 24px; max-width:520px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.card h2{margin:0 0 6px; font-size:34px; font-weight:900; letter-spacing:.04em}
+.card .lead{margin:0 0 12px; font-weight:700; color:#5E574B}
+.card ul{list-style:none; padding:0; margin:0 0 16px; text-align:left; display:grid; gap:6px}
+.card li{background:#F5F1E8; border-radius:12px; padding:6px 12px; font-weight:700; font-size:16px}
+.card .note{font-size:13px; color:#8C8473; margin:0 0 12px}
+.big{border:0; border-radius:999px; padding:12px 34px; font-size:22px; font-weight:900; background:var(--sun); color:#3A2A00; box-shadow:0 5px 0 var(--sun-2)}
+.big:active{transform:translateY(4px); box-shadow:0 1px 0 var(--sun-2)}
+.big.sub{background:#EDE7DA; color:#5E574B; box-shadow:0 5px 0 #D2C8B4; font-size:17px; padding:10px 22px}
+.btns{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+
+.henshin{margin-top:14px; background:var(--bg-2); border-radius:18px; padding:12px 14px; display:grid; gap:10px}
+.hrow{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.hlab{font-weight:900; min-width:3.6em}
+.sw{width:38px; height:38px; border-radius:50%; border:3px solid rgba(255,255,255,.25); padding:0}
+.sw[aria-pressed=true]{border-color:#fff; box-shadow:0 0 0 3px var(--sun)}
+.shp{border:0; border-radius:12px; padding:6px 14px; background:#3A4B72; color:var(--ink); font-weight:900}
+.shp[aria-pressed=true]{background:var(--sun); color:#3A2A00}
+.hnote{margin:0; font-size:14px; color:var(--ink-2)}
+.hnote b{color:var(--sun)}
+@media (max-width:560px){ .title{font-size:21px} .timer{font-size:21px} .card h2{font-size:28px} .sw{width:34px; height:34px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hud">
+    <h1 class="title"><span class="mk" aria-hidden="true">？</span>へんしん</h1>
+    <div class="stat">
+      <span class="stage" id="stage">1めん</span>
+      <span class="timer" id="timer" aria-live="off">60<small>びょう</small></span>
+    </div>
+  </div>
+  <div class="tbar"><i id="tbar"></i></div>
+
+  <div class="stagebox">
+    <canvas id="cv" width="960" height="660" aria-label="3かいだての いえ。クリックした ところへ あるく"></canvas>
+    <div class="over" id="over">
+      <div class="card" id="card"></div>
+    </div>
+  </div>
+
+  <section class="henshin" aria-label="へんしん">
+    <div class="hrow"><span class="hlab">いろ</span><span class="hrow" id="colors"></span></div>
+    <div class="hrow"><span class="hlab">かたち</span><span class="hrow" id="shapes"></span></div>
+    <p class="hnote">へんしんすると どう なる？ → <b>まだ きまってない（はるが きめる）</b></p>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ===== LOGIC START ===== */
+/* ここから LOGIC END までは がめんに さわらない。test/logic.test.js が そのまま 取り出して うごかす。
+   ルールは はるの こたえ（2026-10-04・8もん）だけで つくった。きまっていない ところは「かり」と かいてある。 */
+const VW = 960, VH = 660;
+const BASE = 610, FH = 160, FLOORS = 3;      // 1かいの ゆかの 高さ／1かいぶんの 高さ
+const XL = 56, XR = 904;                      // あるける はば
+// STAIRS[f]：f かい → f+1 かい の かいだん。x0 ＝ したの はし、x1 ＝ うえの はし
+const STAIRS = [{x0: 820, x1: 680}, {x0: 140, x1: 280}];
+const SPEED = {player: 175, patrol: 70, chase: 145};   // かり：おいかける けいさつは はるより すこし おそい
+const VIEW = 320;                             // かり：けいさつが みえる きょり
+const CATCH = 26;
+const TIME = 60;                              // はる：1ぷん みつからなければ かち
+const STAGES = [                              // はる：2めんでは けいさつが ふえる
+  {police: [{f: 2, x: 820}]},
+  {police: [{f: 2, x: 820}, {f: 1, x: 320}]}
+];
+const COLORS = ["#F28C28", "#E5484D", "#3E7BFA", "#30A46C", "#F5D90A", "#FFFFFF", "#8E4EC6", "#6B4F3A"];
+const SHAPES = ["ひと", "まる", "しかく", "さんかく"];
+
+function floorY(f){ return BASE - f * FH; }
+function levelOf(y){ return Math.max(0, Math.min(FLOORS - 1, Math.round((BASE - y) / FH))); }
+function clampX(x){ return Math.max(XL, Math.min(XR, x)); }
+function floorAt(wy){ return Math.max(0, Math.min(FLOORS - 1, Math.floor((BASE - wy) / FH))); }
+
+// fa かいの xa から fb かいの xb まで。かいだんを とおる ときは stair:true の てんを はさむ
+function plan(fa, xa, fb, xb){
+  const pts = [];
+  let f = fa;
+  while (f < fb) { const s = STAIRS[f]; pts.push({x: s.x0, y: floorY(f)}); pts.push({x: s.x1, y: floorY(f + 1), stair: true}); f++; }
+  while (f > fb) { const s = STAIRS[f - 1]; pts.push({x: s.x1, y: floorY(f)}); pts.push({x: s.x0, y: floorY(f - 1), stair: true}); f--; }
+  pts.push({x: clampX(xb), y: floorY(fb)});
+  return pts;
+}
+// いきさきを かえる。かいだんの とちゅうなら、のぼり（くだり）きってから
+function setTarget(e, fb, xb){
+  if (e.path.length && e.path[0].stair) {
+    const keep = e.path[0];
+    e.path = [keep].concat(plan(levelOf(keep.y), keep.x, fb, xb));
+  } else {
+    e.path = plan(levelOf(e.y), e.x, fb, xb);
+  }
+}
+// みちに そって すすむ。すすんだ きょりを かえす
+function moveAlong(e, speed, dt){
+  let left = speed * dt, moved = 0;
+  while (left > 1e-9 && e.path.length) {
+    const p = e.path[0], dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy);
+    if (Math.abs(dx) > 0.5) e.face = Math.sign(dx);
+    if (d <= left) { e.x = p.x; e.y = p.y; left -= d; moved += d; e.path.shift(); }
+    else { e.x += dx / d * left; e.y += dy / d * left; moved += left; left = 0; }
+  }
+  return moved;
+}
+// けいさつ c から p が みえるか（おなじ かいで、むいている ほうに VIEW いない）
+function sees(c, p){
+  if (levelOf(c.y) !== levelOf(p.y)) return false;
+  const dx = p.x - c.x;
+  if (Math.abs(dx) > VIEW) return false;
+  return Math.abs(dx) < 24 || Math.sign(dx) === c.face;
+}
+function newGame(stage, rng){
+  rng = rng || Math.random;
+  const s = Math.max(0, Math.min(STAGES.length - 1, stage | 0));
+  return {
+    stage: s, time: 0, status: "play", caught: -1,
+    player: {x: 150, y: floorY(0), path: [], face: 1, moving: false, color: 0, shape: 0},
+    police: STAGES[s].police.map(p => ({
+      x: p.x, y: floorY(p.f), path: [], face: -1,
+      mode: "patrol", wait: 0.8 + rng() * 0.8, alertT: 99, lastSeen: null, retarget: 0, lookT: 0
+    }))
+  };
+}
+function clickTo(g, wx, wy){
+  if (g.status !== "play") return false;
+  setTarget(g.player, floorAt(wy), wx);
+  return true;
+}
+function step(g, dt, rng){
+  rng = rng || Math.random;
+  if (g.status !== "play") return g;
+  g.time += dt;
+  const P = g.player;
+  P.moving = moveAlong(P, SPEED.player, dt) > 0;
+  for (let i = 0; i < g.police.length; i++) {
+    const c = g.police[i];
+    c.alertT += dt;
+    // はる：うごいている ところを みられると、けいさつが きづく
+    if (c.mode !== "chase" && P.moving && sees(c, P)) { c.mode = "chase"; c.alertT = 0; c.retarget = 0; c.lastSeen = {f: levelOf(P.y), x: P.x}; }
+    if (c.mode === "chase") {
+      // はる：きづくと おいかける（みえて いる あいだは ついてくる。かり：みうしなったら さいごに みた ところまで いく）
+      if (sees(c, P)) c.lastSeen = {f: levelOf(P.y), x: P.x};
+      c.retarget -= dt;
+      if (c.retarget <= 0 && c.lastSeen) { setTarget(c, c.lastSeen.f, c.lastSeen.x); c.retarget = 0.25; }
+      moveAlong(c, SPEED.chase, dt);
+      if (!c.path.length && !sees(c, P)) { c.mode = "search"; c.lookT = 1.8; }
+      // おいつかれたら つかまる（はるは「ぶつかったら みつかる」は えらばなかった ので、みまわり中は すりぬける）
+      if (levelOf(c.y) === levelOf(P.y) && Math.abs(c.x - P.x) < CATCH && Math.abs(c.y - P.y) < 40) {
+        g.status = "lose"; g.caught = i; return g;
+      }
+    } else if (c.mode === "search") {
+      // かり：みうしなったら すこし あたりを みまわして、みまわりに もどる
+      const before = c.lookT;
+      c.lookT -= dt;
+      if ((before > 1.2 && c.lookT <= 1.2) || (before > 0.6 && c.lookT <= 0.6)) c.face = -c.face;
+      if (c.lookT <= 0) { c.mode = "patrol"; c.wait = 0.3; }
+    } else {
+      if (c.path.length) moveAlong(c, SPEED.patrol, dt);
+      else {
+        c.wait -= dt;
+        if (c.wait <= 0) { setTarget(c, Math.floor(rng() * FLOORS), XL + 20 + rng() * (XR - XL - 40)); c.wait = 0.6 + rng() * 1.0; }
+        else if (rng() < dt * 0.8) c.face = -c.face;      // たちどまって きょろきょろ
+      }
+    }
+  }
+  if (g.time >= TIME) g.status = "win";
+  return g;
+}
+/* ===== LOGIC END ===== */
+
+/* ---------- かく ---------- */
+const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+const $ = id => document.getElementById(id);
+let dpr = 1;
+function fit(){
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = VW * dpr; cv.height = VH * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+const ROOMS = [   // [かい, x0, x1, かべの いろ, なまえ]
+  [0, 40, 480, "#F7E6C4", "リビング"], [0, 480, 920, "#D9F0E1", "キッチン"],
+  [1, 40, 480, "#DCE6FA", "こどもべや"], [1, 480, 920, "#F6DDE6", "しんしつ"],
+  [2, 40, 920, "#E8D6BE", "やねうら"]
+];
+function rr(x, y, w, h, r){ ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function drawHouse(){
+  // そら と じめん
+  const sky = ctx.createLinearGradient(0, 0, 0, VH);
+  sky.addColorStop(0, "#8CCBF2"); sky.addColorStop(1, "#CDEBFB");
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, VW, VH);
+  ctx.fillStyle = "#6CBF5A"; ctx.fillRect(0, BASE + 8, VW, VH - BASE);
+  ctx.fillStyle = "#5AA94A"; for (let x = 0; x < VW; x += 18) ctx.fillRect(x, BASE + 8, 9, 5);
+  // やね
+  ctx.fillStyle = "#B4513A";
+  ctx.beginPath(); ctx.moveTo(8, floorY(2) - FH + 12); ctx.lineTo(480, 26); ctx.lineTo(952, floorY(2) - FH + 12); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "#9C4130";
+  ctx.beginPath(); ctx.moveTo(8, floorY(2) - FH + 12); ctx.lineTo(952, floorY(2) - FH + 12); ctx.lineTo(940, floorY(2) - FH + 24); ctx.lineTo(20, floorY(2) - FH + 24); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "#FFF4D6"; ctx.beginPath(); ctx.arc(480, 92, 22, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = "#9C4130"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(458, 92); ctx.lineTo(502, 92); ctx.moveTo(480, 70); ctx.lineTo(480, 114); ctx.stroke();
+  // へや
+  for (const [f, x0, x1, col, name] of ROOMS) {
+    const top = floorY(f) - FH + 24, h = FH - 24;
+    ctx.fillStyle = col; ctx.fillRect(x0, top, x1 - x0, h);
+    ctx.fillStyle = "rgba(0,0,0,.04)";
+    for (let x = x0 + 14; x < x1; x += 28) ctx.fillRect(x, top, 2, h);
+    ctx.fillStyle = "rgba(60,50,30,.35)"; ctx.font = "700 13px 'Zen Maru Gothic', sans-serif";
+    ctx.fillText(name, x0 + 10, top + 18);
+  }
+  // そとかべ と ゆか
+  ctx.fillStyle = "#7A5A44";
+  ctx.fillRect(28, floorY(2) - FH + 24, 12, BASE - floorY(2) + FH - 16);
+  ctx.fillRect(920, floorY(2) - FH + 24, 12, BASE - floorY(2) + FH - 16);
+  for (const f of [0, 1]) ctx.fillRect(476, floorY(f) - FH + 24, 8, FH - 24 - 92);   // 1かい・2かいの まんなかの かべ（したは ドアの ぶん あいている）
+  for (let f = 0; f < FLOORS; f++) { ctx.fillStyle = "#8B6B52"; ctx.fillRect(28, floorY(f), 904, 10); ctx.fillStyle = "#A9876B"; ctx.fillRect(28, floorY(f), 904, 3); }
+  drawFurniture();
+  // かいだん（まんなかの かべより まえ）
+  STAIRS.forEach((s, f) => drawStairs(s, f));
+}
+function drawStairs(s, f){
+  const n = 9, yb = floorY(f), yt = floorY(f + 1);
+  const dir = Math.sign(s.x1 - s.x0), w = Math.abs(s.x1 - s.x0) / n, hh = (yb - yt) / n;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(Math.min(s.x0, s.x1) - 20, yt, Math.abs(s.x1 - s.x0) + 40, yb - yt); ctx.clip();   // てすりが うえの かいに つきでないように
+  ctx.fillStyle = "#C79A6B";
+  for (let i = 0; i < n; i++) {
+    const x = s.x0 + dir * (i * w) + (dir < 0 ? -w : 0);
+    const y = yb - (i + 1) * hh;
+    ctx.fillRect(x, y, w + 1, (i + 1) * hh);
+  }
+  ctx.fillStyle = "#A87B4F";
+  for (let i = 0; i < n; i++) {
+    const x = s.x0 + dir * (i * w) + (dir < 0 ? -w : 0);
+    ctx.fillRect(x, yb - (i + 1) * hh, w + 1, 3);
+  }
+  // てすり
+  ctx.strokeStyle = "#7A5A44"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(s.x0, yb - 34); ctx.lineTo(s.x1, yt - 34); ctx.stroke();
+  ctx.restore();
+  // あなを あける（うえの ゆか）
+  ctx.fillStyle = "rgba(0,0,0,.18)";
+  ctx.fillRect(Math.min(s.x0, s.x1) + (dir > 0 ? Math.abs(s.x1 - s.x0) * 0.55 : 0), yt, Math.abs(s.x1 - s.x0) * 0.45, 10);
+}
+function drawFurniture(){
+  const y0 = floorY(0), y1 = floorY(1), y2 = floorY(2);
+  // 1かい リビング：ソファ・テレビ・はちうえ
+  ctx.fillStyle = "#D9734E"; rr(90, y0 - 46, 150, 46, 10); ctx.fill();
+  ctx.fillStyle = "#C25F3D"; rr(90, y0 - 70, 150, 30, 10); ctx.fill(); rr(80, y0 - 52, 22, 52, 8); ctx.fill(); rr(228, y0 - 52, 22, 52, 8); ctx.fill();
+  ctx.fillStyle = "#6B4F3A"; ctx.fillRect(300, y0 - 30, 110, 30);
+  ctx.fillStyle = "#2A2F3A"; rr(310, y0 - 96, 90, 60, 6); ctx.fill(); ctx.fillStyle = "#5B8FD9"; ctx.fillRect(316, y0 - 90, 78, 48);
+  ctx.fillStyle = "#B4703E"; ctx.fillRect(436, y0 - 30, 26, 30);
+  ctx.fillStyle = "#3F9A54"; ctx.beginPath(); ctx.arc(449, y0 - 44, 20, 0, Math.PI * 2); ctx.fill();
+  // 1かい キッチン：テーブル・れいぞうこ
+  ctx.fillStyle = "#9C6B45"; ctx.fillRect(520, y0 - 52, 120, 10); ctx.fillRect(530, y0 - 42, 8, 42); ctx.fillRect(622, y0 - 42, 8, 42);
+  ctx.fillStyle = "#E9EEF2"; rr(856, y0 - 128, 54, 128, 8); ctx.fill(); ctx.fillStyle = "#C8D1D9"; ctx.fillRect(856, y0 - 80, 54, 3); ctx.fillRect(900, y0 - 116, 4, 26);
+  // 2かい こどもべや：つくえ・ベッド
+  ctx.fillStyle = "#9C6B45"; ctx.fillRect(56, y1 - 60, 70, 8); ctx.fillRect(60, y1 - 52, 6, 52); ctx.fillRect(116, y1 - 52, 6, 52);
+  ctx.fillStyle = "#5B8FD9"; rr(300, y1 - 40, 160, 34, 8); ctx.fill(); ctx.fillStyle = "#FFFFFF"; rr(306, y1 - 52, 40, 16, 6); ctx.fill();
+  ctx.fillStyle = "#6B4F3A"; ctx.fillRect(296, y1 - 64, 8, 64); ctx.fillRect(456, y1 - 48, 8, 48);
+  // 2かい しんしつ：ベッド・クローゼット・ライト
+  ctx.fillStyle = "#E49AB0"; rr(720, y1 - 40, 140, 34, 8); ctx.fill(); ctx.fillStyle = "#FFFFFF"; rr(820, y1 - 52, 36, 16, 6); ctx.fill();
+  ctx.fillStyle = "#6B4F3A"; ctx.fillRect(856, y1 - 66, 8, 66);
+  ctx.fillStyle = "#8E6A4E"; rr(868, y1 - 124, 48, 124, 4); ctx.fill(); ctx.fillStyle = "#7A5A40"; ctx.fillRect(891, y1 - 120, 2, 116); ctx.fillStyle = "#E2C49A"; ctx.fillRect(884, y1 - 66, 3, 10); ctx.fillRect(897, y1 - 66, 3, 10);
+  ctx.fillStyle = "#F5D06B"; ctx.beginPath(); ctx.moveTo(500, y1 - 100); ctx.lineTo(540, y1 - 100); ctx.lineTo(530, y1 - 76); ctx.lineTo(510, y1 - 76); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "#6B4F3A"; ctx.fillRect(518, y1 - 76, 4, 76);
+  // 3かい やねうら：はこ・ながもち
+  ctx.fillStyle = "#C9A56E"; ctx.fillRect(560, y2 - 44, 60, 44); ctx.fillRect(626, y2 - 30, 40, 30); ctx.fillRect(574, y2 - 74, 40, 30);
+  ctx.fillStyle = "#B08E58"; ctx.fillRect(560, y2 - 24, 60, 3); ctx.fillRect(574, y2 - 60, 40, 3);
+  ctx.fillStyle = "#7A5A44"; rr(760, y2 - 48, 120, 48, 6); ctx.fill(); ctx.fillStyle = "#E2C49A"; ctx.fillRect(812, y2 - 32, 16, 10);
+}
+function drawPlayer(p, t){
+  const col = COLORS[p.color], bob = p.moving ? Math.abs(Math.sin(t * 14)) * 3 : 0;
+  const x = p.x, y = p.y - bob;
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.beginPath(); ctx.ellipse(p.x, p.y + 2, 16, 4, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = col; ctx.strokeStyle = "rgba(0,0,0,.45)"; ctx.lineWidth = 2.5;
+  let eyeY;
+  const shape = SHAPES[p.shape];
+  if (shape === "まる") { ctx.beginPath(); ctx.arc(x, y - 20, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); eyeY = y - 24; }
+  else if (shape === "しかく") { rr(x - 19, y - 40, 38, 40, 5); ctx.fill(); ctx.stroke(); eyeY = y - 26; }
+  else if (shape === "さんかく") { ctx.beginPath(); ctx.moveTo(x, y - 46); ctx.lineTo(x + 24, y); ctx.lineTo(x - 24, y); ctx.closePath(); ctx.fill(); ctx.stroke(); eyeY = y - 16; }
+  else {
+    rr(x - 12, y - 32, 24, 32, 10); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x, y - 42, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    eyeY = y - 43;
+  }
+  ctx.fillStyle = "#1E1E1E";
+  ctx.beginPath(); ctx.arc(x + p.face * 3 - 4, eyeY, 2.6, 0, Math.PI * 2); ctx.arc(x + p.face * 3 + 4, eyeY, 2.6, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+function drawPolice(c, t){
+  const x = c.x, y = c.y;
+  // みえる はんい（かいちゅうでんとう）
+  const top = floorY(levelOf(y)) - FH + 26, x2 = x + c.face * VIEW;
+  const grad = ctx.createLinearGradient(x, 0, x2, 0);
+  const base = c.mode === "chase" ? "229,72,77" : "255,232,120";
+  grad.addColorStop(0, `rgba(${base},.38)`); grad.addColorStop(1, `rgba(${base},0)`);
+  ctx.fillStyle = grad;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(40, top, 880, y - top); ctx.clip();   // ひかりは いえの なかだけ
+  ctx.beginPath(); ctx.moveTo(x, y - 44); ctx.lineTo(x2, top); ctx.lineTo(x2, y); ctx.lineTo(x, y - 30); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  const bob = c.path.length ? Math.abs(Math.sin(t * (c.mode === "chase" ? 14 : 8))) * 2 : 0;
+  const yy = y - bob;
+  ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.beginPath(); ctx.ellipse(x, y + 2, 16, 4, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#24335E"; rr(x - 13, yy - 34, 26, 34, 8); ctx.fill();
+  ctx.fillStyle = "#F6C744"; ctx.beginPath(); ctx.arc(x + c.face * 5, yy - 24, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#F2C9A0"; ctx.beginPath(); ctx.arc(x, yy - 44, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#1A254A"; rr(x - 13, yy - 58, 26, 9, 3); ctx.fill(); ctx.fillRect(x - 2 + c.face * 8, yy - 51, 10 * c.face, 3);
+  ctx.fillStyle = "#F6C744"; ctx.fillRect(x - 3, yy - 56, 6, 5);
+  ctx.fillStyle = "#1E1E1E"; ctx.beginPath(); ctx.arc(x + c.face * 5, yy - 44, 2.2, 0, Math.PI * 2); ctx.fill();
+  // ！ と ？
+  let mark = "";
+  if (c.mode === "chase" && c.alertT < 1.2) mark = "！";
+  else if (c.mode === "search") mark = "？";
+  if (mark) {
+    ctx.fillStyle = "#FFFFFF"; rr(x - 14, yy - 92, 28, 28, 8); ctx.fill();
+    ctx.fillStyle = mark === "！" ? "#E5484D" : "#3E7BFA"; ctx.font = "900 22px 'Zen Maru Gothic', sans-serif"; ctx.textAlign = "center";
+    ctx.fillText(mark, x, yy - 70); ctx.textAlign = "start";
+  }
+}
+let marker = null;
+function drawMarker(t){
+  if (!marker) return;
+  const a = 1 - (t - marker.t) / 0.7;
+  if (a <= 0) { marker = null; return; }
+  ctx.strokeStyle = `rgba(255,255,255,${a})`; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.ellipse(marker.x, marker.y, 22 * (1.4 - a * 0.4), 6, 0, 0, Math.PI * 2); ctx.stroke();
+}
+function render(t){
+  drawHouse();
+  drawMarker(t);
+  for (const c of G.police) drawPolice(c, t);
+  drawPlayer(G.player, t);
+  const left = Math.max(0, Math.ceil(TIME - G.time));
+  $("timer").innerHTML = `${left}<small>びょう</small>`;
+  $("tbar").style.width = Math.min(100, G.time / TIME * 100) + "%";
+  $("stage").textContent = (G.stage + 1) + "めん";
+}
+
+/* ---------- すすめる ---------- */
+let G = newGame(0);
+let running = false, last = 0;
+function loop(ts){
+  const t = ts / 1000;
+  if (running) {
+    const dt = Math.min(0.05, Math.max(0, t - last));
+    step(G, dt);
+    if (G.status !== "play") { running = false; showEnd(); }
+  }
+  last = t;
+  render(t);
+  requestAnimationFrame(loop);
+}
+function card(html){ $("card").innerHTML = html; $("over").hidden = false; }
+function showStart(){
+  card(`<h2>へんしん</h2>
+    <p class="lead">けいさつから 1ぷん にげきったら かち！</p>
+    <ul>
+      <li>🏠 3かいだての いえの なか</li>
+      <li>🖱️ クリックした ところへ あるく</li>
+      <li>👀 うごいている ところを みられると、けいさつが おいかけて くる</li>
+      <li>🚓 2めんは けいさつが ふえる</li>
+    </ul>
+    <p class="note">へんしんの ちからは まだ ない（はるが きめる）</p>
+    <div class="btns"><button class="big" data-act="start">スタート</button></div>`);
+}
+function showEnd(){
+  if (G.status === "win") {
+    const lastStage = G.stage >= STAGES.length - 1;
+    card(`<h2>${lastStage ? "ぜんぶ クリア！" : "にげきった！"}</h2>
+      <p class="lead">${G.stage + 1}めん クリア</p>
+      <div class="btns">${lastStage
+        ? '<button class="big" data-act="first">1めんから</button>'
+        : `<button class="big" data-act="next">${G.stage + 2}めんへ</button><button class="big sub" data-act="again">もういちど</button>`}</div>`);
+  } else {
+    card(`<h2>つかまった…</h2>
+      <p class="lead">${Math.floor(G.time)}びょう にげた</p>
+      <div class="btns"><button class="big" data-act="again">もういちど</button></div>`);
+  }
+}
+function begin(stage){
+  const keep = G.player;
+  G = newGame(stage);
+  G.player.color = keep.color; G.player.shape = keep.shape;   // へんしんは そのまま
+  $("over").hidden = true;
+  running = true;
+}
+$("card").addEventListener("click", e => {
+  const b = e.target.closest("button[data-act]");
+  if (!b) return;
+  const a = b.dataset.act;
+  if (a === "start" || a === "first") begin(0);
+  else if (a === "next") begin(G.stage + 1);
+  else if (a === "again") begin(G.stage);
+});
+cv.addEventListener("pointerdown", e => {
+  if (!running) return;
+  const r = cv.getBoundingClientRect();
+  const wx = (e.clientX - r.left) / r.width * VW, wy = (e.clientY - r.top) / r.height * VH;
+  if (clickTo(G, wx, wy)) marker = {x: clampX(wx), y: floorY(floorAt(wy)), t: performance.now() / 1000};
+});
+
+/* ---------- へんしん（いろ・かたち。ちからは まだ ない） ---------- */
+function buildHenshin(){
+  $("colors").innerHTML = COLORS.map((c, i) => `<button class="sw" data-color="${i}" style="background:${c}" aria-label="いろ ${i + 1}" aria-pressed="${i === 0}"></button>`).join("");
+  $("shapes").innerHTML = SHAPES.map((s, i) => `<button class="shp" data-shape="${i}" aria-pressed="${i === 0}">${s}</button>`).join("");
+}
+function syncHenshin(){
+  document.querySelectorAll("[data-color]").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.color === G.player.color)));
+  document.querySelectorAll("[data-shape]").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.shape === G.player.shape)));
+}
+document.querySelector(".henshin").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  if (b.dataset.color !== undefined) G.player.color = +b.dataset.color;
+  if (b.dataset.shape !== undefined) G.player.shape = +b.dataset.shape;
+  syncHenshin();
+});
+
+fit();
+window.addEventListener("resize", fit);
+buildHenshin();
+showStart();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
