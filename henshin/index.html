@@ -68,7 +68,8 @@ canvas{display:block; width:100%; height:100%; touch-action:manipulation; cursor
 .btns{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
 
 .henshin{flex:none; width:100%; max-width:960px; background:var(--bg-2); border-radius:18px; padding:10px 14px; display:grid; gap:8px}
-.main.side .henshin{width:224px; align-self:center}
+.main.side .henshin{width:260px; align-self:center; gap:6px}
+.main.side .hnote{line-height:1.5}
 .main.side .henshin .hrow{flex-direction:column; align-items:stretch}
 .main.side .colors{display:grid; grid-template-columns:repeat(5, 34px); gap:7px; justify-content:start}
 .main.side #shapes{display:grid; grid-template-columns:1fr 1fr; gap:6px}
@@ -83,6 +84,13 @@ canvas{display:block; width:100%; height:100%; touch-action:manipulation; cursor
 .sw[aria-pressed=true]{border-color:#fff; box-shadow:0 0 0 3px var(--sun)}
 .shp{border:0; border-radius:12px; padding:6px 14px; background:#3A4B72; color:var(--ink); font-weight:900}
 .shp[aria-pressed=true]{background:var(--sun); color:#3A2A00}
+.tool{border:0; border-radius:12px; padding:5px 10px; background:#3A4B72; color:var(--ink); font-weight:900; display:inline-flex; align-items:center; gap:6px; white-space:nowrap}
+.tool b{background:var(--bg); border-radius:999px; min-width:1.6em; padding:0 6px; text-align:center}
+.tool .key{background:#2B3A5C}
+.tool[aria-pressed=true]{background:#7C5CD6; box-shadow:0 0 0 3px #B794F6}
+.tool:disabled{opacity:.45; cursor:default}
+.main.side .tools .tool{justify-content:space-between; padding:3px 10px}
+.main.side .tools .tool b{margin-left:auto}
 .hnote{margin:0; font-size:14px; color:var(--ink-2)}
 .hnote b{color:var(--sun)}
 @media (max-width:560px){ .foods{font-size:18px} .title{font-size:21px} .timer{font-size:21px} .card h2{font-size:28px} .sw{width:34px; height:34px} }
@@ -108,6 +116,10 @@ canvas{display:block; width:100%; height:100%; touch-action:manipulation; cursor
   <section class="henshin" id="henshin" aria-label="へんしん">
     <div class="hrow"><span class="hlab">いろ</span><span class="hrow colors" id="colors"></span><span class="key">Shift で つぎの いろ</span></div>
     <div class="hrow"><span class="hlab">かたち</span><span class="hrow" id="shapes"></span></div>
+    <div class="hrow tools"><span class="hlab">どうぐ</span>
+      <button class="tool" id="bWarp" aria-pressed="false">🌀 ワープ <b id="nWarp">2</b><span class="key">W</span></button>
+      <button class="tool" id="bJump">⤴️ ジャンプ <b id="nJump">0</b><span class="key">スペース</span></button>
+    </div>
     <p class="hnote">とまっていて <b>うしろと おなじ いろ</b>（かべ・かぐ・かいだん）なら みつからない。からだが うすく なったら かくれている。かたちの ちからは まだ ない</p>
   </section>
   </div>
@@ -122,19 +134,69 @@ canvas{display:block; width:100%; height:100%; touch-action:manipulation; cursor
 /* ここから LOGIC END までは がめんに さわらない。test/logic.test.js が そのまま 取り出して うごかす。
    ルールは はるの こたえ（2026-10-04・8もん）と、そのあとの はるの なおし（2026-10-04 よる）で つくった。
    きまっていない ところは「かり」と かいてある。 */
-const VW = 960, VH = 660;
-const BASE = 610, FH = 160, FLOORS = 3;      // 1かいの ゆかの 高さ／1かいぶんの 高さ
+const VW = 960, FH = 160;                     // 1かいぶんの 高さ
 const XL = 56, XR = 904;                      // あるける はば
-// STAIRS[f]：f かい → f+1 かい の かいだん。x0 ＝ したの はし、x1 ＝ うえの はし
-const STAIRS = [{x0: 820, x1: 680}, {x0: 140, x1: 280}];
 const SPEED = {player: 175, patrol: 70, chase: 145};   // かり：おいかける けいさつは はるより すこし おそい
 const VIEW = 320;                             // かり：けいさつが みえる きょり
 const CATCH = 26;
 const TIME = 60;                              // はる：1ぷん にげきる
 const PICK = 26;                              // たべものを とれる きょり
+// はる（10/5 の てがみ）：「2かいだけ すきな ところに ワープできる」
+//   かり：1めんごとに 2かい。1めんから つかえる（レベルの じょうけんが ついていなかった）
+const WARPS = 2;
+// はる（10/5 の てがみ）：「レベル5いじょうの とき 3かいだけ けいさつを ジャンプできる」
+//   かり：1めんごとに 3かい。むいている ほうへ JUMP.dist とぶ。とんでいる あいだは つかまらない（うごいているので みつかりは する）
+const JUMPS = 3, JUMP_FROM = 4;               // JUMP_FROM ＝ 5めん（0 から かぞえる）
+const JUMP = {dist: 130, time: 0.5, h: 70};
+// いろ。へんしんで えらべる いろ ＝ いえの なかに ある いろ ぜんぶ（オレンジ だけは どこにも ない ＝ さいしょの いろ）
+const C = {orange: "#F28C28", yellow: "#F4D27A", green: "#8FD1A6", sky: "#8DB4F0", pink: "#F09DB8",
+           tan: "#C9A27A", red: "#E5484D", white: "#FFFFFF", purple: "#9B7BD0", brown: "#9A6B47"};
+const COLORS = [C.orange, C.yellow, C.green, C.sky, C.pink, C.tan, C.red, C.white, C.purple, C.brown];
+// いえ。3かいだて（1〜4めん）と 5かいだて（5めんから。はる 10/5：「レベル5いじょうの ときは 5かいだてに して」）
+// 1かい・2かい と いちばん うえ（やねうら）は どちらも おなじ。5かいだては あいだに 3かい・4かいが はいる（かり：へやと かぐ）
+// へや：[かい, x0, x1, かべの いろ, なまえ]
+// かぐ：[かい, x0, x1, たかさ, いろ, なまえ]。からだの まんなか（ゆかから BODY）より たかい かぐは「うしろの いろ」に なる
+// （テーブル・つくえの あし、ライトの はしら など ほそい ものは かぞえない）
+// STAIRS[f]：f かい → f+1 かい の かいだん。x0 ＝ したの はし、x1 ＝ うえの はし
+const ROOMS_LOW = [
+  [0, 40, 480, C.yellow, "リビング"], [0, 480, 920, C.green, "キッチン"],
+  [1, 40, 480, C.sky, "こどもべや"], [1, 480, 920, C.pink, "しんしつ"]
+];
+const FURN_LOW = [
+  [0, 80, 250, 70, C.red, "ソファ"], [0, 300, 410, 30, C.brown, "テレビだい"], [0, 436, 462, 30, C.brown, "うえきばち"],
+  [0, 856, 910, 128, C.white, "れいぞうこ"],
+  [1, 300, 460, 40, C.red, "ベッド"],
+  [1, 720, 860, 40, C.purple, "ベッド"], [1, 868, 916, 124, C.brown, "クローゼット"]
+];
+const attic = f => [[f, 40, 920, C.tan, "やねうら"]];
+const atticFurn = f => [[f, 560, 620, 44, C.yellow, "はこ"], [f, 626, 666, 30, C.yellow, "はこ"], [f, 760, 880, 48, C.brown, "ながもち"]];
+const UP_R = {x0: 820, x1: 680}, UP_L = {x0: 140, x1: 280};
+const HOUSES = {
+  3: {rooms: [...ROOMS_LOW, ...attic(2)], furn: [...FURN_LOW, ...atticFurn(2)], stairs: [UP_R, UP_L]},
+  5: {rooms: [...ROOMS_LOW,
+              [2, 40, 480, C.purple, "ゲームべや"], [2, 480, 920, C.yellow, "ほんの へや"],
+              [3, 40, 480, C.sky, "おふろ"], [3, 480, 920, C.green, "ものおき"], ...attic(4)],
+      furn: [...FURN_LOW,
+             [2, 60, 120, 96, C.brown, "たな"], [2, 300, 450, 70, C.red, "ソファ"],
+             [2, 566, 676, 124, C.brown, "ほんだな"], [2, 850, 912, 40, C.sky, "つくえ"],
+             [3, 300, 440, 44, C.white, "おふろ"],
+             [3, 520, 610, 50, C.yellow, "はこ"], [3, 800, 900, 110, C.pink, "たな"],
+             ...atticFurn(4)],
+      stairs: [UP_R, UP_L, UP_R, UP_L]}
+};
+// いまの いえ。newGame が きりかえる（えも はんていも これを みる）
+let FLOORS, VH, BASE, ROOMS, FURN, STAIRS;
+function useHouse(n){
+  const h = HOUSES[n] || HOUSES[3];
+  FLOORS = h.stairs.length + 1; VH = 180 + FLOORS * FH; BASE = VH - 50;   // 3かいだて：VH 660・BASE 610
+  ROOMS = h.rooms; FURN = h.furn; STAIRS = h.stairs;
+  return FLOORS;
+}
+useHouse(3);
 // はる：2めんでは けいさつが ふえる／1めんごとに ミッション「たべものを ぜんぶ あつめて 1ぷん にげきる」
 // かり：たべものの かず・ばしょ、けいさつの ばしょ。はる（10/4 よる）：「5めんくらいまで」
 //       → めんが すすむと けいさつと たべものが ふえる（あたらしい しくみは たさない）
+// はる（10/5）：5めんから 5かいだて。しゅくだい「6〜10めんの しかけ」→ 10めんまで（かり：けいさつは 1めん 1人ずつ ふやす）
 const STAGES = [
   {police: [{f: 2, x: 820}],
    foods: [{f: 0, x: 580, k: "🍜"}, {f: 1, x: 390, k: "🍙"}, {f: 2, x: 450, k: "🍰"}]},
@@ -144,27 +206,19 @@ const STAGES = [
    foods: [{f: 0, x: 560, k: "🍜"}, {f: 0, x: 380, k: "🍔"}, {f: 1, x: 620, k: "🍩"}, {f: 1, x: 200, k: "🍙"}, {f: 2, x: 700, k: "🍦"}]},
   {police: [{f: 2, x: 820}, {f: 1, x: 320}, {f: 0, x: 700}, {f: 2, x: 560}],
    foods: [{f: 0, x: 400, k: "🍜"}, {f: 0, x: 640, k: "🍣"}, {f: 1, x: 560, k: "🍕"}, {f: 1, x: 300, k: "🍙"}, {f: 2, x: 420, k: "🍎"}]},
-  {police: [{f: 2, x: 820}, {f: 1, x: 320}, {f: 0, x: 700}, {f: 2, x: 200}, {f: 1, x: 880}],
-   foods: [{f: 0, x: 330, k: "🍜"}, {f: 0, x: 520, k: "🍔"}, {f: 0, x: 720, k: "🍩"}, {f: 1, x: 600, k: "🍙"}, {f: 1, x: 240, k: "🍕"}, {f: 2, x: 380, k: "🍰"}]}
-];
-// いろ。へんしんで えらべる いろ ＝ いえの なかに ある いろ ぜんぶ（オレンジ だけは どこにも ない ＝ さいしょの いろ）
-const C = {orange: "#F28C28", yellow: "#F4D27A", green: "#8FD1A6", sky: "#8DB4F0", pink: "#F09DB8",
-           tan: "#C9A27A", red: "#E5484D", white: "#FFFFFF", purple: "#9B7BD0", brown: "#9A6B47"};
-const COLORS = [C.orange, C.yellow, C.green, C.sky, C.pink, C.tan, C.red, C.white, C.purple, C.brown];
-// へや：[かい, x0, x1, かべの いろ, なまえ]
-const ROOMS = [
-  [0, 40, 480, C.yellow, "リビング"], [0, 480, 920, C.green, "キッチン"],
-  [1, 40, 480, C.sky, "こどもべや"], [1, 480, 920, C.pink, "しんしつ"],
-  [2, 40, 920, C.tan, "やねうら"]
-];
-// かぐ：[かい, x0, x1, たかさ, いろ, なまえ]。からだの まんなか（ゆかから BODY）より たかい かぐは「うしろの いろ」に なる
-// （テーブル・つくえの あし、ライトの はしら など ほそい ものは かぞえない）
-const FURN = [
-  [0, 80, 250, 70, C.red, "ソファ"], [0, 300, 410, 30, C.brown, "テレビだい"], [0, 436, 462, 30, C.brown, "うえきばち"],
-  [0, 856, 910, 128, C.white, "れいぞうこ"],
-  [1, 300, 460, 40, C.red, "ベッド"],
-  [1, 720, 860, 40, C.purple, "ベッド"], [1, 868, 916, 124, C.brown, "クローゼット"],
-  [2, 560, 620, 44, C.yellow, "はこ"], [2, 626, 666, 30, C.yellow, "はこ"], [2, 760, 880, 48, C.brown, "ながもち"]
+  // ここから 5かいだて（1かい〜5かい ＝ f 0〜4）
+  {house: 5, police: [{f: 4, x: 820}, {f: 3, x: 320}, {f: 2, x: 700}, {f: 1, x: 320}, {f: 0, x: 700}],
+   foods: [{f: 0, x: 560, k: "🍜"}, {f: 1, x: 600, k: "🍙"}, {f: 2, x: 400, k: "🍩"}, {f: 3, x: 560, k: "🍔"}, {f: 4, x: 450, k: "🍕"}, {f: 4, x: 760, k: "🍰"}]},
+  {house: 5, police: [{f: 4, x: 820}, {f: 3, x: 320}, {f: 2, x: 700}, {f: 1, x: 320}, {f: 0, x: 700}, {f: 2, x: 200}],
+   foods: [{f: 0, x: 420, k: "🍜"}, {f: 1, x: 250, k: "🍣"}, {f: 2, x: 560, k: "🍙"}, {f: 3, x: 380, k: "🍦"}, {f: 3, x: 820, k: "🍕"}, {f: 4, x: 600, k: "🍰"}]},
+  {house: 5, police: [{f: 4, x: 820}, {f: 3, x: 320}, {f: 2, x: 700}, {f: 1, x: 320}, {f: 0, x: 700}, {f: 2, x: 200}, {f: 3, x: 860}],
+   foods: [{f: 0, x: 340, k: "🍜"}, {f: 0, x: 620, k: "🍔"}, {f: 1, x: 500, k: "🍩"}, {f: 2, x: 330, k: "🍙"}, {f: 3, x: 600, k: "🍎"}, {f: 4, x: 380, k: "🍕"}, {f: 4, x: 820, k: "🍰"}]},
+  {house: 5, police: [{f: 4, x: 820}, {f: 3, x: 320}, {f: 2, x: 700}, {f: 1, x: 320}, {f: 0, x: 700}, {f: 2, x: 200}, {f: 3, x: 860}, {f: 1, x: 860}],
+   foods: [{f: 0, x: 480, k: "🍜"}, {f: 1, x: 640, k: "🍣"}, {f: 1, x: 200, k: "🍙"}, {f: 2, x: 520, k: "🍦"}, {f: 3, x: 450, k: "🍔"}, {f: 3, x: 760, k: "🍩"}, {f: 4, x: 560, k: "🍰"}]},
+  {house: 5, police: [{f: 4, x: 820}, {f: 3, x: 320}, {f: 2, x: 700}, {f: 1, x: 320}, {f: 0, x: 700}, {f: 2, x: 200}, {f: 3, x: 860}, {f: 1, x: 860}, {f: 4, x: 300}],
+   foods: [{f: 0, x: 360, k: "🍜"}, {f: 0, x: 600, k: "🍕"}, {f: 1, x: 560, k: "🍙"}, {f: 2, x: 340, k: "🍩"}, {f: 2, x: 600, k: "🍔"}, {f: 3, x: 520, k: "🍎"}, {f: 4, x: 460, k: "🍦"}, {f: 4, x: 780, k: "🍰"}]},
+  {house: 5, police: [{f: 4, x: 820}, {f: 3, x: 320}, {f: 2, x: 700}, {f: 1, x: 320}, {f: 0, x: 700}, {f: 2, x: 200}, {f: 3, x: 860}, {f: 1, x: 860}, {f: 4, x: 300}, {f: 0, x: 900}],
+   foods: [{f: 0, x: 400, k: "🍜"}, {f: 0, x: 640, k: "🍣"}, {f: 1, x: 440, k: "🍙"}, {f: 2, x: 380, k: "🍕"}, {f: 2, x: 580, k: "🍔"}, {f: 3, x: 420, k: "🍩"}, {f: 4, x: 520, k: "🍎"}, {f: 4, x: 800, k: "🍰"}]}
 ];
 const STAIR_COLOR = C.brown, STEPS = 9;
 const BODY = 18;                              // うしろの いろを みる 高さ（からだの まんなか）
@@ -239,9 +293,11 @@ function sees(c, p){
 function newGame(stage, rng){
   rng = rng || Math.random;
   const s = Math.max(0, Math.min(STAGES.length - 1, stage | 0));
+  useHouse(STAGES[s].house || 3);
   return {
     stage: s, time: 0, status: "play", caught: -1, reason: "",
-    player: {x: 150, y: floorY(0), path: [], face: 1, moving: false, color: 0, shape: 0},
+    warps: WARPS, jumps: s >= JUMP_FROM ? JUMPS : 0,
+    player: {x: 150, y: floorY(0), path: [], face: 1, moving: false, color: 0, shape: 0, jump: null},
     foods: STAGES[s].foods.map(q => ({x: q.x, y: floorY(q.f), k: q.k, got: false, gotAt: -1})),
     police: STAGES[s].police.map(p => ({
       x: p.x, y: floorY(p.f), path: [], face: -1,
@@ -252,14 +308,14 @@ function newGame(stage, rng){
 // はる（10/4 よる）：やじるしキーで いどう。← → は おしている あいだ あるく（dir＝-1/0/1。0 で とまる）
 function walk(g, dir){
   const P = g.player;
-  if (g.status !== "play" || (P.path.length && P.path[0].stair)) return false;   // かいだんの とちゅうは のぼり（くだり）きる
+  if (g.status !== "play" || P.jump || (P.path.length && P.path[0].stair)) return false;   // かいだんの とちゅうは のぼり（くだり）きる
   P.path = dir ? [{x: dir < 0 ? XL : XR, y: floorY(levelOf(P.y))}] : [];
   return true;
 }
 // ↑ ↓ は ひとつ うえ／した の かいへ（かいだんまで じどうで あるいて、のぼりきった ところで とまる）
 function climb(g, d){
   const P = g.player;
-  if (g.status !== "play") return false;
+  if (g.status !== "play" || P.jump) return false;
   const lv = levelOf(P.path.length && P.path[0].stair ? P.path[0].y : P.y);
   if (d > 0 && lv < FLOORS - 1) { setTarget(P, lv + 1, STAIRS[lv].x1); return true; }
   if (d < 0 && lv > 0) { setTarget(P, lv - 1, STAIRS[lv - 1].x0); return true; }
@@ -268,8 +324,26 @@ function climb(g, d){
 // はる（10/4 よる）：シフトで いろを かえる（つぎの いろへ。さいごの つぎは さいしょ）
 function nextColor(g){ g.player.color = (g.player.color + 1) % COLORS.length; return g.player.color; }
 function clickTo(g, wx, wy){
-  if (g.status !== "play") return false;
+  if (g.status !== "play" || g.player.jump) return false;
   setTarget(g.player, floorAt(wy), wx);
+  return true;
+}
+// はる（10/5）：ワープ。かり：クリックした ところへ すぐ いく（かいだんの とちゅうからでも）。ワープは「うごいた」に ならない
+function warp(g, wx, wy){
+  const P = g.player;
+  if (g.status !== "play" || g.warps <= 0 || P.jump) return false;
+  P.x = clampX(wx); P.y = floorY(floorAt(wy)); P.path = []; P.moving = false;
+  g.warps--;
+  return true;
+}
+// はる（10/5）：けいさつを ジャンプ（5めんから）。かいだんの とちゅうでは とべない
+function jump(g){
+  const P = g.player;
+  if (g.status !== "play" || g.jumps <= 0 || P.jump) return false;
+  if ((P.path.length && P.path[0].stair) || Math.abs(P.y - floorY(levelOf(P.y))) > 0.5) return false;
+  P.path = [];
+  P.jump = {x0: P.x, x1: clampX(P.x + P.face * JUMP.dist), t: 0};
+  g.jumps--;
   return true;
 }
 function step(g, dt, rng){
@@ -277,7 +351,14 @@ function step(g, dt, rng){
   if (g.status !== "play") return g;
   g.time += dt;
   const P = g.player;
-  P.moving = moveAlong(P, SPEED.player, dt) > 0;
+  if (P.jump) {
+    const J = P.jump;
+    J.t += dt;
+    const k = Math.min(1, J.t / JUMP.time);
+    P.x = J.x0 + (J.x1 - J.x0) * k;
+    P.moving = true;
+    if (k >= 1) P.jump = null;
+  } else P.moving = moveAlong(P, SPEED.player, dt) > 0;
   // たべものを とる（おなじ かいで ちかく）
   for (const q of g.foods) {
     if (!q.got && levelOf(q.y) === levelOf(P.y) && Math.abs(q.x - P.x) < PICK) { q.got = true; q.gotAt = g.time; }
@@ -295,8 +376,8 @@ function step(g, dt, rng){
       if (c.retarget <= 0 && c.lastSeen) { setTarget(c, c.lastSeen.f, c.lastSeen.x); c.retarget = 0.25; }
       moveAlong(c, SPEED.chase, dt);
       if (!c.path.length && !(vis && sees(c, P))) { c.mode = "search"; c.lookT = 1.8; }
-      // おいつかれたら つかまる。かくれている（とまって かべと おなじ いろ）ときは つかまらない
-      if (vis && levelOf(c.y) === levelOf(P.y) && Math.abs(c.x - P.x) < CATCH && Math.abs(c.y - P.y) < 40) {
+      // おいつかれたら つかまる。かくれている（とまって かべと おなじ いろ）ときと、とんでいる ときは つかまらない
+      if (vis && !P.jump && levelOf(c.y) === levelOf(P.y) && Math.abs(c.x - P.x) < CATCH && Math.abs(c.y - P.y) < 40) {
         g.status = "lose"; g.caught = i; g.reason = "caught"; return g;
       }
     } else if (c.mode === "search") {
@@ -352,11 +433,12 @@ function drawHouse(){
   ctx.fillStyle = sky; ctx.fillRect(0, 0, VW, VH);
   ctx.fillStyle = "#6CBF5A"; ctx.fillRect(0, BASE + 8, VW, VH - BASE);
   ctx.fillStyle = "#5AA94A"; for (let x = 0; x < VW; x += 18) ctx.fillRect(x, BASE + 8, 9, 5);
-  // やね
+  // やね（いちばん うえの かいの うえ）
+  const top = FLOORS - 1;
   ctx.fillStyle = "#B4513A";
-  ctx.beginPath(); ctx.moveTo(8, floorY(2) - FH + 12); ctx.lineTo(480, 26); ctx.lineTo(952, floorY(2) - FH + 12); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(8, floorY(top) - FH + 12); ctx.lineTo(480, 26); ctx.lineTo(952, floorY(top) - FH + 12); ctx.closePath(); ctx.fill();
   ctx.fillStyle = "#9C4130";
-  ctx.beginPath(); ctx.moveTo(8, floorY(2) - FH + 12); ctx.lineTo(952, floorY(2) - FH + 12); ctx.lineTo(940, floorY(2) - FH + 24); ctx.lineTo(20, floorY(2) - FH + 24); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(8, floorY(top) - FH + 12); ctx.lineTo(952, floorY(top) - FH + 12); ctx.lineTo(940, floorY(top) - FH + 24); ctx.lineTo(20, floorY(top) - FH + 24); ctx.closePath(); ctx.fill();
   ctx.fillStyle = "#FFF4D6"; ctx.beginPath(); ctx.arc(480, 92, 22, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = "#9C4130"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(458, 92); ctx.lineTo(502, 92); ctx.moveTo(480, 70); ctx.lineTo(480, 114); ctx.stroke();
   // へや
@@ -370,9 +452,9 @@ function drawHouse(){
   }
   // そとかべ と ゆか
   ctx.fillStyle = "#7A5A44";
-  ctx.fillRect(28, floorY(2) - FH + 24, 12, BASE - floorY(2) + FH - 16);
-  ctx.fillRect(920, floorY(2) - FH + 24, 12, BASE - floorY(2) + FH - 16);
-  for (const f of [0, 1]) ctx.fillRect(476, floorY(f) - FH + 24, 8, FH - 24 - 92);   // 1かい・2かいの まんなかの かべ（したは ドアの ぶん あいている）
+  ctx.fillRect(28, floorY(top) - FH + 24, 12, BASE - floorY(top) + FH - 16);
+  ctx.fillRect(920, floorY(top) - FH + 24, 12, BASE - floorY(top) + FH - 16);
+  for (let f = 0; f < top; f++) ctx.fillRect(476, floorY(f) - FH + 24, 8, FH - 24 - 92);   // やねうら いがいの まんなかの かべ（したは ドアの ぶん あいている）
   for (let f = 0; f < FLOORS; f++) { ctx.fillStyle = "#8B6B52"; ctx.fillRect(28, floorY(f), 904, 10); ctx.fillStyle = "#A9876B"; ctx.fillRect(28, floorY(f), 904, 3); }
   drawFurniture();
   // かいだん（まんなかの かべより まえ）
@@ -403,7 +485,7 @@ function drawStairs(s, f){
   ctx.fillRect(Math.min(s.x0, s.x1) + (dir > 0 ? Math.abs(s.x1 - s.x0) * 0.55 : 0), yt, Math.abs(s.x1 - s.x0) * 0.45, 10);
 }
 function drawFurniture(){
-  const y0 = floorY(0), y1 = floorY(1), y2 = floorY(2);
+  const y0 = floorY(0), y1 = floorY(1), y2 = floorY(FLOORS - 1);   // y2 ＝ やねうら
   const line = "rgba(0,0,0,.18)";
   // ほそい もの（はんていには かぞえない）
   ctx.fillStyle = C.brown;
@@ -430,10 +512,22 @@ function drawFurniture(){
   ctx.fillStyle = C.yellow; ctx.strokeStyle = line; rr(574, y2 - 74, 40, 30, 4); ctx.fill(); ctx.stroke();   // はこ（うえ）
   ctx.fillStyle = "rgba(0,0,0,.12)"; ctx.fillRect(560, y2 - 30, 60, 3); ctx.fillRect(626, y2 - 26, 40, 3); ctx.fillRect(574, y2 - 60, 40, 3);
   ctx.fillStyle = "#E2C49A"; ctx.fillRect(812, y2 - 36, 16, 10);                                     // ながもちの かぎ
+  if (FLOORS === 5) {                                                                                // 5かいだての 3かい・4かい（BODY より うえ だけ）
+    const y3 = floorY(2), y4 = floorY(3);
+    ctx.fillStyle = "#2A2F3A"; rr(330, y3 - 128, 90, 54, 6); ctx.fill(); ctx.fillStyle = "#7BD389"; ctx.fillRect(336, y3 - 122, 78, 42);   // ゲームの がめん
+    ctx.fillStyle = "rgba(0,0,0,.12)"; ctx.fillRect(306, y3 - 48, 138, 3);                                                                // ソファの ざぶとん
+    for (const [x, c] of [[576, "#E5484D"], [594, "#8DB4F0"], [612, "#F4D27A"], [632, "#8FD1A6"], [652, "#F09DB8"]]) {                    // ほん
+      ctx.fillStyle = c; ctx.fillRect(x, y3 - 118, 14, 34); ctx.fillRect(x + 4, y3 - 74, 12, 30);
+    }
+    ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.fillRect(566, y3 - 82, 110, 3); ctx.fillRect(566, y3 - 40, 110, 3); ctx.fillRect(60, y3 - 50, 60, 3);   // たなの いた
+    ctx.fillStyle = "#CFE4F7"; ctx.fillRect(306, y4 - 40, 128, 8);                                                                       // おゆ
+    ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.fillRect(800, y4 - 58, 100, 3); ctx.fillRect(560, y4 - 30, 50, 3);                            // たなの いた・はこ
+  }
 }
 function drawPlayer(p, t){
-  const col = COLORS[p.color], bob = p.moving ? Math.abs(Math.sin(t * 14)) * 3 : 0;
-  const x = p.x, y = p.y - bob;
+  const col = COLORS[p.color], bob = p.moving && !p.jump ? Math.abs(Math.sin(t * 14)) * 3 : 0;
+  const air = p.jump ? Math.sin(Math.PI * Math.min(1, p.jump.t / JUMP.time)) * JUMP.h : 0;   // ジャンプの たかさ（えだけ）
+  const x = p.x, y = p.y - bob - air;
   ctx.save();
   if (!exposed(p)) ctx.globalAlpha = 0.55;
   ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.beginPath(); ctx.ellipse(p.x, p.y + 2, 16, 4, 0, 0, Math.PI * 2); ctx.fill();
@@ -496,7 +590,7 @@ function drawPolice(c, t){
     ctx.fillText(mark, x, yy - 70); ctx.textAlign = "start";
   }
 }
-let marker = null;
+let marker = null, warpFx = [], warpArmed = false;
 function drawMarker(t){
   if (!marker) return;
   const a = 1 - (t - marker.t) / 0.7;
@@ -504,12 +598,40 @@ function drawMarker(t){
   ctx.strokeStyle = `rgba(255,255,255,${a})`; ctx.lineWidth = 3;
   ctx.beginPath(); ctx.ellipse(marker.x, marker.y, 22 * (1.4 - a * 0.4), 6, 0, 0, Math.PI * 2); ctx.stroke();
 }
+// ワープの うずまき（でた ところ と ついた ところ）
+function drawWarpFx(t){
+  warpFx = warpFx.filter(w => t - w.t < 0.8);
+  for (const w of warpFx) {
+    const k = (t - w.t) / 0.8;
+    ctx.strokeStyle = `rgba(183,148,246,${1 - k})`; ctx.lineWidth = 4;
+    for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.ellipse(w.x, w.y - 26, 10 + (k * 40 + i * 10), 6 + (k * 30 + i * 8), 0, 0, Math.PI * 2); ctx.stroke(); }
+  }
+}
+// ワープを えらんでいる あいだの あんない
+function drawWarpHint(){
+  if (!warpArmed) return;
+  const msg = "🌀 ワープする ところを クリック（W で やめる）";
+  ctx.font = "900 26px 'Zen Maru Gothic', sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  const w = ctx.measureText(msg).width + 40;
+  ctx.fillStyle = "rgba(76,52,140,.88)"; rr(VW / 2 - w / 2, 34, w, 48, 24); ctx.fill();
+  ctx.fillStyle = "#FFFFFF"; ctx.fillText(msg, VW / 2, 59);
+  ctx.textAlign = "start"; ctx.textBaseline = "alphabetic";
+}
+let shownVH = 0, shownTools = "";
 function render(t){
+  if (VH !== shownVH) {                       // 3かいだて ⇄ 5かいだて で えの たてが かわる
+    shownVH = VH; fit();
+    cv.setAttribute("aria-label", `${FLOORS}かいだての いえ。やじるしキーで あるく。クリックした ところへも あるく`);
+  }
   drawHouse();
   drawMarker(t);
   drawFoods(t);
   for (const c of G.police) drawPolice(c, t);
   drawPlayer(G.player, t);
+  drawWarpFx(t);
+  drawWarpHint();
+  const tk = [G.stage, G.warps, G.jumps, warpArmed].join(":");
+  if (tk !== shownTools) { shownTools = tk; syncTools(); }
   const left = Math.max(0, Math.ceil(TIME - G.time));
   $("timer").innerHTML = `${left}<small>びょう</small>`;
   $("tbar").style.width = Math.min(100, G.time / TIME * 100) + "%";
@@ -542,7 +664,7 @@ function loop(ts){
 function card(html){ $("card").innerHTML = html; $("over").hidden = false; }
 function mission(stage){
   const st = STAGES[stage];
-  return `たべもの ${st.foods.map(q => q.k).join("")} を ぜんぶ あつめて、1ぷん にげきろう（けいさつ ${st.police.length}にん）`;
+  return `たべもの ${st.foods.map(q => q.k).join("")} を ぜんぶ あつめて、1ぷん にげきろう（けいさつ ${st.police.length}にん${st.house === 5 ? "・5かいだて" : ""}）`;
 }
 function showStart(){
   card(`<h2>へんしん</h2>
@@ -551,13 +673,16 @@ function showStart(){
       <li>⌨️ <b>← →</b> で あるく・<b>↑ ↓</b> で うえ／したの かいへ・<b>Shift</b> で いろを かえる（クリックでも あるける）</li>
       <li>👀 うごいていると、けいさつに みつかる</li>
       <li>🎨 とまっていても、うしろの いろ（かべ・かぐ・かいだん）と ちがうと みつかる → へんしんで おなじ いろに なろう</li>
-      <li>🚓 めんが すすむと けいさつと たべものが ふえる（ぜんぶで ${STAGES.length}めん）</li>
+      <li>🌀 ワープ：1めんに ${WARPS}かい。<b>W</b> か ボタンを おして、いきたい ところを クリック</li>
+      <li>⤴️ ジャンプ：${JUMP_FROM + 1}めんから 1めんに ${JUMPS}かい。<b>スペース</b> か ボタンで、むいている ほうへ とぶ（とんでいる あいだは つかまらない）</li>
+      <li>🚓 めんが すすむと けいさつと たべものが ふえる。${JUMP_FROM + 1}めんからは 5かいだて（ぜんぶで ${STAGES.length}めん）</li>
     </ul>
     <div class="btns"><button class="big" data-act="start">スタート</button></div>`);
 }
 function showIntro(stage){
+  const news = stage === JUMP_FROM ? `<p class="lead">ここから 5かいだて！ ⤴️ ジャンプが つかえる（<b>スペース</b>・${JUMPS}かい）</p>` : "";
   card(`<h2>${stage + 1}めん</h2>
-    <p class="lead">ミッション：${mission(stage)}</p>
+    ${news}<p class="lead">ミッション：${mission(stage)}</p>
     <div class="btns"><button class="big" data-act="go" data-stage="${stage}">スタート</button></div>`);
 }
 function showEnd(){
@@ -579,6 +704,7 @@ function begin(stage){
   const keep = G.player;
   G = newGame(stage);
   G.player.color = keep.color; G.player.shape = keep.shape;   // へんしんは そのまま
+  warpArmed = false;
   $("over").hidden = true;
   running = true;
 }
@@ -600,6 +726,10 @@ window.addEventListener("keydown", e => {
     if (!e.repeat && running) { nextColor(G); }
     return;
   }
+  // はる（10/5）：ジャンプ（スペース）・ワープ（W。にほんごにゅうりょくでも きくように e.code で みる）
+  if (running && e.key === " ") { e.preventDefault(); if (!e.repeat) jump(G); return; }
+  if (running && e.code === "KeyW") { e.preventDefault(); if (!e.repeat) toggleWarp(); return; }
+  if (running && e.key === "Escape") { warpArmed = false; return; }
   if (running && SCROLL_KEYS.includes(e.key)) { e.preventDefault(); return; }
   const k = e.key;
   if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(k)) {
@@ -622,8 +752,26 @@ cv.addEventListener("pointerdown", e => {
   if (!running) return;
   const r = cv.getBoundingClientRect();
   const wx = (e.clientX - r.left) / r.width * VW, wy = (e.clientY - r.top) / r.height * VH;
-  if (clickTo(G, wx, wy)) marker = {x: clampX(wx), y: floorY(floorAt(wy)), t: performance.now() / 1000};
+  const now = performance.now() / 1000;
+  if (warpArmed) {
+    const from = {x: G.player.x, y: G.player.y};
+    if (warp(G, wx, wy)) warpFx.push({...from, t: now}, {x: G.player.x, y: G.player.y, t: now});
+    warpArmed = false;
+    return;
+  }
+  if (clickTo(G, wx, wy)) marker = {x: clampX(wx), y: floorY(floorAt(wy)), t: now};
 });
+function toggleWarp(){ warpArmed = !warpArmed && G.warps > 0 && G.status === "play"; }
+function syncTools(){
+  const bw = $("bWarp"), bj = $("bJump");
+  $("nWarp").textContent = G.warps; $("nJump").textContent = G.jumps;
+  bw.disabled = G.warps <= 0; bw.setAttribute("aria-pressed", String(warpArmed));
+  bj.disabled = G.jumps <= 0;
+  bj.title = G.stage < JUMP_FROM ? `${JUMP_FROM + 1}めんから つかえる` : "";
+  cv.style.cursor = warpArmed ? "crosshair" : "pointer";
+}
+$("bWarp").addEventListener("click", e => { e.currentTarget.blur(); if (running) toggleWarp(); });
+$("bJump").addEventListener("click", e => { e.currentTarget.blur(); if (running) jump(G); });
 
 /* ---------- へんしん（いろ・かたち。ちからは まだ ない） ---------- */
 function buildHenshin(){
