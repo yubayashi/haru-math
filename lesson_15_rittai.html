@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 15 — 立体 (Poliedros)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .solid-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 8px 0; }
+  .solid-svg { display: block; width: 100%; max-width: 360px; height: auto; margin: 0 auto;
+               touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; }
+  .solid-svg:active { cursor: grabbing; }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+  .shape-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin: 6px 0; }
+  .shape-btn {
+    font-family: 'Nunito', sans-serif; background: #fff; color: #2c3e50;
+    border: 2px solid #ddd; border-radius: 10px; padding: 8px 12px;
+    font-size: 14px; font-weight: 900; cursor: pointer;
+  }
+  .shape-btn.on { border-color: #3498db; background: #eaf6ff; color: #2471c8; }
+  .count-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 6px 0; }
+  .count-row label { font-weight: 900; color: #2c3e50; }
+  .count-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 6px 8px;
+    text-align: center; outline: none; background: #fff; width: 70px;
+  }
+  .count-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .count-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 17px; padding: 12px 8px; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 15</div>
+    <h1>🧊 立体 — 面・頂点・辺</h1>
+    <div class="sub">Poliedros e planificações — 教科書の 少し先（5.º ano）</div>
+  </div>
+
+  <!-- ===== 1. まわす ===== -->
+  <div class="card">
+    <div class="card-title">🖐️ まわして 見よう</div>
+    <p>立体を <b>ドラッグで まわせる</b>。うしろの 面も すけて 見える。</p>
+    <div class="shape-btns" id="shape-btns"></div>
+    <div class="solid-host"><svg class="solid-svg" id="solid-svg" viewBox="0 0 360 320"></svg></div>
+    <div class="callout-green">
+      <b>✅ ことばを 3つ:</b><br>
+      <b>面</b>（face）＝ たいらな ところ<br>
+      <b>頂点</b>（vértice）＝ とがった 角（青い 点）<br>
+      <b>辺</b>（aresta）＝ 面と 面の さかいめの 線
+    </div>
+  </div>
+
+  <!-- ===== 2. 数える ===== -->
+  <div class="card">
+    <div class="card-title">🔢 数えよう</div>
+    <p>上の 立体を まわしながら 数えて、3つ 書いてから「こたえる」。</p>
+    <div id="c-list"></div>
+  </div>
+
+  <!-- ===== 3. きまり ===== -->
+  <div class="card">
+    <div class="card-title">🔎 きまりを 見つけよう</div>
+    <div class="tip">
+      <b>💡 ヒント:</b> 三角柱は 三角形が 上と下に 1つずつ。四角柱は 四角形、六角柱は 六角形。<br>
+      □角柱の 頂点は「□ が 上に 1周、下に 1周」。
+    </div>
+    <div id="r-list"></div>
+    <div class="callout-orange">
+      <b>🌟 オイラーの 公式:</b> どの 立体でも <b>面 ＋ 頂点 − 辺 ＝ 2</b>。<br>
+      300年くらい 前に スイスの 数学者 オイラー（Euler）が 見つけた。ポルトガルの 教科書にも 出てくる。
+    </div>
+  </div>
+
+  <!-- ===== 4. 展開図 ===== -->
+  <div class="card">
+    <div class="card-title">📦 展開図 — 立方体に なる？</div>
+    <p>組み立てると <b>立方体</b>（cubo）に なる？ ならない？ 頭の中で たたんでみて。</p>
+    <div id="n-list"></div>
+    <div class="tip">
+      <b>💡</b> 立方体の 展開図は ぜんぶで <b>11種類</b>。面が かさなったら ダメ。
+    </div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">poliedro</span> 平らな面で かこまれた 立体</span>
+      <span class="vocab-chip"><span class="pt">prisma</span> 角柱</span>
+      <span class="vocab-chip"><span class="pt">pirâmide</span> 角すい</span>
+      <span class="vocab-chip"><span class="pt">face</span> 面</span>
+      <span class="vocab-chip"><span class="pt">vértice</span> 頂点</span>
+      <span class="vocab-chip"><span class="pt">aresta</span> 辺</span>
+      <span class="vocab-chip"><span class="pt">planificação</span> 展開図</span>
+      <span class="vocab-chip"><span class="pt">cubo</span> 立方体</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+const tracking = {};
+const TOTAL_Q = 17;   // 数える 3立体×3 + きまり4 + 展開図4
+let submitted = false;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+function parseIntJ(raw) {
+  const s = raw.trim().replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/[^0-9]/g, '');
+  return /^\d+$/.test(s) ? parseInt(s, 10) : null;
+}
+
+/* ============ 立体（まわせる） ============ */
+function prism(n, rot) {
+  const V = [], F = [];
+  for (let i = 0; i < n; i++) { const a = rot + 2 * Math.PI * i / n; V.push([Math.cos(a), -0.75, Math.sin(a)]); }
+  for (let i = 0; i < n; i++) { const a = rot + 2 * Math.PI * i / n; V.push([Math.cos(a), 0.75, Math.sin(a)]); }
+  F.push([...Array(n).keys()]);
+  F.push([...Array(n).keys()].map(i => n + i));
+  for (let i = 0; i < n; i++) F.push([i, (i + 1) % n, n + (i + 1) % n, n + i]);
+  return { V, F };
+}
+function pyramid(n, rot) {
+  const V = [], F = [];
+  for (let i = 0; i < n; i++) { const a = rot + 2 * Math.PI * i / n; V.push([Math.cos(a), -0.7, Math.sin(a)]); }
+  V.push([0, 0.95, 0]);
+  F.push([...Array(n).keys()]);
+  for (let i = 0; i < n; i++) F.push([i, (i + 1) % n, n]);
+  return { V, F };
+}
+const SHAPES = [
+  { key: 'tri', name: '三角柱', make: () => prism(3, Math.PI / 2) },
+  { key: 'cube', name: '四角柱', make: () => prism(4, Math.PI / 4) },
+  { key: 'hex', name: '六角柱', make: () => prism(6, 0) },
+  { key: 'pyr4', name: '四角すい', make: () => pyramid(4, Math.PI / 4) },
+];
+let cur = SHAPES[0].make(), yaw = 0.6, pitch = 0.45;
+function edgesOf(F) {
+  const set = new Map();
+  for (const f of F) for (let i = 0; i < f.length; i++) {
+    const a = f[i], b = f[(i + 1) % f.length], k = Math.min(a, b) + '-' + Math.max(a, b);
+    set.set(k, [a, b]);
+  }
+  return [...set.values()];
+}
+function solidRender() {
+  const cx = 180, cy = 165, R = 105;
+  const P = cur.V.map(([x, y, z]) => {
+    const x1 = x * Math.cos(yaw) + z * Math.sin(yaw), z1 = -x * Math.sin(yaw) + z * Math.cos(yaw);
+    const y2 = y * Math.cos(pitch) - z1 * Math.sin(pitch), z2 = y * Math.sin(pitch) + z1 * Math.cos(pitch);
+    return [cx + x1 * R, cy - y2 * R, z2];
+  });
+  const faces = cur.F.map(f => ({ f, z: f.reduce((s, i) => s + P[i][2], 0) / f.length })).sort((a, b) => a.z - b.z);
+  let s = '';
+  for (const { f } of faces) s += '<polygon points="' + f.map(i => P[i][0] + ',' + P[i][1]).join(' ') + '" fill="#f5b041" fill-opacity="0.35" stroke="none"/>';
+  for (const [a, b] of edgesOf(cur.F)) {
+    const back = (P[a][2] + P[b][2]) / 2 < -0.15;
+    s += '<line x1="' + P[a][0] + '" y1="' + P[a][1] + '" x2="' + P[b][0] + '" y2="' + P[b][1] + '" stroke="#d35400" stroke-width="' + (back ? 2 : 3.5) + '"' + (back ? ' stroke-dasharray="6 5" stroke-opacity="0.7"' : '') + '/>';
+  }
+  for (const p of P) s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="6" fill="#3498db" stroke="#fff" stroke-width="2"/>';
+  document.getElementById('solid-svg').innerHTML = s;
+}
+function pickShape(i) {
+  cur = SHAPES[i].make();
+  document.querySelectorAll('.shape-btn').forEach((b, j) => b.className = 'shape-btn' + (i === j ? ' on' : ''));
+  solidRender();
+}
+document.getElementById('shape-btns').innerHTML = SHAPES.map((s, i) =>
+  '<button class="shape-btn' + (i === 0 ? ' on' : '') + '" onclick="pickShape(' + i + ')">' + s.name + '</button>').join('');
+(function () {
+  const svg = document.getElementById('solid-svg');
+  let drag = null;
+  svg.addEventListener('pointerdown', e => { drag = [e.clientX, e.clientY, yaw, pitch]; svg.setPointerCapture(e.pointerId); });
+  svg.addEventListener('pointermove', e => {
+    if (!drag) return;
+    yaw = drag[2] + (e.clientX - drag[0]) * 0.012;
+    pitch = Math.max(-1.3, Math.min(1.3, drag[3] + (e.clientY - drag[1]) * 0.012));
+    solidRender();
+  });
+  svg.addEventListener('pointerup', () => { drag = null; });
+  svg.addEventListener('pointercancel', () => { drag = null; });
+})();
+solidRender();
+
+/* ============ 2. 数える ============ */
+let qNo = 0;
+const C_QS = [
+  { key: 'tri', name: '三角柱', shape: 0, f: 5, v: 6, e: 9 },
+  { key: 'hex', name: '六角柱', shape: 2, f: 8, v: 12, e: 18 },
+  { key: 'pyr4', name: '四角すい', shape: 3, f: 5, v: 5, e: 8 },
+];
+document.getElementById('c-list').innerHTML = C_QS.map(q =>
+  '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+  '<div class="q-text"><b>' + q.name + '</b> <button class="shape-btn" onclick="pickShape(' + q.shape + ');document.getElementById(\'solid-svg\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">上に 出す</button></div>' +
+  '<div class="count-row">' +
+  [['f', '面'], ['v', '頂点'], ['e', '辺']].map(([k, l]) => '<label>' + l + '</label><input id="cnt_' + q.key + '_' + k + '" inputmode="numeric" autocomplete="off">').join('') +
+  '<button class="check-btn" onclick="countCheck(\'' + q.key + '\')">こたえる</button></div>' +
+  '<div class="feedback" id="cnt_' + q.key + '-fb"></div></div>'
+).join('');
+function countCheck(key) {
+  const q = C_QS.find(x => x.key === key), fb = document.getElementById('cnt_' + key + '-fb');
+  const parts = [['f', '面'], ['v', '頂点'], ['e', '辺']];
+  const vals = parts.map(([k]) => parseIntJ(document.getElementById('cnt_' + key + '_' + k).value));
+  if (vals.some(v => v === null)) { fb.className = 'feedback wrong'; fb.textContent = '3つとも 数で 書いてね。'; return; }
+  const wrong = [];
+  parts.forEach(([k, l], i) => {
+    const id = 'cnt_' + key + '_' + k, input = document.getElementById(id);
+    if (input.disabled) return;
+    const ok = vals[i] === q[k];
+    record(id, ok, { answer: vals[i], target: q[k] });
+    if (ok) { input.className = 'correct'; input.disabled = true; }
+    else { input.className = 'wrong'; wrong.push(l); }
+  });
+  if (wrong.length === 0) {
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ 正解！ 面 ' + q.f + '・頂点 ' + q.v + '・辺 ' + q.e + '。';
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + wrong.join('・') + ' が ちがう。まわして、うしろ（点線）も 数えて。';
+  }
+}
+
+/* ============ 3. きまり ============ */
+const R_QS = [
+  { id: 'rule_10_v', text: '十角柱（底が 十角形）の 頂点は いくつ？', answer: 20, ok: '上に 10、下に 10 で 20。' , hint: '上の 十角形に 10こ、下にも。' },
+  { id: 'rule_10_e', text: '十角柱の 辺は いくつ？', answer: 30, ok: '上 10 ＋ 下 10 ＋ たて 10 ＝ 30。', hint: '上の 周り、下の 周り、たての 線。' },
+  { id: 'rule_euler', text: '三角柱で「面 ＋ 頂点 − 辺」を 計算すると？', answer: 2, ok: '5 ＋ 6 − 9 ＝ 2。六角柱も 8 ＋ 12 − 18 ＝ 2！', hint: '面 5、頂点 6、辺 9。' },
+  { id: 'rule_icosa', text: '面が 20、頂点が 12 の 立体（正二十面体）。辺は いくつ？', answer: 30, ok: '20 ＋ 12 − 辺 ＝ 2 → 辺 ＝ 30。', hint: '面 ＋ 頂点 − 辺 ＝ 2 を 使う。' },
+];
+document.getElementById('r-list').innerHTML = R_QS.map(q =>
+  '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+  '<div class="q-text">' + q.text + '</div>' +
+  '<div class="answer-row"><input id="' + q.id + '" inputmode="numeric" autocomplete="off">' +
+  '<button class="check-btn" onclick="ruleCheck(\'' + q.id + '\')">こたえる</button></div>' +
+  '<div class="feedback" id="' + q.id + '-fb"></div></div>'
+).join('');
+function ruleCheck(id) {
+  const q = R_QS.find(x => x.id === id), input = document.getElementById(id), fb = document.getElementById(id + '-fb');
+  if (!input.value.trim()) return;
+  const got = parseIntJ(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね。'; return; }
+  const ok = got === q.answer;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) { input.className = 'correct'; input.disabled = true; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    input.className = 'wrong'; fb.className = 'feedback wrong'; fb.textContent = '❌ ' + got + ' じゃない。' + q.hint;
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || !e.target.matches('.practice-q input')) return;
+  const id = e.target.id;
+  if (id.startsWith('cnt_')) countCheck(id.split('_')[1]); else ruleCheck(id);
+});
+
+/* ============ 4. 展開図 ============ */
+function netSVG(cells) {
+  const S = 44, maxX = Math.max(...cells.map(c => c[0])) + 1, maxY = Math.max(...cells.map(c => c[1])) + 1;
+  let s = '<svg class="fig-svg" style="max-width:' + (maxX * S + 20) * 1.3 + 'px" viewBox="0 0 ' + (maxX * S + 20) + ' ' + (maxY * S + 20) + '">';
+  for (const [x, y] of cells) s += '<rect x="' + (10 + x * S) + '" y="' + (10 + y * S) + '" width="' + S + '" height="' + S + '" fill="#d6eaf8" stroke="#2471c8" stroke-width="2.5"/>';
+  return s + '</svg>';
+}
+const N_QS = [
+  { id: 'net_cross', cells: [[0, 1], [1, 1], [2, 1], [3, 1], [1, 0], [1, 2]], ok: true,
+    why: '十字の 形。4つが ぐるっと まわって、上と下が ふたに なる。' },
+  { id: 'net_twotop', cells: [[0, 1], [1, 1], [2, 1], [3, 1], [0, 0], [1, 0]], ok: false,
+    why: '上に ならんだ 2つが、どちらも「ふた」に なって かさなる。' },
+  { id: 'net_stairs', cells: [[0, 0], [1, 0], [2, 0], [2, 1], [3, 1], [4, 1]], ok: true,
+    why: '3つ ＋ 3つの かいだん。これも 11種類の 1つ。' },
+  { id: 'net_block', cells: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]], ok: false,
+    why: '2 × 3 の 長方形は、たたむと 面が かさなって ふたが できない。' },
+];
+document.getElementById('n-list').innerHTML = N_QS.map(q =>
+  '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+  netSVG(q.cells) +
+  '<div class="choice-row" id="' + q.id + '-btns" style="margin-top:10px">' +
+  '<button class="choice-btn small" onclick="netCheck(\'' + q.id + '\',true,this)">なる</button>' +
+  '<button class="choice-btn small" onclick="netCheck(\'' + q.id + '\',false,this)">ならない</button>' +
+  '</div><div class="feedback" id="' + q.id + '-fb"></div></div>'
+).join('');
+function netCheck(id, picked, btn) {
+  const q = N_QS.find(x => x.id === id);
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = picked === q.ok;
+  record(id, ok, { answer: picked ? 'naru' : 'naranai', target: q.ok ? 'naru' : 'naranai' });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.why;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ 1つの 面を 底に して、まわりを 立ててみて。かさなる 面は ない？';
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 オイラーの 公式まで 使いこなした！';
+  else if (firstCount >= 13) msg.textContent = 'Muito bom! 立体を 頭の中で まわせてる。';
+  else if (firstCount >= 9) msg.textContent = 'Bom! うしろの 点線も 数えるのが コツ。';
+  else msg.textContent = '立体を まわしながら、もう1回 数えてみよう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_15_rittai',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>

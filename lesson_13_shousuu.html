@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 13 — 小数の かけ算・わり算 (Decimais)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .tape-host, .grid-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 8px 0; }
+  .grid-svg { display: block; width: 100%; max-width: 320px; height: auto; margin: 0 auto; }
+  .slider-row { display: flex; align-items: center; gap: 10px; font-weight: 900; color: #2c3e50; margin: 6px 0; }
+  .slider-row input[type=range] { flex: 1; height: 34px; accent-color: #3498db; }
+  .slider-row .val { width: 48px; text-align: right; font-size: 18px; }
+  .choice-row { display: flex; gap: 8px; }
+  .choice-btn.small { font-size: 17px; padding: 12px 8px; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 13</div>
+    <h1>🔢 小数の かけ算・わり算</h1>
+    <div class="sub">Multiplicação e divisão de decimais — 教科書の 少し先（5.º ano）</div>
+  </div>
+
+  <!-- ===== 1. わり算＝いくつ分 ===== -->
+  <div class="card">
+    <div class="card-title">📏 わり算は「いくつ分」</div>
+    <p><b>12 ÷ 6</b> は「12 の中に 6 が いくつ 入るか」。12 を 半分に するのとは ちがう（半分は ÷ 2）。<br>
+    テープの ブロックを 数えて 答えよう。</p>
+    <div id="d-list"></div>
+    <div class="tip">
+      <b>💡 気づいた？</b> 3 ÷ 0.5 は <b>6</b>。わったのに 3 より <b>大きく</b> なった。<br>
+      0.5 は 小さいから、たくさん 入る。ポルトガル語なら「quantas vezes cabe?」（何回 入る？）。
+    </div>
+  </div>
+
+  <!-- ===== 2. 小数×小数 ===== -->
+  <div class="card">
+    <div class="card-title">🟦 小数 × 小数 は 面積で 見る</div>
+    <p>大きい 正方形が <b>1</b>。たても よこも 10こに 分けたので、小さい マス 1こは <b>0.01</b>（100こで 1）。<br>
+    スライダーで 長方形を 作って、色の マスを 数えよう。</p>
+
+    <div class="grid-host"><svg class="grid-svg" id="g-svg" viewBox="0 0 330 330"></svg></div>
+    <div class="slider-row">よこ <input type="range" id="g-w" min="1" max="10" value="3"><span class="val" id="g-wv">0.3</span></div>
+    <div class="slider-row">たて <input type="range" id="g-h" min="1" max="10" value="2"><span class="val" id="g-hv">0.2</span></div>
+    <div class="equation" id="g-eq"></div>
+
+    <div id="m-list"></div>
+
+    <div class="callout-green">
+      <b>✅ 筆算の きまり:</b> 0.3 × 0.2 → まず <b>3 × 2 = 6</b>。<br>
+      小数点の 右の けた数（casas decimais）を <b>たす</b>：1けた + 1けた = <b>2けた</b> → <b>0.06</b>
+    </div>
+    <div id="m2-list"></div>
+  </div>
+
+  <!-- ===== 3. 大きくなる？小さくなる？ ===== -->
+  <div class="card">
+    <div class="card-title">🤔 8 より 大きくなる？ 小さくなる？</div>
+    <p>計算しないで 考えよう。</p>
+    <div id="s-list"></div>
+    <div class="callout-orange">
+      <b>🔑 まとめ:</b> 1 より 小さい数を <b>かける</b> → 小さくなる。<br>
+      1 より 小さい数で <b>わる</b> → 大きくなる。
+    </div>
+  </div>
+
+  <!-- ===== 4. 小数のわり算 ===== -->
+  <div class="card">
+    <div class="card-title">➗ 小数で わる</div>
+    <div class="tip">
+      <b>💡 わる数を 整数に する:</b> 7.2 ÷ 0.6 → 両方を <b>10倍</b> → 72 ÷ 6 = <b>12</b><br>
+      両方を 同じだけ 大きくしても「いくつ分」は 変わらない。
+    </div>
+    <div id="v-list"></div>
+  </div>
+
+  <!-- ===== 5. お店 ===== -->
+  <div class="card">
+    <div class="card-title">🛒 お店で 使う</div>
+    <p>ポルトガルの 値段は <b>2,40€</b> のように <b>,（vírgula）</b>で 書く。日本の 2.40 と 同じ。答えは「3.6」でも「3,6」でも OK。</p>
+    <div id="p-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">multiplicação</span> かけ算</span>
+      <span class="vocab-chip"><span class="pt">divisão</span> わり算</span>
+      <span class="vocab-chip"><span class="pt">número decimal</span> 小数</span>
+      <span class="vocab-chip"><span class="pt">vírgula</span> 小数点</span>
+      <span class="vocab-chip"><span class="pt">casas decimais</span> 小数点の 右の けた</span>
+      <span class="vocab-chip"><span class="pt">produto</span> かけ算の 答え（積）</span>
+      <span class="vocab-chip"><span class="pt">quociente</span> わり算の 答え（商）</span>
+      <span class="vocab-chip"><span class="pt">quantas vezes cabe</span> いくつ分</span>
+    </div>
+
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+const tracking = {};
+const TOTAL_Q = 20;   // いくつ分4 + 面積3 + 筆算2 + 大小4 + わり算4 + お店3
+let submitted = false;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* 0.30000000000000004 を 0.3 に */
+function fmtD(x) { return String(+x.toFixed(6)); }
+
+/* 全角・「,」「，」「．」・€・単位を受けて数に。読めなければ null */
+function parseDec(raw) {
+  let s = raw.trim()
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/[,，．、]/g, '.')
+    .replace(/[^0-9.]/g, '');
+  return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : null;
+}
+
+/* ---- 入力問題（共通） ---- */
+const INPUT_QS = {};
+function renderInputs(hostId, qs, offset) {
+  qs.forEach(q => { INPUT_QS[q.id] = q; });
+  document.getElementById(hostId).innerHTML = qs.map((q, i) =>
+    '<div class="practice-q"><div class="q-num">' + (offset + i + 1) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    (q.tape ? '<div class="tape-host">' + tapeSVG(q.tape[0], q.tape[1]) + '</div>' : '') +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="decimal" autocomplete="off">' +
+    (q.unit ? '<span class="unit">' + q.unit + '</span>' : '') +
+    '<button class="check-btn" onclick="inputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>'
+  ).join('');
+}
+function inputCheck(id) {
+  const q = INPUT_QS[id];
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  if (!input.value.trim()) return;
+  const got = parseDec(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね（例: 0.06）。'; return; }
+  const ok = Math.abs(got - q.answer) < 1e-9;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) {
+    input.className = 'correct'; input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + fmtD(got) + ' じゃない。' + q.hint;
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches('.practice-q input')) inputCheck(e.target.id);
+});
+
+/* ============ 1. テープ ============ */
+function tapeSVG(total, piece) {
+  const W = 600, x0 = 20, len = 560, sc = len / total, n = Math.round(total / piece);
+  const colors = ['#3498db', '#85c1e9'];
+  let s = '<svg class="grid-svg" style="max-width:none" viewBox="0 0 ' + W + ' 92">';
+  for (let i = 0; i < n; i++) {
+    const x = x0 + i * piece * sc, w = piece * sc;
+    s += '<rect x="' + x + '" y="14" width="' + w + '" height="36" fill="' + colors[i % 2] + '" stroke="#fff" stroke-width="2"/>';
+    if (w >= 34) s += '<text x="' + (x + w / 2) + '" y="38" text-anchor="middle" font-size="14" font-weight="900" fill="#fff">' + fmtD(piece) + '</text>';
+  }
+  s += '<rect x="' + x0 + '" y="14" width="' + len + '" height="36" fill="none" stroke="#2c3e50" stroke-width="2"/>';
+  const step = total > 6 ? 2 : (total >= 2 ? 1 : 0.5);
+  for (let v = 0; v <= total + 1e-9; v += step) {
+    const x = x0 + v * sc;
+    s += '<line x1="' + x + '" y1="50" x2="' + x + '" y2="60" stroke="#555" stroke-width="2"/>';
+    s += '<text x="' + x + '" y="80" text-anchor="middle" font-size="15" font-weight="800" fill="#555">' + fmtD(v) + '</text>';
+  }
+  if (Math.abs(total / step - Math.round(total / step)) > 1e-9) {
+    s += '<line x1="' + (x0 + len) + '" y1="50" x2="' + (x0 + len) + '" y2="60" stroke="#555" stroke-width="2"/>';
+    s += '<text x="' + (x0 + len) + '" y="80" text-anchor="middle" font-size="15" font-weight="800" fill="#555">' + fmtD(total) + '</text>';
+  }
+  return s + '</svg>';
+}
+renderInputs('d-list', [
+  { id: 'div_12_6', text: '12 ÷ 6 — 12 の中に 6 は いくつ？', tape: [12, 6], answer: 2,
+    ok: '12 ÷ 6 = 2。6 が 2つ分。', hint: '6 の ブロックを 数えて。' },
+  { id: 'div_3_05', text: '3 ÷ 0.5 — 3 の中に 0.5 は いくつ？', tape: [3, 0.5], answer: 6,
+    ok: '3 ÷ 0.5 = 6。1 の中に 0.5 は 2つ、それが 3つで 6。', hint: '0.5 の ブロックを 数えて。' },
+  { id: 'div_2_025', text: '2 ÷ 0.25 — 2 の中に 0.25 は いくつ？', tape: [2, 0.25], answer: 8,
+    ok: '2 ÷ 0.25 = 8。0.25 は 1 の中に 4つ。', hint: '1 の中に 0.25 は いくつ ある？' },
+  { id: 'div_15_03', text: '1.5 ÷ 0.3 — 1.5 の中に 0.3 は いくつ？', tape: [1.5, 0.3], answer: 5,
+    ok: '1.5 ÷ 0.3 = 5。', hint: 'ブロックを 1つずつ 数えて。' },
+], 0);
+
+/* ============ 2. 面積の マス目 ============ */
+const gW = document.getElementById('g-w'), gH = document.getElementById('g-h');
+function gridRender() {
+  const w = +gW.value, h = +gH.value, C = 30, X = 15, Y = 15;
+  document.getElementById('g-wv').textContent = fmtD(w / 10);
+  document.getElementById('g-hv').textContent = fmtD(h / 10);
+  let s = '<rect x="' + X + '" y="' + Y + '" width="300" height="300" fill="#fff"/>';
+  s += '<rect x="' + X + '" y="' + Y + '" width="' + (w * C) + '" height="' + (h * C) + '" fill="#f5b041"/>';
+  for (let i = 1; i < 10; i++) {
+    s += '<line x1="' + (X + i * C) + '" y1="' + Y + '" x2="' + (X + i * C) + '" y2="' + (Y + 300) + '" stroke="#ccc"/>';
+    s += '<line x1="' + X + '" y1="' + (Y + i * C) + '" x2="' + (X + 300) + '" y2="' + (Y + i * C) + '" stroke="#ccc"/>';
+  }
+  s += '<rect x="' + X + '" y="' + Y + '" width="' + (w * C) + '" height="' + (h * C) + '" fill="none" stroke="#d35400" stroke-width="3"/>';
+  s += '<rect x="' + X + '" y="' + Y + '" width="300" height="300" fill="none" stroke="#2c3e50" stroke-width="3"/>';
+  document.getElementById('g-svg').innerHTML = s;
+  document.getElementById('g-eq').textContent = fmtD(w / 10) + ' × ' + fmtD(h / 10) + ' → 色の マスは ' + (w * h) + 'こ';
+}
+gW.addEventListener('input', gridRender); gH.addEventListener('input', gridRender);
+gridRender();
+
+renderInputs('m-list', [
+  { id: 'mul_03_02', text: '0.3 × 0.2 = ?（スライダーで 作って、マス 1こ＝0.01）', answer: 0.06,
+    ok: '6マス × 0.01 = 0.06。0.3 よりも 0.2 よりも 小さい！', hint: 'マスは 6こ。1こが 0.01 なら？' },
+  { id: 'mul_04_05', text: '0.4 × 0.5 = ?', answer: 0.2,
+    ok: '20マス = 0.20 = 0.2。', hint: 'スライダーで よこ 0.4・たて 0.5 に して 数えて。' },
+  { id: 'mul_07_06', text: '0.7 × 0.6 = ?', answer: 0.42,
+    ok: '42マス = 0.42。', hint: '7 × 6 = 42 マス。1マスは 0.01。' },
+], 4);
+renderInputs('m2-list', [
+  { id: 'mul_12_03', text: '1.2 × 0.3 = ?（マス目なしで）', answer: 0.36,
+    ok: '12 × 3 = 36、けたは 1 + 1 = 2 → 0.36。', hint: 'まず 12 × 3。そのあと 小数点の 右に 2けた。' },
+  { id: 'mul_25_04', text: '2.5 × 0.4 = ?', answer: 1,
+    ok: '25 × 4 = 100 → 2けた → 1.00 = 1。', hint: '25 × 4 = 100。小数点の 右に 2けた うつと？' },
+], 7);
+
+/* ============ 3. 大きくなる？小さくなる？ ============ */
+const S_QS = [
+  { id: 'sz_mul05', expr: '8 × 0.5', big: false, why: '8 × 0.5 = 4。0.5 は 1 より 小さいから、かけると へる。' },
+  { id: 'sz_div05', expr: '8 ÷ 0.5', big: true, why: '8 ÷ 0.5 = 16。0.5 が 16こ 入る。' },
+  { id: 'sz_mul12', expr: '8 × 1.2', big: true, why: '8 × 1.2 = 9.6。1 より 大きい数を かけると ふえる。' },
+  { id: 'sz_div01', expr: '8 ÷ 0.1', big: true, why: '8 ÷ 0.1 = 80。0.1 は 8 の中に 80こ。' },
+];
+document.getElementById('s-list').innerHTML = S_QS.map((q, i) =>
+  '<div class="practice-q"><div class="q-num">' + (10 + i) + '</div>' +
+  '<div class="equation" style="margin-top:4px">' + q.expr + '</div>' +
+  '<div class="choice-row" id="' + q.id + '-btns">' +
+  '<button class="choice-btn small" onclick="sizeCheck(' + i + ',true,this)">8 より 大きい</button>' +
+  '<button class="choice-btn small" onclick="sizeCheck(' + i + ',false,this)">8 より 小さい</button>' +
+  '</div><div class="feedback" id="' + q.id + '-fb"></div></div>'
+).join('');
+function sizeCheck(i, pickedBig, btn) {
+  const q = S_QS[i];
+  if (tracking[q.id] && tracking[q.id].correct) return;
+  const ok = pickedBig === q.big;
+  record(q.id, ok, { answer: pickedBig ? 'big' : 'small', target: q.big ? 'big' : 'small' });
+  const fb = document.getElementById(q.id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + q.id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ 正解！ ' + q.why;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ 1 より 大きい数？ 小さい数？ かける？ わる？';
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ============ 4. 小数で わる ============ */
+renderInputs('v-list', [
+  { id: 'dv_72_06', text: '7.2 ÷ 0.6 = ?', answer: 12,
+    ok: '72 ÷ 6 = 12。', hint: '両方 10倍 → 72 ÷ 6。' },
+  { id: 'dv_45_15', text: '4.5 ÷ 1.5 = ?', answer: 3,
+    ok: '45 ÷ 15 = 3。1.5 が 3つで 4.5。', hint: '両方 10倍 → 45 ÷ 15。' },
+  { id: 'dv_08_02', text: '0.8 ÷ 0.2 = ?', answer: 4,
+    ok: '8 ÷ 2 = 4。', hint: '両方 10倍 → 8 ÷ 2。' },
+  { id: 'dv_6_04', text: '6 ÷ 0.4 = ?', answer: 15,
+    ok: '60 ÷ 4 = 15。6 も 10倍して 60 に するのが ポイント。', hint: '6 も 10倍 → 60 ÷ 4。' },
+], 13);
+
+/* ============ 5. お店 ============ */
+renderInputs('p-list', [
+  { id: 'shop_apple', text: '🍎 りんごは 1kg 2,40€。1,5kg 買うと いくら？', answer: 3.6, unit: '€',
+    ok: '2,40 × 1,5 = 3,60€。', hint: '2.4 × 1.5。24 × 15 を 計算して、けたは 1 + 1 = 2。' },
+  { id: 'shop_juice', text: '🧃 ジュース 0,5L で 1,20€。1L なら いくら？', answer: 2.4, unit: '€',
+    ok: '1,20 ÷ 0,5 = 2,40€（0,5L が 2つで 1L）。', hint: '1L は 0,5L が いくつ分？' },
+  { id: 'shop_nata', text: '🥧 パステル・デ・ナタ 1こ 1,20€。6€ で いくつ 買える？', answer: 5, unit: 'こ',
+    ok: '6 ÷ 1,2 = 5こ。', hint: '6 ÷ 1.2。両方 10倍 → 60 ÷ 12。' },
+], 17);
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 授業で 出てきたら もう 先生より 先に 分かってる！';
+  else if (firstCount >= 15) msg.textContent = 'Muito bom! 小数の かけ算・わり算、ほぼ 完成。';
+  else if (firstCount >= 10) msg.textContent = 'Bom! 「わり算＝いくつ分」を テープで もう1回 見てみよう。';
+  else msg.textContent = 'テープと マス目を さわりながら、もう1回 やってみよう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_13_shousuu',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>

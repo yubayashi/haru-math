@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 14 — 面積 (Áreas)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .fig-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 8px 0; }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+  .slider-row { display: flex; align-items: center; gap: 10px; font-weight: 900; color: #2c3e50; margin: 6px 0; }
+  .slider-row input[type=range] { flex: 1; height: 34px; accent-color: #3498db; }
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 17px; padding: 12px 8px; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 14</div>
+    <h1>📐 平行四辺形と 三角形の 面積</h1>
+    <div class="sub">Área do paralelogramo e do triângulo — 教科書の 少し先（5.º ano）</div>
+  </div>
+
+  <!-- ===== 1. 平行四辺形 → 長方形 ===== -->
+  <div class="card">
+    <div class="card-title">✂️ 平行四辺形を 長方形に かえる</div>
+    <p>スライダーで ななめに してみて。「切って うつす」を おすと、左の 三角を 右へ うつせる。<br>
+    マス 1こ ＝ 1cm²。</p>
+    <div class="fig-host"><svg class="fig-svg" id="pg-svg" viewBox="0 0 520 300"></svg></div>
+    <div class="slider-row">ななめ <input type="range" id="pg-s" min="0" max="4" value="2"></div>
+    <div class="row-btns">
+      <button class="act-btn ghost" id="pg-cut" onclick="pgToggle()">切って うつす</button>
+    </div>
+    <div class="equation" id="pg-eq"></div>
+    <div class="callout-green">
+      <b>✅ 平行四辺形の 面積 ＝ 底辺 × 高さ</b>（base × altura）<br>
+      ななめの 辺の 長さは 使わない。<b>高さは 底辺と 直角</b>。
+    </div>
+    <div id="q1-list"></div>
+  </div>
+
+  <!-- ===== 2. 三角形 ===== -->
+  <div class="card">
+    <div class="card-title">🔺 三角形は 平行四辺形の 半分</div>
+    <p>同じ 三角形を 2つ くっつけると 平行四辺形に なる。だから 三角形は その <b>半分</b>。</p>
+    <div class="fig-host"><svg class="fig-svg" id="tr-svg" viewBox="0 0 520 300"></svg></div>
+    <div class="row-btns">
+      <button class="act-btn ghost" id="tr-btn" onclick="trToggle()">もう1つ くっつける</button>
+    </div>
+    <div class="callout-green">
+      <b>✅ 三角形の 面積 ＝ 底辺 × 高さ ÷ 2</b>
+    </div>
+    <div id="q2-list"></div>
+  </div>
+
+  <!-- ===== 3. 計算 ===== -->
+  <div class="card">
+    <div class="card-title">🧮 面積を 出そう</div>
+    <p>使わない 数も 書いてある。<b>どれが 高さか</b> よく見て。</p>
+    <div id="q3-list"></div>
+  </div>
+
+  <!-- ===== 4. どれが高さ ===== -->
+  <div class="card">
+    <div class="card-title">🔍 どれが 高さ？</div>
+    <p>底辺は 下の 太い線。高さは どれ？</p>
+    <div id="q4-list"></div>
+    <div class="tip">
+      <b>💡</b> とがった 三角形では、高さが <b>外に はみ出す</b>ことが ある。底辺を のばして、そこへ 直角に おろす。
+    </div>
+  </div>
+
+  <!-- ===== 5. 逆に考える ===== -->
+  <div class="card">
+    <div class="card-title">🔁 逆に 考える</div>
+    <div id="q5-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">área</span> 面積</span>
+      <span class="vocab-chip"><span class="pt">base</span> 底辺</span>
+      <span class="vocab-chip"><span class="pt">altura</span> 高さ</span>
+      <span class="vocab-chip"><span class="pt">paralelogramo</span> 平行四辺形</span>
+      <span class="vocab-chip"><span class="pt">triângulo</span> 三角形</span>
+      <span class="vocab-chip"><span class="pt">figuras equivalentes</span> 面積が 同じ 図形</span>
+      <span class="vocab-chip"><span class="pt">cm²</span> 平方センチメートル</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+const tracking = {};
+const TOTAL_Q = 13;   // 動かす2 + 計算5 + 高さ2 + 逆4
+let submitted = false;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+function parseDec(raw) {
+  let s = raw.trim()
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/cm²|cm2|cm/g, '')
+    .replace(/[,，．、]/g, '.')
+    .replace(/[^0-9.]/g, '');
+  return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : null;
+}
+
+/* ---- 入力問題（共通） ---- */
+const INPUT_QS = {};
+let qNo = 0;
+function renderInputs(hostId, qs) {
+  qs.forEach(q => { INPUT_QS[q.id] = q; });
+  document.getElementById(hostId).innerHTML = qs.map(q =>
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    (q.fig ? '<div class="fig-host">' + q.fig + '</div>' : '') +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="decimal" autocomplete="off">' +
+    '<span class="unit">' + (q.unit || 'cm²') + '</span>' +
+    '<button class="check-btn" onclick="inputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>'
+  ).join('');
+}
+function inputCheck(id) {
+  const q = INPUT_QS[id];
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  if (!input.value.trim()) return;
+  const got = parseDec(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね。'; return; }
+  const ok = Math.abs(got - q.answer) < 1e-9;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) {
+    input.className = 'correct'; input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + got + ' じゃない。' + q.hint;
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches('.practice-q input')) inputCheck(e.target.id);
+});
+
+/* ---- マス目 ---- */
+const C = 40, GX = 20, GY = 20;   // マス 40px
+function gridBG(cols, rows) {
+  let s = '';
+  for (let i = 0; i <= cols; i++) s += '<line x1="' + (GX + i * C) + '" y1="' + GY + '" x2="' + (GX + i * C) + '" y2="' + (GY + rows * C) + '" stroke="#e3e3e3"/>';
+  for (let j = 0; j <= rows; j++) s += '<line x1="' + GX + '" y1="' + (GY + j * C) + '" x2="' + (GX + cols * C) + '" y2="' + (GY + j * C) + '" stroke="#e3e3e3"/>';
+  return s;
+}
+function P(x, y) { return (GX + x * C) + ',' + (GY + y * C); }
+
+/* ============ 1. 平行四辺形 ============ */
+let pgCut = false;
+const pgS = document.getElementById('pg-s');
+function pgRender() {
+  const s = +pgS.value;   // 上の辺のずれ（マス）
+  let g = gridBG(12, 6);
+  if (pgCut && s > 0) {
+    g += '<polygon points="' + [P(1, 5), P(7, 5), P(7 + s, 1), P(1 + s, 1)].join(' ') + '" fill="none" stroke="#bbb" stroke-width="2" stroke-dasharray="6 4"/>';
+    g += '<polygon points="' + [P(1 + s, 5), P(7, 5), P(7 + s, 1), P(1 + s, 1)].join(' ') + '" fill="#85c1e9" stroke="#2471c8" stroke-width="3"/>';
+    g += '<polygon points="' + [P(7, 5), P(7 + s, 5), P(7 + s, 1)].join(' ') + '" fill="#f5b041" stroke="#d35400" stroke-width="3"/>';
+  } else {
+    g += '<polygon points="' + [P(1, 5), P(7, 5), P(7 + s, 1), P(1 + s, 1)].join(' ') + '" fill="#85c1e9" stroke="#2471c8" stroke-width="3"/>';
+    if (s > 0) g += '<polygon points="' + [P(1, 5), P(1 + s, 5), P(1 + s, 1)].join(' ') + '" fill="#f5b041" fill-opacity="0.8" stroke="#d35400" stroke-width="2"/>';
+  }
+  const hx = 1 + s;
+  g += '<line x1="' + (GX + hx * C) + '" y1="' + (GY + C) + '" x2="' + (GX + hx * C) + '" y2="' + (GY + 5 * C) + '" stroke="#c0392b" stroke-width="3" stroke-dasharray="7 5"/>';
+  g += '<text x="' + (GX + hx * C + 8) + '" y="' + (GY + 3.1 * C) + '" font-size="16" font-weight="900" fill="#c0392b">高さ 4</text>';
+  g += '<text x="' + (GX + (pgCut ? 4 + s : 4) * C) + '" y="' + (GY + 5.7 * C) + '" text-anchor="middle" font-size="16" font-weight="900" fill="#2471c8">底辺 6</text>';
+  document.getElementById('pg-svg').innerHTML = g;
+  document.getElementById('pg-eq').textContent = '6 × 4 = 24 cm²' + (s === 0 ? '（いまは 長方形）' : '');
+  document.getElementById('pg-cut').textContent = pgCut ? 'もとに もどす' : '切って うつす';
+}
+function pgToggle() { pgCut = !pgCut; pgRender(); }
+pgS.addEventListener('input', pgRender);
+pgRender();
+
+/* ============ 2. 三角形 ============ */
+let trTwo = false;
+function trRender() {
+  let g = gridBG(12, 6);
+  g += '<polygon points="' + [P(2, 5), P(8, 5), P(4, 1)].join(' ') + '" fill="#f5b041" stroke="#d35400" stroke-width="3"/>';
+  if (trTwo) g += '<polygon points="' + [P(8, 5), P(10, 1), P(4, 1)].join(' ') + '" fill="#85c1e9" fill-opacity="0.8" stroke="#2471c8" stroke-width="3" stroke-dasharray="7 4"/>';
+  g += '<line x1="' + (GX + 4 * C) + '" y1="' + (GY + C) + '" x2="' + (GX + 4 * C) + '" y2="' + (GY + 5 * C) + '" stroke="#c0392b" stroke-width="3" stroke-dasharray="7 5"/>';
+  g += '<text x="' + (GX + 4 * C + 8) + '" y="' + (GY + 3.6 * C) + '" font-size="16" font-weight="900" fill="#c0392b">高さ 4</text>';
+  g += '<text x="' + (GX + 5 * C) + '" y="' + (GY + 5.7 * C) + '" text-anchor="middle" font-size="16" font-weight="900" fill="#d35400">底辺 6</text>';
+  document.getElementById('tr-svg').innerHTML = g;
+  document.getElementById('tr-btn').textContent = trTwo ? '1つに もどす' : 'もう1つ くっつける';
+}
+function trToggle() { trTwo = !trTwo; trRender(); }
+trRender();
+
+/* ============ 図（cm の数字つき） ============ */
+const K = 26;   // 1cm = 26px
+function figPara(b, side, h, labelSide) {
+  const off = Math.sqrt(side * side - h * h), x0 = 30, y0 = 30 + h * K;
+  const W = (b + off) * K + 80, H = h * K + 70;
+  const A = [x0, y0], B = [x0 + b * K, y0], Cc = [x0 + (b + off) * K, y0 - h * K], D = [x0 + off * K, y0 - h * K];
+  let s = '<svg class="fig-svg" style="max-width:' + W * 1.2 + 'px" viewBox="0 0 ' + W + ' ' + H + '">';
+  s += '<polygon points="' + [A, B, Cc, D].map(p => p.join(',')).join(' ') + '" fill="#d6eaf8" stroke="#2471c8" stroke-width="3"/>';
+  s += '<line x1="' + D[0] + '" y1="' + D[1] + '" x2="' + D[0] + '" y2="' + y0 + '" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6 4"/>';
+  s += '<polyline points="' + (D[0]) + ',' + (y0 - 10) + ' ' + (D[0] + 10) + ',' + (y0 - 10) + ' ' + (D[0] + 10) + ',' + y0 + '" fill="none" stroke="#c0392b" stroke-width="1.5"/>';
+  s += '<text x="' + (D[0] + 6) + '" y="' + (y0 - h * K / 2) + '" font-size="15" font-weight="900" fill="#c0392b">' + h + ' cm</text>';
+  s += '<text x="' + ((A[0] + B[0]) / 2) + '" y="' + (y0 + 22) + '" text-anchor="middle" font-size="15" font-weight="900" fill="#2471c8">' + b + ' cm</text>';
+  if (labelSide) s += '<text x="' + ((A[0] + D[0]) / 2 - 8) + '" y="' + ((A[1] + D[1]) / 2) + '" text-anchor="end" font-size="15" font-weight="900" fill="#555">' + side + ' cm</text>';
+  return s + '</svg>';
+}
+/* cx: 頂点の x（cm）。cx が b より大きいと 鈍角で 高さが 外 */
+function figTri(b, h, cx, sideLabel) {
+  const x0 = 30, y0 = 30 + h * K, right = Math.max(b, cx);
+  const W = right * K + 90, H = h * K + 70;
+  const A = [x0, y0], B = [x0 + b * K, y0], T = [x0 + cx * K, y0 - h * K];
+  let s = '<svg class="fig-svg" style="max-width:' + W * 1.2 + 'px" viewBox="0 0 ' + W + ' ' + H + '">';
+  if (cx > b) s += '<line x1="' + B[0] + '" y1="' + y0 + '" x2="' + T[0] + '" y2="' + y0 + '" stroke="#999" stroke-width="2" stroke-dasharray="5 4"/>';
+  s += '<polygon points="' + [A, B, T].map(p => p.join(',')).join(' ') + '" fill="#fdebd0" stroke="#d35400" stroke-width="3"/>';
+  s += '<line x1="' + T[0] + '" y1="' + T[1] + '" x2="' + T[0] + '" y2="' + y0 + '" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6 4"/>';
+  s += '<polyline points="' + T[0] + ',' + (y0 - 10) + ' ' + (T[0] - 10) + ',' + (y0 - 10) + ' ' + (T[0] - 10) + ',' + y0 + '" fill="none" stroke="#c0392b" stroke-width="1.5"/>';
+  s += '<text x="' + (T[0] + 6) + '" y="' + (y0 - h * K / 2) + '" font-size="15" font-weight="900" fill="#c0392b">' + h + ' cm</text>';
+  s += '<text x="' + ((A[0] + B[0]) / 2) + '" y="' + (y0 + 22) + '" text-anchor="middle" font-size="15" font-weight="900" fill="#d35400">' + b + ' cm</text>';
+  if (sideLabel) s += '<text x="' + ((A[0] + T[0]) / 2 - 8) + '" y="' + ((A[1] + T[1]) / 2) + '" text-anchor="end" font-size="15" font-weight="900" fill="#555">' + sideLabel + ' cm</text>';
+  return s + '</svg>';
+}
+
+/* ---- 1・2 のあとの問題 ---- */
+renderInputs('q1-list', [
+  { id: 'pg_slide', text: 'スライダーを いちばん ななめ（右はし）に すると、面積は 何cm²？', answer: 24,
+    ok: 'ななめに しても 24cm²。形が ちがっても 面積が 同じ（figuras equivalentes）。', hint: '切って うつすと、長方形の 6 × 4 に なる。' },
+]);
+renderInputs('q2-list', [
+  { id: 'tr_grid', text: 'オレンジの 三角形の 面積は 何cm²？', answer: 12,
+    ok: '6 × 4 ÷ 2 = 12cm²。平行四辺形 24 の 半分。', hint: '平行四辺形（6 × 4）の 半分。' },
+]);
+
+/* ============ 3. 計算 ============ */
+renderInputs('q3-list', [
+  { id: 'calc_pg_8_5', text: '平行四辺形の 面積は？', fig: figPara(8, 6, 5, true), answer: 40,
+    ok: '8 × 5 = 40cm²。6cm は 使わない。', hint: '底辺 × 高さ。高さは 直角の 赤い線。' },
+  { id: 'calc_pg_7_3', text: '平行四辺形の 面積は？', fig: figPara(7, 4, 3, true), answer: 21,
+    ok: '7 × 3 = 21cm²。7 × 4 に しないのが ポイント。', hint: '4cm は ななめの 辺。高さは どれ？' },
+  { id: 'calc_tr_10_6', text: '三角形の 面積は？', fig: figTri(10, 6, 5.3, 8), answer: 30,
+    ok: '10 × 6 ÷ 2 = 30cm²。', hint: '底辺 × 高さ ÷ 2。8cm は ななめの 辺。' },
+  { id: 'calc_tr_5_4', text: '三角形の 面積は？', fig: figTri(5, 4, 2, 4.5), answer: 10,
+    ok: '5 × 4 ÷ 2 = 10cm²。', hint: '÷ 2 を わすれて いない？' },
+  { id: 'calc_tr_obtuse', text: '三角形の 面積は？（高さが 外に ある）', fig: figTri(6, 4, 8), answer: 12,
+    ok: '6 × 4 ÷ 2 = 12cm²。高さが 外でも 式は 同じ。', hint: '底辺は 6cm（点線の のばした ところは 入れない）。' },
+]);
+
+/* ============ 4. どれが高さ ============ */
+function figWhich(obtuse) {
+  const y0 = 200, A = [40, y0], B = [obtuse ? 240 : 340, y0], T = obtuse ? [380, 60] : [150, 50];
+  let s = '<svg class="fig-svg" style="max-width:520px" viewBox="0 0 440 240">';
+  if (obtuse) s += '<line x1="' + B[0] + '" y1="' + y0 + '" x2="' + T[0] + '" y2="' + y0 + '" stroke="#999" stroke-width="2" stroke-dasharray="5 4"/>';
+  s += '<polygon points="' + [A, B, T].map(p => p.join(',')).join(' ') + '" fill="#f4f6f7" stroke="#7f8c8d" stroke-width="2"/>';
+  s += '<line x1="' + A[0] + '" y1="' + y0 + '" x2="' + B[0] + '" y2="' + y0 + '" stroke="#2c3e50" stroke-width="6"/>';
+  const segs = obtuse
+    ? [['a', T, B, '#8e44ad'], ['b', T, [170, y0], '#16a085'], ['c', T, [T[0], y0], '#e67e22']]
+    : [['a', T, A, '#8e44ad'], ['b', T, [T[0], y0], '#e67e22'], ['c', T, [250, y0], '#16a085']];
+  for (const [name, p, q, col] of segs) {
+    s += '<line x1="' + p[0] + '" y1="' + p[1] + '" x2="' + q[0] + '" y2="' + q[1] + '" stroke="' + col + '" stroke-width="4"' + (name === (obtuse ? 'c' : 'b') ? ' stroke-dasharray="8 5"' : '') + '/>';
+    s += '<text x="' + ((p[0] + q[0]) / 2 + 8) + '" y="' + ((p[1] + q[1]) / 2 + 18) + '" font-size="20" font-weight="900" fill="' + col + '">' + name + '</text>';
+  }
+  return s + '</svg>';
+}
+const W_QS = [
+  { id: 'which_acute', fig: figWhich(false), answer: 'b', why: 'b は 底辺と 直角。a は 辺、c は ななめ。' },
+  { id: 'which_obtuse', fig: figWhich(true), answer: 'c', why: 'c は 底辺を のばした 線と 直角。外に あっても 高さ。' },
+];
+document.getElementById('q4-list').innerHTML = W_QS.map(q =>
+  '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+  '<div class="fig-host">' + q.fig + '</div>' +
+  '<div class="choice-row" id="' + q.id + '-btns">' +
+  ['a', 'b', 'c'].map(n => '<button class="choice-btn" onclick="whichCheck(\'' + q.id + '\',\'' + n + '\',this)">' + n + '</button>').join('') +
+  '</div><div class="feedback" id="' + q.id + '-fb"></div></div>'
+).join('');
+function whichCheck(id, picked, btn) {
+  const q = W_QS.find(x => x.id === id);
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = picked === q.answer;
+  record(id, ok, { answer: picked, target: q.answer });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.why;
+  } else {
+    btn.className = 'choice-btn wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ 高さは 底辺（太い線）と 直角に まじわる 線。';
+    setTimeout(() => { btn.className = 'choice-btn'; }, 1200);
+  }
+}
+
+/* ============ 5. 逆に考える ============ */
+function figSame() {
+  let s = '<svg class="fig-svg" style="max-width:520px" viewBox="0 0 440 200">';
+  s += '<line x1="10" y1="40" x2="430" y2="40" stroke="#999" stroke-width="2"/>';
+  s += '<line x1="10" y1="170" x2="430" y2="170" stroke="#999" stroke-width="2"/>';
+  const tris = [['A', 60, '#f5b041'], ['B', 230, '#85c1e9'], ['C', 400, '#82e0aa']];
+  for (const [n, top, col] of tris) {
+    s += '<polygon points="150,170 270,170 ' + top + ',40" fill="' + col + '" fill-opacity="0.55" stroke="#555" stroke-width="2"/>';
+    s += '<text x="' + top + '" y="30" text-anchor="middle" font-size="18" font-weight="900" fill="#2c3e50">' + n + '</text>';
+  }
+  s += '<text x="210" y="192" text-anchor="middle" font-size="14" font-weight="800" fill="#555">3つとも 同じ 底辺</text>';
+  return s + '</svg>';
+}
+renderInputs('q5-list', [
+  { id: 'inv_pg', text: '平行四辺形の 面積が 24cm²、底辺が 8cm。高さは 何cm？', answer: 3, unit: 'cm',
+    ok: '8 × □ = 24 → □ = 3cm。', hint: '8 × □ = 24。' },
+  { id: 'inv_tr', text: '三角形の 面積が 15cm²、底辺が 6cm。高さは 何cm？', answer: 5, unit: 'cm',
+    ok: '6 × □ ÷ 2 = 15 → 6 × □ = 30 → □ = 5cm。', hint: '÷ 2 する 前は 30。6 × □ = 30。' },
+  { id: 'inv_tr2', text: '三角形の 面積が 12cm²、高さが 3cm。底辺は 何cm？', answer: 8, unit: 'cm',
+    ok: '□ × 3 ÷ 2 = 12 → □ × 3 = 24 → □ = 8cm。', hint: '÷ 2 する 前は 24。' },
+]);
+document.getElementById('q5-list').insertAdjacentHTML('beforeend',
+  '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+  '<div class="q-text">平行な 2本の 線の あいだに、底辺が 同じ 三角形が 3つ。面積が いちばん 大きいのは？</div>' +
+  '<div class="fig-host">' + figSame() + '</div>' +
+  '<div class="choice-row" id="same-btns">' +
+  ['A', 'B', 'C', 'ぜんぶ 同じ'].map(n => '<button class="choice-btn small" onclick="sameCheck(\'' + n + '\',this)">' + n + '</button>').join('') +
+  '</div><div class="feedback" id="same-fb"></div></div>');
+function sameCheck(picked, btn) {
+  if (tracking.same && tracking.same.correct) return;
+  const ok = picked === 'ぜんぶ 同じ';
+  record('same', ok, { answer: picked, target: 'ぜんぶ 同じ' });
+  const fb = document.getElementById('same-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#same-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ 底辺も 高さ（2本の 線の あいだ）も 同じだから、面積も 同じ。';
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ 底辺は 同じ。高さは？ 2本の 線の あいだの きょりを 見て。';
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 高さを 見ぬく 目が できてる！';
+  else if (firstCount >= 10) msg.textContent = 'Muito bom! 面積は もう だいじょうぶ。';
+  else if (firstCount >= 7) msg.textContent = 'Bom! 「高さは 底辺と 直角」を 図で たしかめよう。';
+  else msg.textContent = 'スライダーと「切って うつす」で もう1回 見てみよう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_14_menseki',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>
