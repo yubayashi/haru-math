@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 16 — 累乗と 小数の まるめ (Potências)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .fig-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 8px 0; }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+  .slider-row { display: flex; align-items: center; gap: 10px; font-weight: 900; color: #2c3e50; margin: 6px 0; }
+  .slider-row input[type=range] { flex: 1; height: 34px; accent-color: #3498db; }
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 18px; padding: 12px 8px; }
+  .order-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .order-btn {
+    flex: 1; min-width: 80px; font-family: 'Nunito', sans-serif; position: relative;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 8px; font-size: 20px; font-weight: 900; cursor: pointer;
+  }
+  .order-btn.picked { border-color: #3498db; background: #eaf6ff; }
+  .order-btn .badge-n {
+    position: absolute; top: -10px; right: -6px; background: #3498db; color: #fff;
+    width: 24px; height: 24px; border-radius: 12px; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .order-row.correct .order-btn { border-color: #27ae60; background: #eafff0; }
+  .order-row.wrong .order-btn.picked { border-color: #e74c3c; background: #fff5f5; }
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; font-weight: 900; line-height: 1.1;
+  }
+  .frac .num { border-bottom: 2.5px solid #2c3e50; padding: 0 4px 2px; }
+  .frac .den { padding: 2px 4px 0; }
+  sup { font-size: 0.65em; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 16</div>
+    <h1>🧮 累乗と 小数の まるめ</h1>
+    <div class="sub">Potências e arredondamentos — 教科書の 予習（5.º ano）</div>
+  </div>
+
+  <!-- ===== 1. 累乗 ===== -->
+  <div class="card">
+    <div class="card-title">🧊 同じ数を 何回も かける ＝ 累乗</div>
+    <p>5 × 5 × 5 は「5 を 3回 かける」。これを <b>5<sup>3</sup></b> と書いて「5 の 3乗」（cinco <b>elevado a</b> três）と読む。<br>
+    下の 5 が <b>base</b>（もとの数）、右上の 3 が <b>expoente</b>（かける 回数）。</p>
+    <div class="equation">5<sup>3</sup> ＝ 5 × 5 × 5 ＝ 125</div>
+    <p>スライダーで 立方体の 大きさを かえてみて。小さい キューブは いくつ？</p>
+    <div class="fig-host"><svg class="fig-svg" id="cube-svg" viewBox="0 0 320 300" style="max-width:320px"></svg></div>
+    <div class="slider-row">1辺 <input type="range" id="cube-n" min="1" max="6" value="3"></div>
+    <div class="equation" id="cube-eq"></div>
+    <div class="callout-orange">
+      <b>⚠️ よくある まちがい:</b> 3<sup>2</sup> は 3 × 2 ＝ 6 <b>じゃない</b>。3 × 3 ＝ 9。<br>
+      2乗 ＝ <b>quadrado</b>（正方形の マス）、3乗 ＝ <b>cubo</b>（立方体の キューブ）。
+    </div>
+    <div id="p-list"></div>
+  </div>
+
+  <!-- ===== 2. 10 の累乗 ===== -->
+  <div class="card">
+    <div class="card-title">🔟 10 の 累乗 は 0 の 数</div>
+    <p>10<sup>3</sup> ＝ 10 × 10 × 10 ＝ 1000。<b>右上の 数 ＝ 0 の 数</b>。<br>
+    大きい数は 4 000 000 ＝ 4 × 10<sup>6</sup> のように 短く 書ける。</p>
+    <div id="t-list"></div>
+  </div>
+
+  <!-- ===== 3. ×0.1 ===== -->
+  <div class="card">
+    <div class="card-title">⚡ × 0.1 と × 0.01 は あんざんで</div>
+    <div class="tip">
+      <b>💡</b> × 0.1 ＝ ÷ 10（小数点が 左へ 1つ）。× 0.01 ＝ ÷ 100（左へ 2つ）。<br>
+      例: 70 × 0.1 ＝ 70 ÷ 10 ＝ 7
+    </div>
+    <div id="m-list"></div>
+  </div>
+
+  <!-- ===== 4. 大小 ===== -->
+  <div class="card">
+    <div class="card-title">📶 小さい じゅんに ならべよう</div>
+    <p>小さい ものから じゅんに クリック。分数は 小数に なおすと くらべやすい（<span class="frac"><span class="num">6</span><span class="den">10</span></span> ＝ 0.6）。</p>
+    <div id="o-list"></div>
+  </div>
+
+  <!-- ===== 5. 四捨五入 ===== -->
+  <div class="card">
+    <div class="card-title">✂️ 四捨五入（arredondamento）</div>
+    <div class="callout-green">
+      <b>✅ きまり:</b> まるめたい けたの <b>1つ 右</b>を 見る。<br>
+      0〜4 → そのまま（切りすて）／ 5〜9 → 1 ふやす（切り上げ）<br>
+      unidades（一の位）・décimas（0.1の位）・centésimas（0.01の位）
+    </div>
+    <div id="r-list"></div>
+  </div>
+
+  <!-- ===== 6. 概算 ===== -->
+  <div class="card">
+    <div class="card-title">🎯 だいたい いくつ？（概算）</div>
+    <div class="tip">
+      <b>💡</b> 49 ÷ 6.98 は、6.98 を <b>7</b> に まるめて 49 ÷ 7 ＝ <b>7</b>。答えは「≈ 7」（だいたい 7）。
+    </div>
+    <div id="e-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">potência</span> 累乗</span>
+      <span class="vocab-chip"><span class="pt">base</span> もとの数</span>
+      <span class="vocab-chip"><span class="pt">expoente</span> 指数（かける回数）</span>
+      <span class="vocab-chip"><span class="pt">elevado a</span> 〜乗</span>
+      <span class="vocab-chip"><span class="pt">quadrado</span> 2乗</span>
+      <span class="vocab-chip"><span class="pt">cubo</span> 3乗</span>
+      <span class="vocab-chip"><span class="pt">arredondar</span> 四捨五入する</span>
+      <span class="vocab-chip"><span class="pt">valor aproximado</span> だいたいの 数</span>
+      <span class="vocab-chip"><span class="pt">ordem crescente</span> 小さい じゅん</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+function fmtD(x) { return String(+x.toFixed(6)); }
+function parseDec(raw) {
+  let s = raw.trim()
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/[,，．、]/g, '.')
+    .replace(/[\s ]/g, '')
+    .replace(/[^0-9.]/g, '');
+  return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : null;
+}
+
+/* ---- 入力問題（共通） ---- */
+const INPUT_QS = {};
+let qNo = 0;
+function renderInputs(hostId, qs) {
+  qs.forEach(q => { INPUT_QS[q.id] = q; TOTAL_Q++; });
+  document.getElementById(hostId).insertAdjacentHTML('beforeend', qs.map(q =>
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="decimal" autocomplete="off">' +
+    (q.unit ? '<span class="unit">' + q.unit + '</span>' : '') +
+    '<button class="check-btn" onclick="inputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>'
+  ).join(''));
+}
+function inputCheck(id) {
+  const q = INPUT_QS[id];
+  const input = document.getElementById(id);
+  const fb = document.getElementById(id + '-fb');
+  if (!input.value.trim()) return;
+  const got = parseDec(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね。'; return; }
+  const ok = Math.abs(got - q.answer) < 1e-9;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) {
+    input.className = 'correct'; input.disabled = true;
+    fb.className = 'feedback correct';
+    fb.innerHTML = '⭕ 正解！ ' + q.ok;
+  } else {
+    input.className = 'wrong';
+    fb.className = 'feedback wrong';
+    fb.innerHTML = '❌ ' + fmtD(got) + ' じゃない。' + ((q.traps && q.traps[fmtD(got)]) || q.hint);
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1800);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches('.practice-q input')) inputCheck(e.target.id);
+});
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ============ 1. 立方体 ============ */
+const cubeN = document.getElementById('cube-n');
+function cubeRender() {
+  const n = +cubeN.value, s = 118 / n, cx = 160, cy = 152;
+  const c30 = Math.cos(Math.PI / 6), s30 = 0.5;
+  const P = (x, y, z) => (cx + (x - y) * c30 * s) + ',' + (cy + (x + y) * s30 * s - z * s);
+  const face = (pts, fill) => '<polygon points="' + pts.join(' ') + '" fill="' + fill + '" stroke="#2c3e50" stroke-width="2.5"/>';
+  let g = '';
+  g += face([P(0, 0, n), P(n, 0, n), P(n, n, n), P(0, n, n)], '#f7dc6f');
+  g += face([P(n, 0, 0), P(n, n, 0), P(n, n, n), P(n, 0, n)], '#5dade2');
+  g += face([P(0, n, 0), P(n, n, 0), P(n, n, n), P(0, n, n)], '#ec7063');
+  const L = (a, b) => '<line x1="' + a.split(',')[0] + '" y1="' + a.split(',')[1] + '" x2="' + b.split(',')[0] + '" y2="' + b.split(',')[1] + '" stroke="#2c3e50" stroke-width="1.5"/>';
+  for (let i = 1; i < n; i++) {
+    g += L(P(i, 0, n), P(i, n, n)) + L(P(0, i, n), P(n, i, n));
+    g += L(P(n, i, 0), P(n, i, n)) + L(P(n, 0, i), P(n, n, i));
+    g += L(P(i, n, 0), P(i, n, n)) + L(P(0, n, i), P(n, n, i));
+  }
+  document.getElementById('cube-svg').innerHTML = g;
+  document.getElementById('cube-eq').innerHTML = n + ' × ' + n + ' × ' + n + ' ＝ ' + n + '<sup>3</sup> ＝ ' + (n * n * n) + 'こ';
+}
+cubeN.addEventListener('input', cubeRender);
+cubeRender();
+
+renderInputs('p-list', [
+  { id: 'pw_32', text: '3<sup>2</sup> ＝ ?', answer: 9, ok: '3 × 3 ＝ 9。', hint: '3 を 2回 かける。', traps: { '6': '3 × 2 に なってる。3 × 3 だよ。' } },
+  { id: 'pw_25', text: '2<sup>5</sup> ＝ ?', answer: 32, ok: '2 × 2 × 2 × 2 × 2 ＝ 32。', hint: '2 を 5回 かける。', traps: { '10': '2 × 5 に なってる。2 を 5回 かけて。' } },
+  { id: 'pw_43', text: '1辺 4こ の 立方体。小さい キューブは いくつ？（4<sup>3</sup>）', answer: 64, ok: '4 × 4 × 4 ＝ 64こ。', hint: 'スライダーを 4 に して、4 × 4 × 4。' },
+  { id: 'pw_exp', text: '6 × 6 × 6 × 6 ＝ 6<sup>□</sup>。□ は？', answer: 4, ok: '6 を 4回 かけたから 6<sup>4</sup>。', hint: '6 は 何回 かけてある？' },
+]);
+renderChoice('p-list', { id: 'pw_cube', text: 'つぎの うち、ある数の 3乗（número cúbico）は どれ？', options: ['12', '36', '64', '100'], answer: 2,
+  ok: '64 ＝ 4 × 4 × 4。36 と 100 は 2乗（6 × 6、10 × 10）。', hint: '1 × 1 × 1、2 × 2 × 2、3 × 3 × 3、4 × 4 × 4 … を 計算してみて。' });
+
+/* ============ 2. 10 の累乗 ============ */
+renderInputs('t-list', [
+  { id: 'ten_4', text: '10<sup>4</sup> ＝ ?', answer: 10000, ok: '0 が 4つ で 10000。', hint: '1 の あとに 0 を 4つ。' },
+  { id: 'ten_3x5', text: '3 × 10<sup>5</sup> ＝ ?', answer: 300000, ok: '3 の あとに 0 が 5つ で 300 000。', hint: '10<sup>5</sup> ＝ 100 000。それの 3つ分。' },
+  { id: 'ten_exp', text: '7 000 000 ＝ 7 × 10<sup>□</sup>。□ は？', answer: 6, ok: '0 が 6つ だから 10<sup>6</sup>（milhão）。', hint: '0 を 数えて。' },
+  { id: 'ten_mix', text: '25 × 10<sup>2</sup> ＝ ?', answer: 2500, ok: '25 × 100 ＝ 2500。', hint: '10<sup>2</sup> ＝ 100。' },
+]);
+
+/* ============ 3. ×0.1 ============ */
+renderInputs('m-list', [
+  { id: 'mm_80', text: '80 × 0.1 ＝ ?', answer: 8, ok: '80 ÷ 10 ＝ 8。', hint: '× 0.1 は ÷ 10。' },
+  { id: 'mm_45', text: '45 × 0.1 ＝ ?', answer: 4.5, ok: '45 ÷ 10 ＝ 4.5。', hint: '小数点を 左へ 1つ。' },
+  { id: 'mm_300', text: '300 × 0.01 ＝ ?', answer: 3, ok: '300 ÷ 100 ＝ 3。', hint: '× 0.01 は ÷ 100。' },
+  { id: 'mm_87', text: '87 × 0.01 ＝ ?', answer: 0.87, ok: '87 ÷ 100 ＝ 0.87。', hint: '小数点を 左へ 2つ。' },
+]);
+
+/* ============ 4. ならべる ============ */
+const F = (a, b) => '<span class="frac"><span class="num">' + a + '</span><span class="den">' + b + '</span></span>';
+const O_QS = [
+  { id: 'ord_1', items: [['0.7', 0.7], [F(6, 10), 0.6], ['0.65', 0.65]], ok: '0.6 → 0.65 → 0.7。' },
+  { id: 'ord_2', items: [[F(3, 10), 0.3], ['0.08', 0.08], ['0.25', 0.25], [F(27, 100), 0.27]], ok: '0.08 → 0.25 → 0.27 → 0.3。' },
+  { id: 'ord_3', items: [['1.5', 1.5], ['1.05', 1.05], [F(14, 10), 1.4], ['1.45', 1.45]], ok: '1.05 → 1.4 → 1.45 → 1.5。' },
+];
+const orderState = {};
+O_QS.forEach(q => {
+  TOTAL_Q++;
+  orderState[q.id] = [];
+  document.getElementById('o-list').insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="order-row" id="' + q.id + '-row">' +
+    q.items.map((it, i) => '<button class="order-btn" id="' + q.id + '-b' + i + '" onclick="orderPick(\'' + q.id + '\',' + i + ')">' + it[0] + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+});
+function orderPick(id, i) {
+  const q = O_QS.find(x => x.id === id), seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(i) || seq.length === q.items.length) return;
+  seq.push(i);
+  const b = document.getElementById(id + '-b' + i);
+  b.classList.add('picked'); b.insertAdjacentHTML('beforeend', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const vals = seq.map(k => q.items[k][1]);
+  const ok = vals.every((v, k) => k === 0 || vals[k - 1] < v);
+  record(id, ok, { answer: vals.join(' < '), target: q.items.map(it => it[1]).sort((a, b) => a - b).join(' < ') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ちがう。ぜんぶ 小数に して、けたを そろえて くらべて（0.7 ＝ 0.70）。';
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((it, k) => { const x = document.getElementById(id + '-b' + k); x.className = 'order-btn'; x.innerHTML = it[0]; });
+      fb.textContent = '';
+    }, 1800);
+  }
+}
+
+/* ============ 5. 四捨五入 ============ */
+renderInputs('r-list', [
+  { id: 'rd_u', text: '4.276 を unidades（一の位）に まるめると？', answer: 4, ok: '1つ右の 2 は 0〜4 → 4。', hint: '一の位の 1つ右（0.1の位）は 2。' },
+  { id: 'rd_d', text: '4.276 を décimas（0.1の位）に まるめると？', answer: 4.3, ok: '1つ右の 7 は 5〜9 → 4.3。', hint: '0.1の位の 1つ右（0.01の位）は 7。', traps: { '4.2': '7 は 5〜9 だから 切り上げ。' } },
+  { id: 'rd_c', text: '4.276 を centésimas（0.01の位）に まるめると？', answer: 4.28, ok: '1つ右の 6 は 5〜9 → 4.28。', hint: '0.01の位の 1つ右は 6。' },
+  { id: 'rd_carry', text: '9.96 を décimas（0.1の位）に まるめると？', answer: 10, ok: '9.9 が 1 ふえて 10.0（＝ 10）。くり上がり！', hint: '0.1の位の 9 が 1 ふえると？', traps: { '9.1': '9 が 1 ふえたら 10。くり上がって 10.0。', '9.9': '1つ右の 6 は 5〜9 だから 切り上げ。' } },
+]);
+
+/* ============ 6. 概算 ============ */
+renderInputs('e-list', [
+  { id: 'es_div', text: '42 ÷ 6.97 ≈ ?（6.97 を まるめて）', answer: 6, ok: '42 ÷ 7 ＝ 6。', hint: '6.97 は だいたい 7。' },
+  { id: 'es_mul', text: '7.9 × 12 ≈ ?（7.9 を まるめて）', answer: 96, ok: '8 × 12 ＝ 96。（本当は 94.8）', hint: '7.9 は だいたい 8。' },
+  { id: 'es_shop', text: '🛒 1さつ 2,98€ の ノートを 4さつ。だいたい いくら？', answer: 12, unit: '€', ok: '3 × 4 ＝ 12€ くらい。（本当は 11,92€）', hint: '2,98€ は だいたい 3€。' },
+]);
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 授業で 出ても もう だいじょうぶ！';
+  else if (firstCount >= TOTAL_Q - 5) msg.textContent = 'Muito bom! 累乗も まるめも ほぼ 完成。';
+  else if (firstCount >= TOTAL_Q / 2) msg.innerHTML = 'Bom! 3<sup>2</sup> ＝ 3 × 3 と「1つ右を 見る」を もう1回。';
+  else msg.textContent = '立方体の スライダーから もう1回 やってみよう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_16_ruijou',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>

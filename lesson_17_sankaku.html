@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 17 — 直線と 三角形 (Retas e triângulos)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .fig-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 8px 0; }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+  .slider-row { display: flex; align-items: center; gap: 10px; font-weight: 900; color: #2c3e50; margin: 6px 0; }
+  .slider-row input[type=range] { flex: 1; height: 34px; accent-color: #3498db; }
+  .slider-row .val { width: 56px; text-align: right; font-size: 17px; }
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 15px; padding: 12px 6px; }
+  .rel-label { text-align: center; font-size: 18px; font-weight: 900; color: #2c3e50; padding: 6px 0 10px; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 17</div>
+    <h1>📏 直線と 三角形</h1>
+    <div class="sub">Retas e triângulos — 教科書の 予習（5.º ano）</div>
+  </div>
+
+  <!-- ===== 1. 直線・半直線・線分 ===== -->
+  <div class="card">
+    <div class="card-title">➖ 直線・半直線・線分</div>
+    <div class="callout-green">
+      <b>✅ 3つの ちがい:</b><br>
+      <b>直線</b>（reta）＝ 両方に ずっと のびる。はじも おわりも ない<br>
+      <b>半直線</b>（semirreta）＝ 1点から はじまって、片方に ずっと のびる<br>
+      <b>線分</b>（segmento de reta）＝ 2つの 点の あいだ だけ。[AB] と 書く
+    </div>
+    <div id="l-list"></div>
+  </div>
+
+  <!-- ===== 2. 2本の直線 ===== -->
+  <div class="card">
+    <div class="card-title">✖️ 2本の 直線の 関係</div>
+    <p>スライダーで 下の 線を まわしてみて。</p>
+    <div class="fig-host"><svg class="fig-svg" id="rel-svg" viewBox="0 0 420 240" style="max-width:520px"></svg></div>
+    <div class="slider-row">角度 <input type="range" id="rel-a" min="0" max="179" value="35"><span class="val" id="rel-v">35°</span></div>
+    <div class="rel-label" id="rel-label"></div>
+    <div class="tip">
+      <b>💡</b> 交わらない → <b>平行</b>（paralelas）／ 直角に 交わる → <b>垂直</b>（perpendiculares）／ ななめに 交わる → oblíquas<br>
+      交わる 2本は まとめて <b>concorrentes</b> と いう。
+    </div>
+    <div id="r-list"></div>
+  </div>
+
+  <!-- ===== 3. 三角形の分類 ===== -->
+  <div class="card">
+    <div class="card-title">🔺 三角形の なかま分け</div>
+    <div class="callout-green">
+      <b>辺で 分ける:</b> 3辺 同じ → <b>正三角形</b>（equilátero）／ 2辺 同じ → <b>二等辺三角形</b>（isósceles）／ ぜんぶ ちがう → escaleno<br>
+      <b>角で 分ける:</b> ぜんぶ 90°より 小さい → <b>鋭角三角形</b>（acutângulo）／ 90° が ある → <b>直角三角形</b>（retângulo）／ 90°より 大きい角が ある → <b>鈍角三角形</b>（obtusângulo）
+    </div>
+    <div id="c-list"></div>
+    <div class="callout-orange">
+      <b>🔑 三角形の 3つの 角を たすと いつも 180°。</b>
+    </div>
+    <div id="s-list"></div>
+  </div>
+
+  <!-- ===== 4. 三角形ができる？ ===== -->
+  <div class="card">
+    <div class="card-title">🧩 その 3本で 三角形が できる？</div>
+    <p>スライダーで 3本の 長さを かえてみて。</p>
+    <div class="fig-host"><svg class="fig-svg" id="ti-svg" viewBox="0 0 420 240" style="max-width:520px"></svg></div>
+    <div class="slider-row">a <input type="range" id="ti-a" min="1" max="12" value="5"><span class="val" id="ti-av"></span></div>
+    <div class="slider-row">b <input type="range" id="ti-b" min="1" max="12" value="4"><span class="val" id="ti-bv"></span></div>
+    <div class="slider-row">c <input type="range" id="ti-c" min="1" max="12" value="10"><span class="val" id="ti-cv"></span></div>
+    <div class="rel-label" id="ti-label"></div>
+    <div class="callout-green">
+      <b>✅ きまり（desigualdade triangular）:</b> いちばん 長い 辺 ＜ ほかの 2本を たした 長さ。<br>
+      ちょうど 同じ だと ぺちゃんこに なって 三角形に ならない。
+    </div>
+    <div id="t-list"></div>
+  </div>
+
+  <!-- ===== 5. 合同 ===== -->
+  <div class="card">
+    <div class="card-title">👯 同じ 三角形（合同）と 言える？</div>
+    <div class="callout-green">
+      <b>✅ これが そろえば ぴったり 同じ（iguais）:</b><br>
+      <b>LLL</b> … 3辺が 同じ<br>
+      <b>LAL</b> … 2辺と、その <b>あいだの</b> 角が 同じ<br>
+      <b>ALA</b> … 1辺と、その <b>両はしの</b> 角が 同じ<br>
+      （L ＝ lado 辺、A ＝ ângulo 角）
+    </div>
+    <div id="g-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">reta</span> 直線</span>
+      <span class="vocab-chip"><span class="pt">semirreta</span> 半直線</span>
+      <span class="vocab-chip"><span class="pt">segmento de reta</span> 線分</span>
+      <span class="vocab-chip"><span class="pt">paralelas</span> 平行</span>
+      <span class="vocab-chip"><span class="pt">perpendiculares</span> 垂直</span>
+      <span class="vocab-chip"><span class="pt">equilátero</span> 正三角形</span>
+      <span class="vocab-chip"><span class="pt">isósceles</span> 二等辺三角形</span>
+      <span class="vocab-chip"><span class="pt">escaleno</span> 不等辺三角形</span>
+      <span class="vocab-chip"><span class="pt">triângulos iguais</span> 合同な 三角形</span>
+      <span class="vocab-chip"><span class="pt">esquadro</span> 三角定規</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+let qNo = 0;
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    (q.fig ? '<div class="fig-host">' + q.fig + '</div>' : '') +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- 入力問題（角度） ---- */
+const INPUT_QS = {};
+function renderInput(hostId, q) {
+  INPUT_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="numeric" autocomplete="off"><span class="unit">°</span>' +
+    '<button class="check-btn" onclick="inputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function inputCheck(id) {
+  const q = INPUT_QS[id], input = document.getElementById(id), fb = document.getElementById(id + '-fb');
+  const s = input.value.trim().replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/[^0-9]/g, '');
+  if (!s) return;
+  const got = parseInt(s, 10), ok = got === q.answer;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) { input.className = 'correct'; input.disabled = true; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    input.className = 'wrong'; fb.className = 'feedback wrong'; fb.textContent = '❌ ' + got + '° じゃない。' + q.hint;
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches('.practice-q input')) inputCheck(e.target.id);
+});
+
+/* ============ 1. 直線・半直線・線分 ============ */
+function lineFig(kind) {
+  let s = '<svg class="fig-svg" style="max-width:420px" viewBox="0 0 420 70">';
+  const arrowR = '<polygon points="398,35 384,27 384,43" fill="#2c3e50"/>';
+  const arrowL = '<polygon points="22,35 36,27 36,43" fill="#2c3e50"/>';
+  const dot = (x, n) => '<circle cx="' + x + '" cy="35" r="6" fill="#e67e22"/><text x="' + x + '" y="62" text-anchor="middle" font-size="15" font-weight="900" fill="#e67e22">' + n + '</text>';
+  if (kind === 'reta') s += '<line x1="30" y1="35" x2="390" y2="35" stroke="#2c3e50" stroke-width="3"/>' + arrowL + arrowR + dot(150, 'A') + dot(270, 'B');
+  if (kind === 'semi') s += '<line x1="120" y1="35" x2="390" y2="35" stroke="#2c3e50" stroke-width="3"/>' + arrowR + dot(120, 'C') + dot(260, 'D');
+  if (kind === 'seg') s += '<line x1="120" y1="35" x2="300" y2="35" stroke="#2c3e50" stroke-width="3"/>' + dot(120, 'E') + dot(300, 'F');
+  return s + '</svg>';
+}
+const L_OPTS = ['直線', '半直線', '線分'];
+renderChoice('l-list', { id: 'line_semi', text: 'これは どれ？', fig: lineFig('semi'), options: L_OPTS, answer: 1,
+  ok: 'C から はじまって 右へ ずっと。semirreta。', hint: 'はじまりの 点は ある？ おわりは ある？' });
+renderChoice('l-list', { id: 'line_seg', text: 'これは どれ？', fig: lineFig('seg'), options: L_OPTS, answer: 2,
+  ok: 'E と F の あいだ だけ。[EF] と 書く。', hint: '両はしが 点で 止まっている。' });
+renderChoice('l-list', { id: 'line_reta', text: 'これは どれ？', fig: lineFig('reta'), options: L_OPTS, answer: 0,
+  ok: '両方に 矢印 ＝ ずっと のびる。A と B を 通る 直線 AB。', hint: '矢印は いくつ ある？' });
+
+/* ============ 2. 2本の直線 ============ */
+const relA = document.getElementById('rel-a');
+function relRender() {
+  let a = +relA.value;
+  if (Math.abs(a - 90) <= 2) a = 90;
+  if (a <= 2 || a >= 178) a = 0;
+  document.getElementById('rel-v').textContent = a + '°';
+  const th = a * Math.PI / 180, px = 210, py = 165, L = 260;
+  let s = '<line x1="10" y1="75" x2="410" y2="75" stroke="#2471c8" stroke-width="4"/>';
+  s += '<text x="16" y="66" font-size="15" font-weight="900" fill="#2471c8">r</text>';
+  const x1 = px - L * Math.cos(th), y1 = py + L * Math.sin(th), x2 = px + L * Math.cos(th), y2 = py - L * Math.sin(th);
+  s += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="#d35400" stroke-width="4"/>';
+  let label;
+  if (a === 0) label = '交わらない → 平行（paralelas）';
+  else {
+    const ix = px + (py - 75) * Math.cos(th) / Math.sin(th);
+    if (ix > -200 && ix < 620) s += '<circle cx="' + ix + '" cy="75" r="7" fill="#c0392b"/>';
+    if (a === 90) {
+      s += '<polyline points="' + (ix + 14) + ',75 ' + (ix + 14) + ',89 ' + ix + ',89" fill="none" stroke="#c0392b" stroke-width="2"/>';
+      label = '直角に 交わる → 垂直（perpendiculares）';
+    } else label = 'ななめに 交わる → oblíquas' + ((ix < 0 || ix > 420) ? '（画面の 外で 交わる）' : '');
+  }
+  document.getElementById('rel-svg').innerHTML = s;
+  document.getElementById('rel-label').textContent = label;
+}
+relA.addEventListener('input', relRender);
+relRender();
+
+function pairFig(kind) {
+  let s = '<svg class="fig-svg" style="max-width:300px" viewBox="0 0 300 140">';
+  if (kind === 'par') s += '<line x1="20" y1="110" x2="260" y2="30" stroke="#2471c8" stroke-width="4"/><line x1="50" y1="130" x2="290" y2="50" stroke="#d35400" stroke-width="4"/>';
+  if (kind === 'perp') s += '<line x1="40" y1="20" x2="250" y2="125" stroke="#2471c8" stroke-width="4"/><line x1="90" y1="130" x2="175" y2="-40" stroke="#d35400" stroke-width="4"/>';
+  if (kind === 'obl') s += '<line x1="20" y1="70" x2="280" y2="70" stroke="#2471c8" stroke-width="4"/><line x1="60" y1="130" x2="240" y2="10" stroke="#d35400" stroke-width="4"/>';
+  return s + '</svg>';
+}
+const R_OPTS = ['平行', '垂直', 'ななめ（oblíquas）'];
+renderChoice('r-list', { id: 'rel_perp', text: 'この 2本は？（三角定規を 当てて みたつもりで）', fig: pairFig('perp'), options: R_OPTS, answer: 1,
+  ok: '交わった ところが 直角。かたむいていても 垂直。', hint: '交わる 角は 90°？' });
+renderChoice('r-list', { id: 'rel_par', text: 'この 2本は？', fig: pairFig('par'), options: R_OPTS, answer: 0,
+  ok: 'ななめに 置いても、間の 長さが ずっと 同じなら 平行。', hint: 'のばしたら 交わる？' });
+
+/* ============ 3. 三角形の分類 ============ */
+const SIDE_OPTS = ['正三角形', '二等辺三角形', '不等辺（escaleno）'];
+const ANG_OPTS = ['鋭角三角形', '直角三角形', '鈍角三角形'];
+renderChoice('c-list', { id: 'cls_447', text: '辺が 7cm・4cm・7cm の 三角形は？', options: SIDE_OPTS, answer: 1,
+  ok: '7cm が 2つ → 二等辺三角形（isósceles）。', hint: '同じ 長さの 辺は いくつ？' });
+renderChoice('c-list', { id: 'cls_356', text: '辺が 3cm・5cm・6cm の 三角形は？', options: SIDE_OPTS, answer: 2,
+  ok: 'ぜんぶ ちがう → escaleno。', hint: '同じ 長さの 辺は ある？' });
+renderChoice('c-list', { id: 'cls_ang_90', text: '角が 30°・60°・90° の 三角形は？', options: ANG_OPTS, answer: 1,
+  ok: '90° が ある → 直角三角形（retângulo）。', hint: '90° の 角は ある？' });
+renderChoice('c-list', { id: 'cls_ang_100', text: '角が 40°・40°・100° の 三角形は？', options: ANG_OPTS, answer: 2,
+  ok: '100° は 90°より 大きい → 鈍角三角形。40° が 2つ だから 二等辺三角形でも ある。', hint: '90°より 大きい 角は ある？' });
+renderInput('s-list', { id: 'sum_30_80', text: '2つの 角が 30° と 80°。のこりの 角は？', answer: 70,
+  ok: '180 − 30 − 80 ＝ 70°。', hint: '3つ たすと 180°。' });
+renderInput('s-list', { id: 'sum_eq', text: '正三角形の 1つの 角は？', answer: 60,
+  ok: '3つ とも 同じ。180 ÷ 3 ＝ 60°。', hint: '3つの 角は ぜんぶ 同じ 大きさ。' });
+
+/* ============ 4. 三角形ができる？ ============ */
+const tiA = document.getElementById('ti-a'), tiB = document.getElementById('ti-b'), tiC = document.getElementById('ti-c');
+function tiRender() {
+  const vals = [+tiA.value, +tiB.value, +tiC.value];
+  ['a', 'b', 'c'].forEach((k, i) => document.getElementById('ti-' + k + 'v').textContent = vals[i] + 'cm');
+  const sorted = vals.map((v, i) => [v, 'abc'[i]]).sort((x, y) => y[0] - x[0]);
+  const [base, p, q] = sorted, K = 400 / Math.max(12, base[0] + 1), x0 = (420 - base[0] * K) / 2, y0 = 200;
+  const col = { a: '#2471c8', b: '#27ae60', c: '#d35400' };
+  let s = '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + (x0 + base[0] * K) + '" y2="' + y0 + '" stroke="' + col[base[1]] + '" stroke-width="6" stroke-linecap="round"/>';
+  let label;
+  if (p[0] + q[0] > base[0]) {
+    const d = base[0], x = (p[0] * p[0] - q[0] * q[0] + d * d) / (2 * d), h = Math.sqrt(Math.max(0, p[0] * p[0] - x * x));
+    const tx = x0 + x * K, ty = y0 - h * K;
+    s += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + tx + '" y2="' + ty + '" stroke="' + col[p[1]] + '" stroke-width="6" stroke-linecap="round"/>';
+    s += '<line x1="' + (x0 + d * K) + '" y1="' + y0 + '" x2="' + tx + '" y2="' + ty + '" stroke="' + col[q[1]] + '" stroke-width="6" stroke-linecap="round"/>';
+    label = '⭕ できる！ ' + base[0] + ' ＜ ' + p[0] + ' ＋ ' + q[0] + ' ＝ ' + (p[0] + q[0]);
+  } else {
+    const ang = p[0] + q[0] === base[0] ? 0 : 0.5;
+    s += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + (x0 + p[0] * K * Math.cos(ang)) + '" y2="' + (y0 - p[0] * K * Math.sin(ang)) + '" stroke="' + col[p[1]] + '" stroke-width="6" stroke-linecap="round"/>';
+    s += '<line x1="' + (x0 + base[0] * K) + '" y1="' + y0 + '" x2="' + (x0 + base[0] * K - q[0] * K * Math.cos(ang)) + '" y2="' + (y0 - q[0] * K * Math.sin(ang)) + '" stroke="' + col[q[1]] + '" stroke-width="6" stroke-linecap="round"/>';
+    label = p[0] + q[0] === base[0]
+      ? '❌ ぺちゃんこ。' + p[0] + ' ＋ ' + q[0] + ' ＝ ' + base[0] + ' で 線に なる'
+      : '❌ とどかない。' + p[0] + ' ＋ ' + q[0] + ' ＝ ' + (p[0] + q[0]) + ' は ' + base[0] + ' より 短い';
+  }
+  document.getElementById('ti-svg').innerHTML = s;
+  document.getElementById('ti-label').textContent = label;
+}
+[tiA, tiB, tiC].forEach(x => x.addEventListener('input', tiRender));
+tiRender();
+
+const YN = ['できる', 'できない'];
+renderChoice('t-list', { id: 'ti_449', text: '4cm・4cm・9cm', options: YN, answer: 1,
+  ok: '4 ＋ 4 ＝ 8 は 9 より 短い。とどかない。', hint: 'いちばん 長い 9 と、ほかの 2本の 合計を くらべて。' });
+renderChoice('t-list', { id: 'ti_5610', text: '5cm・6cm・10cm', options: YN, answer: 0,
+  ok: '5 ＋ 6 ＝ 11 は 10 より 長い。', hint: 'いちばん 長い 10 と、5 ＋ 6 を くらべて。' });
+renderChoice('t-list', { id: 'ti_347', text: '3cm・4cm・7cm', options: YN, answer: 1,
+  ok: '3 ＋ 4 ＝ 7 で ちょうど 同じ → ぺちゃんこ。', hint: 'スライダーで 3・4・7 に してみて。' });
+renderChoice('t-list', { id: 'ti_mm', text: '60mm・8cm・10cm（単位に 注意）', options: YN, answer: 0,
+  ok: '60mm ＝ 6cm。6 ＋ 8 ＝ 14 は 10 より 長い。', hint: 'まず mm を cm に。10mm ＝ 1cm。' });
+
+/* ============ 5. 合同 ============ */
+const G_OPTS = ['LLL', 'LAL', 'ALA', '同じとは 言えない'];
+renderChoice('g-list', { id: 'cg_lll', text: '2つの 三角形で、3辺が 5cm・6cm・4cm で 同じ。', options: G_OPTS, answer: 0,
+  ok: '3辺が 同じ → LLL。', hint: '同じなのは 辺？ 角？ いくつ？' });
+renderChoice('g-list', { id: 'cg_lal', text: '2辺が 4cm と 6cm、その あいだの 角が 50° で 同じ。', options: G_OPTS, answer: 1,
+  ok: '辺・角・辺 の じゅん → LAL。', hint: '角は 2辺の「あいだ」に ある。' });
+renderChoice('g-list', { id: 'cg_ala', text: '1辺が 7cm、その 両はしの 角が 40° と 70° で 同じ。', options: G_OPTS, answer: 2,
+  ok: '角・辺・角 → ALA。', hint: '角は 辺の「両はし」に ある。' });
+renderChoice('g-list', { id: 'cg_aaa', text: '3つの 角が 50°・60°・70° で 同じ（辺の 長さは わからない）。', options: G_OPTS, answer: 3,
+  ok: '角だけ 同じだと、形は 同じでも 大きさが ちがう ことが ある（コピーの 拡大と 同じ）。', hint: '同じ 形で、大きさだけ ちがう 三角形は 作れない？' });
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 授業で 出ても もう だいじょうぶ！';
+  else if (firstCount >= TOTAL_Q - 4) msg.textContent = 'Muito bom! 直線と 三角形は ほぼ 完成。';
+  else if (firstCount >= TOTAL_Q / 2) msg.textContent = 'Bom! スライダーで もう1回 たしかめよう。';
+  else msg.textContent = '上の きまりを 読みながら もう1回 やってみよう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: 'lesson_17_sankaku',
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>
