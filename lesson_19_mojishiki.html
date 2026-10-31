@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 19 — きまりと 文字の式 (Sequências)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 17px; padding: 12px 8px; }
+  .fig-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 8px 0; }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+  .slider-row { display: flex; align-items: center; gap: 10px; font-weight: 900; color: #2c3e50; margin: 6px 0; }
+  .slider-row input[type=range] { flex: 1; height: 34px; accent-color: #3498db; }
+  .slider-row .val { width: 50px; text-align: right; font-size: 18px; }
+  .seq { font-size: 24px; font-weight: 900; letter-spacing: 2px; text-align: center; color: #2c3e50; margin: 6px 0; }
+  .x { color: #8e44ad; font-style: italic; font-weight: 900; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">LIÇÃO 19</div>
+    <h1>🧩 きまりを 見つけて 文字で 書く</h1>
+    <div class="sub">Sequências e expressões algébricas — 教科書の 少し先（5.º ano）／日本の 小6〜中1</div>
+  </div>
+
+  <!-- ===== 1. マッチ棒 ===== -->
+  <div class="card">
+    <div class="card-title">🔥 マッチぼうで 正方形を ならべる</div>
+    <p>スライダーで 正方形の 数を かえて、マッチぼうの 本数が どう ふえるか 見てみよう。</p>
+    <div class="fig-host"><svg class="fig-svg" id="mt-svg" viewBox="0 0 520 130"></svg></div>
+    <div class="slider-row">正方形 <input type="range" id="mt-n" min="1" max="8" value="3"><span class="val" id="mt-v">3こ</span></div>
+    <div class="equation" id="mt-eq"></div>
+    <div class="tip">
+      <b>💡 見方:</b> さいしょの 1本（左はし）＋ 正方形 1こ ごとに <b>3本</b> ふえる。<br>
+      だから 正方形が □こ なら、本数は <b>□ × 3 ＋ 1</b>。
+    </div>
+    <div id="a-list"></div>
+  </div>
+
+  <!-- ===== 2. 数のならび ===== -->
+  <div class="card">
+    <div class="card-title">🔢 数の ならびの きまり</div>
+    <p>つぎに くる 数は？ たし算？ かけ算？ 何かの 2乗？</p>
+    <div id="b-list"></div>
+  </div>
+
+  <!-- ===== 3. 文字の式 ===== -->
+  <div class="card">
+    <div class="card-title">✏️ わからない 数を 文字で 書く</div>
+    <p>まだ 決まっていない 数や、いろいろ かわる 数は、<span class="x">x</span> や <span class="x">a</span> などの <b>文字</b>で 書ける。</p>
+    <div class="equation">1さつ <span class="x">x</span> 円の ノートを 3さつ → <span class="x">3 × x</span> 円</div>
+    <div class="callout-green">
+      <b>✅ 文字に 数を 入れると 答えが 出る:</b> <span class="x">x</span> ＝ 120 なら 3 × 120 ＝ 360円。<br>
+      ポルトガルでは「expressão algébrica」。<span class="x">3 × x</span> を <span class="x">3x</span> と 書くことも ある（中学で 習う）。
+    </div>
+    <div id="c-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">sequência</span> ならび</span>
+      <span class="vocab-chip"><span class="pt">termo</span> ならびの 1つ1つの 数</span>
+      <span class="vocab-chip"><span class="pt">lei de formação</span> きまり</span>
+      <span class="vocab-chip"><span class="pt">expressão algébrica</span> 文字を 使った 式</span>
+      <span class="vocab-chip"><span class="pt">valor</span> 式の 値（答え）</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'lesson_19_mojishiki';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+/* ---- 数を 入れる問題（共通） ---- */
+const INPUT_QS = {};
+function parseDec(raw) {
+  let s = raw.trim()
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/[,，．、]/g, '.')
+    .replace(/[^0-9.]/g, '');
+  return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : null;
+}
+function renderInput(hostId, q) {
+  INPUT_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="decimal" autocomplete="off">' +
+    (q.unit ? '<span class="unit">' + q.unit + '</span>' : '') +
+    '<button class="check-btn" onclick="inputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function inputCheck(id) {
+  const q = INPUT_QS[id], input = document.getElementById(id), fb = document.getElementById(id + '-fb');
+  if (!input.value.trim()) return;
+  const got = parseDec(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね。'; return; }
+  const ok = Math.abs(got - q.answer) < 1e-9;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) { input.className = 'correct'; input.disabled = true; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    input.className = 'wrong'; fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + got + ' じゃない。' + ((q.traps && q.traps[String(got)]) || q.hint);
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches('.practice-q input') && INPUT_QS[e.target.id]) inputCheck(e.target.id);
+});
+
+
+/* ============ 1. マッチ棒 ============ */
+const mtN = document.getElementById('mt-n');
+function mtRender() {
+  const n = +mtN.value, S = Math.min(56, 480 / n), x0 = (520 - n * S) / 2, y0 = 20;
+  document.getElementById('mt-v').textContent = n + 'こ';
+  const stick = (x1, y1, x2, y2, first) => '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (first ? '#e67e22' : '#a0522d') + '" stroke-width="6" stroke-linecap="round"/>';
+  let s = stick(x0, y0, x0, y0 + S, true);
+  for (let i = 0; i < n; i++) {
+    const x = x0 + i * S;
+    s += stick(x + 4, y0, x + S - 4, y0) + stick(x + 4, y0 + S, x + S - 4, y0 + S) + stick(x + S, y0, x + S, y0 + S);
+  }
+  s += '<text x="' + x0 + '" y="' + (y0 + S + 26) + '" font-size="13" font-weight="800" fill="#e67e22">さいしょの 1本</text>';
+  document.getElementById('mt-svg').innerHTML = s;
+  document.getElementById('mt-eq').textContent = n + ' × 3 ＋ 1 ＝ ' + (n * 3 + 1) + '本';
+}
+mtN.addEventListener('input', mtRender);
+mtRender();
+
+renderInput('a-list', { id: 'mt_4', text: '正方形 4こ には、マッチぼう 何本？', answer: 13, unit: '本',
+  ok: '4 × 3 ＋ 1 ＝ 13本。', hint: 'スライダーを 4に して 数えて。', traps: { '16': '4 × 4 に なってる。となりと 1本を 共有しているよ。' } });
+renderInput('a-list', { id: 'mt_10', text: '正方形 10こ なら？（スライダーは 8まで。きまりで 考えよう）', answer: 31, unit: '本',
+  ok: '10 × 3 ＋ 1 ＝ 31本。図を かかなくても わかる ＝ きまりの 力。', hint: '□ × 3 ＋ 1 の □ に 10。' });
+renderInput('a-list', { id: 'mt_rev', text: 'マッチぼうを 25本 ぜんぶ 使った。正方形は 何こ？', answer: 8, unit: 'こ',
+  ok: '□ × 3 ＋ 1 ＝ 25 → □ × 3 ＝ 24 → □ ＝ 8こ。', hint: 'さいしょの 1本を ひくと 24本。それが 3本ずつ。' });
+
+/* ============ 2. 数のならび ============ */
+renderInput('b-list', { id: 'sq_add4', text: '<div class="seq">3, 7, 11, 15, ？</div>', answer: 19,
+  ok: '4ずつ ふえる。15 ＋ 4 ＝ 19。', hint: 'となりどうしの ちがいは？' });
+renderInput('b-list', { id: 'sq_10th', text: '<div class="seq">3, 7, 11, 15, …</div>この ならびの <b>10番目</b>の 数は？', answer: 39,
+  ok: '1番目が 3、そこから 4ずつ 9回 ふえる → 3 ＋ 4 × 9 ＝ 39。（4 × 10 − 1 でも 出る）', hint: '1番目から 10番目までに、4は 何回 たされる？', traps: { '43': '4 × 10 ＋ 3 に なってる。たすのは 9回だよ。' } });
+renderInput('b-list', { id: 'sq_x2', text: '<div class="seq">2, 4, 8, 16, ？</div>', answer: 32,
+  ok: '2倍ずつ。2の 5乗 ＝ 32。累乗の ならび！', hint: 'たし算では ない。何倍？' });
+renderInput('b-list', { id: 'sq_sq', text: '<div class="seq">1, 4, 9, 16, ？</div>', answer: 25,
+  ok: '1×1, 2×2, 3×3, 4×4, 5×5 ＝ 25。2乗の ならび！', hint: 'ちがいは 3, 5, 7… と ふえている。それとも 何かの 2乗？' });
+
+/* ============ 3. 文字の式 ============ */
+renderChoice('c-list', { id: 'ex_note', text: '1さつ <span class="x">x</span> 円の ノートを 3さつと、50円の ペンを 1本 買った。代金の 式は？',
+  options: ['x ＋ 3 ＋ 50', '3 × x ＋ 50', '3 × (x ＋ 50)'], answer: 1,
+  ok: 'ノート 3さつ分（3 × x）に ペン 50円を たす。', hint: 'ノートは 3さつ、ペンは 1本だけ。' });
+renderInput('c-list', { id: 'ex_val', text: '上の 式で <span class="x">x</span> ＝ 120 の とき、代金は？', answer: 410, unit: '円',
+  ok: '3 × 120 ＋ 50 ＝ 410円。', hint: 'x の ところに 120 を 入れる。かけ算が 先。', traps: { '510': '3 × (120 ＋ 50) に なってる。かけ算を 先に。' } });
+renderInput('c-list', { id: 'ex_square', text: '1辺 <span class="x">a</span> cm の 正方形の まわりの 長さは <span class="x">a × 4</span>。<span class="x">a</span> ＝ 6 なら？', answer: 24, unit: 'cm',
+  ok: '6 × 4 ＝ 24cm。', hint: 'a に 6 を 入れる。' });
+renderChoice('c-list', { id: 'ex_same', text: '<span class="x">x ＋ x ＋ x</span> と 同じ 式は？', options: ['x × 3', 'x ＋ 3', 'x × x × x'], answer: 0,
+  ok: '同じ ものを 3回 たす ＝ 3倍。x × x × x は x の 3乗（ちがう！）。', hint: 'x が 2 だったら？ 2 ＋ 2 ＋ 2 ＝ 6。どれも 6に なる？' });
+renderChoice('c-list', { id: 'ex_match', text: 'マッチぼうの きまりを 文字で 書くと？（正方形が <span class="x">n</span> こ）', options: ['n ＋ 3', 'n × 3 ＋ 1', 'n × 4'], answer: 1,
+  ok: '□ を n に しただけ。これで どんな 数でも 計算できる。', hint: 'さっきの「□ × 3 ＋ 1」を 思い出して。' });
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 中学の 入り口まで 来てる！';
+  else if (firstCount >= TOTAL_Q - 3) msg.textContent = 'Muito bom! きまりを 文字に するのが できてる。';
+  else msg.textContent = 'マッチぼうの スライダーから もう1回。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+</body>
+</html>
