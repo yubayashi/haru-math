@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>りか2 — 水の すがた (A água)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 16px; padding: 12px 6px; }
+  .order-col { display: flex; flex-direction: column; gap: 8px; }
+  .order-btn {
+    font-family: 'Nunito', sans-serif; position: relative; text-align: left;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 12px 14px 12px 44px; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .order-btn.picked { border-color: #3498db; background: #eaf6ff; }
+  .order-btn .badge-n {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    background: #3498db; color: #fff; width: 24px; height: 24px; border-radius: 12px;
+    font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  .order-col.correct .order-btn { border-color: #27ae60; background: #eafff0; }
+  .order-col.wrong .order-btn.picked { border-color: #e74c3c; background: #fff5f5; }
+  .state-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 8px 0; }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+  .slider-row { display: flex; align-items: center; gap: 10px; font-weight: 900; color: #2c3e50; margin: 6px 0; }
+  .slider-row input[type=range] { flex: 1; height: 34px; accent-color: #3498db; }
+  .slider-row .val { width: 70px; text-align: right; font-size: 18px; }
+  .state-label { text-align: center; font-size: 20px; font-weight: 900; padding: 4px 0 10px; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">りか 2</div>
+    <h1>💧 水の すがたと 地球を めぐる 水</h1>
+    <div class="sub">A água — 教科書の 少し先（5.º ano）。日本では 小4・小5 で 習う</div>
+  </div>
+
+  <!-- ===== 1. 3つのすがた ===== -->
+  <div class="card">
+    <div class="card-title">🧊 水の 3つの すがた</div>
+    <p>スライダーで 温度を かえてみて。水の つぶ（分子）の 動きが かわる。</p>
+    <div class="state-host"><svg class="fig-svg" id="st-svg" viewBox="0 0 320 200" style="max-width:360px"></svg></div>
+    <div class="slider-row">温度 <input type="range" id="st-t" min="-20" max="120" value="20"><span class="val" id="st-v">20℃</span></div>
+    <div class="state-label" id="st-label"></div>
+    <div class="callout-green">
+      <b>✅</b> 氷 ＝ 固体（sólido）／ 水 ＝ 液体（líquido）／ 水蒸気 ＝ 気体（gasoso）。<b>水蒸気は 目に 見えない</b>。<br>
+      0℃ で こおる・とける、100℃ で ふっとう する。
+    </div>
+    <div id="a-list"></div>
+  </div>
+
+  <!-- ===== 2. じゅんかん ===== -->
+  <div class="card">
+    <div class="card-title">🔄 地球を めぐる 水（ciclo da água）</div>
+    <p>海の 水は 形を かえながら、ぐるっと まわって また 海に もどる。</p>
+    <div id="c-list"></div>
+  </div>
+
+  <!-- ===== 3. 地球の水 ===== -->
+  <div class="card">
+    <div class="card-title">🌍 地球の 水は どこに ある？</div>
+    <div id="w-list"></div>
+    <div class="callout-orange">
+      <b>🔑</b> 地球は「水の 星」でも、人が そのまま 使える 水は ほんの 少し。だから 水を きれいに して 大切に 使う。
+    </div>
+  </div>
+
+  <!-- ===== 4. 浄水場 ===== -->
+  <div class="card">
+    <div class="card-title">🚰 飲める 水（água potável）が 家に とどくまで</div>
+    <p>川の 水は そのままでは 飲めない。浄水場（ETA）で きれいに する。</p>
+    <div id="p-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">sólido / líquido / gasoso</span> 固体／液体／気体</span>
+      <span class="vocab-chip"><span class="pt">fusão</span> とける</span>
+      <span class="vocab-chip"><span class="pt">solidificação</span> こおる</span>
+      <span class="vocab-chip"><span class="pt">evaporação</span> 蒸発</span>
+      <span class="vocab-chip"><span class="pt">ebulição</span> ふっとう</span>
+      <span class="vocab-chip"><span class="pt">condensação</span> 水蒸気が 水に もどる こと</span>
+      <span class="vocab-chip"><span class="pt">ciclo da água</span> 水の じゅんかん</span>
+      <span class="vocab-chip"><span class="pt">água potável</span> 飲める 水</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'rika_02_mizu';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+
+/* ============ 1. 温度と すがた ============ */
+const stT = document.getElementById('st-t');
+const SEED = Array.from({ length: 24 }, (_, i) => [((i * 37) % 97) / 97, ((i * 61) % 89) / 89]);
+function stRender() {
+  const t = +stT.value;
+  document.getElementById('st-v').textContent = t + '℃';
+  let state, color, s = '<rect x="10" y="10" width="300" height="180" rx="12" fill="#fff" stroke="#bbb" stroke-width="2"/>';
+  if (t < 0) { state = '氷（固体）— つぶが ならんで ほとんど 動かない'; color = '#5dade2'; }
+  else if (t === 0) { state = '0℃：氷が とける・水が こおる さかいめ'; color = '#5dade2'; }
+  else if (t < 100) { state = '水（液体）— つぶが くっつきながら 動く'; color = '#2e86c1'; }
+  else if (t === 100) { state = '100℃：ふっとう（中から あわが 出る）'; color = '#e67e22'; }
+  else { state = '水蒸気（気体）— つぶが ばらばらに とびまわる・見えない'; color = '#bbb'; }
+  SEED.forEach(([a, b], i) => {
+    let x, y;
+    if (t <= 0) { x = 60 + (i % 6) * 40; y = 50 + Math.floor(i / 6) * 32; }
+    else if (t < 100) { x = 40 + a * 240; y = 90 + b * 90; }
+    else { x = 30 + a * 260; y = 25 + b * 155; }
+    s += '<circle cx="' + x + '" cy="' + y + '" r="' + (t > 100 ? 6 : 9) + '" fill="' + color + '" fill-opacity="' + (t > 100 ? 0.5 : 0.9) + '"/>';
+  });
+  if (t > 0 && t < 100) s += '<line x1="12" y1="80" x2="308" y2="80" stroke="#aed6f1" stroke-width="2" stroke-dasharray="6 4"/>';
+  document.getElementById('st-svg').innerHTML = s;
+  document.getElementById('st-label').textContent = state;
+}
+stT.addEventListener('input', stRender);
+stRender();
+
+const CHG = ['とける', 'こおる', '蒸発', 'ふっとう'];
+[
+  ['ch_melt', '氷が 水に なる へんか は？', CHG, 0, 'とける（fusão）。0℃で 起こる。'],
+  ['ch_freeze', '冬の 池の 水が 氷に なる へんか は？', CHG, 1, 'こおる（solidificação）。'],
+  ['ch_boil', 'なべの 水が 100℃で 中から あわを 出して 水蒸気に なる へんか は？', CHG, 3, 'ふっとう（ebulição）。'],
+  ['ch_evap', '晴れた 日、水たまりが いつのまにか なくなった。何が 起きた？', CHG, 2, '蒸発（evaporação）。100℃に ならなくても、表面から 少しずつ 水蒸気に なる。'],
+  ['ch_cup', '冷たい ジュースを 入れた コップの 外がわに 水てきが ついた。この 水は どこから？', ['コップから しみ出た', '空気の 中の 水蒸気が 冷やされた', 'ジュースが こぼれた'], 1, '空気の 中には 見えない 水蒸気が ある。冷たい コップで 冷やされて 水に もどった（condensação）。'],
+  ['ch_steam', 'やかんの 口から 出る 白い「湯気」は 何？', ['水蒸気（気体）', '小さな 水の つぶ（液体）', 'けむり'], 1, '水蒸気は 見えない。白く 見えるのは、冷えて 水の つぶに もどった もの。'],
+].forEach(([id, text, options, a, why]) => renderChoice('a-list', { id, text, options, answer: a, ok: why,
+  hint: 'スライダーと 上の まとめを もう一度 見て。' }));
+
+/* ============ 2. じゅんかん ============ */
+renderOrder('c-list', { id: 'cycle_order', text: '起こる じゅんに クリック（海から スタート）',
+  items: ['海の 水が 太陽で あたためられて 蒸発する', '水蒸気が 空の 高い ところで 冷える', '小さな 水や 氷の つぶに なって 雲が できる', '雨や 雪に なって ふる', '川や 地下水に なって 海へ もどる'],
+  shuffle: [3, 0, 4, 2, 1], ok: '蒸発 → 冷える → 雲 → 雨・雪 → 川 → 海。ずっと くりかえす。', hint: '「〜だから〜」で つながるか、1つずつ たしかめて。' });
+renderChoice('c-list', { id: 'cloud', text: '雲は 何で できている？', options: ['水蒸気', '小さな 水や 氷の つぶ', 'けむり'], answer: 1,
+  ok: '水蒸気は 見えない。雲が 見えるのは 水や 氷の つぶだから。湯気と 同じ。', hint: '水蒸気は 目に 見える？' });
+
+/* ============ 3. 地球の水 ============ */
+renderChoice('w-list', { id: 'sea_pct', text: '地球の 水の うち、海の 水（塩水）は どれくらい？', options: ['約50%', '約70%', '約97%'], answer: 2,
+  ok: '約97%が 海。のこり 約3% が 塩からくない 水（淡水）。', hint: 'ほとんど ぜんぶ。' });
+renderChoice('w-list', { id: 'fresh_pct', text: '人が 使いやすい 川・湖・地下水の 水は、地球の 水の どれくらい？', options: ['約30%', '約10%', '1%より 少ない'], answer: 2,
+  ok: '淡水の 多くは 南極などの 氷。使いやすい 水は 1%より 少ない。', hint: '淡水は 全部で 約3%。その 多くは 氷。' });
+
+/* ============ 4. 浄水場 ============ */
+renderOrder('p-list', { id: 'eta_order', text: 'きれいに する じゅんに クリック',
+  items: ['川から 水を 取り入れる', '薬を 入れて、にごりを かためて しずめる', '砂の 層で こす（ろ過）', '消毒して、ばいきんを なくす', '水道管を 通って 家に とどく'],
+  shuffle: [2, 4, 0, 3, 1], ok: '取り入れる → しずめる → こす → 消毒 → 家へ。', hint: '大きな よごれから 先に 取る。消毒は さいご。' });
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 湯気の ひっかけも 見ぬいた！';
+  else if (firstCount >= TOTAL_Q - 3) msg.textContent = 'Muito bom! 水の すがたは ばっちり。';
+  else msg.textContent = 'スライダーで 0℃と 100℃を もう一度 見てみよう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>りか1 — 岩石と 土 (Rochas e solo)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 16px; padding: 12px 6px; }
+  .order-col { display: flex; flex-direction: column; gap: 8px; }
+  .order-btn {
+    font-family: 'Nunito', sans-serif; position: relative; text-align: left;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 12px 14px 12px 44px; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .order-btn.picked { border-color: #3498db; background: #eaf6ff; }
+  .order-btn .badge-n {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    background: #3498db; color: #fff; width: 24px; height: 24px; border-radius: 12px;
+    font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  .order-col.correct .order-btn { border-color: #27ae60; background: #eafff0; }
+  .order-col.wrong .order-btn.picked { border-color: #e74c3c; background: #fff5f5; }
+  .rock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+  .rock-card { border-radius: 12px; padding: 10px; font-size: 13px; line-height: 1.6; }
+  .rock-card b { font-size: 15px; display: block; }
+  .rock-card.ig { background: #fdecea; border: 2px solid #e6b0aa; }
+  .rock-card.se { background: #fef9e7; border: 2px solid #f7dc6f; }
+  .rock-card.me { background: #eaf2f8; border: 2px solid #aed6f1; }
+  @media (max-width: 520px) { .rock-grid { grid-template-columns: 1fr; } }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">りか 1</div>
+    <h1>🪨 岩石と 土</h1>
+    <div class="sub">Rochas e solo — 教科書の 少し先（5.º ano）。日本では 小6・中1 で 習う</div>
+  </div>
+
+  <!-- ===== 1. 地球の中 ===== -->
+  <div class="card">
+    <div class="card-title">🌍 ふくしゅう：地球の 中</div>
+    <svg class="fig-svg" style="max-width:300px" viewBox="0 0 300 300">
+      <circle cx="150" cy="150" r="140" fill="#a0522d"/>
+      <circle cx="150" cy="150" r="128" fill="#e67e22"/>
+      <circle cx="150" cy="150" r="70" fill="#f4d03f"/>
+      <text x="150" y="20" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">地殻 crosta</text>
+      <text x="150" y="105" text-anchor="middle" font-size="15" font-weight="900" fill="#fff">マントル manto</text>
+      <text x="150" y="155" text-anchor="middle" font-size="15" font-weight="900" fill="#7d6608">核 núcleo</text>
+      <text x="150" y="175" text-anchor="middle" font-size="12" font-weight="800" fill="#7d6608">約5000℃</text>
+    </svg>
+    <p style="text-align:center;font-size:13px;color:#888">いちばん 外の うすい 皮が 地殻。わたしたちは その 上に いる。</p>
+    <div id="e-list"></div>
+  </div>
+
+  <!-- ===== 2. 岩石の3つのなかま ===== -->
+  <div class="card">
+    <div class="card-title">🪨 岩石の 3つの なかま</div>
+    <div class="rock-grid">
+      <div class="rock-card ig"><b>🔥 火成岩</b>rochas magmáticas<br>マグマが 冷えて かたまった。<br>例：玄武岩（basalto）、花こう岩（granito）</div>
+      <div class="rock-card se"><b>🏖️ 堆積岩</b>rochas sedimentares<br>砂・どろ・貝がらが つもって かたまった。<b style="display:inline;font-size:13px">化石</b>が 見つかる ことが ある。<br>例：砂岩、石灰岩（calcário）</div>
+      <div class="rock-card me"><b>⚙️ 変成岩</b>rochas metamórficas<br>岩石が 熱や 強い 力で 別の 岩石に 変わった。<br>例：大理石（mármore）</div>
+    </div>
+    <div class="callout-orange">
+      <b>🇵🇹 ポルトガルの 道:</b> 歩道の 石だたみ（calçada portuguesa）の <b>白い 石は 石灰岩</b>、<b>黒い 石は 玄武岩</b>。ポルトの 古い 建物の 灰色の 石は 花こう岩。今日 外で 見てみよう。
+    </div>
+    <p>どの なかま？</p>
+    <div id="r-list"></div>
+  </div>
+
+  <!-- ===== 3. 岩石から土へ ===== -->
+  <div class="card">
+    <div class="card-title">🌱 岩石が 土に なるまで</div>
+    <p>土（solo）は、もとは 岩石。何万年も かけて できる。</p>
+    <div id="s-list"></div>
+    <div class="callout-green">
+      <b>✅ 土の 中身:</b> 小石・砂（areia）・ねん土（argila）・<b>腐植</b>（húmus＝かれ葉や 生き物の 死がいが くさった もの）・水・空気
+    </div>
+    <svg class="fig-svg" style="max-width:220px" viewBox="0 0 220 250">
+      <rect x="50" y="20" width="120" height="210" rx="14" fill="#eaf6ff" stroke="#7fb3d5" stroke-width="3"/>
+      <rect x="53" y="40" width="114" height="6" fill="#6e2c00"/>
+      <rect x="53" y="46" width="114" height="104" fill="#d6eaf8" opacity="0.8"/>
+      <rect x="53" y="150" width="114" height="22" fill="#b9770e" opacity="0.6"/>
+      <rect x="53" y="172" width="114" height="22" fill="#d4ac0d" opacity="0.8"/>
+      <rect x="53" y="194" width="114" height="33" fill="#7f8c8d"/>
+      <text x="175" y="46" font-size="12" font-weight="800" fill="#6e2c00">?</text>
+      <text x="175" y="166" font-size="12" font-weight="800" fill="#b9770e">?</text>
+      <text x="175" y="188" font-size="12" font-weight="800" fill="#b7950b">?</text>
+      <text x="175" y="215" font-size="12" font-weight="800" fill="#566573">?</text>
+    </svg>
+    <p style="text-align:center;font-size:13px;color:#888">土を 水に 入れて よく ふって、しばらく 置いた ビン</p>
+    <div id="j-list"></div>
+  </div>
+
+  <!-- ===== 4. 鉱物 ===== -->
+  <div class="card">
+    <div class="card-title">💎 岩石は 鉱物の つぶで できている</div>
+    <p>花こう岩（granito）を よく 見ると、3しゅるいの つぶ（<b>鉱物</b>・minerais）が 見える。</p>
+    <div class="tip">
+      <b>石英</b>（quartzo）＝ 白〜とうめい、ガラスみたい／<b>長石</b>（feldspato）＝ 白〜ピンク／<b>雲母</b>（mica）＝ 黒くて うすく、はがれる
+    </div>
+    <div id="m-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">rocha</span> 岩石</span>
+      <span class="vocab-chip"><span class="pt">mineral</span> 鉱物</span>
+      <span class="vocab-chip"><span class="pt">magma</span> マグマ</span>
+      <span class="vocab-chip"><span class="pt">fóssil</span> 化石</span>
+      <span class="vocab-chip"><span class="pt">solo</span> 土</span>
+      <span class="vocab-chip"><span class="pt">areia</span> 砂</span>
+      <span class="vocab-chip"><span class="pt">argila</span> ねん土</span>
+      <span class="vocab-chip"><span class="pt">húmus</span> 腐植</span>
+      <span class="vocab-chip"><span class="pt">erosão</span> けずられて 運ばれる こと（侵食）</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'rika_01_ganseki';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+
+/* ============ 1. 地球の中 ============ */
+renderOrder('e-list', { id: 'earth_order', text: '外から じゅんに クリック',
+  items: ['地殻（crosta）', 'マントル（manto）', '核（núcleo）'], shuffle: [2, 0, 1],
+  ok: '外から 地殻 → マントル → 核。', hint: 'いちばん 外の うすい 皮は どれ？' });
+renderChoice('e-list', { id: 'earth_hot', text: 'いちばん 熱いのは？', options: ['地殻', 'マントル', '核'], answer: 2,
+  ok: '中心の 核は 約5000℃。太陽の 表面（約6000℃）に 近い。', hint: '深く なるほど 熱く なる。' });
+
+/* ============ 2. 岩石のなかま ============ */
+const ROCKS = ['火成岩', '堆積岩', '変成岩'];
+[
+  ['rk_magma', 'マグマが 冷えて かたまった 岩石', 0, '火の 成り立ち＝火成岩。'],
+  ['rk_sand', '砂や どろが 何万年も つもって かたまった 岩石', 1, '「堆積」は つもる こと。'],
+  ['rk_fossil', '中から 貝の 化石が 見つかった 岩石', 1, '化石は つもった ものの 中に うまる。マグマの 中では とけて しまう。'],
+  ['rk_heat', 'もとの 岩石が 熱と 強い 力で 別の 岩石に 変わった', 2, '「変わって 成った」＝変成岩。'],
+  ['rk_basalt', 'calçada の 黒い 石（玄武岩）', 0, '玄武岩は マグマが 地表近くで すばやく 冷えた もの。'],
+  ['rk_lime', 'calçada の 白い 石（石灰岩）', 1, '石灰岩は 貝がらや サンゴが つもって できた。'],
+  ['rk_marble', '大理石（mármore）', 2, '大理石は 石灰岩が 熱と 力で 変わった もの。ポルトガルの Estremoz は 大理石で 有名。'],
+  ['rk_granite', '花こう岩（granito）', 0, '花こう岩は マグマが 地下の 深い ところで ゆっくり 冷えた もの。'],
+].forEach(([id, text, a, why]) => renderChoice('r-list', {
+  id, text, options: ROCKS, answer: a, ok: why, hint: '上の 3まいの カードを もう一度 読んで。'
+}));
+
+/* ============ 3. 岩石→土 ============ */
+renderOrder('s-list', { id: 'soil_order', text: '起こる じゅんに クリック',
+  items: ['岩石に 雨・風・あつさ寒さが くりかえし あたる', 'ひびが 入って くだける', '小さな つぶ（小石・砂・ねん土）に なる', 'かれ葉や 生き物の 死がいが まざって 土に なる'],
+  shuffle: [3, 1, 0, 2], ok: 'くだける → 小さく なる → 生き物の ものが まざって 土。', hint: 'いちばん はじめの 原因は どれ？「だから」で つながるか たしかめて。' });
+renderChoice('j-list', { id: 'jar_bottom', text: 'ビンの いちばん 下に しずむのは？', options: ['小石・砂', 'ねん土', '腐植（かれ葉の かけら）'], answer: 0,
+  ok: '重くて 大きい つぶほど 早く 下に しずむ。', hint: '重い ものと 軽い もの、どっちが 早く しずむ？' });
+renderChoice('j-list', { id: 'jar_top', text: '水の 上に うくのは？', options: ['小石・砂', 'ねん土', '腐植（かれ葉の かけら）'], answer: 2,
+  ok: 'かれ葉の かけらは 軽いので うく。', hint: 'いちばん 軽いのは どれ？' });
+renderChoice('j-list', { id: 'jar_cloudy', text: 'なかなか しずまず、水を にごらせるのは？', options: ['小石・砂', 'ねん土', '腐植（かれ葉の かけら）'], answer: 1,
+  ok: 'ねん土は とても 細かいので、ゆっくり しずむ。', hint: 'いちばん 細かい つぶは どれ？' });
+
+/* ============ 4. 鉱物 ============ */
+renderChoice('m-list', { id: 'min_mica', text: '黒くて うすく、つめで はがれる 鉱物は？', options: ['石英', '長石', '雲母'], answer: 2,
+  ok: '雲母（mica）。うすい 紙を かさねたような つくり。', hint: '上の 説明を 読んで。' });
+renderChoice('m-list', { id: 'min_quartz', text: 'ガラスのように とうめいな 鉱物は？', options: ['石英', '長石', '雲母'], answer: 0,
+  ok: '石英（quartzo）。とても かたい。', hint: '上の 説明を 読んで。' });
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 外で 石を 見たら 名前が 言えるね！';
+  else if (firstCount >= TOTAL_Q - 4) msg.textContent = 'Muito bom! calçada の 石を 見に 行こう。';
+  else msg.textContent = '3まいの カードを 読みなおして、もう1回。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+</body>
+</html>

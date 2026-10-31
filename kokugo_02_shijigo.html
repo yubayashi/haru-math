@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>こくご2 — 指示語と たとえば・つまり</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 16px; padding: 12px 8px; }
+  .choice-row.col { flex-direction: column; }
+  .choice-row.col .choice-btn.small { text-align: left; padding: 12px 14px; }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .chip {
+    font-family: 'Nunito', sans-serif; background: #fff; color: #2c3e50;
+    border: 2px solid #ccc; border-radius: 10px; padding: 8px 10px;
+    font-size: 18px; font-weight: 700; cursor: pointer;
+  }
+  .chip:hover { border-color: #3498db; }
+  .chip.mod { border-color: #8e44ad; background: #f4ecf7; color: #6c3483; cursor: default; }
+  .chip.ok { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .chip.bad { border-color: #e74c3c; background: #fff5f5; }
+  .order-col { display: flex; flex-direction: column; gap: 8px; }
+  .order-btn {
+    font-family: 'Nunito', sans-serif; position: relative; text-align: left;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 12px 14px 12px 44px; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .order-btn.picked { border-color: #3498db; background: #eaf6ff; }
+  .order-btn .badge-n {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    background: #3498db; color: #fff; width: 24px; height: 24px; border-radius: 12px;
+    font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  .order-col.correct .order-btn { border-color: #27ae60; background: #eafff0; }
+  .order-col.wrong .order-btn.picked { border-color: #e74c3c; background: #fff5f5; }
+  .blank { display: inline-block; min-width: 64px; border-bottom: 3px solid #2c3e50; text-align: center; }
+  .passage { background: #fffdf5; border: 2px solid #f0e2b6; border-radius: 12px; padding: 14px 16px; font-size: 16px; line-height: 2; margin: 8px 0; }
+  .sj { background: #fdebd0; border-radius: 4px; padding: 0 3px; font-weight: 900; color: #b9770e; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">こくご 2</div>
+    <h1>👉 指示語 と「たとえば・つまり」</h1>
+    <div class="sub">Pronomes demonstrativos e exemplos — 文と 文の つながりを 読む</div>
+  </div>
+
+  <!-- ===== 1. かかりうけ ===== -->
+  <div class="card">
+    <div class="card-title">🧷 くわしくする ことばは どこに つく？</div>
+    <p>むらさきの ことば（修飾語）は、どの ことばを くわしく している？ クリックしよう。</p>
+    <div class="tip"><b>💡 コツ:</b> 2つを つなげて 読んでみる。「大きな 犬が」は 意味が 通る。「大きな 歩く」は 通らない。</div>
+    <div id="m-list"></div>
+  </div>
+
+  <!-- ===== 2. 指示語 ===== -->
+  <div class="card">
+    <div class="card-title">👉 指示語（これ・それ・その・この）は 何を さす？</div>
+    <div class="callout-green">
+      <b>✅ さがし方:</b> ① 指示語の 中身は ふつう <b>その 前</b>に ある。② 見つけたら 指示語の ところに <b>入れて 読んでみる</b>。意味が 通れば 正解。<br>
+      「この 変化」「その 理由」のように、<b>前の 文 まるごと</b>を さす ことも ある。
+    </div>
+    <div id="d-list"></div>
+  </div>
+
+  <!-- ===== 3. たとえば・つまり ===== -->
+  <div class="card">
+    <div class="card-title">🔍 たとえば（くわしい 例）と つまり（まとめ）</div>
+    <div class="tip">
+      <b>たとえば</b> → 後ろに <b>くわしい 例</b>が くる（por exemplo）<br>
+      <b>つまり</b> → 後ろに <b>まとめ</b>が くる（ou seja）<br>
+      🔑 書いた 人が いちばん 言いたい ことは、たいてい <b>まとめ</b>の ほうに ある。
+    </div>
+    <div id="t-list"></div>
+  </div>
+
+  <!-- ===== 4. 文章で ===== -->
+  <div class="card">
+    <div class="card-title">📖 文章で ためそう</div>
+    <div class="passage" id="passage"></div>
+    <div id="p-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">isto / isso / aquilo</span> これ・それ・あれ</span>
+      <span class="vocab-chip"><span class="pt">pronome demonstrativo</span> 指示語</span>
+      <span class="vocab-chip"><span class="pt">por exemplo</span> たとえば</span>
+      <span class="vocab-chip"><span class="pt">ou seja</span> つまり</span>
+      <span class="vocab-chip"><span class="pt">ideia principal</span> いちばん 言いたい こと</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'kokugo_02_shijigo';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+
+/* ============ 1. かかりうけ ============ */
+const M_QS = [
+  { id: 'kk_ookina', chips: ['大きな', '犬が', 'ゆっくり', '歩く。'], mod: 0, to: 1, why: '「大きな 犬が」。どんな 犬？' },
+  { id: 'kk_yukkuri', chips: ['大きな', '犬が', 'ゆっくり', '歩く。'], mod: 2, to: 3, why: '「ゆっくり 歩く」。どう 歩く？' },
+  { id: 'kk_totemo', chips: ['とても', '冷たい', '水を', '飲んだ。'], mod: 0, to: 1, why: '「とても 冷たい」。「とても 飲んだ」は 変。' },
+  { id: 'kk_akai', chips: ['きのう', '買った', '赤い', 'くつを', 'はいた。'], mod: 2, to: 3, why: '「赤い くつを」。どんな くつ？' },
+];
+M_QS.forEach(q => {
+  TOTAL_Q++;
+  document.getElementById('m-list').insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="chip-row">' + q.chips.map((c, i) => '<button class="chip' + (i === q.mod ? ' mod' : '') + '" id="' + q.id + '-c' + i + '" onclick="modPick(\'' + q.id + '\',' + i + ')">' + c + '</button>').join('') + '</div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>');
+});
+function modPick(id, i) {
+  const q = M_QS.find(x => x.id === id), fb = document.getElementById(id + '-fb');
+  if (i === q.mod || (tracking[id] && tracking[id].correct)) return;
+  const ok = i === q.to, el = document.getElementById(id + '-c' + i);
+  record(id, ok, { answer: q.chips[i], target: q.chips[q.to] });
+  if (ok) { el.className = 'chip ok'; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.why; }
+  else {
+    el.className = 'chip bad'; fb.className = 'feedback wrong';
+    fb.textContent = '❌「' + q.chips[q.mod] + ' ' + q.chips[i].replace('。', '') + '」と つなげて 読むと 意味が 通る？';
+    setTimeout(() => { el.className = 'chip'; }, 1300);
+  }
+}
+
+/* ============ 2. 指示語 ============ */
+const S = (w) => '<span class="sj">' + w + '</span>';
+[
+  { id: 'sj_sore', text: '公園に 大きな 木が ある。' + S('それ') + 'は 百年前に 植えられた。<br><b>「それ」は 何？</b>',
+    options: ['公園', '大きな 木', '百年前'], answer: 1, ok: '「大きな 木は 百年前に 植えられた」で 意味が 通る。' },
+  { id: 'sj_kore', text: 'ぼくは 毎朝 犬の 散歩を する。' + S('これ') + 'が 一日で いちばん 楽しい 時間だ。<br><b>「これ」は 何？</b>',
+    options: ['犬', '朝', '毎朝 犬の 散歩を する こと'], answer: 2, ok: '「時間」に つながるのは「散歩を する こと」。犬は 時間では ない。' },
+  { id: 'sj_sou', text: 'カメレオンは まわりの 色に 合わせて 体の 色を 変える。' + S('そう') + 'する ことで、敵に 見つかりにくく なる。<br><b>「そう」は 何？</b>',
+    options: ['まわりの 色に 合わせて 体の 色を 変える', '敵に 見つかる', 'まわりを 見る'], answer: 0, ok: '「体の 色を 変える ことで、見つかりにくく なる」。へんしん と 同じ しくみ！' },
+  { id: 'sj_sono', text: '海の 水は 太陽に あたためられて 空へ のぼる。' + S('その 水') + 'が 冷えて 雲に なる。<br><b>「その 水」は どんな 水？</b>',
+    options: ['海に のこった 水', '空へ のぼった 水', '雨の 水'], answer: 1, ok: '直前の「空へ のぼる」水。' },
+  { id: 'sj_henka', text: '森で 一本の 大きな 木が たおれた。すると、地面に 日光が とどくように なった。' + S('この 変化') + 'で、小さな 草が いっせいに 育ちはじめた。<br><b>「この 変化」は 何？</b>',
+    options: ['小さな 草が 育ちはじめた こと', '森に 木が たくさん ある こと', '木が たおれて、地面に 日光が とどくように なった こと'], answer: 2,
+    ok: '「この」は 前を さす。草が 育つのは 変化の「結果」で、変化 そのものは その 前。', hint: '' },
+].forEach(q => renderChoice('d-list', Object.assign({ hint: '指示語の ところに 入れて 読んでみて。前の 文から さがす。' }, q, { hint: q.hint || '指示語の ところに 入れて 読んでみて。前の 文から さがす。' })));
+document.querySelectorAll('#d-list .choice-row').forEach(r => r.classList.add('col'));
+
+/* ============ 3. たとえば・つまり ============ */
+const TT = ['たとえば', 'つまり', 'しかし'];
+[
+  ['tt_vitamin', 'くだものには ビタミンが 多い。（<span class="blank">　</span>）、みかんには ビタミンCが たくさん ふくまれる。', 0, '後ろは「みかん」という くわしい 例。'],
+  ['tt_matome', 'みかんにも、いちごにも、キウイにも ビタミンCが 多い。（<span class="blank">　</span>）、ビタミンCが 多い くだものは たくさん ある。', 1, '前の 3つを まとめている。'],
+  ['tt_nata', 'ポルトガルには 有名な おかしが ある。（<span class="blank">　</span>）、パステル・デ・ナタだ。', 0, '「おかし」の くわしい 例。'],
+  ['tt_sport', 'サッカーも、木登りも、かくれんぼも 体を 使う。（<span class="blank">　</span>）、どれも 運動だ。', 1, '3つを「運動」と まとめている。'],
+].forEach(([id, text, a, why]) => renderChoice('t-list', { id, text, options: TT, answer: a, ok: TT[a] + '。' + why,
+  hint: '後ろは「くわしい 例」？「まとめ」？' }));
+
+/* ============ 4. 文章 ============ */
+document.getElementById('passage').innerHTML =
+  'ビーバーという 動物は、川に 木の 枝や どろで ダムを 作る。ダムが できると、川の 水が せき止められて 池が できる。' +
+  S('この 池') + 'は、ビーバーに とって 安全な 家に なる。敵が 近づきにくいからだ。<br>' +
+  'しかし、それだけでは ない。池が できると、そこに 魚や カエルや 水鳥が 集まって くる。' +
+  'つまり、ビーバーの ダムは、ビーバー 自身だけでなく、たくさんの 生き物の すみかを 作って いるのだ。';
+renderChoice('p-list', { id: 'ps_ike', text: '「この 池」は 何？', options: ['魚が いる 近くの 池', 'ダムで 水が せき止められて できた 池', 'ビーバーが ほった あな'], answer: 1,
+  ok: '直前の「せき止められて 池が できる」の 池。', hint: '「この」の すぐ 前を 読んで。' });
+renderChoice('p-list', { id: 'ps_why', text: '池が ビーバーに とって 安全なのは なぜ？', options: ['魚が たくさん いるから', '敵が 近づきにくいから', '水が きれいだから'], answer: 1,
+  ok: '「〜からだ」が 理由の しるし。', hint: '「〜からだ」と 書いてある ところを さがして。' });
+renderChoice('p-list', { id: 'ps_main', text: '書いた 人が いちばん 言いたい ことは？', options: ['ビーバーは ダムを 作るのが 上手だ', '池には 魚や カエルが 集まる', 'ビーバーの ダムは、たくさんの 生き物の すみかを 作っている'], answer: 2,
+  ok: '「つまり」の 後ろ＝まとめ。そこが いちばん 言いたい こと。', hint: '「つまり」の 後ろを 読んで。' });
+renderOrder('p-list', { id: 'ps_chain', text: '起こる じゅんに クリック',
+  items: ['ビーバーが ダムを 作る', '川の 水が せき止められる', '池が できる', '魚や カエルや 水鳥が 集まる'], shuffle: [2, 0, 3, 1],
+  ok: 'ダム → せき止められる → 池 → 生き物が 集まる。', hint: '文章の「〜と」「〜できると」を たどって。' });
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 指示語も まとめも 見ぬけてる！';
+  else if (firstCount >= TOTAL_Q - 4) msg.textContent = 'Muito bom! 「入れて 読んでみる」が 使えてる。';
+  else msg.textContent = '指示語は「前を 見る・入れて 読む」。もう1回。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+</body>
+</html>

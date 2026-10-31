@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>こくご1 — 文の ほね と つなぎことば</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 17px; padding: 12px 8px; }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+  .chip {
+    font-family: 'Nunito', sans-serif; background: #fff; color: #2c3e50;
+    border: 2px solid #ccc; border-radius: 10px; padding: 8px 10px;
+    font-size: 18px; font-weight: 700; cursor: pointer;
+  }
+  .chip:hover { border-color: #3498db; }
+  .chip.pred { border-color: #e67e22; background: #fff3e0; color: #d35400; }
+  .chip.subj { border-color: #2471c8; background: #eaf2fb; color: #2471c8; }
+  .chip.bad { border-color: #e74c3c; background: #fff5f5; }
+  .step-label { font-size: 14px; font-weight: 900; color: #888; }
+  .order-col { display: flex; flex-direction: column; gap: 8px; }
+  .order-btn {
+    font-family: 'Nunito', sans-serif; position: relative; text-align: left;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 12px 14px 12px 44px; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .order-btn.picked { border-color: #3498db; background: #eaf6ff; }
+  .order-btn .badge-n {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    background: #3498db; color: #fff; width: 24px; height: 24px; border-radius: 12px;
+    font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  .order-col.correct .order-btn { border-color: #27ae60; background: #eafff0; }
+  .order-col.wrong .order-btn.picked { border-color: #e74c3c; background: #fff5f5; }
+  .blank { display: inline-block; min-width: 64px; border-bottom: 3px solid #2c3e50; text-align: center; font-weight: 900; color: #e67e22; }
+  .conn-table { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 15px; margin: 8px 0; }
+  .conn-table .w { font-weight: 900; }
+  .write-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 16px; font-weight: 700; }
+  .write-row input {
+    font-family: 'Nunito', sans-serif; font-size: 16px; border: 2px solid #ddd; border-radius: 8px;
+    padding: 8px 10px; flex: 1; min-width: 160px; outline: none;
+  }
+  .write-row input:focus { border-color: #3498db; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">こくご 1</div>
+    <h1>🦴 文の ほね と つなぎことば</h1>
+    <div class="sub">Sujeito, predicado e conectores — 文を 正しく 読む 練習</div>
+  </div>
+
+  <!-- ===== 1. 主語と述語 ===== -->
+  <div class="card">
+    <div class="card-title">🦴 文の「ほね」を 見つける</div>
+    <p>どんなに 長い 文にも「ほね」が ある。<br>
+    <b>述語</b>（predicado）＝ どうする・どんなだ・なんだ　→ たいてい 文の <b>さいご</b><br>
+    <b>主語</b>（sujeito）＝ だれが・なにが　→「〜は」「〜が」</p>
+    <div class="tip">
+      <b>💡 コツ:</b> 先に <b>述語</b>を 見つけて、それに「<b>だれが？ なにが？</b>」と 聞く。答えが 主語。<br>
+      ほかの ことば（いつ・どこで・どんな）は ほねに つく「肉」＝ <b>修飾語</b>。
+    </div>
+    <div id="s-list"></div>
+    <div class="callout-green">
+      <b>✅ ほねだけに すると:</b>「となりの 家の 大きな 犬が 毎朝 ほえる」→「<b>犬が ほえる</b>」。<br>
+      長い 文が わからない ときは、まず ほねだけに して 読む。
+    </div>
+  </div>
+
+  <!-- ===== 2. つなぎことば ===== -->
+  <div class="card">
+    <div class="card-title">🔗 つなぎことば で 次を よそうする</div>
+    <div class="conn-table">
+      <span class="w" style="color:#27ae60">だから →</span><span>前が 理由、後ろが その 結果（por isso）</span>
+      <span class="w" style="color:#c0392b">しかし ↔</span><span>後ろは 前と <b>反対</b>の ことに なる（mas）</span>
+      <span class="w" style="color:#2471c8">つまり ＝</span><span>前を まとめる・言いかえる（ou seja）</span>
+    </div>
+    <p>（　）に 入る ことばを えらぼう。</p>
+    <div id="c-list"></div>
+    <div class="tip">
+      <b>💡</b> つなぎことばを 見たら、後ろを 読む 前に「次は 反対の 話だな」「次は 結果だな」と <b>よそう</b>できる。これが 速く 正しく 読む コツ。
+    </div>
+  </div>
+
+  <!-- ===== 3. つながりを たどる ===== -->
+  <div class="card">
+    <div class="card-title">⛓️「A だから B、B だから C」を たどる</div>
+    <p>起こる じゅんに クリック。1つ 目が 原因、さいごが 結果。</p>
+    <div id="o-list"></div>
+    <div class="callout-orange">
+      <b>🔑</b> 説明文は、こういう「だから」の くさりで できている。1つ とばすと、わからなくなる。
+    </div>
+  </div>
+
+  <!-- ===== 4. 書いてみる ===== -->
+  <div class="card">
+    <div class="card-title">✏️ 自分で 書いてみよう</div>
+    <p>自分の ことで「〜。だから、〜。」の 文を 1つ 作ろう。（例：雨が ふった。だから、外で 遊べなかった。）</p>
+    <div id="w-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">sujeito</span> 主語</span>
+      <span class="vocab-chip"><span class="pt">predicado</span> 述語</span>
+      <span class="vocab-chip"><span class="pt">modificador</span> 修飾語</span>
+      <span class="vocab-chip"><span class="pt">por isso</span> だから</span>
+      <span class="vocab-chip"><span class="pt">mas / porém</span> しかし</span>
+      <span class="vocab-chip"><span class="pt">ou seja</span> つまり</span>
+      <span class="vocab-chip"><span class="pt">causa</span> 原因</span>
+      <span class="vocab-chip"><span class="pt">consequência</span> 結果</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'kokugo_01_hone';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+
+/* ============ 1. 主語・述語 ============ */
+const S_QS = [
+  { id: 'sj_book', chips: ['ぼくは', 'きのう', '図書館で', '本を', '三さつ', '借りた。'], subj: 0, pred: 5 },
+  { id: 'sj_dog', chips: ['となりの', '家の', '大きな', '犬が', '毎朝', 'ほえる。'], subj: 3, pred: 5 },
+  { id: 'sj_winter', chips: ['ポルトガルの', '冬は', '日本より', 'あたたかい。'], subj: 1, pred: 3 },
+  { id: 'sj_trap1', chips: ['毎朝', 'ほえる', '犬が', 'うるさい。'], subj: 2, pred: 3,
+    trap: { 1: '「ほえる」は 犬を くわしく している ことば。文の さいごを 見て。' } },
+  { id: 'sj_trap2', chips: ['木の', '上から', '見る', '海は', 'とても', 'きれいだ。'], subj: 3, pred: 5,
+    trap: { 2: '「見る」は 海を くわしく している ことば。文の さいごを 見て。' } },
+];
+const sState = {};
+S_QS.forEach(q => {
+  TOTAL_Q += 2; sState[q.id] = 'pred';
+  document.getElementById('s-list').insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="step-label" id="' + q.id + '-step">① 述語（どうする・どんなだ・なんだ）を クリック</div>' +
+    '<div class="chip-row">' + q.chips.map((c, i) => '<button class="chip" id="' + q.id + '-c' + i + '" onclick="chipPick(\'' + q.id + '\',' + i + ')">' + c + '</button>').join('') + '</div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>');
+});
+function chipPick(id, i) {
+  const q = S_QS.find(x => x.id === id), st = sState[id], fb = document.getElementById(id + '-fb');
+  if (st === 'done') return;
+  const want = st === 'pred' ? q.pred : q.subj, ok = i === want;
+  record(id + '_' + st, ok, { answer: q.chips[i], target: q.chips[want] });
+  const el = document.getElementById(id + '-c' + i);
+  if (ok) {
+    el.className = 'chip ' + (st === 'pred' ? 'pred' : 'subj');
+    if (st === 'pred') {
+      sState[id] = 'subj';
+      document.getElementById(id + '-step').textContent = '② 「' + q.chips[q.pred].replace('。', '') + '」のは だれ？ なに？ 主語を クリック';
+      fb.className = 'feedback correct'; fb.textContent = '⭕ 述語は「' + q.chips[q.pred] + '」';
+    } else {
+      sState[id] = 'done';
+      document.getElementById(id + '-step').textContent = 'ほね：' + q.chips[q.subj] + ' ' + q.chips[q.pred];
+      fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ほねは「' + q.chips[q.subj] + ' ' + q.chips[q.pred] + '」';
+    }
+  } else {
+    el.className = 'chip bad';
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + ((q.trap && q.trap[i]) || (st === 'pred' ? '述語は たいてい 文の さいご。' : '「〜は」「〜が」の ついた ことばを さがして。'));
+    setTimeout(() => { if (el.className === 'chip bad') el.className = 'chip'; }, 1200);
+  }
+}
+
+/* ============ 2. つなぎことば ============ */
+const CONN = ['だから', 'しかし', 'つまり'];
+const C_QS = [
+  { id: 'cn_rain', s: ['雨が たくさん ふった。', '、サッカーの 試合は 中止に なった。'], a: 0, why: '雨（理由）→ 中止（結果）。' },
+  { id: 'cn_practice', s: ['毎日 練習した。', '、試合には 負けて しまった。'], a: 1, why: '「練習した」なら 勝ちそうなのに、反対の 結果。' },
+  { id: 'cn_penguin', s: ['ペンギンは 鳥だ。', '、空を 飛ぶことは できない。'], a: 1, why: '鳥なら 飛べそうなのに、反対。' },
+  { id: 'cn_ice', s: ['水は 0℃で こおる。', '、冬の 池には 氷が はる。'], a: 0, why: '0℃で こおる（理由）→ 氷が はる（結果）。' },
+  { id: 'cn_fruit', s: ['りんご、みかん、ぶどう。', '、ぜんぶ くだものだ。'], a: 2, why: '前の 3つを「くだもの」と まとめている。' },
+  { id: 'cn_tree', s: ['木登りは けがを する ことも ある。', '、ぼくは 木登りが 大好きだ。'], a: 1, why: 'あぶないのに 好き＝反対の 向き。' },
+];
+C_QS.forEach(q => renderChoice('c-list', {
+  id: q.id, text: q.s[0] + '（<span class="blank">　</span>）' + q.s[1], options: CONN, answer: q.a,
+  ok: CONN[q.a] + '。' + q.why, hint: '前と 後ろは「理由→結果」？「反対」？「まとめ」？'
+}));
+
+/* ============ 3. くさり ============ */
+renderOrder('o-list', { id: 'ch_river', text: '大雨の 日の 川',
+  items: ['大雨が ふる', '川の 水が ふえる', '水の 流れが はやくなる', '土や 石が 流される'], shuffle: [1, 3, 0, 2],
+  ok: '大雨 → 水が ふえる → 流れが はやく → 土や 石が 流される。', hint: '「〜だから〜」で つながるか、1つずつ 声に 出して たしかめて。' });
+renderOrder('o-list', { id: 'ch_pond', text: '冬の 池',
+  items: ['冬に なる', '気温が 0℃より 下がる', '池の 水が こおる', '池の 上で スケートが できる'], shuffle: [2, 0, 3, 1],
+  ok: '冬 → 0℃より 下 → こおる → スケート。', hint: 'いちばん はじめの 原因は どれ？' });
+
+/* ============ 4. 書く ============ */
+TOTAL_Q++;
+document.getElementById('w-list').innerHTML =
+  '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+  '<div class="write-row"><input id="w-a" placeholder="理由（〜た。）"><span>。だから、</span><input id="w-b" placeholder="結果"><span>。</span></div>' +
+  '<div class="row-btns"><button class="act-btn" onclick="writeDone()">できた</button></div>' +
+  '<div class="feedback" id="w-fb"></div></div>';
+function writeDone() {
+  const a = document.getElementById('w-a').value.trim().replace(/。$/, ''), b = document.getElementById('w-b').value.trim().replace(/。$/, '');
+  const fb = document.getElementById('w-fb');
+  if (!a || !b) { fb.className = 'feedback wrong'; fb.textContent = '2つとも 書いてね。'; return; }
+  record('write_dakara', true, { answer: a + '。だから、' + b + '。', target: '(自由)' });
+  fb.className = 'feedback correct';
+  fb.textContent = '⭕ 「' + a + '。だから、' + b + '。」 前が 理由・後ろが 結果に なっているか、もう一度 読んで たしかめよう。';
+}
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 文の ほねも つなぎことばも 見えてる！';
+  else if (firstCount >= TOTAL_Q - 4) msg.textContent = 'Muito bom! 次は もっと 長い 文で やってみよう。';
+  else msg.textContent = '「述語を 先に 見つける」「つなぎことばで よそうする」を もう1回。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+</body>
+</html>
