@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>こくご3 — くらべる と いちばん 言いたい こと</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 16px; padding: 12px 8px; }
+  .choice-row.col { flex-direction: column; }
+  .choice-row.col .choice-btn.small { text-align: left; padding: 12px 14px; }
+  .order-col { display: flex; flex-direction: column; gap: 8px; }
+  .order-btn {
+    font-family: 'Nunito', sans-serif; position: relative; text-align: left;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 12px 14px 12px 44px; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .order-btn.picked { border-color: #3498db; background: #eaf6ff; }
+  .order-btn .badge-n {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    background: #3498db; color: #fff; width: 24px; height: 24px; border-radius: 12px;
+    font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  .order-col.correct .order-btn { border-color: #27ae60; background: #eafff0; }
+  .order-col.wrong .order-btn.picked { border-color: #e74c3c; background: #fff5f5; }
+  .blank { display: inline-block; min-width: 64px; border-bottom: 3px solid #2c3e50; text-align: center; }
+  .passage { background: #fffdf5; border: 2px solid #f0e2b6; border-radius: 12px; padding: 14px 16px; font-size: 16px; line-height: 2; margin: 8px 0; }
+  .passage p { margin: 0 0 8px; text-indent: 1em; }
+  .passage p:last-child { margin-bottom: 0; }
+  .cn { background: #d6eaf8; border-radius: 4px; padding: 0 3px; font-weight: 900; color: #1f618d; }
+  .rel-table { display: grid; grid-template-columns: auto auto 1fr; gap: 8px 12px; align-items: center; font-size: 15px; margin: 8px 0; }
+  .rel-table .sym { font-size: 22px; font-weight: 900; text-align: center; color: #8e44ad; }
+  .rel-table .w { font-weight: 900; }
+  .rel-table .now { background: #fef9e7; border-radius: 6px; padding: 2px 6px; font-weight: 900; color: #b9770e; }
+  .write-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 16px; font-weight: 700; }
+  .write-row input {
+    font-family: 'Nunito', sans-serif; font-size: 16px; border: 2px solid #ddd; border-radius: 8px;
+    padding: 8px 10px; flex: 1; min-width: 160px; outline: none;
+  }
+  .write-row input:focus { border-color: #3498db; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">こくご 3</div>
+    <h1>⚖️ くらべる ことばと「いちばん 言いたい こと」</h1>
+    <div class="sub">Comparar e encontrar a ideia principal — 文章の ほねを 見ぬく</div>
+  </div>
+
+  <!-- ===== 0. 3つの 関係 ===== -->
+  <div class="card">
+    <div class="card-title">🧠 文と 文の つながりは 3しゅるい</div>
+    <p>文章の 中の 文と 文は、だいたい この 3つの どれかで つながっている。</p>
+    <div class="rel-table">
+      <span class="sym">＝</span><span class="w">同じ（言いかえ）</span><span>たとえば・つまり …… こくご2</span>
+      <span class="sym">⇔</span><span class="w">くらべる・反対</span><span><span class="now">一方・しかし・〜ではなく …… きょう！</span></span>
+      <span class="sym">→</span><span class="w">原因と 結果</span><span>だから・〜から …… こくご1</span>
+    </div>
+    <div class="tip"><b>💡</b> つなぎことばを 見れば、次に どんな 文が 来るか 予想できる。これが 3つ そろうと、長い 文章も こわくない。</div>
+  </div>
+
+  <!-- ===== 1. くらべる ことば ===== -->
+  <div class="card">
+    <div class="card-title">⚖️ くらべる ことば「一方」</div>
+    <div class="tip">
+      <b>一方（いっぽう）・それに対して</b> → 前と 後ろで <b>2つの ものを くらべる</b>（por outro lado / enquanto）<br>
+      形は「<b>Aは 〜。一方、Bは 〜。</b>」。同じ ことについて、AとBの <b>ちがい</b>を 見せる。
+    </div>
+    <p>（　）に 入る ことばは？</p>
+    <div id="a-list"></div>
+  </div>
+
+  <!-- ===== 2. 何と 何を くらべている？ ===== -->
+  <div class="card">
+    <div class="card-title">🆚 何と 何を くらべている？</div>
+    <div class="passage" id="cmp-passage"></div>
+    <div id="b-list"></div>
+    <div class="callout-green">
+      <b>✅「〜ではなく、〜」:</b> 書いた 人が 言いたいのは <b>「ではなく」の 後ろ</b>。前は「そう 思うかも しれないけど、ちがうよ」の ほう。
+    </div>
+    <div id="b2-list"></div>
+  </div>
+
+  <!-- ===== 3. いちばん 言いたい 文 ===== -->
+  <div class="card">
+    <div class="card-title">🔑 いちばん 言いたい 文は どれ？</div>
+    <div class="tip">
+      <b>しるし</b><br>
+      ・「つまり」「このように」の 後ろ（まとめ）<br>
+      ・「しかし」の 後ろ（前より 後ろが 大事な ことが 多い）<br>
+      ・「〜ではなく、〜」の 後ろ<br>
+      ・「大切だ」「〜と 思う」（書いた 人の 意見）<br>
+      ・<b>はじめの 文</b>で 言ってから、後ろで くわしく 説明する ことも ある
+    </div>
+    <div id="c-list"></div>
+  </div>
+
+  <!-- ===== 4. 文章で ===== -->
+  <div class="card">
+    <div class="card-title">📖 文章で ためそう — チーターと 人間</div>
+    <div class="passage" id="passage"></div>
+    <div id="p-list"></div>
+  </div>
+
+  <!-- ===== 5. 書く ===== -->
+  <div class="card">
+    <div class="card-title">✍️ 自分で くらべて 書こう</div>
+    <p>日本と ポルトガルで ちがう ことを 1つ えらんで、「一方」を 使って 書こう。</p>
+    <div class="callout-green">例）日本では 家に 入る とき くつを ぬぐ。一方、ポルトガルでは くつの まま 入る 家が 多い。</div>
+    <div id="w-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">comparar</span> くらべる</span>
+      <span class="vocab-chip"><span class="pt">por outro lado</span> 一方</span>
+      <span class="vocab-chip"><span class="pt">enquanto</span> 〜のに 対して</span>
+      <span class="vocab-chip"><span class="pt">não …, mas sim …</span> 〜ではなく、〜</span>
+      <span class="vocab-chip"><span class="pt">opinião do autor</span> 書いた 人の 意見</span>
+      <span class="vocab-chip"><span class="pt">resumo</span> 要約（短い まとめ）</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'kokugo_03_kuraberu';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+
+const C = (w) => '<span class="cn">' + w + '</span>';
+const B = '（<span class="blank">　</span>）';
+const col = (host) => document.querySelectorAll('#' + host + ' .choice-row').forEach(r => r.classList.add('col'));
+
+/* ============ 1. 一方 ============ */
+const TT = ['一方', 'だから', 'たとえば'];
+[
+  ['ip_kyushoku', '日本の 学校では、給食を 教室で 食べる。' + B + '、ポルトガルの 学校では、食堂（cantina）で 食べる。', 0, '日本と ポルトガルの「食べる 場所」を くらべている。'],
+  ['ip_dakara', '雨が たくさん ふった。' + B + '、サッカーの 試合は 中止に なった。', 1, '雨が 理由で、中止が 結果。くらべては いない。'],
+  ['ip_inu', '犬は 毎日 散歩に 行く ひつようが ある。' + B + '、ねこは 家の 中だけでも 元気に すごせる。', 0, '犬と ねこを くらべている。'],
+  ['ip_rei', '南の 国には めずらしい くだものが ある。' + B + '、マンゴーや パパイヤだ。', 2, '後ろは くわしい 例。'],
+].forEach(([id, text, a, why]) => renderChoice('a-list', { id, text, options: TT, answer: a, ok: TT[a] + '。' + why,
+  hint: '前と 後ろは「くらべている」？「理由と 結果」？「例」？' }));
+
+/* ============ 2. 何と 何を ============ */
+document.getElementById('cmp-passage').innerHTML =
+  '<p>玄武岩は、マグマが 急に 冷えて できるので、粒が 小さい。' + C('一方') + '、花崗岩は、ゆっくり 冷えて できるので、粒が 大きい。</p>';
+renderChoice('b-list', { id: 'cm_what', text: '何と 何を くらべている？', options: ['マグマと 溶岩', '玄武岩と 花崗岩', '粒と 石'], answer: 1,
+  ok: '「一方」の 前が 玄武岩、後ろが 花崗岩。きのうの 理科と 同じ！', hint: '「一方」の 前と 後ろの「〜は」を 見て。' });
+renderChoice('b-list', { id: 'cm_diff', text: '2つの 粒の 大きさが ちがうのは、何が ちがうから？', options: ['色', '重さ', '冷える はやさ'], answer: 2,
+  ok: '急に 冷える → 小さい、ゆっくり → 大きい。「〜ので」が 理由の しるし。くらべる 文の 中に 原因と 結果も 入っている。', hint: '「〜ので」の 前を 読んで。' });
+renderChoice('b2-list', { id: 'cm_yomu', text: '「本を 読む とき 大切なのは、たくさん 読む ことではなく、ていねいに 読む ことだ。」<br><b>書いた 人が すすめているのは？</b>',
+  options: ['ていねいに 読む こと', 'たくさん 読む こと', '本を 買う こと'], answer: 0,
+  ok: '「ではなく」の 後ろ＝言いたい こと。', hint: '「ではなく」の 前？ 後ろ？' });
+renderChoice('b2-list', { id: 'cm_kinobori', text: '「木登りで 大切なのは、高く 登る ことではない。次に どの 枝に 手を かけるかを、自分で 考える ことだ。」<br><b>書いた 人が 大切だと 言っているのは？</b>',
+  options: ['高く 登る こと', 'はやく 登る こと', 'どの 枝に 手を かけるか 自分で 考える こと'], answer: 2,
+  ok: '「〜ではない。〜だ。」も 同じ 形。後ろが 言いたい こと。', hint: '「ではない」で 打ち消している のは どっち？' });
+col('b2-list');
+
+/* ============ 3. いちばん 言いたい 文 ============ */
+[
+  { id: 'sh_map', text: '①スマホの 地図は べんりだ。②行きたい 場所まで、道を 教えて くれる。③' + C('しかし') + '、地図ばかり 見て 歩くと、まわりの けしきを おぼえられない。④ときには 地図を しまって、自分の 目で 道を 見る ことも 大切だ。',
+    options: ['① スマホの 地図は べんりだ', '② 道を 教えて くれる', '③ まわりの けしきを おぼえられない', '④ 自分の 目で 道を 見る ことも 大切だ'], answer: 3,
+    ok: '「しかし」で 話が かわり、最後に「大切だ」（意見）。①② は「たしかに べんり」と みとめている ところ。', hint: '「しかし」の 後ろと、「大切だ」を さがして。' },
+  { id: 'sh_calcada', text: '①ポルトガルの 歩道（calçada）は、石を 一つ一つ 手で ならべて 作る。②まず、職人が ハンマーで 石を 小さな 四角に 割る。③次に、砂の 上に その 石を すき間なく しきつめる。④白い 石と 黒い 石を 組み合わせれば、波や 船の もようも 作れる。',
+    options: ['① 石を 一つ一つ 手で ならべて 作る', '② ハンマーで 石を 割る', '③ 砂の 上に しきつめる', '④ 波や 船の もようも 作れる'], answer: 0,
+    ok: '②〜④は「まず・次に」で ① を くわしく 説明している。はじめに 言いたい ことを 言う 文章。', hint: '②③④は 何の 説明？「まず」「次に」は 何の じゅんばん？' },
+  { id: 'sh_kame', text: '①カメレオンは 体を かくす ために 色を 変える、と 思っている 人は 多い。②' + C('しかし') + '、それだけでは ない。③気分や まわりの 温度に よっても、色が 変わる。④カメレオンの 色は、かくれる ためだけの ものではなく、気持ちを 伝える 合図でも あるのだ。',
+    options: ['① 体を かくす ために 色を 変える', '② しかし、それだけでは ない', '③ 気分や 温度でも 色が 変わる', '④ 色は 気持ちを 伝える 合図でも ある'], answer: 3,
+    ok: '①は「みんなは こう 思っている」、④が 書いた 人の 答え。「〜ではなく」の 後ろ も ④。こくご2の カメレオンの 話の つづき！', hint: '「〜ではなく」と「〜のだ」が ある 文は？' },
+].forEach(q => renderChoice('c-list', Object.assign({}, q, { text: '<div class="passage" style="text-indent:0">' + q.text + '</div>' })));
+col('c-list');
+
+/* ============ 4. 文章 ============ */
+document.getElementById('passage').innerHTML =
+  '<p>速く 走る 動物と いえば、チーターを 思いうかべる 人が 多いだろう。たしかに、チーターは 時速100kmほどで 走る ことが できる。' + C('しかし') + '、その 速さで 走れるのは 数百メートルだけだ。力を 一気に 使うので、すぐに つかれて しまうからだ。</p>' +
+  '<p>' + C('一方') + '、人間は 速さでは チーターに かなわない。' + C('けれども') + '、人間は 汗を かいて 体を 冷やせるので、長い きょりを 走りつづける ことが できる。昔の 人は、えものが つかれて 動けなく なるまで、何時間も 追いかけた と 考えられている。</p>' +
+  '<p>' + C('つまり') + '、走る 力は「速さ」だけでは くらべられない。「どれだけ 長く 走れるか」も、大切な 力なのだ。</p>';
+renderChoice('p-list', { id: 'ps_what', text: 'この 文章は、何と 何を くらべている？', options: ['チーターと ライオン', 'チーターと 人間', '昔の 人と 今の 人'], answer: 1,
+  ok: '1つ目の まとまりが チーター、「一方」の 後ろが 人間。', hint: '「一方」の 前と 後ろの 主語を 見て。' });
+renderChoice('p-list', { id: 'ps_cheetah', text: 'チーターが 長く 走れないのは なぜ？', options: ['足が 短いから', '人間に 追いかけられるから', 'すぐに つかれて しまうから'], answer: 2,
+  ok: '「〜からだ」が 理由の しるし。', hint: '「〜からだ」と 書いてある ところを さがして。' });
+renderChoice('p-list', { id: 'ps_human', text: '人間が 長く 走りつづけられるのは なぜ？', options: ['汗を かいて 体を 冷やせるから', 'チーターより 速いから', '何時間も 練習したから'], answer: 0,
+  ok: '「〜ので」の 前が 理由。', hint: '人間の まとまりの「〜ので」を 読んで。' });
+renderChoice('p-list', { id: 'ps_ippou', text: '「一方」の 前と 後ろは、どんな 関係？', options: ['同じ ことを 言いかえている', '2つの ものを くらべている', '原因と 結果'], answer: 1,
+  ok: 'チーター ⇔ 人間。いちばん 上の 表の「⇔」。', hint: '「一方」は 3つの 関係の どれ？' });
+renderChoice('p-list', { id: 'ps_main', text: '書いた 人が いちばん 言いたい ことは？', options: ['チーターは いちばん 速い 動物だ', '人間は えものを 追いかけるのが 好きだ', '走る 力は 速さだけでは くらべられない'], answer: 2,
+  ok: '「つまり」の 後ろ＝まとめ。くらべた あとに 答えを 言っている。', hint: '「つまり」の 後ろを 読んで。' });
+col('p-list');
+renderOrder('p-list', { id: 'ps_bone', text: '文章の「ほね」を じゅんに ならべよう',
+  items: ['チーターは 速いが、長くは 走れない', '人間は 速くないが、長く 走れる', 'つまり、走る 力は 速さだけでは くらべられない'], shuffle: [2, 0, 1],
+  ok: 'チーター ⇔ 人間 → つまり（まとめ）。この 3つを つなげると、文章の 短い まとめ（要約）に なる。', hint: '「一方」と「つまり」が 出てくる じゅんばんを 見て。' });
+
+/* ============ 5. 書く ============ */
+TOTAL_Q++;
+document.getElementById('w-list').innerHTML =
+  '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+  '<div class="write-row"><input id="w-a" placeholder="日本では …"><span>。一方、</span><input id="w-b" placeholder="ポルトガルでは …"><span>。</span></div>' +
+  '<div class="row-btns"><button class="act-btn" onclick="writeDone()">できた</button></div>' +
+  '<div class="feedback" id="w-fb"></div></div>';
+function writeDone() {
+  const a = document.getElementById('w-a').value.trim().replace(/。$/, ''), b = document.getElementById('w-b').value.trim().replace(/。$/, '');
+  const fb = document.getElementById('w-fb');
+  if (!a || !b) { fb.className = 'feedback wrong'; fb.textContent = '2つとも 書いてね。'; return; }
+  record('write_ippou', true, { answer: a + '。一方、' + b + '。', target: '(自由)' });
+  fb.className = 'feedback correct';
+  fb.textContent = '⭕ 「' + a + '。一方、' + b + '。」 同じ ことに ついて、日本と ポルトガルの ちがいが 書けているか、声に 出して 読んで たしかめよう。';
+}
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 3つの 関係が ぜんぶ 使えてる！';
+  else if (firstCount >= TOTAL_Q - 4) msg.textContent = 'Muito bom! 「くらべる」と「言いたい こと」が 見えてる。';
+  else msg.textContent = '「一方」の 前と 後ろ、「しかし」「つまり」の 後ろを もう1回 見よう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+</body>
+</html>
