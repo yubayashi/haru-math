@@ -140,6 +140,8 @@ const SPEED = {player: 175, patrol: 70, chase: 145};   // かり：おいかけ�
 const VIEW = 320;                             // かり：けいさつが みえる きょり
 const CATCH = 26;
 const TIME = 60;                              // はる：1ぷん にげきる
+const TIME_LONG = 120, LONG_FROM = 8;         // はる（2026-11-08）：9めんから 2ふんに。LONG_FROM ＝ 9めん（0 から かぞえる）
+function timeOf(stage){ return stage >= LONG_FROM ? TIME_LONG : TIME; }
 const PICK = 26;                              // たべものを とれる きょり
 // はる（10/5 の てがみ）：「2かいだけ すきな ところに ワープできる」
 //   かり：1めんごとに 2かい。1めんから つかえる（レベルの じょうけんが ついていなかった）
@@ -396,7 +398,7 @@ function step(g, dt, rng){
     }
   }
   // はる：たべものを ぜんぶ あつめて 1ぷん にげきったら クリア。かり：1ぷんで のこっていたら じかんぎれ
-  if (g.time >= TIME) {
+  if (g.time >= timeOf(g.stage)) {
     if (g.foods.every(q => q.got)) g.status = "win";
     else { g.status = "lose"; g.reason = "food"; }
   }
@@ -632,9 +634,9 @@ function render(t){
   drawWarpHint();
   const tk = [G.stage, G.warps, G.jumps, warpArmed].join(":");
   if (tk !== shownTools) { shownTools = tk; syncTools(); }
-  const left = Math.max(0, Math.ceil(TIME - G.time));
+  const left = Math.max(0, Math.ceil(timeOf(G.stage) - G.time));
   $("timer").innerHTML = `${left}<small>びょう</small>`;
-  $("tbar").style.width = Math.min(100, G.time / TIME * 100) + "%";
+  $("tbar").style.width = Math.min(100, G.time / timeOf(G.stage) * 100) + "%";
   $("stage").textContent = (G.stage + 1) + "めん";
   if (G.player.color !== shownLook[0] || G.player.shape !== shownLook[1]) { shownLook = [G.player.color, G.player.shape]; syncHenshin(); }
   const key = G.stage + ":" + G.foods.map(q => q.got ? 1 : 0).join("");
@@ -664,7 +666,7 @@ function loop(ts){
 function card(html){ $("card").innerHTML = html; $("over").hidden = false; }
 function mission(stage){
   const st = STAGES[stage];
-  return `たべもの ${st.foods.map(q => q.k).join("")} を ぜんぶ あつめて、1ぷん にげきろう（けいさつ ${st.police.length}にん${st.house === 5 ? "・5かいだて" : ""}）`;
+  return `たべもの ${st.foods.map(q => q.k).join("")} を ぜんぶ あつめて、${timeOf(stage) === TIME_LONG ? "2ふん" : "1ぷん"} にげきろう（けいさつ ${st.police.length}にん${st.house === 5 ? "・5かいだて" : ""}）`;
 }
 function showStart(){
   card(`<h2>へんしん</h2>
@@ -677,10 +679,11 @@ function showStart(){
       <li>⤴️ ジャンプ：${JUMP_FROM + 1}めんから 1めんに ${JUMPS}かい。<b>スペース</b> か ボタンで、むいている ほうへ とぶ（とんでいる あいだは つかまらない）</li>
       <li>🚓 めんが すすむと けいさつと たべものが ふえる。${JUMP_FROM + 1}めんからは 5かいだて（ぜんぶで ${STAGES.length}めん）</li>
     </ul>
-    <div class="btns"><button class="big" data-act="start">スタート</button></div>`);
+    <div class="btns"><button class="big" data-act="start">スタート</button><button class="big sub" data-act="nine">${LONG_FROM + 1}めんから</button></div>`);
 }
 function showIntro(stage){
-  const news = stage === JUMP_FROM ? `<p class="lead">ここから 5かいだて！ ⤴️ ジャンプが つかえる（<b>スペース</b>・${JUMPS}かい）</p>` : "";
+  const news = stage === JUMP_FROM ? `<p class="lead">ここから 5かいだて！ ⤴️ ジャンプが つかえる（<b>スペース</b>・${JUMPS}かい）</p>`
+    : stage === LONG_FROM ? `<p class="lead">ここから じかんが 2ふんに！ ⏱️</p>` : "";
   card(`<h2>${stage + 1}めん</h2>
     ${news}<p class="lead">ミッション：${mission(stage)}</p>
     <div class="btns"><button class="big" data-act="go" data-stage="${stage}">スタート</button></div>`);
@@ -714,6 +717,7 @@ $("card").addEventListener("click", e => {
   const a = b.dataset.act;
   if (a === "start" || a === "first") begin(0);
   else if (a === "next") { const keep = G.player; G = newGame(G.stage + 1); G.player.color = keep.color; G.player.shape = keep.shape; showIntro(G.stage); }
+  else if (a === "nine") { const keep = G.player; G = newGame(LONG_FROM); G.player.color = keep.color; G.player.shape = keep.shape; showIntro(G.stage); }
   else if (a === "go") begin(+b.dataset.stage);
   else if (a === "again") begin(G.stage);
 });
