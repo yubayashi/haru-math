@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ふくしゅう1 — 思い出し チャレンジ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+<link rel="stylesheet" href="game.css">
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 16px; padding: 12px 8px; }
+  .order-col { display: flex; flex-direction: column; gap: 8px; }
+  .order-btn {
+    font-family: 'Nunito', sans-serif; position: relative; text-align: left;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 12px 14px 12px 44px; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .order-btn.picked { border-color: #3498db; background: #eaf6ff; }
+  .order-btn .badge-n {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    background: #3498db; color: #fff; width: 24px; height: 24px; border-radius: 12px;
+    font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  .order-col.correct .order-btn { border-color: #27ae60; background: #eafff0; }
+  .order-col.wrong .order-btn.picked { border-color: #e74c3c; background: #fff5f5; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">ふくしゅう 1</div>
+    <h1>🗝️ 思い出し チャレンジ</h1>
+    <div class="sub">Revisão — 前に やった ことを、もう一度 使ってみよう</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🧊 水と 石</div>
+    <div id="a-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔢 数の きまり</div>
+    <div id="b-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🥧 円グラフと パーセント</div>
+    <div class="tip"><b>💡</b> 10% や 20% を 先に 出して、倍や 半分に する やり方で OK。</div>
+    <div id="c-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚖️ 平均から 逆に 考える</div>
+    <div class="tip"><b>💡</b> 平均 × 回数 ＝ 合計。</div>
+    <div id="d-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📖 ことば</div>
+    <div id="e-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'fukushuu_01';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+/* ---- 数を 入れる問題（共通） ---- */
+const INPUT_QS = {};
+function parseDec(raw) {
+  let s = raw.trim()
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/[,，．、]/g, '.')
+    .replace(/[^0-9.]/g, '');
+  return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : null;
+}
+function renderInput(hostId, q) {
+  INPUT_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="decimal" autocomplete="off">' +
+    (q.unit ? '<span class="unit">' + q.unit + '</span>' : '') +
+    '<button class="check-btn" onclick="inputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function inputCheck(id) {
+  const q = INPUT_QS[id], input = document.getElementById(id), fb = document.getElementById(id + '-fb');
+  if (!input.value.trim()) return;
+  const got = parseDec(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね。'; return; }
+  const ok = Math.abs(got - q.answer) < 1e-9;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) { input.className = 'correct'; input.disabled = true; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    input.className = 'wrong'; fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + got + ' じゃない。' + ((q.traps && q.traps[String(got)]) || q.hint);
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches('.practice-q input') && INPUT_QS[e.target.id]) inputCheck(e.target.id);
+});
+
+
+/* ============ 1. 水と 石 ============ */
+renderInput('a-list', { id: 'w_boil', text: '水が ふっとう するのは 何℃？', answer: 100, unit: '℃',
+  ok: '100℃で 中から あわが 出る。', hint: 'なべの お湯が ぐらぐらする 温度。切りの いい 数。',
+  traps: { '40': 'それは お風呂くらいの 温度。ふっとうは もっと ずっと 上。', '80': 'まだ ふっとう しない。あと 20℃。' } });
+renderInput('a-list', { id: 'w_freeze', text: '水が こおるのは 何℃？', answer: 0, unit: '℃',
+  ok: '0℃で こおる・とける。', hint: '温度の 目もりの はじまりの 数。' });
+renderChoice('a-list', { id: 'w_gas', text: '水蒸気は どれ？', options: ['固体', '液体', '気体'], answer: 2,
+  ok: '水蒸気は 気体。目に 見えない。', hint: '氷が 固体、水が 液体。' });
+renderChoice('a-list', { id: 'w_dry', text: 'ぬれた 洗たく物が かわくのは？', options: ['とける', 'こおる', '蒸発', 'ふっとう'], answer: 2,
+  ok: '蒸発。100℃に ならなくても、表面から 水蒸気に なる。', hint: '100℃に なって いないのに 水が 消える。水たまりと 同じ。' });
+renderChoice('a-list', { id: 'r_slow', text: 'マグマが 地下で ゆっくり 冷えて、つぶが 大きく なった 岩は？', options: ['玄武岩', '花崗岩'], answer: 1,
+  ok: '花崗岩。ゆっくり 冷える と つぶが 大きく なる。', hint: '玄武岩は 地上で 急に 冷えた 岩。' });
+renderOrder('a-list', { id: 'w_eta', text: '浄水場（ETA）で 水が きれいに なる じゅんに ならべよう',
+  items: ['川から 水を とる', '薬で よごれを かためて 沈める', '砂の 層で こす', '消毒して 家に 送る'], shuffle: [2, 0, 3, 1],
+  ok: '大きな よごれを 沈めて から、砂で こす。', hint: '砂で こす 前に、よごれを 大きく かためて おくよ。' });
+
+/* ============ 2. 数の きまり ============ */
+renderInput('b-list', { id: 'n_cube', text: '4 の 3乗（4³）は？', answer: 64,
+  ok: '4 × 4 × 4 ＝ 64。', hint: '4 を 3回 かける。', traps: { '12': '4 × 3 じゃないよ。4 × 4 × 4。' } });
+renderInput('b-list', { id: 'n_cube2', text: '2 の 3乗（2³）は？', answer: 8,
+  ok: '2 × 2 × 2 ＝ 8。', hint: '2 を 3回 かける。', traps: { '6': '2 × 3 じゃないよ。2 × 2 × 2。' } });
+renderInput('b-list', { id: 'n_sq', text: '1, 4, 9, 16, 25 の 次は？', answer: 36,
+  ok: '6 × 6 ＝ 36。', hint: '1×1, 2×2, 3×3 … と 見てみて。' });
+renderInput('b-list', { id: 'n_seq', text: '5, 8, 11, 14 …… と 3ずつ ふえる。<b>10番目</b>は？', answer: 32,
+  ok: '3 を たすのは 9回。5 ＋ 3 × 9 ＝ 32。', hint: '2番目は 1回 たす、3番目は 2回 たす。10番目は 何回？',
+  traps: { '35': '3 を 10回 たして しまったかな。2番目は 1回、3番目は 2回 だよ。' } });
+
+/* ============ 3. 円グラフと パーセント ============ */
+renderInput('c-list', { id: 'p_full', text: '円の 1周は 何度？', answer: 360, unit: '°',
+  ok: '1周 ＝ 360°。', hint: '半周が 180°。', traps: { '50': 'もっと ずっと 大きい 数。半周で 180° だよ。', '100': '100 は パーセントの ほう。角度では？' } });
+renderInput('c-list', { id: 'p_25', text: '円グラフで 25% の おうぎ形は 何度？', answer: 90, unit: '°',
+  ok: '25% は 4分の1。360 ÷ 4 ＝ 90°。', hint: '25% は 全体の 何分の1？' });
+renderInput('c-list', { id: 'p_30', text: '円グラフで 30% の おうぎ形は 何度？', answer: 108, unit: '°',
+  ok: '360 × 0.3 ＝ 108°。10% が 36° だから、その 3倍。', hint: 'まず 10% が 何度か 出そう。360 ÷ 10。' });
+renderInput('c-list', { id: 'p_6of30', text: '30人の うち 6人は 何%？', answer: 20, unit: '%',
+  ok: '10% が 3人。6人は その 倍で 20%。', hint: '30人の 10% は 何人？' });
+renderInput('c-list', { id: 'p_10of40', text: '40人の うち 10人は 何%？', answer: 25, unit: '%',
+  ok: '10 ÷ 40 ＝ 0.25。4分の1 だから 25%。', hint: '10人は 40人の 何分の1？' });
+
+/* ============ 4. 平均 ============ */
+renderInput('d-list', { id: 'a_total', text: '4回の テストの 平均が 75点に なるには、4回の 合計は 何点 いる？', answer: 300, unit: '点',
+  ok: '75 × 4 ＝ 300点。', hint: '平均 × 回数 ＝ 合計。' });
+renderInput('d-list', { id: 'a_4th', text: '3回の テストは 70点・80点・60点 だった。4回の 平均を 75点に するには、4回目は 何点？', answer: 90, unit: '点',
+  ok: '合計 300点 いる。70＋80＋60 ＝ 210 だから 300 − 210 ＝ 90点。', hint: 'さっきの 300点から、3回分の 合計を ひく。' });
+renderInput('d-list', { id: 'a_solo', text: '2回の テストは 6点と 9点 だった。3回の 平均を 8点に するには、3回目は 何点？', answer: 9, unit: '点',
+  ok: '8 × 3 ＝ 24点。6＋9 ＝ 15 だから 24 − 15 ＝ 9点。', hint: 'まず 3回の 合計は 何点 いる？' });
+
+/* ============ 5. ことば ============ */
+renderChoice('e-list', { id: 'k_sore', text: 'カメは かたい 甲らを 持って いる。<b>それ</b>は 体を 守る ために ある。<br>「それ」は 何？', options: ['カメ', '甲ら', '体'], answer: 1,
+  ok: '「それ」は すぐ 前の ものを さす。', hint: '「それ」を 入れかえて、読んで みて。' });
+renderChoice('e-list', { id: 'k_dewanaku', text: '大切なのは 速さでは なく、ていねいさだ。<br>いちばん 言いたいのは？', options: ['速さ', 'ていねいさ'], answer: 1,
+  ok: '「〜では なく」の 後ろが 言いたい こと。', hint: '「〜では なく」の 後ろを 見て。' });
+renderChoice('e-list', { id: 'k_ippou', text: 'ポルトガルの 夏は 雨が 少ない。（　　）、日本の 夏は 雨が 多い。', options: ['だから', '一方', 'たとえば'], answer: 1,
+  ok: 'ちがう ものを くらべる ときは「一方」。', hint: '前と 後ろは、ちがう ことを 言って いるよ。' });
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 ぜんぶ 思い出せた！';
+  else if (firstCount >= TOTAL_Q - 4) msg.textContent = 'Muito bom! ほとんど おぼえてる。';
+  else msg.textContent = '思い出すと、前より 忘れにくく なるよ。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+<script src="game.js"></script>
+</body>
+</html>

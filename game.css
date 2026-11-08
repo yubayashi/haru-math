@@ -1,0 +1,110 @@
+/* ゲームふうの見た目（game.js が body に .g を付けたときだけ効く） */
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap');
+
+body.g {
+  font-family: 'M PLUS Rounded 1c', 'Nunito', sans-serif;
+  background-color: #1d2b53;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,.55) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 78% 9%, rgba(255,255,255,.45) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 42% 62%, rgba(255,255,255,.35) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 88% 74%, rgba(255,255,255,.5) 0 1.5px, transparent 2px),
+    linear-gradient(180deg, #1d2b53 0%, #3b2f6e 100%);
+  background-size: 240px 240px, 310px 310px, 270px 270px, 330px 330px, 100% 100%;
+  background-attachment: fixed;
+  padding-top: 0;
+}
+.g .header { padding-top: 16px; }
+.g .header .badge {
+  background: #ffcd3c; color: #3b2a00; border: 3px solid #0b1330; box-shadow: 0 3px 0 #0b1330;
+  font-size: 13px; font-weight: 800; letter-spacing: 2px; padding: 3px 16px;
+}
+.g .header h1 { color: #fff; font-size: 24px; font-weight: 800; text-shadow: 0 3px 0 #0b1330; line-height: 1.5; }
+.g .header .sub { color: #b8c4e6; }
+
+.g .card {
+  position: relative; margin: 30px 0; border: 4px solid #0b1330; border-radius: 18px;
+  box-shadow: 0 6px 0 #0b1330; padding-top: 24px;
+}
+.g .card-title { font-size: 18px; font-weight: 800; }
+.g-stage {
+  position: absolute; top: -16px; left: 16px; z-index: 2;
+  background: #ff5c8a; color: #fff; font-weight: 800; font-size: 12px; letter-spacing: 1.5px;
+  padding: 2px 12px; border-radius: 999px; border: 3px solid #0b1330;
+}
+.g-stage.hint { background: #3fb8af; }
+.g-stage.goal { background: #a06cd5; }
+.g .card.g-stage-clear::after {
+  content: 'CLEAR!'; position: absolute; top: 8px; right: 12px;
+  color: #e74c3c; border: 4px solid #e74c3c; border-radius: 10px; padding: 0 8px;
+  font-weight: 800; font-size: 20px; letter-spacing: 1px; background: rgba(255,255,255,.85);
+  transform: rotate(12deg); animation: g-stamp .35s ease-out; pointer-events: none;
+}
+
+.g .practice-q { background: #fff; border: 3px solid #dfe6f3; border-radius: 14px; transition: border-color .2s, background .2s; }
+.g .practice-q .q-num {
+  top: -14px; width: 30px; height: 30px; border-radius: 10px;
+  background: #ffcd3c; color: #3b2a00; border: 3px solid #0b1330; font-size: 13px;
+}
+.g .practice-q.g-cleared { border-color: #2ecc71; background: #f3fff7; }
+.g .practice-q.g-cleared .q-num { background: #2ecc71; color: #fff; font-size: 15px; }
+.g .practice-q.g-cleared.g-retry .q-num { background: #9fb3c8; }
+.g .practice-q.g-shake { animation: g-shake .35s; }
+
+.g .choice-btn, .g .order-btn, .g .chip {
+  font-family: 'M PLUS Rounded 1c', 'Nunito', sans-serif;
+  border-bottom-width: 6px; transition: transform .06s, border-color .15s;
+}
+.g .choice-btn:active, .g .order-btn:active, .g .chip:active { transform: translateY(3px); }
+.g .choice-btn:hover, .g .order-btn:hover { border-color: #5b8def; }
+.g .check-btn, .g .act-btn:not(.ghost) {
+  font-family: 'M PLUS Rounded 1c', 'Nunito', sans-serif;
+  background: #ff8a3d; border-bottom: 5px solid #c45a12; border-radius: 12px; font-weight: 800;
+}
+.g .check-btn:hover, .g .act-btn:not(.ghost):hover { background: #ff9a55; }
+.g .check-btn:active, .g .act-btn:not(.ghost):active { transform: translateY(2px); border-bottom-width: 3px; }
+.g .answer-row input, .g .write-row input { font-family: 'M PLUS Rounded 1c', 'Nunito', sans-serif; border-width: 3px; border-radius: 10px; }
+.g .feedback.wrong { color: #e67e22; }
+.g .tip, .g .callout-green, .g .callout-orange { border-left-width: 6px; border-radius: 0 12px 12px 0; }
+
+/* 上のバー */
+.g-hud {
+  position: sticky; top: 0; z-index: 50; margin: 0 -16px;
+  padding: 8px 16px; background: rgba(11,19,48,.93); color: #fff; font-weight: 800;
+}
+.g-hud-in { max-width: 640px; margin: 0 auto; display: flex; align-items: center; gap: 12px; font-size: 15px; }
+.g-road { flex: 1; height: 16px; background: #2c3b6b; border: 2px solid #4a5b8f; border-radius: 999px; position: relative; }
+.g-fill { height: 100%; width: 0; background: linear-gradient(90deg, #ffcd3c, #ff8a3d); border-radius: 999px; transition: width .5s; }
+.g-runner { position: absolute; top: 50%; left: 0; font-size: 22px; line-height: 1; transform: translate(-50%, -58%) scaleX(-1); transition: left .5s; }
+.g-goal { position: absolute; right: -8px; top: 50%; transform: translateY(-58%); font-size: 18px; line-height: 1; }
+.g-snd { background: none; border: none; font-size: 18px; cursor: pointer; padding: 0 2px; }
+.g-coinbox.g-bump { animation: g-bump .3s; }
+
+.g-float {
+  position: absolute; top: -18px; right: 14px; z-index: 5; pointer-events: none;
+  font-weight: 800; font-size: 20px; color: #f5a400; text-shadow: 0 2px 0 #fff;
+  animation: g-float .9s ease-out forwards;
+}
+
+/* ゴール */
+.g .result-box {
+  background: linear-gradient(180deg, #fff6d6, #ffe39a); border: 4px solid #0b1330;
+  box-shadow: 0 6px 0 #0b1330; border-radius: 16px; padding: 18px;
+}
+.g-clear-t { font-size: 30px; font-weight: 800; color: #ff5c8a; letter-spacing: 2px; animation: g-pop .5s ease-out; }
+.g-rank {
+  width: 84px; height: 84px; margin: 8px auto; border-radius: 50%; border: 4px solid #0b1330;
+  display: flex; align-items: center; justify-content: center; font-size: 46px; font-weight: 800; color: #fff;
+  animation: g-pop .6s ease-out;
+}
+.g-rank.S { background: #ffb300; } .g-rank.A { background: #ff5c8a; } .g-rank.B { background: #5b8def; } .g-rank.C { background: #3fb8af; }
+.g-earn { font-size: 20px; font-weight: 800; color: #3b2a00; }
+.g-total { font-size: 14px; color: #6b5a2a; margin-top: 4px; }
+.g-conf { position: fixed; top: -16px; width: 9px; height: 15px; z-index: 100; pointer-events: none; animation: g-fall linear forwards; }
+
+@keyframes g-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+@keyframes g-float { 0% { opacity: 0; transform: translateY(8px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-26px); } }
+@keyframes g-stamp { 0% { opacity: 0; transform: rotate(12deg) scale(2.2); } 100% { opacity: 1; transform: rotate(12deg) scale(1); } }
+@keyframes g-pop { 0% { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes g-bump { 50% { transform: scale(1.3); } }
+@keyframes g-fall { to { transform: translateY(110vh) rotate(720deg); } }
