@@ -6,7 +6,7 @@
   const lessonId = typeof LESSON_ID !== 'undefined' ? LESSON_ID : location.pathname.split('/').pop();
   const total = () => (typeof TOTAL_Q !== 'undefined' ? TOTAL_Q : Object.keys(tracking).length);
   const solved = () => Object.values(tracking).filter(t => t.correct);
-  const coinsNow = () => solved().reduce((s, t) => s + (t.attempts === 1 ? 10 : 5), 0);
+  const coinsNow = () => solved().length * 10;   // まちがえても へらさない（1問 10まい）
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -86,9 +86,8 @@
 
   function onSolved(q, first) {
     if (!q) return;
-    if (!first) q.dataset.gRetry = '1';
     const f = document.createElement('span');
-    f.className = 'g-float'; f.textContent = '+' + (first ? 10 : 5) + '🪙';
+    f.className = 'g-float'; f.textContent = '+10🪙';
     f.style.right = (14 + q.querySelectorAll('.g-float').length * 54) + 'px';
     q.appendChild(f); setTimeout(() => f.remove(), 950);
     play(sfx.ok);
@@ -98,7 +97,7 @@
     if (q.classList.contains('g-cleared')) return;
     const ins = [...q.querySelectorAll('input[id]')].filter(i => tracking[i.id]);
     if (!ins.every(i => tracking[i.id].correct)) return;
-    q.classList.add('g-cleared'); if (q.dataset.gRetry) q.classList.add('g-retry');
+    q.classList.add('g-cleared');
     const num = q.querySelector('.q-num'); if (num) num.textContent = '★';
     const card = q.closest('.card');
     if (card && !card.classList.contains('g-stage-clear')) {
@@ -143,16 +142,14 @@
       origShow();
       const box = document.getElementById('result-box');
       if (!box) return;
-      const msg = (document.getElementById('result-msg') || {}).textContent || '';
-      const n = total(), first = solved().filter(t => t.attempts === 1).length, coins = coinsNow();
-      const rank = first === n ? 'S' : first >= n * 0.8 ? 'A' : first >= n * 0.6 ? 'B' : 'C';
+      const n = total(), coins = coinsNow();
       const best = store.get('g-best', {});
       if (!best[lessonId] || best[lessonId] < coins) { best[lessonId] = coins; store.set('g-best', best); }
       const bank = Object.values(best).reduce((s, v) => s + v, 0);
       box.innerHTML = '<div class="g-clear-t">QUEST CLEAR!</div>' +
-        '<div class="g-rank ' + rank + '">' + rank + '</div>' +
-        '<div class="g-earn">🪙 ' + coins + ' ゲット ／ ⭐ 一発 ' + first + '/' + n + '</div>' +
-        '<div class="msg">' + msg + '</div>' +
+        '<div class="g-rank S">★</div>' +
+        '<div class="g-earn">🪙 ' + coins + ' ゲット ／ ⭐ ' + n + '/' + n + ' クリア</div>' +
+        '<div class="msg">さいごまで やりきった！ まちがえても、なおせば ちゃんと 力に なる。</div>' +
         '<div class="g-total">これまでに ためた コイン：🪙 ' + bank + '</div>';
       box.style.display = 'block';
       sfx.clear(); confetti();

@@ -1,0 +1,42 @@
+/* 2カラム（左＝文章・右＝問題）。body に duo-page を付けたページだけに効く */
+body.duo-page .page { max-width: 1400px; }
+body.duo-page.g .g-hud-in { max-width: 1400px; }
+
+.duo { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.duo-text { position: sticky; top: 64px; max-height: calc(100vh - 80px); overflow: auto; }
+.duo-q .practice-q:first-child { margin-top: 0; }
+
+/* 文章：ふだんは たて書き。ボタンで よこ書きに */
+.passage-v {
+  writing-mode: vertical-rl; width: 100%; box-sizing: border-box; height: 460px; overflow-x: auto; overflow-y: hidden;
+  font-size: 19px; line-height: 2.15; letter-spacing: .04em;
+  background: #fffdf5; border: 2px solid #f0e2b6; border-radius: 12px; padding: 16px 14px;
+}
+.passage-v p { margin: 0 0 0 .4em; text-indent: 1em; }
+.passage-v ruby rt { font-size: 10px; }
+.passage-v.yoko { writing-mode: horizontal-tb; height: auto; overflow: visible; line-height: 2; }
+.passage-v.yoko p { margin: 0 0 6px; }
+.passage-v .mk { background: #fdebd0; border-radius: 3px; }
+.duo-note { font-size: 13px; color: #888; margin: 6px 2px 0; }
+
+/* 穴うめ */
+.blank-row { font-size: 17px; font-weight: 700; line-height: 2.4; }
+.blank-row input {
+  font-family: inherit; font-size: 16px; font-weight: 700; border: 2px solid #ddd; border-bottom: 3px solid #3498db;
+  border-radius: 8px; padding: 4px 8px; margin: 0 4px; outline: none; background: #fff;
+}
+.blank-row input:focus { border-color: #3498db; }
+.blank-row input.correct { border-color: #27ae60; background: #eafff0; }
+.blank-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+
+.pt-box { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 8px; }
+.pt-box div { background: #f4f6f7; border-radius: 10px; padding: 10px 12px; font-size: 14px; line-height: 1.7; }
+.pt-box b { display: block; font-size: 16px; color: #2c3e50; margin-bottom: 2px; }
+.tate-btn { font-family: inherit; border: 2px solid #ddd; background: #fff; border-radius: 999px; padding: 4px 14px; font-weight: 700; cursor: pointer; }
+
+@media (max-width: 900px) {
+  .duo { grid-template-columns: 1fr; }
+  .duo-text { position: static; max-height: none; }
+  .passage-v { height: 360px; }
+  .pt-box { grid-template-columns: 1fr; }
+}
