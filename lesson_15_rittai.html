@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lição 15 — 立体 (Poliedros)</title>
+<title>算数15 — 立体（面・頂点・辺）</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -188,6 +188,32 @@
   .count-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
   .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .choice-btn.small { font-size: 17px; padding: 12px 8px; }
+  /* 説明パート（2026-11-15 追加） */
+  .ex-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 8px 0; }
+  .ex-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ex-box { background: #f4f6f7; border-radius: 12px; padding: 10px 12px; font-size: 15px; line-height: 1.75; margin: 8px 0; }
+  .ex-grid .ex-box { margin: 0; }
+  .ex-box b.h { display: block; font-size: 16px; color: #2c3e50; margin-bottom: 2px; }
+  .ex-box .fig-svg { max-width: 220px; margin: 4px auto; }
+  .ex-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .ex-chip { background: #fff; border: 2px solid #e3ecf5; border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 14px; }
+  .warn-box { background: #fff5f5; border: 2px solid #f5b7b1; border-radius: 12px; padding: 10px 12px; font-size: 15px; line-height: 1.8; margin: 10px 0; }
+  .warn-box b { color: #c0392b; }
+  .mode-label { text-align: center; font-weight: 900; font-size: 16px; color: #2c3e50; padding: 2px 6px 8px; min-height: 1.6em; line-height: 1.6; }
+  .leg { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; font-weight: 900; font-size: 14px; margin: 4px 0; }
+  .leg .sw { display: inline-block; width: 18px; height: 6px; border-radius: 3px; vertical-align: middle; margin-right: 4px; }
+  .cap { text-align: center; font-size: 14px; color: #555; margin: 2px 0 8px; line-height: 1.7; }
+  .eu-wrap { overflow-x: auto; margin: 8px 0; }
+  .eu-table { border-collapse: collapse; width: 100%; font-size: 15px; font-weight: 700; text-align: center; }
+  .eu-table th, .eu-table td { border: 2px solid #e3ecf5; padding: 6px 4px; }
+  .eu-table th { background: #eaf6ff; color: #2c3e50; font-size: 13px; }
+  .eu-table input {
+    font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 700; width: 52px; text-align: center;
+    border: 2px solid #ddd; border-radius: 8px; padding: 4px; outline: none; background: #fff;
+  }
+  .eu-table input.correct { border-color: #27ae60; background: #eafff0; }
+  .eu-table input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  @media (max-width: 600px) { .ex-grid, .ex-grid.three { grid-template-columns: 1fr; } .choice-row.xcol { flex-direction: column; } }
 </style>
 
 <div class="page">
@@ -196,6 +222,61 @@
     <div class="badge">LIÇÃO 15</div>
     <h1>🧊 立体 — 面・頂点・辺</h1>
     <div class="sub">Poliedros e planificações — 教科書の 少し先（5.º ano）</div>
+  </div>
+
+  <!-- ===== A. 立体って なに？（2026-11-15 追加） ===== -->
+  <div class="card">
+    <div class="card-title">🧊 立体って なに？</div>
+    <div class="ex-grid">
+      <div class="ex-box"><b class="h">📄 平面の 図形</b>
+        <svg class="fig-svg" viewBox="0 0 200 110">
+          <rect x="18" y="22" width="68" height="68" fill="#d6eaf8" stroke="#2471c8" stroke-width="3"/>
+          <polygon points="108,90 186,90 147,22" fill="#d6eaf8" stroke="#2471c8" stroke-width="3"/>
+        </svg>
+        たて と よこ だけ。紙に かける。<b>あつみが ない</b>。</div>
+      <div class="ex-box"><b class="h">🧊 立体</b>
+        <svg class="fig-svg" viewBox="0 0 200 110">
+          <polygon points="14,42 70,42 70,98 14,98" fill="#fad7a0" stroke="#d35400" stroke-width="3"/>
+          <polygon points="14,42 38,22 94,22 70,42" fill="#fdebd0" stroke="#d35400" stroke-width="3"/>
+          <polygon points="70,42 94,22 94,78 70,98" fill="#f5cba7" stroke="#d35400" stroke-width="3"/>
+          <g stroke="#d35400" stroke-width="2" stroke-dasharray="5 4" stroke-opacity="0.7">
+            <line x1="38" y1="78" x2="14" y2="98"/><line x1="38" y1="78" x2="94" y2="78"/><line x1="38" y1="78" x2="38" y2="22"/>
+          </g>
+          <polygon points="112,96 162,96 156,18" fill="#fad7a0" fill-opacity="0.85" stroke="#d35400" stroke-width="3"/>
+          <polygon points="162,96 190,80 156,18" fill="#f5cba7" fill-opacity="0.85" stroke="#d35400" stroke-width="3"/>
+          <g stroke="#d35400" stroke-width="2" stroke-dasharray="5 4" stroke-opacity="0.7">
+            <line x1="122" y1="80" x2="190" y2="80"/><line x1="122" y1="80" x2="112" y2="96"/><line x1="122" y1="80" x2="156" y2="18"/>
+          </g>
+        </svg>
+        たて・よこ・<b>高さ</b>が ある。手で 持てる。</div>
+    </div>
+    <div class="ex-chips">
+      <span class="ex-chip">🎲 サイコロ → 立方体（cubo）</span>
+      <span class="ex-chip">📦 箱 → 直方体（四角柱）</span>
+      <span class="ex-chip">⛺ テント → 三角柱（prisma）</span>
+      <span class="ex-chip">🔺 ピラミッド → 四角すい（pirâmide）</span>
+      <span class="ex-chip">⚽ ボール → 球</span>
+    </div>
+    <div class="callout-green">
+      <b>✅ poliedro（多面体）</b> ＝ <b>たいらな 面 だけ</b>で かこまれた 立体。<br>
+      ボールや かんづめ（円柱）は 面が まがって いるので、poliedro では ない。
+    </div>
+    <div id="x-a-list"></div>
+  </div>
+
+  <!-- ===== B. 面・頂点・辺を 見分ける（2026-11-15 追加） ===== -->
+  <div class="card">
+    <div class="card-title">👀 面・頂点・辺を 見分けよう</div>
+    <p>ボタンを おすと、その 部分だけ 光る。<b>点線</b>は うしろに かくれて 見えない ところ。</p>
+    <div class="shape-btns" id="x-mode-btns"></div>
+    <div class="solid-host"><svg class="fig-svg" id="x-cube" viewBox="20 20 250 220" style="max-width:340px"></svg></div>
+    <div class="mode-label" id="x-mode-label"></div>
+    <div class="ex-grid three">
+      <div class="ex-box"><b class="h">🟧 面（face）</b>たいらな ところ</div>
+      <div class="ex-box"><b class="h">🔵 頂点（vértice）</b>辺が あつまる、とがった 点</div>
+      <div class="ex-box"><b class="h">➖ 辺（aresta）</b>面と 面の さかいめの 線</div>
+    </div>
+    <div id="x-b-list"></div>
   </div>
 
   <!-- ===== 1. まわす ===== -->
@@ -212,11 +293,54 @@
     </div>
   </div>
 
+  <!-- ===== C. 数え方の コツ（2026-11-15 追加） ===== -->
+  <div class="card">
+    <div class="card-title">🧮 数え方の コツ — 分けて 数える</div>
+    <p>1つずつ 数えると、どれを 数えたか わからなく なる。<b>グループに 分けて</b> 数えよう。</p>
+    <div class="ex-box"><b class="h">🎲 立方体（上の「辺だけ」と 同じ 色）</b>
+      辺 ＝ <b style="color:#e74c3c">上 4</b> ＋ <b style="color:#2e86c1">下 4</b> ＋ <b style="color:#27ae60">たて 4</b> ＝ <b>12</b><br>
+      頂点 ＝ 上 4 ＋ 下 4 ＝ <b>8</b><br>
+      面 ＝ 上 1 ＋ 下 1 ＋ まわり 4 ＝ <b>6</b>
+    </div>
+    <div class="ex-grid">
+      <div class="ex-box"><b class="h">三角柱</b>
+        <svg class="fig-svg" id="x-st-tri" viewBox="40 30 280 270"></svg>
+        辺 ＝ 上 ？ ＋ 下 ？ ＋ たて ？</div>
+      <div class="ex-box"><b class="h">四角すい</b>
+        <svg class="fig-svg" id="x-st-pyr" viewBox="40 30 280 270"></svg>
+        辺 ＝ 底の まわり ？ ＋ ななめ ？<br>頂点 ＝ 底の 角 ？ ＋ てっぺん 1</div>
+    </div>
+    <div class="leg">
+      <span><span class="sw" style="background:#e74c3c"></span>上</span>
+      <span><span class="sw" style="background:#2e86c1"></span>下（底）</span>
+      <span><span class="sw" style="background:#27ae60"></span>たて・ななめ</span>
+    </div>
+    <p class="cap">？ は この あとの「数えよう」で 書きこむ。</p>
+    <div class="warn-box"><b>⚠️ よくある まちがい</b><br>
+      ① 見える 辺 だけ 数える → 立方体だと 9本に なって しまう。<b>点線</b>も 数える。<br>
+      ② 面ごとに 4本ずつ 数えて たす → 4 × 6 ＝ 24本。1本の 辺は <b>2つの 面の さかいめ</b>なので、2回ずつ 数えて いる。24 ÷ 2 ＝ 12。
+    </div>
+    <div id="x-c-list"></div>
+  </div>
+
   <!-- ===== 2. 数える ===== -->
   <div class="card">
     <div class="card-title">🔢 数えよう</div>
     <p>上の 立体を まわしながら 数えて、3つ 書いてから「こたえる」。</p>
     <div id="c-list"></div>
+  </div>
+
+  <!-- ===== D. 面＋頂点−辺（2026-11-15 追加） ===== -->
+  <div class="card">
+    <div class="card-title">🧪 ふしぎな 計算 — 面 ＋ 頂点 − 辺</div>
+    <p>いろいろな 立体で「面 ＋ 頂点 − 辺」を 計算して、いちばん 右に 書こう。<b>何か 気づく？</b></p>
+    <div id="x-d-list"></div>
+    <div class="callout-orange" id="x-d-after" style="display:none">
+      <b>🌟 気づいた？ ぜんぶ 2！</b><br>
+      形も 大きさも ちがうのに、面 ＋ 頂点 − 辺 は いつも 2。これが <b>オイラーの 公式</b>。<br>
+      2つの 数が わかれば、のこりの 1つは 計算で 出せる。<br>
+      たとえば 面 6・頂点 8 なら、6 ＋ 8 − 辺 ＝ 2 → 14 − 辺 ＝ 2 → 辺 ＝ 12。
+    </div>
   </div>
 
   <!-- ===== 3. きまり ===== -->
@@ -231,6 +355,20 @@
       <b>🌟 オイラーの 公式:</b> どの 立体でも <b>面 ＋ 頂点 − 辺 ＝ 2</b>。<br>
       300年くらい 前に スイスの 数学者 オイラー（Euler）が 見つけた。ポルトガルの 教科書にも 出てくる。
     </div>
+  </div>
+
+  <!-- ===== E. 展開図の 見方（2026-11-15 追加） ===== -->
+  <div class="card">
+    <div class="card-title">✂️ 展開図の 見方</div>
+    <div class="ex-box"><b class="h">展開図（planificação）とは</b>立体の 辺を 切って、ひらいて 平らに した 図。立方体なら 正方形が 6まい。</div>
+    <div class="solid-host" id="x-net-die"></div>
+    <p class="cap">サイコロの 展開図。<b>同じ 色</b>が、組み立てた ときに 向かい合う 面。<br>サイコロは 向かい合う 目を たすと 7（1と6・2と5・3と4）。</p>
+    <div class="ex-grid">
+      <div class="ex-box"><b class="h">① 向かい合う 面</b>一列に ならんだ 面は、<b>1つ とばし</b>で 向かい合う。となりどうしは 向かい合わない。</div>
+      <div class="ex-box"><b class="h">② なる？ ならない？</b>1つの 面を 底に して、まわりの 面を 立てて いく。<b>2まいが かさなったら</b> ならない。</div>
+    </div>
+    <div class="tip"><b>💡</b> 立方体の 展開図は ぜんぶで <b>11種類</b>（回したり うらがえしたり して 同じに なる ものは 1つと 数える）。</div>
+    <div id="x-e-list"></div>
   </div>
 
   <!-- ===== 4. 展開図 ===== -->
@@ -268,7 +406,7 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
 
 const tracking = {};
-const TOTAL_Q = 17;   // 数える 3立体×3 + きまり4 + 展開図4
+let TOTAL_Q = 17;   // 数える 3立体×3 + きまり4 + 展開図4。足した 問題の 分は 下で 数え直す
 let submitted = false;
 
 function record(id, ok, detail) {
@@ -322,6 +460,7 @@ const SHAPES = [
   { key: 'cube', name: '四角柱', make: () => prism(4, Math.PI / 4) },
   { key: 'hex', name: '六角柱', make: () => prism(6, 0) },
   { key: 'pyr4', name: '四角すい', make: () => pyramid(4, Math.PI / 4) },
+  { key: 'pent', name: '五角柱', make: () => prism(5, Math.PI / 2) },
 ];
 let cur = SHAPES[0].make(), yaw = 0.6, pitch = 0.45;
 function edgesOf(F) {
@@ -433,13 +572,15 @@ function ruleCheck(id) {
   if (ok) { input.className = 'correct'; input.disabled = true; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
   else {
     input.className = 'wrong'; fb.className = 'feedback wrong'; fb.textContent = '❌ ' + got + ' じゃない。' + q.hint;
-    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+    setTimeout(() => { if (!input.disabled) { input.value = ''; input.className = ''; } }, 1600);
   }
 }
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter' || !e.target.matches('.practice-q input')) return;
   const id = e.target.id;
-  if (id.startsWith('cnt_')) countCheck(id.split('_')[1]); else ruleCheck(id);
+  if (id.startsWith('x15_eu_')) euCheck();
+  else if (id.startsWith('x15_')) xInputCheck(id);
+  else if (id.startsWith('cnt_')) countCheck(id.split('_')[1]); else ruleCheck(id);
 });
 
 /* ============ 4. 展開図 ============ */
@@ -484,6 +625,233 @@ function netCheck(id, picked, btn) {
   }
 }
 
+/* ============ 足した 説明パート（2026-11-15） ============ */
+const XQ = {};   // 足した 選ぶ・書く 問題
+
+function xChoice(host, q) {
+  XQ[q.id] = q;
+  document.getElementById(host).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">・</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row' + (q.col ? ' xcol' : '') + '" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="xChoiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function xChoiceCheck(id, i, btn) {
+  const q = XQ[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + ((q.traps && q.traps[i]) || q.hint);
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+function xInput(host, q) {
+  XQ[q.id] = q;
+  document.getElementById(host).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">・</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="numeric" autocomplete="off">' +
+    (q.unit ? '<span class="unit">' + q.unit + '</span>' : '') +
+    '<button class="check-btn" onclick="xInputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function xInputCheck(id) {
+  const q = XQ[id], input = document.getElementById(id), fb = document.getElementById(id + '-fb');
+  if (input.disabled || !input.value.trim()) return;
+  const got = parseIntJ(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね。'; return; }
+  const ok = got === q.answer;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) { input.className = 'correct'; input.disabled = true; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    input.className = 'wrong'; fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + got + ' じゃない。' + ((q.traps && q.traps[String(got)]) || q.hint);
+    setTimeout(() => { if (!input.disabled) { input.value = ''; input.className = ''; } }, 2200);
+  }
+}
+
+/* ---- A. 立体って なに？ ---- */
+xChoice('x-a-list', { id: 'x15_poly', text: 'poliedro（たいらな 面 だけで かこまれた 立体）は どれ？',
+  options: ['紙に かいた 正方形', 'サイコロ', 'サッカーボール'], answer: 1, col: true,
+  ok: 'サイコロは 6つの 面が ぜんぶ たいら。正方形は 平面（あつみが ない）、ボールは 立体 だけど 面が まがって いる。',
+  hint: '「手で 持てる」と「面が ぜんぶ たいら」の 2つが そろって いる もの。',
+  traps: { 0: '正方形は 平面の 図形。あつみが ない ので、立体 では ない。', 2: 'ボールは 立体 だけど、面が まがって いる。poliedro は たいらな 面 だけ。' } });
+
+/* ---- B. 面・頂点・辺を 光らせる 立方体 ---- */
+const XC = { A: [50, 100], B: [170, 100], C: [170, 220], D: [50, 220], E: [120, 40], F: [240, 40], G: [240, 160], H: [120, 160] };
+const XC_NUM = { A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8 };
+const XC_EDGES = [['A', 'B', 'top'], ['B', 'F', 'top'], ['F', 'E', 'top'], ['E', 'A', 'top'],
+                  ['D', 'C', 'bot'], ['C', 'G', 'bot'], ['G', 'H', 'bot'], ['H', 'D', 'bot'],
+                  ['A', 'D', 'ver'], ['B', 'C', 'ver'], ['F', 'G', 'ver'], ['E', 'H', 'ver']];
+const XC_FACES = [{ p: 'ABCD', c: '#f5b041', n: '前', at: [82, 146] }, { p: 'ABFE', c: '#58d68d', n: '上', at: [158, 70] }, { p: 'BFGC', c: '#5dade2', n: '右', at: [205, 130] }];
+const XC_COL = { top: '#e74c3c', bot: '#2e86c1', ver: '#27ae60' };
+const XC_MODES = [
+  ['all', 'ぜんぶ', ''],
+  ['face', '面だけ', '見える 面は 3つ（前・上・右）。見えない うしろ・左・下 にも 3つ。<br>3 ＋ 3 ＝ <b>6つ</b>'],
+  ['vertex', '頂点だけ', '前に 4つ ＋ うしろに 4つ ＝ <b>8つ</b>（8番は かくれて いる）'],
+  ['edge', '辺だけ', '<span style="color:#e74c3c">上 4</span> ＋ <span style="color:#2e86c1">下 4</span> ＋ <span style="color:#27ae60">たて 4</span> ＝ <b>12本</b>（点線も 数える）'],
+];
+function xCube(mode) {
+  const P = k => XC[k], hid = (a, b) => a === 'H' || b === 'H';
+  let s = '';
+  XC_FACES.forEach(f => {
+    const pts = f.p.split('').map(k => P(k).join(',')).join(' ');
+    s += '<polygon points="' + pts + '" fill="' + (mode === 'face' ? f.c : '#f5b041') + '" fill-opacity="' + (mode === 'face' ? 0.75 : mode === 'all' ? 0.25 : 0.08) + '"/>';
+  });
+  XC_EDGES.forEach(([a, b, g]) => {
+    const h = hid(a, b), on = mode === 'edge';
+    const col = on ? XC_COL[g] : mode === 'all' ? '#d35400' : '#b2babb';
+    const w = on ? (h ? 3.5 : 6) : mode === 'all' ? (h ? 2 : 3.5) : 2;
+    s += '<line x1="' + P(a)[0] + '" y1="' + P(a)[1] + '" x2="' + P(b)[0] + '" y2="' + P(b)[1] + '" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round"' + (h ? ' stroke-dasharray="7 6"' : '') + '/>';
+  });
+  if (mode === 'face') XC_FACES.forEach((f, i) => {
+    s += '<text x="' + f.at[0] + '" y="' + (f.at[1] + 9) + '" text-anchor="middle" font-size="26" font-weight="900" fill="#2c3e50">' + (i + 1) + '</text>';
+  });
+  Object.keys(XC).forEach(k => {
+    const [x, y] = P(k), h = k === 'H';
+    if (mode === 'vertex') {
+      s += '<circle cx="' + x + '" cy="' + y + '" r="14" fill="' + (h ? '#fff' : '#3498db') + '" stroke="#3498db" stroke-width="3"' + (h ? ' stroke-dasharray="5 4"' : '') + '/>' +
+           '<text x="' + x + '" y="' + (y + 6) + '" text-anchor="middle" font-size="16" font-weight="900" fill="' + (h ? '#3498db' : '#fff') + '">' + XC_NUM[k] + '</text>';
+    } else if (mode === 'all') {
+      s += '<circle cx="' + x + '" cy="' + y + '" r="6" fill="#3498db" stroke="#fff" stroke-width="2"' + (h ? ' fill-opacity="0.5"' : '') + '/>';
+    }
+  });
+  document.getElementById('x-cube').innerHTML = s;
+  const m = XC_MODES.find(x => x[0] === mode);
+  document.getElementById('x-mode-label').innerHTML = m[2] || 'ボタンを おして みよう';
+  document.querySelectorAll('#x-mode-btns .shape-btn').forEach(b => b.className = 'shape-btn' + (b.dataset.m === mode ? ' on' : ''));
+}
+document.getElementById('x-mode-btns').innerHTML = XC_MODES.map(([m, l]) =>
+  '<button class="shape-btn" data-m="' + m + '" onclick="xCube(\'' + m + '\')">' + l + '</button>').join('');
+xCube('all');
+
+xChoice('x-b-list', { id: 'x15_corner', text: '立方体の 1つの 頂点に、辺は 何本 あつまって いる？',
+  options: ['2本', '3本', '4本'], answer: 1,
+  ok: 'たて・よこ・おくの 3本。頂点 8つ × 3本 ＝ 24 だけど、1本の 辺には はしが 2つ あるので 2回ずつ 数えて いる。24 ÷ 2 ＝ 12本。',
+  hint: '「辺だけ」を おして、前の 右上の 点から 出て いる 線を 数えて。',
+  traps: { 0: '2本 だと 紙の 上の 角。おくに のびる 線も あるよ。', 2: '立方体の 頂点に 4本 あつまる ところは ない。前の 右上の 点を よく 見て。' } });
+
+/* ---- C. 数え方の コツ（色分けした 三角柱・四角すい） ---- */
+function xStatic(svgId, solid, n, isPyr, yw) {
+  const pt = 0.42, cx = 180, cy = 165, R = 112;
+  const Q = solid.V.map(([x, y, z]) => {
+    const x1 = x * Math.cos(yw) + z * Math.sin(yw), z1 = -x * Math.sin(yw) + z * Math.cos(yw);
+    return [x1, y * Math.cos(pt) - z1 * Math.sin(pt), y * Math.sin(pt) + z1 * Math.cos(pt)];
+  });
+  const P = Q.map(([x, y, z]) => [cx + x * R, cy - y * R, z]);
+  // 面が こちらを 向いて いるか（外向きの 法線の z が 正なら 見える）
+  const mid = [0, 1, 2].map(k => Q.reduce((t, q) => t + q[k], 0) / Q.length);
+  const seen = solid.F.map(f => {
+    const [a, b, c] = f.map(i => Q[i]);
+    const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+    let nn = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+    const fc = [0, 1, 2].map(k => f.reduce((t, i) => t + Q[i][k], 0) / f.length);
+    if (nn[0] * (fc[0] - mid[0]) + nn[1] * (fc[1] - mid[1]) + nn[2] * (fc[2] - mid[2]) < 0) nn = nn.map(x => -x);
+    return nn[2] > 1e-6;
+  });
+  const edgeSeen = (a, b) => solid.F.some((f, j) => seen[j] && f.includes(a) && f.includes(b) &&
+    (f.indexOf(b) === (f.indexOf(a) + 1) % f.length || f.indexOf(a) === (f.indexOf(b) + 1) % f.length));
+  let s = '';
+  solid.F.forEach((f, j) => { if (seen[j]) s += '<polygon points="' + f.map(i => P[i][0] + ',' + P[i][1]).join(' ') + '" fill="#f5b041" fill-opacity="0.18"/>'; });
+  const lines = edgesOf(solid.F).map(([a, b]) => ({ a, b, back: !edgeSeen(a, b) })).sort((x, y) => (y.back ? 1 : 0) - (x.back ? 1 : 0));
+  for (const { a, b, back } of lines) {
+    const col = isPyr ? (a < n && b < n ? '#2e86c1' : '#27ae60')
+                      : (a < n && b < n ? '#2e86c1' : a >= n && b >= n ? '#e74c3c' : '#27ae60');
+    s += '<line x1="' + P[a][0] + '" y1="' + P[a][1] + '" x2="' + P[b][0] + '" y2="' + P[b][1] + '" stroke="' + col + '" stroke-width="' + (back ? 3 : 6) + '" stroke-linecap="round"' + (back ? ' stroke-dasharray="8 7" stroke-opacity="0.8"' : '') + '/>';
+  }
+  for (const p of P) s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="6" fill="#2c3e50" stroke="#fff" stroke-width="2"/>';
+  document.getElementById(svgId).innerHTML = s;
+}
+xStatic('x-st-tri', prism(3, Math.PI / 2), 3, false, 0.2);
+xStatic('x-st-pyr', pyramid(4, Math.PI / 4), 4, true, 0.55);
+
+xInput('x-c-list', { id: 'x15_pent_e', text: '<b>五角柱</b>（底が 五角形の 角柱）の 辺は 何本？ 上・下・たての 3つに 分けて 考えよう。', answer: 15, unit: '本',
+  ok: '上 5 ＋ 下 5 ＋ たて 5 ＝ 15本。グループに 分けると、数えのこしも 2回 数えも ない。',
+  hint: '上の 五角形・下の 五角形・たての 線 の 3つに 分けよう。「まわして 見よう」で 五角柱も 出せる。',
+  traps: { '10': '10 は 上と 下の 五角形の 分 だけ（頂点の 数も 10）。たての 辺 5本も たそう。',
+           '5': 'それは 上の 五角形の 辺 だけ。下と たても ある。',
+           '7': 'それは 面の 数（上 1・下 1・まわり 5）。辺は 線の ほう。',
+           '30': '面ごとに 数えて たすと、1本の 辺を 2回 数えて しまう。上・下・たての 3グループで 数えよう。' } });
+
+/* ---- D. 面 ＋ 頂点 − 辺 の 表 ---- */
+const EU_ROWS = [
+  { key: 'cube', name: '立方体', f: 6, v: 8, e: 12 },
+  { key: 'tri3', name: '三角すい', f: 4, v: 4, e: 6 },
+  { key: 'pyr5', name: '五角すい', f: 6, v: 6, e: 10 },
+  { key: 'oct', name: '八角柱', f: 10, v: 16, e: 24 },
+];
+document.getElementById('x-d-list').innerHTML =
+  '<div class="practice-q"><div class="q-num">・</div>' +
+  '<div class="q-text">4つの 立体で 計算しよう。</div>' +
+  '<div class="eu-wrap"><table class="eu-table"><tr><th>立体</th><th>面</th><th>頂点</th><th>辺</th><th>面 ＋ 頂点 − 辺</th></tr>' +
+  EU_ROWS.map(r => '<tr><td>' + r.name + '</td><td>' + r.f + '</td><td>' + r.v + '</td><td>' + r.e + '</td>' +
+    '<td><input id="x15_eu_' + r.key + '" inputmode="numeric" autocomplete="off"></td></tr>').join('') +
+  '</table></div>' +
+  '<button class="check-btn" onclick="euCheck()">こたえる</button>' +
+  '<div class="feedback" id="x15_eu-fb"></div></div>';
+function euCheck() {
+  const fb = document.getElementById('x15_eu-fb');
+  const rows = EU_ROWS.map(r => ({ r, input: document.getElementById('x15_eu_' + r.key) }));
+  const open = rows.filter(x => !x.input.disabled);
+  if (!open.length) return;
+  if (open.some(x => parseIntJ(x.input.value) === null)) { fb.className = 'feedback wrong'; fb.textContent = 'ぜんぶの 行に 数を 書いてね。'; return; }
+  const wrong = [];
+  open.forEach(({ r, input }) => {
+    const got = parseIntJ(input.value), ok = got === 2;
+    record('x15_eu_' + r.key, ok, { answer: got, target: 2 });
+    if (ok) { input.className = 'correct'; input.disabled = true; }
+    else { input.className = 'wrong'; wrong.push(got === r.f + r.v + r.e ? r.name + '（ぜんぶ たして いる。辺は ひく）' : r.name); }
+  });
+  if (!wrong.length) {
+    fb.className = 'feedback correct';
+    fb.textContent = '⭕ 正解！ 4つとも 2。どの 立体でも 同じ 数に なった。';
+    document.getElementById('x-d-after').style.display = 'block';
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + wrong.join('・') + ' が ちがう。面 ＋ 頂点 を 先に 計算して、そこから 辺を ひく。';
+  }
+}
+
+/* ---- E. 展開図の 見方 ---- */
+function netLabeled(cells, labels, fills) {
+  const S = 50, maxX = Math.max(...cells.map(c => c[0])) + 1, maxY = Math.max(...cells.map(c => c[1])) + 1;
+  let s = '<svg class="fig-svg" style="max-width:' + Math.round((maxX * S + 20) * 1.25) + 'px" viewBox="0 0 ' + (maxX * S + 20) + ' ' + (maxY * S + 20) + '">';
+  cells.forEach(([x, y], i) => {
+    s += '<rect x="' + (10 + x * S) + '" y="' + (10 + y * S) + '" width="' + S + '" height="' + S + '" fill="' + (fills ? fills[i] : '#d6eaf8') + '" stroke="#2471c8" stroke-width="2.5"/>' +
+         '<text x="' + (10 + x * S + S / 2) + '" y="' + (10 + y * S + S / 2 + 9) + '" text-anchor="middle" font-size="26" font-weight="900" fill="#2c3e50">' + labels[i] + '</text>';
+  });
+  return s + '</svg>';
+}
+(function () {
+  const Y = '#f9e79f', Bc = '#aed6f1', G = '#abebc6';
+  // 4 1 3 6 が 一列、1 の 上に 2、下に 5。ペア: 1-6 / 2-5 / 3-4
+  document.getElementById('x-net-die').innerHTML = netLabeled(
+    [[0, 1], [1, 1], [2, 1], [3, 1], [1, 0], [1, 2]], [4, 1, 3, 6, 2, 5], [G, Y, G, Y, Bc, Bc]);
+})();
+xChoice('x-e-list', { id: 'x15_net_opp',
+  text: '組み立てた とき、<b>1</b> と 向かい合う 面は？' +
+        netLabeled([[0, 1], [1, 1], [2, 1], [3, 1], [0, 0], [2, 2]], [1, 2, 3, 4, 5, 6]),
+  options: ['2', '3', '4', '5', '6'], answer: 1,
+  ok: '一列の 1・2・3 で、1つ とばし。ぐるっと まわすと 1 の 反対がわに 3 が くる。のこりは 2と4、5と6 が ペア。',
+  hint: '一列に ならんだ ところで「1つ とばし」を さがそう。',
+  traps: { 0: '2 は 1 の となりに くっついて いる。となりどうしは 向かい合わない。',
+           2: '4 は 1 から 2つ とばし。4つ ならぶと、1と3・2と4 が ペアに なる。',
+           3: '5 は 1 に くっついて いる ふた。となりどうしは 向かい合わない。',
+           4: '6 は 3 の 下に くっついて いる ふた。5 と 6 が 上と 下の ペア。' } });
+
+/* ---- 問題数と 番号を そろえる（足した 分も ふくめて） ---- */
+TOTAL_Q = C_QS.length * 3 + R_QS.length + N_QS.length + Object.keys(XQ).length + EU_ROWS.length;
+document.querySelectorAll('.practice-q .q-num').forEach((el, i) => { el.textContent = i + 1; });
+
 /* ---- 結果 ---- */
 function showResult() {
   const box = document.getElementById('result-box');
@@ -492,8 +860,8 @@ function showResult() {
   document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
   const msg = document.getElementById('result-msg');
   if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 オイラーの 公式まで 使いこなした！';
-  else if (firstCount >= 13) msg.textContent = 'Muito bom! 立体を 頭の中で まわせてる。';
-  else if (firstCount >= 9) msg.textContent = 'Bom! うしろの 点線も 数えるのが コツ。';
+  else if (firstCount >= TOTAL_Q - 4) msg.textContent = 'Muito bom! 立体を 頭の中で まわせてる。';
+  else if (firstCount >= Math.round(TOTAL_Q * 0.55)) msg.textContent = 'Bom! うしろの 点線も 数えるのが コツ。';
   else msg.textContent = '立体を まわしながら、もう1回 数えてみよう。';
   box.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }

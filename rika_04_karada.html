@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>りか4 — 体の しくみ（いき・心臓・血液）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+<link rel="stylesheet" href="game.css">
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 16px; padding: 12px 6px; }
+  .choice-row.col { flex-direction: column; }
+  .choice-row.col .choice-btn.small { text-align: left; padding: 12px 14px; }
+  .order-col { display: flex; flex-direction: column; gap: 8px; }
+  .order-btn {
+    font-family: 'Nunito', sans-serif; position: relative; text-align: left;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 12px 14px 12px 44px; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .order-btn.picked { border-color: #3498db; background: #eaf6ff; }
+  .order-btn .badge-n {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    background: #3498db; color: #fff; width: 24px; height: 24px; border-radius: 12px;
+    font-size: 13px; display: flex; align-items: center; justify-content: center;
+  }
+  .order-col.correct .order-btn { border-color: #27ae60; background: #eafff0; }
+  .order-col.wrong .order-btn.picked { border-color: #e74c3c; background: #fff5f5; }
+  .fig-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 8px 0; padding: 6px; }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; font-weight: 900; font-size: 14px; margin: 6px 0; }
+  .legend .sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 4px; }
+  .slider-row { display: flex; align-items: center; gap: 10px; font-weight: 900; color: #2c3e50; margin: 6px 0; }
+  .slider-row input[type=range] { flex: 1; min-width: 0; height: 34px; accent-color: #e74c3c; }
+  .state-label { text-align: center; font-size: 16px; font-weight: 900; padding: 4px 0 8px; min-height: 2.6em; color: #2c3e50; }
+  .fig-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 4px 0 8px; }
+  .fig-btns button {
+    font-family: inherit; font-weight: 900; font-size: 15px; border-radius: 999px; padding: 8px 16px; cursor: pointer;
+    border: 2px solid #3498db; background: #fff; color: #2980b9;
+  }
+  .fig-btns button.hic { border-color: #e67e22; color: #e67e22; }
+  .fig-btns button.on { background: #3498db; color: #fff; }
+
+  /* せつめいの 箱 */
+  .ex { background: #f8fbff; border: 2px solid #e3ecf5; border-radius: 12px; padding: 10px 14px; margin: 10px 0; font-size: 15px; line-height: 1.85; }
+  .ex-h { font-weight: 900; color: #2c3e50; font-size: 16px; margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+  .ex-n { display: inline-flex; flex: none; width: 22px; height: 22px; border-radius: 11px; background: #3498db; color: #fff; font-size: 13px; align-items: center; justify-content: center; }
+  .ex ul { margin: 2px 0 0 1.1em; padding: 0; }
+  .ex li { margin: 2px 0; }
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0; }
+  .flow .f { background: #fff; border: 2px solid #d6eaf8; border-radius: 999px; padding: 3px 12px; font-weight: 900; font-size: 14px; }
+  .flow .ar { color: #3498db; font-weight: 900; }
+  .try-box { background: #fff8f0; border: 2px dashed #f0b27a; border-radius: 12px; padding: 10px 14px; margin: 10px 0; font-size: 15px; line-height: 1.85; }
+  .try-h { font-weight: 900; color: #e67e22; }
+  .q-head { font-weight: 900; color: #2c3e50; font-size: 16px; margin: 18px 0 4px; padding-top: 12px; border-top: 2px dashed #e3ecf5; }
+  .cell-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 8px 0; }
+  .cell-grid > div { border-radius: 10px; padding: 10px 12px; font-size: 14px; line-height: 1.7; }
+  .cell-grid b { display: block; font-size: 16px; margin-bottom: 2px; }
+  .doc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .doc-grid > div { background: #f4f6f7; border-radius: 10px; padding: 10px 12px; font-size: 14px; line-height: 1.75; }
+  .doc-grid b { display: block; font-size: 16px; color: #2c3e50; margin-bottom: 2px; }
+  ruby rt { font-size: 10px; font-weight: 700; }
+  @media (max-width: 640px) {
+    .cell-grid, .doc-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">りか 4</div>
+    <h1>🫁 体の しくみ — いき・心臓・血液</h1>
+    <div class="sub">O corpo humano — 6.º ano の 先取り。日本では 小6 で 習う</div>
+  </div>
+
+  <!-- ===== 0. きょうの 地図 ===== -->
+  <div class="card">
+    <div class="card-title">🗺️ きょうの 地図 —「酸素の リレー」</div>
+    <p>体は、すった 空気の 中の <b>酸素</b>を、体の すみずみまで とどけて いる。その リレーを、1つずつ 見て いこう。</p>
+    <div class="flow">
+      <span class="f">👃 鼻・口</span><span class="ar">→</span>
+      <span class="f">🫁 肺</span><span class="ar">→</span>
+      <span class="f">🩸 血液</span><span class="ar">→</span>
+      <span class="f">❤️ 心臓</span><span class="ar">→</span>
+      <span class="f">🏃 全身</span>
+    </div>
+    <div class="tip"><b>💡</b> りか3で「はく 息では 二酸化炭素が ふえる」を やったね。きょうは、そのとき <b>体の 中で 何が 起きて いるか</b>。お医者さんが まず 勉強する ところだよ。</div>
+  </div>
+
+  <!-- ===== 1. 息を する ===== -->
+  <div class="card">
+    <div class="card-title">🫁 1. 息を する（呼吸 — respiração）</div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">1</span>空気の 通り道</div>
+      <div class="flow">
+        <span class="f">鼻・口</span><span class="ar">→</span>
+        <span class="f"><ruby>気管<rt>きかん</rt></ruby></span><span class="ar">→</span>
+        <span class="f"><ruby>気管支<rt>きかんし</rt></ruby></span><span class="ar">→</span>
+        <span class="f">肺の 中の ふくろ（<ruby>肺胞<rt>はいほう</rt></ruby>）</span>
+      </div>
+      気管は、のどの おくから むねへ 下りる 管。むねの 中で 左右 2本に 分かれて（気管支）、右と 左の 肺に 入る。肺の 中で さらに 細かく 分かれて、いちばん 先には 小さな ふくろが ついて いる。<b>木の 幹 → 枝 → 葉っぱ</b> みたいな 形。
+    </div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">2</span>肺は 自分では ふくらめない</div>
+      肺には、自分を 動かす 筋肉が ない。肺の 下に ある うすい 筋肉の まく「<ruby>横隔膜<rt>おうかくまく</rt></ruby>（diafragma）」と、ろっ骨の まわりの 筋肉が むねを 広げると、肺が 引っぱられて ふくらみ、空気が 入る。
+      <ul>
+        <li><b>すう</b>：横隔膜が <b>下がる</b> → むねの 中が 広がる → 空気が 入る</li>
+        <li><b>はく</b>：横隔膜が <b>上がる</b> → むねの 中が せまく なる → 空気が 出る</li>
+      </ul>
+    </div>
+
+    <div class="fig-host"><svg class="fig-svg" id="br-svg" viewBox="0 0 322 300" style="max-width:380px"></svg></div>
+    <div class="slider-row">はく <input type="range" id="br-p" min="0" max="100" value="0"> すう</div>
+    <div class="fig-btns">
+      <button id="br-auto">▶ 自動で 息を する</button>
+      <button id="br-hic" class="hic">ヒック！</button>
+    </div>
+    <div class="state-label" id="br-label"></div>
+
+    <div class="try-box"><span class="try-h">✋ やってみよう</span>　おなかに 手を あてて、ゆっくり 大きく 息を すおう。おなかが 前に 出るのは、横隔膜が 下がって、おなかの 中を 下へ おすから。</div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">3</span>しゃっくり（soluço）の しくみ</div>
+      <div class="flow">
+        <span class="f">横隔膜が 急に ピクッ</span><span class="ar">→</span>
+        <span class="f">空気が 急に 入る</span><span class="ar">→</span>
+        <span class="f">のどの 入り口が パッと しまる</span><span class="ar">→</span>
+        <span class="f">「ヒック」</span>
+      </div>
+      自分で 止めようと 思っても 止まらないのは、横隔膜が 自分の 意思と 関係なく ちぢむ から。上の「ヒック！」ボタンで ためしてみよう。
+    </div>
+
+    <div class="q-head">✏️ たしかめ もんだい</div>
+    <div id="a-list"></div>
+  </div>
+
+  <!-- ===== 2. 肺胞 ===== -->
+  <div class="card">
+    <div class="card-title">🫧 2. 肺胞で 酸素と 二酸化炭素を 交かん</div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">1</span>肺の 中は スポンジ みたい</div>
+      肺の 中には、空気の 小さな ふくろ「肺胞（alvéolos）」が <b>何億こも</b> ある。そのまわりを、かみの毛より 細い 血管「<ruby>毛細血管<rt>もうさいけっかん</rt></ruby>（capilares）」が、あみのように 包んで いる。
+    </div>
+
+    <div class="fig-host"><svg class="fig-svg" id="al-svg" viewBox="0 0 340 210" style="max-width:440px"></svg></div>
+    <div class="legend">
+      <span><span class="sw" style="background:#7d6bb3"></span>心臓から 来た 血液（二酸化炭素が 多い）</span>
+      <span><span class="sw" style="background:#e74c3c"></span>心臓へ もどる 血液（酸素が 多い）</span>
+    </div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">2</span>気体は「多い ほう → 少ない ほう」へ うつる</div>
+      <ul>
+        <li><b>酸素</b>：肺胞の 中に 多くて、血液の 中に 少ない → <b>血液へ</b> うつる</li>
+        <li><b>二酸化炭素</b>：血液の 中に 多くて、肺胞の 中に 少ない → <b>肺胞へ</b> うつる → はく 息で 外へ</li>
+      </ul>
+      りか3の「はく 息では 二酸化炭素が ふえて、酸素が へる」は、ここで 起きて いる。
+    </div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">3</span>なぜ 小さな ふくろが たくさん？</div>
+      大きな ふくろ 1つより、小さな ふくろを たくさん 作る ほうが、空気に ふれる <b>面（表面）</b>が ずっと 広く なる。面が 広いほど、一度に たくさんの 酸素を 取りこめる。
+    </div>
+
+    <div class="q-head">✏️ たしかめ もんだい</div>
+    <div id="b-list"></div>
+  </div>
+
+  <!-- ===== 3. 心臓と めぐり ===== -->
+  <div class="card">
+    <div class="card-title">❤️ 3. 心臓と 血液の めぐり</div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">1</span>心臓（coração）は ポンプ</div>
+      心臓は、筋肉で できた ふくろ。大きさは 自分の にぎりこぶし くらい。ぎゅっと ちぢんで 血液を おし出し、ゆるんで 血液を 受け入れる。これを ねて いる ときも 休まず くり返して いる。
+    </div>
+
+    <div class="try-box">
+      <span class="try-h">✋ やってみよう — 脈を 数える</span><br>
+      手首の 親指がわに、反対の 手の 人さし指と 中指を そっと あてる。トクトク 感じるのが <b><ruby>脈<rt>みゃく</rt></ruby>（pulso）</b>。心臓が 血液を おし出す たびに、血管が ふくらむ しるし。<br>
+      15秒 数えて <b>4倍</b> すると、1分の 数に なる。大人は 1分に 約60〜80回。子どもは それより 少し 多い。その場で 20回 ジャンプした あとにも 数えて、くらべてみよう。
+    </div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">2</span>血管は 3しゅるい</div>
+      <ul>
+        <li><b><ruby>動脈<rt>どうみゃく</rt></ruby>（artéria）</b>：心臓から <b>出ていく</b> 血液が 通る。強い 力で おし出されるので、かべが あつくて じょうぶ。</li>
+        <li><b><ruby>静脈<rt>じょうみゃく</rt></ruby>（veia）</b>：心臓へ <b>もどる</b> 血液が 通る。手の 甲に 見える 青っぽい 血管が これ。</li>
+        <li><b>毛細血管</b>：動脈と 静脈の 間を つなぐ、とても 細い 血管。ここで 酸素や 養分を わたす。</li>
+      </ul>
+    </div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">3</span>めぐりは 2つの「わ」</div>
+      <ul>
+        <li><b>① 肺の わ</b>：心臓 → 肺 → 心臓（酸素を もらいに 行く）</li>
+        <li><b>② 全身の わ</b>：心臓 → 全身 → 心臓（酸素を とどけて、二酸化炭素を 受けとる）</li>
+      </ul>
+      心臓の 中は 4つの 部屋に 分かれて いて、肺へ 送る がわと、全身へ 送る がわが ある。<b>2つの ポンプが くっついて いる</b> イメージ。
+    </div>
+
+    <div class="fig-host"><svg class="fig-svg" id="cy-svg" viewBox="0 0 340 330" style="max-width:420px"></svg></div>
+    <div class="legend">
+      <span><span class="sw" style="background:#e74c3c"></span>酸素が 多い 血液</span>
+      <span><span class="sw" style="background:#7d6bb3"></span>二酸化炭素が 多い 血液</span>
+    </div>
+    <div class="callout-orange"><b>⚠️ 血液は 青く ならない。</b>図では 二酸化炭素が 多い 血液を むらさきで かいたけど、本当の 色は 暗めの 赤。静脈が 青っぽく 見えるのは、ひふを 通して 見て いるから。</div>
+
+    <div class="q-head">✏️ たしかめ もんだい</div>
+    <div id="c-list"></div>
+  </div>
+
+  <!-- ===== 4. 血液の なかみ ===== -->
+  <div class="card">
+    <div class="card-title">🩸 4. 血液（sangue）の なかみ</div>
+
+    <div class="ex">
+      <div class="ex-h"><span class="ex-n">1</span>血液は ただの 赤い 水では ない</div>
+      液体の 部分（<ruby>血<rt>けっ</rt></ruby>しょう）の 中に、3しゅるいの つぶが うかんで いる。
+    </div>
+
+    <div class="fig-host"><svg class="fig-svg" id="bl-svg" viewBox="0 0 340 150" style="max-width:440px"></svg></div>
+
+    <div class="cell-grid">
+      <div style="background:#fdedec"><b style="color:#c0392b">🔴 <ruby>赤血球<rt>せっけっきゅう</rt></ruby></b>（glóbulos vermelhos）<br><b style="display:inline;font-size:14px">酸素を 運ぶ</b>。数が いちばん 多い。血が 赤いのは この 色。まん中が へこんだ 円ばんの 形。</div>
+      <div style="background:#f4ecf7"><b style="color:#8e44ad">🟣 <ruby>白血球<rt>はっけっきゅう</rt></ruby></b>（glóbulos brancos）<br><b style="display:inline;font-size:14px">ばいきんと 戦う</b>。ばいきんを 取りかこんで やっつける。体を 守る 兵隊。</div>
+      <div style="background:#fef5e7"><b style="color:#d68910">🟡 <ruby>血小板<rt>けっしょうばん</rt></ruby></b>（plaquetas）<br><b style="display:inline;font-size:14px">血を 止める</b>。きずに 集まって 血を 固め、ふたを する。</div>
+    </div>
+    <div class="tip"><b>💡 血しょう（液体）</b>は、食べ物から とった 養分や、いらなく なった もの（二酸化炭素など）を とかして 運ぶ。</div>
+    <div class="callout-green"><b>📖 こくご5「かさぶたの ひみつ」を 思い出そう。</b>きずが できると 血小板が 集まって 血を 固める → 固まった 血が かわいて かさぶたに なる → その下で 新しい 皮ふが できる。あの 文章は、ここの 話だった。</div>
+
+    <div class="q-head">✏️ たしかめ もんだい</div>
+    <div id="d-list"></div>
+  </div>
+
+  <!-- ===== 5. お医者さんコラム ===== -->
+  <div class="card">
+    <div class="card-title">🩺 お医者さんは 何を 見て いる？</div>
+    <div class="doc-grid">
+      <div><b>🩺 <ruby>聴診器<rt>ちょうしんき</rt></ruby>（estetoscópio）</b>心臓の「ドックン」は、心臓の 中の とびら（<ruby>弁<rt>べん</rt></ruby>）が しまる 音。肺の 音では、空気が ちゃんと 通って いるかを 聞く。</div>
+      <div><b>😮‍💨 ぜんそく（asma）</b>気管支の 内がわが はれて 細く なり、息が 通りにくく なる。息を はく ときに ヒューヒュー・ゼーゼーと 音が する ことが ある。</div>
+      <div><b>⌚ 脈を はかる</b>手首や 首で 脈を 数えて、心臓が 速すぎ・おそすぎ ないかを 見る。きょう やった 15秒 × 4 の やり方。</div>
+      <div><b>☝️ 指に はさむ 機械</b>光を 当てて、血液が 酸素を どれくらい 運んで いるかを はかる。赤血球の 仕事ぶりを、外から 見る 道具。</div>
+    </div>
+    <div class="tip"><b>💡</b> 体の どこかが うまく 動かない とき、「酸素の リレーの どこで 止まって いるか」を 考えるのが、お医者さんの 仕事の 1つ。</div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">respiração</span> 呼吸</span>
+      <span class="vocab-chip"><span class="pt">traqueia</span> 気管</span>
+      <span class="vocab-chip"><span class="pt">brônquios</span> 気管支</span>
+      <span class="vocab-chip"><span class="pt">pulmões</span> 肺</span>
+      <span class="vocab-chip"><span class="pt">alvéolos</span> 肺胞</span>
+      <span class="vocab-chip"><span class="pt">diafragma</span> 横隔膜</span>
+      <span class="vocab-chip"><span class="pt">soluço</span> しゃっくり</span>
+      <span class="vocab-chip"><span class="pt">coração</span> 心臓</span>
+      <span class="vocab-chip"><span class="pt">pulso</span> 脈</span>
+      <span class="vocab-chip"><span class="pt">artéria</span> 動脈</span>
+      <span class="vocab-chip"><span class="pt">veia</span> 静脈</span>
+      <span class="vocab-chip"><span class="pt">capilares</span> 毛細血管</span>
+      <span class="vocab-chip"><span class="pt">sangue</span> 血液</span>
+      <span class="vocab-chip"><span class="pt">glóbulos vermelhos</span> 赤血球</span>
+      <span class="vocab-chip"><span class="pt">glóbulos brancos</span> 白血球</span>
+      <span class="vocab-chip"><span class="pt">plaquetas</span> 血小板</span>
+      <span class="vocab-chip"><span class="pt">estetoscópio</span> 聴診器</span>
+      <span class="vocab-chip"><span class="pt">asma</span> ぜんそく</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'rika_04_karada';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+/* ---- 数を 入れる問題（共通） ---- */
+const INPUT_QS = {};
+function parseDec(raw) {
+  let s = raw.trim()
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/[,，．、]/g, '.')
+    .replace(/[^0-9.]/g, '');
+  return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : null;
+}
+function renderInput(hostId, q) {
+  INPUT_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="decimal" autocomplete="off">' +
+    (q.unit ? '<span class="unit">' + q.unit + '</span>' : '') +
+    '<button class="check-btn" onclick="inputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function inputCheck(id) {
+  const q = INPUT_QS[id], input = document.getElementById(id), fb = document.getElementById(id + '-fb');
+  if (!input.value.trim()) return;
+  const got = parseDec(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね。'; return; }
+  const ok = Math.abs(got - q.answer) < 1e-9;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) { input.className = 'correct'; input.disabled = true; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    input.className = 'wrong'; fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + got + ' じゃない。' + ((q.traps && q.traps[String(got)]) || q.hint);
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches('.practice-q input') && INPUT_QS[e.target.id]) inputCheck(e.target.id);
+});
+
+
+const col = (host) => document.querySelectorAll('#' + host + ' .choice-row').forEach(r => r.classList.add('col'));
+
+/* ============ 1. 呼吸の 図（横隔膜の スライダー） ============ */
+const brP = document.getElementById('br-p'), brLabel = document.getElementById('br-label');
+let brHic = false;
+function brDraw(v) {            // v: 0（はいた）〜 1（すった）
+  const rx = 38 + 12 * v, ry = 52 + 20 * v, cy = 140 + 12 * v;
+  const E = 232 + 14 * v, C = 141 + 60 * v;
+  let s = '';
+  s += '<rect x="26" y="40" width="270" height="252" rx="42" fill="#fdf2e9" stroke="#e5c7a8" stroke-width="3"/>';
+  for (let i = 0; i < 5; i++) {   // ろっ骨（むねが 広がると 少し 開く）
+    const y = 74 + i * 30, w = 116 + 8 * v;
+    s += '<path d="M ' + (161 - w) + ' ' + (y + 16) + ' Q 161 ' + (y - 12) + ' ' + (161 + w) + ' ' + (y + 16) + '" fill="none" stroke="#ead7c3" stroke-width="6" stroke-linecap="round"/>';
+  }
+  [110, 212].forEach(cx => {
+    s += '<ellipse cx="' + cx + '" cy="' + cy.toFixed(1) + '" rx="' + rx.toFixed(1) + '" ry="' + ry.toFixed(1) + '" fill="#f5b7b1" stroke="#e6a19a" stroke-width="3"/>';
+  });
+  // 気管 と 気管支
+  s += '<rect x="153" y="8" width="16" height="86" rx="6" fill="#f1948a"/>';
+  s += '<path d="M 161 92 L 122 ' + (cy - 26).toFixed(1) + ' M 161 92 L 200 ' + (cy - 26).toFixed(1) + '" stroke="#e17055" stroke-width="9" stroke-linecap="round" fill="none"/>';
+  [[122, -1], [200, 1]].forEach(([x, d]) => {
+    const y = cy - 26;
+    s += '<path d="M ' + x + ' ' + y.toFixed(1) + ' l ' + (-14 * d) + ' 22 M ' + x + ' ' + y.toFixed(1) + ' l ' + (10 * d) + ' 26 M ' + x + ' ' + y.toFixed(1) + ' l ' + (-2 * d) + ' 34" stroke="#e17055" stroke-width="4" stroke-linecap="round" fill="none"/>';
+  });
+  // 横隔膜
+  s += '<path d="M 40 ' + E.toFixed(1) + ' Q 161 ' + C.toFixed(1) + ' 282 ' + E.toFixed(1) + '" fill="none" stroke="#c0392b" stroke-width="7" stroke-linecap="round"/>';
+  s += '<text x="216" y="' + (E + 22).toFixed(1) + '" font-size="15" font-weight="900" fill="#c0392b">横隔膜</text>';
+  s += '<text x="161" y="282" text-anchor="middle" font-size="12" font-weight="700" fill="#a0806a">おなか（胃・腸 など）</text>';
+  s += '<text x="176" y="30" font-size="14" font-weight="900" fill="#2c3e50">気管</text>';
+  s += '<text x="110" y="' + (cy + ry * 0.5).toFixed(1) + '" text-anchor="middle" font-size="16" font-weight="900" fill="#922b21">肺</text>';
+  s += '<text x="212" y="' + (cy + ry * 0.5).toFixed(1) + '" text-anchor="middle" font-size="16" font-weight="900" fill="#922b21">肺</text>';
+  // 空気の 矢じるし
+  if (v > 0.05 && v < 0.98) {
+    const down = brDir >= 0;
+    s += '<text x="132" y="28" text-anchor="middle" font-size="13" font-weight="900" fill="#2980b9">' + (down ? '空気 ⬇' : '空気 ⬆') + '</text>';
+  }
+  document.getElementById('br-svg').innerHTML = s;
+}
+let brDir = 1, brPrev = 0;
+function brLabelSet(v) {
+  if (brHic) return;
+  brLabel.textContent = v < 0.12 ? 'はいた ところ：横隔膜が 上に もり上がって、肺が 小さい'
+    : v > 0.88 ? 'すった ところ：横隔膜が 下がって むねの 中が 広がり、肺が ふくらんだ'
+    : '横隔膜が 下がる ほど、肺が ふくらんで 空気が 入る';
+}
+function brSet(v) {
+  brDir = v >= brPrev ? 1 : -1; brPrev = v;
+  brP.value = Math.round(v * 100); brDraw(v); brLabelSet(v);
+}
+brP.addEventListener('input', () => { brStop(); brSet(+brP.value / 100); });
+let brTimer = null, brT = 0;
+const brAutoBtn = document.getElementById('br-auto');
+function brStop() { if (brTimer) { clearInterval(brTimer); brTimer = null; brAutoBtn.classList.remove('on'); brAutoBtn.textContent = '▶ 自動で 息を する'; } }
+brAutoBtn.addEventListener('click', () => {
+  if (brTimer) { brStop(); return; }
+  brAutoBtn.classList.add('on'); brAutoBtn.textContent = '■ とめる';
+  brT = Math.acos(1 - 2 * (+brP.value / 100));
+  brTimer = setInterval(() => { brT += 0.06; brSet((1 - Math.cos(brT)) / 2); }, 40);
+});
+document.getElementById('br-hic').addEventListener('click', () => {
+  brStop();
+  const base = +brP.value / 100, peak = Math.min(1, base + 0.45);
+  brHic = true;
+  brLabel.textContent = 'ヒック！ 横隔膜が 急に ピクッと 下がって 空気が 入り、のどの 入り口が パッと しまった';
+  brSet(peak);
+  setTimeout(() => { brSet(base); }, 140);
+  setTimeout(() => { brHic = false; brLabelSet(+brP.value / 100); }, 2600);
+});
+brSet(0);
+
+/* ============ 2. 肺胞と 毛細血管の 図 ============ */
+(function () {
+  const cx = 150, cy = 103, r = 88;
+  const pt = a => [(cx + r * Math.cos(a * Math.PI / 180)).toFixed(1), (cy + r * Math.sin(a * Math.PI / 180)).toFixed(1)];
+  const [x1, y1] = pt(130), [x2, y2] = pt(230);
+  let s = '<defs>' +
+    '<linearGradient id="capg" gradientUnits="userSpaceOnUse" x1="0" y1="180" x2="0" y2="30"><stop offset="0" stop-color="#7d6bb3"/><stop offset="1" stop-color="#e74c3c"/></linearGradient>' +
+    '<marker id="cap-ah" markerUnits="userSpaceOnUse" markerWidth="22" markerHeight="22" refX="6" refY="11" orient="auto"><path d="M0 0 L16 11 L0 22 Z" fill="#e74c3c"/></marker>' +
+    '<marker id="o2-ah" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12 Z" fill="#c0392b"/></marker>' +
+    '<marker id="co2-ah" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0 L12 6 L0 12 Z" fill="#7f8c8d"/></marker>' +
+    '</defs>';
+  s += '<rect x="0" y="92" width="80" height="22" fill="#d6eaf8" stroke="#85c1e9" stroke-width="2"/>';
+  s += '<text x="2" y="132" font-size="12" font-weight="900" fill="#2c3e50">気管支から</text><text x="2" y="148" font-size="12" font-weight="900" fill="#2c3e50">空気が 入る</text>';
+  s += '<circle cx="' + cx + '" cy="' + cy + '" r="72" fill="#eaf6ff" stroke="#85c1e9" stroke-width="3"/>';
+  s += '<text x="' + cx + '" y="54" text-anchor="middle" font-size="15" font-weight="900" fill="#2980b9">肺胞</text><text x="' + cx + '" y="69" text-anchor="middle" font-size="11" font-weight="700" fill="#2980b9">（空気の ふくろ）</text>';
+  s += '<path d="M ' + x1 + ' ' + y1 + ' A ' + r + ' ' + r + ' 0 1 0 ' + x2 + ' ' + y2 + '" fill="none" stroke="url(#capg)" stroke-width="14" stroke-linecap="round" marker-end="url(#cap-ah)"/>';
+  s += '<text x="250" y="96" font-size="14" font-weight="900" fill="#2c3e50">毛細血管</text>';
+  s += '<text x="250" y="114" font-size="11" font-weight="700" fill="#7f8c8d">（血液が 流れる）</text>';
+  // 酸素 → 血液
+  s += '<line x1="160" y1="96" x2="214" y2="96" stroke="#c0392b" stroke-width="3" marker-end="url(#o2-ah)"/>';
+  s += '<text x="166" y="88" font-size="13" font-weight="900" fill="#c0392b">酸素 →</text>';
+  // 二酸化炭素 → 肺胞
+  s += '<line x1="214" y1="128" x2="160" y2="128" stroke="#7f8c8d" stroke-width="3" marker-end="url(#co2-ah)"/>';
+  s += '<text x="118" y="150" font-size="13" font-weight="900" fill="#7f8c8d">← 二酸化炭素</text>';
+  [0, 1].forEach(k => {
+    s += '<circle cx="160" cy="96" r="5" fill="#e74c3c"><animate attributeName="cx" from="150" to="226" dur="2s" begin="' + (-k) + 's" repeatCount="indefinite"/></circle>';
+    s += '<circle cx="226" cy="128" r="5" fill="#95a5a6"><animate attributeName="cx" from="230" to="150" dur="2s" begin="' + (-k) + 's" repeatCount="indefinite"/></circle>';
+  });
+  s += '<text x="60" y="200" font-size="12" font-weight="900" fill="#7d6bb3">心臓から ↗</text>';
+  s += '<text x="20" y="22" font-size="12" font-weight="900" fill="#e74c3c">↖ 心臓へ</text>';
+  document.getElementById('al-svg').innerHTML = s;
+})();
+
+/* ============ 3. 血液の めぐりの 図 ============ */
+(function () {
+  const RED = '#e74c3c', PUR = '#7d6bb3';
+  const paths = [
+    { id: 'pp1', d: 'M 150 140 L 150 68', c: PUR, dur: 1.4, n: 2 },
+    { id: 'pp2', d: 'M 190 68 L 190 140', c: RED, dur: 1.4, n: 2 },
+    { id: 'pp3', d: 'M 206 166 L 290 166 L 290 288 L 252 288', c: RED, dur: 3, n: 3 },
+    { id: 'pp4', d: 'M 88 288 L 50 288 L 50 166 L 132 166', c: PUR, dur: 3, n: 3 }
+  ];
+  let s = '<defs>' +
+    '<marker id="ah-red" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" refX="12" refY="8" orient="auto"><path d="M0 0 L16 8 L0 16 Z" fill="' + RED + '"/></marker>' +
+    '<marker id="ah-pur" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" refX="12" refY="8" orient="auto"><path d="M0 0 L16 8 L0 16 Z" fill="' + PUR + '"/></marker>' +
+    '</defs>';
+  s += '<rect x="104" y="12" width="132" height="56" rx="14" fill="#fdedec" stroke="#f1948a" stroke-width="3"/>';
+  s += '<text x="170" y="36" text-anchor="middle" font-size="16" font-weight="900" fill="#922b21">🫁 肺</text>';
+  s += '<text x="170" y="56" text-anchor="middle" font-size="12" font-weight="700" fill="#922b21">酸素を もらう</text>';
+  s += '<rect x="88" y="262" width="164" height="56" rx="14" fill="#fef9e7" stroke="#f5cba7" stroke-width="3"/>';
+  s += '<text x="170" y="286" text-anchor="middle" font-size="15" font-weight="900" fill="#7e5109">🏃 全身</text>';
+  s += '<text x="170" y="306" text-anchor="middle" font-size="11" font-weight="700" fill="#7e5109">体中に 酸素を わたす</text>';
+  paths.forEach(p => {
+    s += '<path id="' + p.id + '" d="' + p.d + '" fill="none" stroke="' + p.c + '" stroke-width="6" stroke-linejoin="round" marker-end="url(#' + (p.c === RED ? 'ah-red' : 'ah-pur') + ')"/>';
+    for (let k = 0; k < p.n; k++) {
+      s += '<circle r="5" fill="#fff" stroke="' + p.c + '" stroke-width="3"><animateMotion dur="' + p.dur + 's" begin="' + (-k * p.dur / p.n).toFixed(2) + 's" repeatCount="indefinite"><mpath href="#' + p.id + '"/></animateMotion></circle>';
+    }
+  });
+  // 心臓
+  s += '<path d="M170 196 C 118 164, 128 118, 170 140 C 212 118, 222 164, 170 196 Z" fill="#e74c3c" stroke="#a93226" stroke-width="3"/>';
+  s += '<text x="170" y="168" text-anchor="middle" font-size="15" font-weight="900" fill="#fff">心臓</text>';
+  s += '<text x="298" y="222" font-size="14" font-weight="900" fill="' + RED + '">動</text><text x="298" y="240" font-size="14" font-weight="900" fill="' + RED + '">脈</text>';
+  s += '<text x="28" y="222" font-size="14" font-weight="900" fill="' + PUR + '">静</text><text x="28" y="240" font-size="14" font-weight="900" fill="' + PUR + '">脈</text>';
+  s += '<text x="210" y="106" font-size="12" font-weight="900" fill="#2c3e50">① 肺の わ</text>';
+  s += '<text x="94" y="248" font-size="12" font-weight="900" fill="#2c3e50">② 全身の わ</text>';
+  document.getElementById('cy-svg').innerHTML = s;
+})();
+
+/* ============ 4. 血液の つぶの 図 ============ */
+(function () {
+  let s = '<rect x="4" y="4" width="332" height="142" rx="16" fill="#fcf3cf" stroke="#f7dc6f" stroke-width="2"/>';
+  s += '<text x="16" y="24" font-size="12" font-weight="900" fill="#9a7d0a">血しょう（液体）</text>';
+  const reds = [[40, 60], [80, 100], [120, 52], [150, 112], [196, 70], [236, 118], [262, 50], [300, 92], [60, 128], [186, 132], [306, 132], [106, 78]];
+  reds.forEach(([x, y], i) => {
+    const rot = (i * 37) % 180;
+    s += '<g transform="rotate(' + rot + ' ' + x + ' ' + y + ')"><ellipse cx="' + x + '" cy="' + y + '" rx="15" ry="13" fill="#e74c3c"/><ellipse cx="' + x + '" cy="' + y + '" rx="7" ry="5.5" fill="#f1948a"/></g>';
+  });
+  s += '<circle cx="232" cy="80" r="22" fill="#e8daef" stroke="#a569bd" stroke-width="3"/>';
+  [[224, 74], [238, 72], [232, 87]].forEach(([x, y]) => { s += '<circle cx="' + x + '" cy="' + y + '" r="6" fill="#8e44ad"/>'; });
+  [[150, 80], [276, 112], [96, 130], [212, 42], [40, 100]].forEach(([x, y], i) => {
+    s += '<ellipse cx="' + x + '" cy="' + y + '" rx="5" ry="3.5" transform="rotate(' + (i * 50) + ' ' + x + ' ' + y + ')" fill="#f5b041" stroke="#d68910" stroke-width="1.5"/>';
+  });
+  document.getElementById('bl-svg').innerHTML = s;
+})();
+
+/* ============ もんだい：1. 呼吸 ============ */
+renderOrder('a-list', { id: 'br_path', text: '空気の 通り道。鼻・口から 先の じゅんに ならべよう',
+  items: ['鼻・口', '気管', '気管支（左右に 分かれた 管）', '肺胞（肺の 中の 小さな ふくろ）'], shuffle: [2, 0, 3, 1],
+  ok: '鼻・口 → 気管 → 気管支 → 肺胞。木の 幹から 枝、葉っぱへ、だんだん 細かく 分かれて いく。', hint: '太い 管から 細い 管へ。いちばん 先は ふくろ。' });
+renderChoice('a-list', { id: 'br_down', text: '息を すう とき、横隔膜は どう 動く？', options: ['上がる', '下がる', '動かない'], answer: 1,
+  ok: '横隔膜が 下がると、むねの 中が 広がって 肺が ふくらみ、空気が 入る。', hint: '図の スライダーを「すう」の ほうへ 動かして、赤い 線を 見よう。' });
+renderChoice('a-list', { id: 'br_self', text: '肺は、自分の 筋肉で ふくらむ？', options: ['ふくらむ', 'ふくらまない（まわりの 筋肉が むねを 広げる）'], answer: 1,
+  ok: '肺には 自分を 動かす 筋肉が ない。横隔膜と ろっ骨の まわりの 筋肉が むねを 広げるから、肺が 引っぱられて ふくらむ。', hint: 'せつめい ②「肺は 自分では ふくらめない」を 読もう。' });
+renderChoice('a-list', { id: 'br_hic', text: 'しゃっくりの とき、急に ピクッと ちぢんで いるのは？', options: ['心臓', '横隔膜', '胃'], answer: 1,
+  ok: '横隔膜が 急に ちぢんで 空気が 入り、のどの 入り口が しまって「ヒック」と 音が 出る。', hint: '「ヒック！」ボタンを おして、どこが 動くか 見よう。' });
+col('a-list');
+
+/* ============ もんだい：2. 肺胞 ============ */
+renderChoice('b-list', { id: 'ex_o2', text: '肺胞で、空気から 血液へ うつる 気体は？', options: ['酸素', '二酸化炭素', 'ちっ素'], answer: 0,
+  ok: '酸素は 肺胞の 中に 多く、血液に 少ない。多い ほうから 少ない ほうへ うつる。', hint: '図の 赤い つぶが、どっちへ 動いて いるか 見よう。' });
+renderChoice('b-list', { id: 'ex_co2', text: '血液から 肺胞へ 出て、はく 息で 外に 出る 気体は？', options: ['酸素', '二酸化炭素', 'ちっ素'], answer: 1,
+  ok: '体中で 酸素を 使うと 二酸化炭素が できる。血液が それを 肺まで 運んで きて、ここで すてる。だから はく 息には 二酸化炭素が 多い（りか3）。', hint: '図の 灰色の つぶの 動きを 見よう。' });
+renderChoice('b-list', { id: 'ex_many', text: '肺に、大きな ふくろ 1つ ではなく、小さな ふくろ（肺胞）が 何億こも ある のは なぜ？', options: ['空気に ふれる 面を 広く して、たくさん 交かん する ため', '肺を 軽く する ため', '声を 出す ため'], answer: 0,
+  ok: '小さく 分ける ほど、表面の 合計が 広く なる。広い ほど 一度に たくさんの 酸素を 取りこめる。', hint: 'せつめい ③を 読もう。「面」が キーワード。' });
+col('b-list');
+
+/* ============ もんだい：3. 心臓と めぐり ============ */
+renderChoice('c-list', { id: 'ht_pump', text: '心臓の いちばんの 仕事は？', options: ['血液を 全身へ おし出す ポンプ', '空気を ためる ふくろ', '食べ物を 消化する'], answer: 0,
+  ok: '筋肉で ぎゅっと ちぢんで 血液を おし出す。ねて いる 間も 休まず 動いて いる。', hint: 'せつめい ①を 読もう。' });
+renderInput('c-list', { id: 'ht_pulse', text: '15秒 数えたら、脈が 20回 だった。1分では 何回？', answer: 80, unit: '回',
+  ok: '1分（60秒）は 15秒の 4こ分。20 × 4 ＝ 80回。15秒 数えて 4倍 する やり方は、病院でも 使われる。', hint: '60秒 ÷ 15秒 ＝ 4。だから 20回を 4倍。',
+  traps: { '20': '20回は 15秒の 数。1分（60秒）は、15秒の 何こ分？', '35': 'たし算 じゃないよ。15秒が 4こで 1分。', '300': '20 × 15 に なってる。1分は 15秒 × 4 だよ。', '40': 'それは 30秒の 数。1分は 15秒の 4こ分。' } });
+renderChoice('c-list', { id: 'ht_artery', text: '心臓から 出ていく 血液が 通る 血管は？', options: ['動脈', '静脈'], answer: 0,
+  ok: '心臓から 出る ＝ 動脈、心臓へ もどる ＝ 静脈。動脈は 強い 力で おし出されるので、かべが あつくて じょうぶ。', hint: '図の 赤い 線（心臓 → 全身）に 書いて ある 名前は？' });
+renderOrder('c-list', { id: 'ht_cycle', text: '血液の めぐり。全身から スタートして ならべよう',
+  items: ['全身から 心臓に もどって くる', '心臓が 肺へ 送る', '肺で 酸素を もらい、二酸化炭素を すてる', 'もう一度 心臓に もどる', '心臓が 全身へ 送り出す'], shuffle: [2, 4, 0, 3, 1],
+  ok: '全身 → 心臓 → 肺 → 心臓 → 全身。心臓を 2回 通るのが ポイント。肺で 酸素を もらってから、全身へ とどける。', hint: '肺に 行く 前と 後で、心臓を 2回 通る。図の 白い つぶを 目で 追ってみよう。' });
+renderChoice('c-list', { id: 'ht_vein', text: '手の 甲に 見える 青っぽい 血管（静脈）。中の 血液は 何色？', options: ['青', '赤（少し 暗い 赤）', 'とうめい'], answer: 1,
+  ok: '静脈の 血も 赤。ひふを 通して 見るから 青っぽく 見える だけ。けがを した とき 出る 血は、いつも 赤いよね。', hint: 'けがで 出る 血の 色を 思い出そう。⚠️ の 箱も 読んで。' });
+col('c-list');
+
+/* ============ もんだい：4. 血液の なかみ ============ */
+renderChoice('d-list', { id: 'bl_red', text: '酸素を 運ぶ つぶは？', options: ['赤血球', '白血球', '血小板'], answer: 0,
+  ok: '赤血球は 肺で 酸素を 受けとって、全身に とどける。血が 赤いのは 赤血球の 色。', hint: 'いちばん 数が 多い、赤い つぶ。' });
+renderChoice('d-list', { id: 'bl_plate', text: 'ころんで ひざを すりむいた。血を 止めて、かさぶたの もとに なるのは？', options: ['赤血球', '白血球', '血小板'], answer: 2,
+  ok: '血小板が きずに 集まって 血を 固める。それが かわいて かさぶたに なる（こくご5の 文章と 同じ）。', hint: 'いちばん 小さな、黄色の つぶ。' });
+renderChoice('d-list', { id: 'bl_white', text: 'きずから ばいきんが 入った。ばいきんと 戦うのは？', options: ['赤血球', '白血球', '血小板'], answer: 1,
+  ok: '白血球が ばいきんを 取りかこんで やっつける。体を 守る 兵隊。', hint: 'むらさき色で、大きな つぶ。' });
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 酸素の リレーが ぜんぶ つながった！';
+  else if (firstCount >= TOTAL_Q - 3) msg.textContent = 'Muito bom! 体の 中の しくみが 見えて きた。';
+  else msg.textContent = '「きょうの 地図」と、各ステージの せつめいの 箱を もう1回 見よう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+<script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>算数21 — パーセントは 10% から</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+<link rel="stylesheet" href="game.css">
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 16px; padding: 12px 6px; }
+  .choice-row.col { flex-direction: column; }
+  .choice-row.col .choice-btn.small { text-align: left; padding: 12px 14px; }
+  .fig-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 8px 0; padding: 6px; }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+  .slider-row { display: flex; align-items: center; gap: 10px; font-weight: 900; color: #2c3e50; margin: 6px 0; }
+  .slider-row input[type=range] { flex: 1; height: 34px; accent-color: #3498db; }
+  .state-label { text-align: center; font-size: 17px; font-weight: 900; padding: 4px 0 8px; color: #2c3e50; }
+  .row-btns { flex-wrap: wrap; }
+  .row-btns .act-btn { flex: 1 1 56px; padding: 12px 6px; }
+  .row-btns .act-btn.on { background: #e67e22; }
+  .try-title { font-weight: 900; color: #8e44ad; margin: 14px 0 4px; }
+  .steps { counter-reset: st; display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+  .steps div { counter-increment: st; position: relative; background: #f8f9fa; border-radius: 10px; padding: 10px 12px 10px 44px; font-size: 15px; line-height: 1.7; }
+  .steps div::before { content: counter(st); position: absolute; left: 10px; top: 10px; width: 24px; height: 24px; border-radius: 12px; background: #8e44ad; color: #fff; font-weight: 900; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+  .make-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 10px 0; }
+  .make-grid div { background: #fff8e8; border-radius: 10px; padding: 8px 10px; font-size: 15px; line-height: 1.6; }
+  .make-grid b { color: #e67e22; font-size: 17px; }
+  @media (max-width: 520px) { .make-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">算数 21</div>
+    <h1>🧱 パーセントは 10% から</h1>
+    <div class="sub">Percentagens — 10% を 先に 出せば、ほとんど ぜんぶ 解ける</div>
+  </div>
+
+  <!-- ===== 1. パーセントって なに？ ===== -->
+  <div class="card">
+    <div class="card-title">💯 パーセント（%）って なに？</div>
+    <p>「%」は、<b>ぜんぶを 100こに 分けた うちの いくつ か</b> を あらわす。</p>
+    <div class="fig-host"><svg class="fig-svg" id="grid100" viewBox="0 0 268 268" style="max-width:280px"></svg></div>
+    <div class="slider-row">0% <input type="range" id="g-p" min="0" max="100" value="30"> 100%</div>
+    <div class="state-label" id="g-label"></div>
+    <div class="callout-green">
+      <b>おぼえる のは 3つ だけ</b><br>
+      ・<b>100%</b> ＝ ぜんぶ<br>
+      ・<b>50%</b> ＝ 半分<br>
+      ・<b>10%</b> ＝ 10こに 分けた うちの 1つ（100マスなら 1れつ）
+    </div>
+    <div class="try-title">✋ やってみよう</div>
+    <div id="a-list"></div>
+  </div>
+
+  <!-- ===== 2. 10% は ÷10 ===== -->
+  <div class="card">
+    <div class="card-title">🔟 10% は「10こに 分けた 1つ」</div>
+    <p>ぜんぶを テープに して、<b>10この ブロック</b>に 分ける。ブロック 1つが <b>10%</b>。</p>
+    <div class="equation">10% ＝ ぜんぶ ÷ 10</div>
+    <p>ぜんぶを 下の ボタンで かえて みよう。ブロック 1つ ぶんが いくつに なるか 見て。</p>
+    <div class="row-btns" id="t2-btns"></div>
+    <div class="fig-host"><svg class="fig-svg" id="t2" viewBox="0 0 620 120"></svg></div>
+    <div class="state-label" id="t2-label"></div>
+    <div class="tip"><b>💡 ÷10 の コツ</b>：200 → 20、360 → 36、50 → 5。<b>おしりの 0を 1つ とる</b>か、<b>小数点を 1つ 左へ</b>。</div>
+    <div class="callout-orange">
+      <b>⚠️ よくある まちがい</b>：「30% だから ÷3」は ちがう！<br>
+      30% は「10% の ブロックが <b>3こ</b>」。だから <b>÷10 してから ×3</b>。
+    </div>
+    <div class="try-title">✋ やってみよう</div>
+    <div id="b-list"></div>
+  </div>
+
+  <!-- ===== 3. 10% から 作る ===== -->
+  <div class="card">
+    <div class="card-title">🧩 10% が わかれば、ほかの % も 作れる</div>
+    <div class="make-grid">
+      <div><b>20%</b> ＝ 10% が 2こ（×2）</div>
+      <div><b>30%</b> ＝ 10% が 3こ（×3）</div>
+      <div><b>5%</b> ＝ 10% の 半分（÷2）</div>
+      <div><b>25%</b> ＝ 10% 2こ ＋ 5%</div>
+      <div><b>50%</b> ＝ 10% が 5こ ＝ 半分</div>
+      <div><b>90%</b> ＝ ぜんぶ − 10%</div>
+    </div>
+    <p><b>ぜんぶが 200円</b> の とき。% を えらぶと、何こ ぶんの ブロックに なるか 光る。</p>
+    <div class="row-btns" id="t3-btns"></div>
+    <div class="fig-host"><svg class="fig-svg" id="t3" viewBox="0 0 620 120"></svg></div>
+    <div class="state-label" id="t3-label"></div>
+    <div class="steps">
+      <div>まず <b>10%</b> を 出す（÷10）</div>
+      <div>ほしい % は、10% の ブロック <b>何こ ぶん</b>？</div>
+      <div>10% の 数 × 何こ（5% なら 半分を たす）</div>
+    </div>
+    <div class="try-title">✏️ もんだい</div>
+    <div id="c-list"></div>
+  </div>
+
+  <!-- ===== 4. 逆に 何%？ ===== -->
+  <div class="card">
+    <div class="card-title">🔄 ぎゃくに「何% か」を 出す</div>
+    <p>「30人の うち 6人は 何%？」の ような 問題。<b>ここでも 10% から</b>。</p>
+    <div class="steps">
+      <div>ぜんぶの <b>10% は 何人</b>？ → 30 ÷ 10 ＝ <b>3人</b></div>
+      <div>6人は、その 3人の <b>何こ ぶん</b>？ → 6 ÷ 3 ＝ <b>2こ</b></div>
+      <div>10% が 2こ だから <b>20%</b></div>
+    </div>
+    <p>30人の うち 何人かを えらんで みよう。</p>
+    <div class="row-btns" id="t4-btns"></div>
+    <div class="fig-host"><svg class="fig-svg" id="t4" viewBox="0 0 620 120"></svg></div>
+    <div class="state-label" id="t4-label"></div>
+    <div class="callout-green"><b>👍 はるの やり方</b>：前に「4人が 20% だから、8人は その 倍で 40%」と 自分で 出せていた。それが この やり方。<b>倍・半分</b>で 動かして いけば いい。</div>
+    <div class="try-title">✏️ もんだい</div>
+    <div id="d-list"></div>
+  </div>
+
+  <!-- ===== 5. 円グラフ ===== -->
+  <div class="card">
+    <div class="card-title">🥧 円グラフでも 10% から</div>
+    <p>円の 1周は <b>360°</b>。だから <b>10% ＝ 36°</b>（360 ÷ 10）。</p>
+    <div class="fig-host"><svg class="fig-svg" id="pie" viewBox="0 0 220 220" style="max-width:240px"></svg></div>
+    <div class="slider-row">0% <input type="range" id="pie-p" min="0" max="100" step="5" value="30"> 100%</div>
+    <div class="state-label" id="pie-label"></div>
+    <div class="try-title">✏️ もんだい</div>
+    <div id="e-list"></div>
+  </div>
+
+  <!-- ===== ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば（ポルトガル語 ↔ 日本語）</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">percentagem</span> パーセント・わりあい</span>
+      <span class="vocab-chip"><span class="pt">por cento</span> 〜パーセント</span>
+      <span class="vocab-chip"><span class="pt">metade</span> 半分</span>
+      <span class="vocab-chip"><span class="pt">o total</span> ぜんぶ</span>
+      <span class="vocab-chip"><span class="pt">gráfico circular</span> 円グラフ</span>
+      <span class="vocab-chip"><span class="pt">desconto</span> 割引</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'lesson_21_wariai';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+/* ---- 数を 入れる問題（共通） ---- */
+const INPUT_QS = {};
+function parseDec(raw) {
+  let s = raw.trim()
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/[,，．、]/g, '.')
+    .replace(/[^0-9.]/g, '');
+  return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : null;
+}
+function renderInput(hostId, q) {
+  INPUT_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="decimal" autocomplete="off">' +
+    (q.unit ? '<span class="unit">' + q.unit + '</span>' : '') +
+    '<button class="check-btn" onclick="inputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function inputCheck(id) {
+  const q = INPUT_QS[id], input = document.getElementById(id), fb = document.getElementById(id + '-fb');
+  if (!input.value.trim()) return;
+  const got = parseDec(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね。'; return; }
+  const ok = Math.abs(got - q.answer) < 1e-9;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) { input.className = 'correct'; input.disabled = true; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    input.className = 'wrong'; fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + got + ' じゃない。' + ((q.traps && q.traps[String(got)]) || q.hint);
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches('.practice-q input') && INPUT_QS[e.target.id]) inputCheck(e.target.id);
+});
+
+
+const col = (host) => document.querySelectorAll('#' + host + ' .choice-row').forEach(r => r.classList.add('col'));
+const fmt = (x) => String(Math.round(x * 100) / 100);
+
+/* ---- テープ図（10ブロック） ---- */
+function drawTape(svgId, total, unit, lit, half, mark) {
+  // lit: 光らせる ブロック数, half: 次の ブロックを 半分 光らせる
+  const W = 56, X0 = 30, Y = 34, H = 52;
+  let s = '<text x="310" y="22" text-anchor="middle" font-size="16" font-weight="900" fill="#2c3e50">ぜんぶ ＝ ' + fmt(total) + unit + '（100%）</text>';
+  for (let i = 0; i < 10; i++) {
+    const x = X0 + i * W;
+    const on = i < lit;
+    s += '<rect x="' + (x + 1) + '" y="' + Y + '" width="' + (W - 2) + '" height="' + H + '" rx="6" fill="' + (on ? '#f5b041' : '#eef3f8') + '" stroke="#5d6d7e" stroke-width="1.5"/>';
+    if (half && i === lit) s += '<rect x="' + (x + 1) + '" y="' + Y + '" width="' + (W / 2 - 1) + '" height="' + H + '" rx="6" fill="#fad7a0" stroke="#5d6d7e" stroke-width="1.5"/>';
+    s += '<text x="' + (x + W / 2) + '" y="' + (Y + 32) + '" text-anchor="middle" font-size="15" font-weight="900" fill="#2c3e50">' + fmt(total / 10) + '</text>';
+    s += '<text x="' + (x + W / 2) + '" y="' + (Y + H + 18) + '" text-anchor="middle" font-size="11" fill="#7f8c8d">' + ((i + 1) * 10) + '%</text>';
+  }
+  if (mark) s += '<rect x="' + (X0 - 1) + '" y="' + (Y - 3) + '" width="' + (W + 2) + '" height="' + (H + 6) + '" rx="8" fill="none" stroke="#e67e22" stroke-width="3.5"/>';
+  document.getElementById(svgId).innerHTML = s;
+}
+function makeBtns(hostId, items, onPick) {
+  const host = document.getElementById(hostId);
+  items.forEach((it, i) => {
+    const b = document.createElement('button');
+    b.className = 'act-btn'; b.textContent = it.label;
+    b.onclick = () => { host.querySelectorAll('.act-btn').forEach(x => x.classList.remove('on')); b.classList.add('on'); onPick(it); };
+    host.appendChild(b);
+    if (i === 0) { b.classList.add('on'); onPick(it); }
+  });
+}
+
+/* ============ 1. 100マス ============ */
+const gP = document.getElementById('g-p');
+function gridRender() {
+  const n = +gP.value; let s = '';
+  for (let i = 0; i < 100; i++) {
+    const c = i % 10, r = Math.floor(i / 10);
+    s += '<rect x="' + (8 + c * 26) + '" y="' + (8 + r * 26) + '" width="22" height="22" rx="4" fill="' + (i < n ? '#f5b041' : '#eef3f8') + '" stroke="#d5dbe1"/>';
+  }
+  document.getElementById('grid100').innerHTML = s;
+  const extra = n === 100 ? '（ぜんぶ）' : n === 50 ? '（半分）' : n % 10 === 0 && n > 0 ? '（1れつ 10マス が ' + (n / 10) + 'つ）' : '';
+  document.getElementById('g-label').textContent = '100マスの うち ' + n + 'マス ＝ ' + n + '%' + extra;
+}
+gP.addEventListener('input', gridRender); gridRender();
+
+renderInput('a-list', { id: 'w_40', text: '100マスの うち 40マスに 色を ぬった。何%？', answer: 40, unit: '%',
+  ok: '100こに 分けた うちの 40こ だから 40%。100マスの ときは、マスの 数が そのまま %。', hint: '上の スライダーを 40 に して みよう。' });
+renderChoice('a-list', { id: 'w_half', text: 'ピザを 半分 食べた。食べたのは 何%？', options: ['20%', '50%', '100%'], answer: 1,
+  ok: 'ぜんぶ（100%）の 半分 だから 50%。100 ÷ 2 ＝ 50。', hint: 'ぜんぶが 100%。その 半分は？' });
+
+/* ============ 2. 10% ＝ ÷10 ============ */
+makeBtns('t2-btns', [
+  { label: '100人', t: 100, u: '人' }, { label: '200円', t: 200, u: '円' }, { label: '30人', t: 30, u: '人' },
+  { label: '360°', t: 360, u: '°' }, { label: '50€', t: 50, u: '€' }
+], it => {
+  drawTape('t2', it.t, it.u, 1, false, true);
+  document.getElementById('t2-label').textContent = '10% ＝ ' + it.t + ' ÷ 10 ＝ ' + fmt(it.t / 10) + it.u;
+});
+renderInput('b-list', { id: 'w_10_200', text: '200円の 10% は 何円？', answer: 20, unit: '円',
+  ok: '200 ÷ 10 ＝ 20円。おしりの 0を 1つ とる だけ。', hint: '10% ＝ ÷10。200 ÷ 10 は？',
+  traps: { '2': '0を 2つ とって しまった。10% は ÷10 だから 0は 1つだけ。', '10': '10% は「10円」じゃなくて「10こに 分けた 1つ」。200 ÷ 10。' } });
+renderInput('b-list', { id: 'w_10_30', text: '30人の 10% は 何人？', answer: 3, unit: '人',
+  ok: '30 ÷ 10 ＝ 3人。テープの ブロック 1つ ぶん。', hint: '上の ボタンで「30人」を おして みよう。' });
+renderInput('b-list', { id: 'w_10_360', text: '360° の 10% は 何度？', answer: 36, unit: '°',
+  ok: '360 ÷ 10 ＝ 36°。円グラフで よく 使う 数。', hint: '360 の おしりの 0を とる。',
+  traps: { '3.6': '小数点を 2つ 動かした。10% は 1つ だけ。' } });
+
+/* ============ 3. 10% から 作る ============ */
+makeBtns('t3-btns', [
+  { label: '10%', p: 10 }, { label: '20%', p: 20 }, { label: '30%', p: 30 }, { label: '5%', p: 5 },
+  { label: '25%', p: 25 }, { label: '50%', p: 50 }, { label: '90%', p: 90 }
+], it => {
+  const k = Math.floor(it.p / 10), half = it.p % 10 === 5;
+  drawTape('t3', 200, '円', k, half, false);
+  const v = 200 * it.p / 100;
+  let how;
+  if (it.p === 5) how = '10%（20円）の 半分';
+  else if (half) how = '10%（20円）が ' + k + 'こ ＋ 半分 ＝ 20 × ' + k + ' ＋ 10';
+  else if (it.p === 90) how = 'ぜんぶ − 10% ＝ 200 − 20';
+  else how = '10%（20円）が ' + k + 'こ ＝ 20 × ' + k;
+  document.getElementById('t3-label').textContent = it.p + '% ＝ ' + how + ' ＝ ' + v + '円';
+});
+renderInput('c-list', { id: 'w_30_200', text: '200円の 30% は 何円？', answer: 60, unit: '円',
+  ok: '10% が 20円。30% は その 3こ ぶんで 20 × 3 ＝ 60円。', hint: 'まず 10% を 出す（200 ÷ 10）。それが 何こ ぶん？',
+  traps: { '66.67': '200 ÷ 3 に なってる。30% は ÷3 じゃない。10% が 3こ。', '66.66': '200 ÷ 3 に なってる。30% は ÷3 じゃない。10% が 3こ。', '600': '200 × 3 に なってる。先に ÷10 して 10% を 出そう。' } });
+renderInput('c-list', { id: 'w_30_360', text: '円グラフで 360° の 30% は 何度？', answer: 108, unit: '°',
+  ok: '10% が 36°。30% は 36 × 3 ＝ 108°。', hint: '10% は 36°。それが 3こ。',
+  traps: { '120': '360 ÷ 3 に なってる。30% は「10% が 3こ」。', '1080': '360 × 3 に なってる。先に ÷10 して 36° に しよう。', '10.8': '小数点の 位置が ずれた。36 × 3 は？' } });
+renderInput('c-list', { id: 'w_5_40', text: '40人の 5% は 何人？', answer: 2, unit: '人',
+  ok: '10% が 4人。5% は その 半分で 2人。', hint: 'まず 10%（40 ÷ 10）。5% は その 半分。',
+  traps: { '4': 'それは 10%。5% は 10% の 半分。', '8': '40 ÷ 5 に なってる。5% は「10% の 半分」。' } });
+renderInput('c-list', { id: 'w_25_80', text: '80€ の 25% は 何€？', answer: 20, unit: '€',
+  ok: '10% が 8€、20% が 16€、5% が 4€。16 ＋ 4 ＝ 20€。（25% は 4分の1 でも ある。80 ÷ 4 ＝ 20）', hint: '25% ＝ 20% ＋ 5%。まず 10% は 何€？',
+  traps: { '16': 'それは 20%。あと 5%（10% の 半分）を たそう。', '3.2': '80 ÷ 25 に なってる。10% から 作ろう。' } });
+
+/* ============ 4. 逆に 何% ============ */
+makeBtns('t4-btns', [
+  { label: '3人', n: 3 }, { label: '6人', n: 6 }, { label: '9人', n: 9 }, { label: '15人', n: 15 }, { label: '30人', n: 30 }
+], it => {
+  const k = it.n / 3;
+  drawTape('t4', 30, '人', k, false, false);
+  document.getElementById('t4-label').textContent = it.n + '人 ＝ 3人（10%）が ' + k + 'こ ＝ ' + (k * 10) + '%';
+});
+renderInput('d-list', { id: 'w_6of30', text: '30人の うち 6人は 何%？', answer: 20, unit: '%',
+  ok: '10% が 3人。6人は 3人の 2こ ぶん だから 20%。', hint: 'まず 30人の 10% は 何人？',
+  traps: { '0.2': '0.2 は 小数の 答え。10% の ブロックが 何こ ぶんかで 考えよう。', '5': '30 ÷ 6 に なってる。10%（3人）が 何こ ぶん？', '6': '6人 そのまま じゃない。ぜんぶが 30人だよ。' } });
+renderInput('d-list', { id: 'w_12of40', text: '40人の うち 12人は 何%？', answer: 30, unit: '%',
+  ok: '10% が 4人。12人は 4人の 3こ ぶん だから 30%。', hint: '40人の 10% は 何人？ 12人は その 何こ ぶん？',
+  traps: { '12': '12人 そのまま じゃない。ぜんぶが 40人だよ。', '0.3': '0.3 は 小数。10% が 何こ ぶんかで %に しよう。' } });
+renderInput('d-list', { id: 'w_10of50', text: '50€ の うち 10€ 使った。何% 使った？', answer: 20, unit: '%',
+  ok: '10% が 5€。10€ は 5€ の 2こ ぶん だから 20%。', hint: '50€ の 10% は 何€？',
+  traps: { '10': '10€ そのまま じゃない。ぜんぶが 50€ だよ。', '5': '50 ÷ 10 に なってる。それは 10% の 金額。10€ は その 何こ ぶん？' } });
+renderInput('d-list', { id: 'w_10of40', text: '<b>チャレンジ</b>：40人の うち 10人は 何%？', answer: 25, unit: '%',
+  ok: '10% が 4人、20% が 8人。のこり 2人は 4人の 半分 だから 5%。20 ＋ 5 ＝ 25%。（10人は 40人の 4分の1 でも ある）', hint: '10% が 4人。8人なら 20%。のこり 2人は 4人の 何分の 何？',
+  traps: { '10': '10人 そのまま じゃない。ぜんぶが 40人だよ。', '4': '40 ÷ 10 に なってる。それは 10% の 人数。', '20': '8人までは 20%。のこり 2人ぶんを たそう。', '0.25': '0.25 は 小数。%に すると？ 10% が 何こ ぶんかで 考えて。' } });
+
+/* ============ 5. 円グラフ ============ */
+const pieP = document.getElementById('pie-p');
+function pieRender() {
+  const p = +pieP.value, a = p * 3.6, cx = 110, cy = 110, r = 95;
+  let s = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#eef3f8" stroke="#5d6d7e" stroke-width="2"/>';
+  for (let i = 0; i < 10; i++) {
+    const t = (i * 36 - 90) * Math.PI / 180;
+    s += '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + r * Math.cos(t)).toFixed(1) + '" y2="' + (cy + r * Math.sin(t)).toFixed(1) + '" stroke="#d5dbe1" stroke-width="1"/>';
+  }
+  if (p >= 100) s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="#f5b041" stroke="#5d6d7e" stroke-width="2"/>';
+  else if (p > 0) {
+    const t = (a - 90) * Math.PI / 180, x = cx + r * Math.cos(t), y = cy + r * Math.sin(t);
+    s += '<path d="M' + cx + ',' + cy + ' L' + cx + ',' + (cy - r) + ' A' + r + ',' + r + ' 0 ' + (a > 180 ? 1 : 0) + ',1 ' + x.toFixed(1) + ',' + y.toFixed(1) + ' Z" fill="#f5b041" stroke="#5d6d7e" stroke-width="2"/>';
+  }
+  document.getElementById('pie').innerHTML = s;
+  const k = p / 10;
+  document.getElementById('pie-label').textContent = p + '% ＝ 36° × ' + fmt(k) + ' ＝ ' + fmt(a) + '°';
+}
+pieP.addEventListener('input', pieRender); pieRender();
+renderInput('e-list', { id: 'w_pie20', text: '円グラフで 20% の おうぎ形は 何度？', answer: 72, unit: '°',
+  ok: '10% が 36°。20% は その 2こ ぶんで 72°。', hint: '10% は 36°。それが 2こ。',
+  traps: { '20': '% と 度は ちがう。360° の 20% を 出そう。', '18': '360 ÷ 20 に なってる。10%（36°）が 2こ。' } });
+renderInput('e-list', { id: 'w_pie25', text: '円グラフで 25% の おうぎ形は 何度？', answer: 90, unit: '°',
+  ok: '20% が 72°、5% が 18°（36 の 半分）。72 ＋ 18 ＝ 90°。25% は 4分の1 だから「直角」でも ある。', hint: '25% ＝ 20% ＋ 5%。5% は 36° の 半分。',
+  traps: { '72': 'それは 20%。あと 5%（18°）を たそう。', '25': '% と 度は ちがう。360° の 25% を 出そう。' } });
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 10% から ぜんぶ 作れた！';
+  else if (firstCount >= TOTAL_Q - 3) msg.textContent = 'Muito bom! 「まず 10%」が 使えてる。';
+  else msg.textContent = 'テープの ブロックを もう1回 動かして、「10% が 何こ」で 考えよう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+<script src="game.js"></script>
+</body>
+</html>

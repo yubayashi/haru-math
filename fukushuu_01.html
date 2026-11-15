@@ -202,18 +202,6 @@
   </div>
 
   <div class="card">
-    <div class="card-title">🥧 円グラフと パーセント</div>
-    <div class="tip"><b>💡</b> 10% や 20% を 先に 出して、倍や 半分に する やり方で OK。</div>
-    <div id="c-list"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">⚖️ 平均から 逆に 考える</div>
-    <div class="tip"><b>💡</b> 平均 × 回数 ＝ 合計。</div>
-    <div id="d-list"></div>
-  </div>
-
-  <div class="card">
     <div class="card-title">📖 ことば</div>
     <div id="e-list"></div>
   </div>
@@ -405,27 +393,7 @@ renderInput('b-list', { id: 'n_seq', text: '5, 8, 11, 14 …… と 3ずつ ふ�
   ok: '3 を たすのは 9回。5 ＋ 3 × 9 ＝ 32。', hint: '2番目は 1回 たす、3番目は 2回 たす。10番目は 何回？',
   traps: { '35': '3 を 10回 たして しまったかな。2番目は 1回、3番目は 2回 だよ。' } });
 
-/* ============ 3. 円グラフと パーセント ============ */
-renderInput('c-list', { id: 'p_full', text: '円の 1周は 何度？', answer: 360, unit: '°',
-  ok: '1周 ＝ 360°。', hint: '半周が 180°。', traps: { '50': 'もっと ずっと 大きい 数。半周で 180° だよ。', '100': '100 は パーセントの ほう。角度では？' } });
-renderInput('c-list', { id: 'p_25', text: '円グラフで 25% の おうぎ形は 何度？', answer: 90, unit: '°',
-  ok: '25% は 4分の1。360 ÷ 4 ＝ 90°。', hint: '25% は 全体の 何分の1？' });
-renderInput('c-list', { id: 'p_30', text: '円グラフで 30% の おうぎ形は 何度？', answer: 108, unit: '°',
-  ok: '360 × 0.3 ＝ 108°。10% が 36° だから、その 3倍。', hint: 'まず 10% が 何度か 出そう。360 ÷ 10。' });
-renderInput('c-list', { id: 'p_6of30', text: '30人の うち 6人は 何%？', answer: 20, unit: '%',
-  ok: '10% が 3人。6人は その 倍で 20%。', hint: '30人の 10% は 何人？' });
-renderInput('c-list', { id: 'p_10of40', text: '40人の うち 10人は 何%？', answer: 25, unit: '%',
-  ok: '10 ÷ 40 ＝ 0.25。4分の1 だから 25%。', hint: '10人は 40人の 何分の1？' });
-
-/* ============ 4. 平均 ============ */
-renderInput('d-list', { id: 'a_total', text: '4回の テストの 平均が 75点に なるには、4回の 合計は 何点 いる？', answer: 300, unit: '点',
-  ok: '75 × 4 ＝ 300点。', hint: '平均 × 回数 ＝ 合計。' });
-renderInput('d-list', { id: 'a_4th', text: '3回の テストは 70点・80点・60点 だった。4回の 平均を 75点に するには、4回目は 何点？', answer: 90, unit: '点',
-  ok: '合計 300点 いる。70＋80＋60 ＝ 210 だから 300 − 210 ＝ 90点。', hint: 'さっきの 300点から、3回分の 合計を ひく。' });
-renderInput('d-list', { id: 'a_solo', text: '2回の テストは 6点と 9点 だった。3回の 平均を 8点に するには、3回目は 何点？', answer: 9, unit: '点',
-  ok: '8 × 3 ＝ 24点。6＋9 ＝ 15 だから 24 − 15 ＝ 9点。', hint: 'まず 3回の 合計は 何点 いる？' });
-
-/* ============ 5. ことば ============ */
+/* ============ 3. ことば ============ */
 renderChoice('e-list', { id: 'k_sore', text: 'カメは かたい 甲らを 持って いる。<b>それ</b>は 体を 守る ために ある。<br>「それ」は 何？', options: ['カメ', '甲ら', '体'], answer: 1,
   ok: '「それ」は すぐ 前の ものを さす。', hint: '「それ」を 入れかえて、読んで みて。' });
 renderChoice('e-list', { id: 'k_dewanaku', text: '大切なのは 速さでは なく、ていねいさだ。<br>いちばん 言いたいのは？', options: ['速さ', 'ていねいさ'], answer: 1,

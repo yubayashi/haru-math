@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>算数22 — 平均（へいきん）を ならして 考える</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: #2d2d2d;
+    background: #f5f5f5;
+    font-size: 15px;
+    line-height: 1.8;
+    padding: 16px;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .header { text-align: center; padding: 20px 0 12px; }
+  .header .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    color: #fff; padding: 4px 16px; border-radius: 16px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; margin-top: 8px; color: #2c3e50; }
+  .header .sub { font-size: 13px; color: #888; }
+
+  .card {
+    background: #fff; border-radius: 16px; padding: 20px 22px;
+    margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 17px; font-weight: 900; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card p { margin-bottom: 10px; }
+
+  .equation {
+    text-align: center; font-size: 22px; font-weight: 900;
+    margin: 14px 0; color: #2c3e50;
+    background: #f8f9fa; border-radius: 10px; padding: 12px;
+  }
+
+  .tip {
+    background: #f0f7ff; border-left: 4px solid #3498db;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .tip b { color: #2980b9; }
+  .callout-green {
+    background: #eafff0; border-left: 4px solid #27ae60;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-green b { color: #27ae60; }
+  .callout-orange {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 12px 14px; border-radius: 0 10px 10px 0;
+    margin: 14px 0; font-size: 14px; line-height: 1.7;
+  }
+  .callout-orange b { color: #e67e22; }
+
+  .vocab { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .vocab-chip {
+    background: #eaf6ff; border: 1px solid #bee0fa; border-radius: 8px;
+    padding: 4px 10px; font-size: 12px;
+  }
+  .vocab-chip .pt { font-weight: 700; color: #2980b9; }
+
+  .practice-q {
+    background: #fafafa; border: 2px solid #e0e0e0; border-radius: 12px;
+    padding: 16px; margin: 18px 0 12px; position: relative;
+  }
+  .practice-q .q-num {
+    position: absolute; top: -10px; left: 12px;
+    background: #3498db; color: #fff;
+    width: 26px; height: 26px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900;
+  }
+  .practice-q .q-text { font-size: 15px; margin-bottom: 10px; padding-top: 4px; }
+  .answer-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .answer-row input {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; padding: 8px 12px;
+    text-align: center; outline: none; background: #fff; width: 130px;
+  }
+  .answer-row input:focus { border-color: #3498db; }
+  .answer-row input.correct { border-color: #27ae60; background: #eafff0; }
+  .answer-row input.wrong { border-color: #e74c3c; background: #fff5f5; }
+  .answer-row .unit { font-size: 16px; font-weight: 700; color: #888; }
+  .check-btn {
+    font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .check-btn:hover { background: #2980b9; }
+  .feedback { margin-top: 8px; font-size: 14px; font-weight: 700; min-height: 22px; }
+  .feedback.correct { color: #27ae60; }
+  .feedback.wrong { color: #e74c3c; }
+  .result-box {
+    text-align: center; padding: 20px; background: #f0f7ff;
+    border-radius: 12px; margin-top: 16px; display: none;
+  }
+  .result-box .score { font-size: 32px; font-weight: 900; color: #2c3e50; }
+  .result-box .msg { font-size: 14px; color: #666; margin-top: 6px; }
+
+  /* ---- このレッスン用 ---- */
+  .thermo-wrap { display: flex; align-items: center; gap: 10px; }
+  .thermo-host { flex: 1; background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; }
+  .thermo-svg, .nl-svg {
+    display: block; width: 100%; height: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .thermo-svg { max-width: 300px; margin: 0 auto; }
+  .nl-svg.static { cursor: default; touch-action: auto; }
+  .thermo-side { width: 120px; text-align: center; }
+  .deg-readout {
+    text-align: center; font-size: 34px; font-weight: 900; color: #2c3e50;
+    padding: 2px 0 10px;
+  }
+  .deg-readout .unit { font-size: 18px; color: #888; }
+  .deg-readout.neg { color: #2471c8; }
+  .nudge { display: flex; flex-direction: column; gap: 6px; }
+
+  .nl-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; }
+  .mini-nl { margin-top: 8px; }
+
+  .mission-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; background: #fff8e8; border-radius: 10px; padding: 10px 14px;
+    font-size: 15px; font-weight: 900; color: #2c3e50; margin-bottom: 8px;
+  }
+  .mission-bar .target { font-size: 18px; color: #e67e22; text-align: right; }
+
+  .row-btns { display: flex; gap: 8px; margin-top: 8px; }
+  .act-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #3498db; color: #fff; border: none; border-radius: 10px;
+    padding: 12px 10px; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .act-btn:hover { background: #2980b9; }
+  .act-btn.ghost { background: #fff; color: #777; border: 2px solid #ddd; }
+  .act-btn.ghost:hover { border-color: #bbb; color: #444; }
+  .act-btn:disabled { background: #ccc; cursor: default; }
+
+  .choice-btn {
+    flex: 1; font-family: 'Nunito', sans-serif;
+    background: #fff; color: #2c3e50; border: 3px solid #ddd; border-radius: 12px;
+    padding: 14px 10px; font-size: 26px; font-weight: 900; cursor: pointer;
+  }
+  .choice-btn:hover { border-color: #3498db; }
+  .choice-btn.correct { border-color: #27ae60; background: #eafff0; color: #1e8449; }
+  .choice-btn.wrong { border-color: #e74c3c; background: #fff5f5; color: #c0392b; }
+  .choice-btn:disabled { cursor: default; }
+
+  .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 8px; }
+  .step-dot { width: 9px; height: 9px; border-radius: 5px; background: #ddd; }
+  .step-dot.done { background: #27ae60; }
+  .step-dot.now { background: #3498db; }
+</style>
+<link rel="stylesheet" href="game.css">
+</head>
+<body>
+<style>
+  .choice-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .choice-btn.small { font-size: 16px; padding: 12px 6px; }
+  .choice-row.col { flex-direction: column; }
+  .choice-row.col .choice-btn.small { text-align: left; padding: 12px 14px; }
+  .fig-host { background: #fafcff; border: 2px solid #e3ecf5; border-radius: 12px; margin: 10px 0; padding: 8px 6px; }
+  .fig-svg { display: block; width: 100%; height: auto; margin: 0 auto; -webkit-user-select: none; user-select: none; }
+  .fig-cap { text-align: center; font-size: 14px; font-weight: 700; color: #555; margin: 2px 0 4px; }
+  .pile-lab { text-align: center; font-size: 15px; font-weight: 900; color: #2c3e50; min-height: 48px; padding: 4px 6px; line-height: 1.6; }
+  .pile-lab.done { color: #1e8449; }
+  .legend { display: flex; gap: 10px 14px; flex-wrap: wrap; justify-content: center; font-weight: 700; font-size: 13px; margin: 6px 0; }
+  .legend .sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 4px; }
+  .slider-row { display: flex; align-items: center; gap: 10px; font-weight: 900; color: #2c3e50; margin: 6px 0; }
+  .slider-row input[type=range] { flex: 1; min-width: 0; height: 34px; accent-color: #8e44ad; }
+  .slider-row .val { min-width: 54px; text-align: right; font-size: 18px; color: #8e44ad; }
+  .bar-stat { text-align: center; font-size: 14px; font-weight: 700; color: #2c3e50; background: #f8f9fa; border-radius: 10px; padding: 8px 10px; line-height: 1.8; }
+  .bar-stat .ok { color: #1e8449; font-weight: 900; }
+  .steps { margin: 10px 0; }
+  .step-box { display: flex; gap: 10px; align-items: flex-start; background: #f8f9fa; border-radius: 10px; padding: 9px 12px; margin: 6px 0; font-size: 15px; line-height: 1.7; }
+  .step-box .n { flex: none; width: 26px; height: 26px; border-radius: 13px; background: #3498db; color: #fff; font-weight: 900; font-size: 14px; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .step-box .f { font-weight: 900; color: #c0392b; white-space: nowrap; }
+  .sec-label { display: inline-block; font-weight: 900; font-size: 13px; padding: 2px 14px; border-radius: 999px; margin: 16px 0 0; }
+  .sec-label.try { background: #fff3d6; color: #b9770e; }
+  .sec-label.prob { background: #eaf2fb; color: #2471a3; }
+  .sec-label.boss { background: #fdecea; color: #c0392b; }
+  .sub-title { font-size: 16px; font-weight: 900; color: #2c3e50; margin: 22px 0 6px; padding-top: 14px; border-top: 2px dashed #e3ecf5; }
+  .equation.small { font-size: 18px; }
+</style>
+
+<div class="page">
+
+  <div class="header">
+    <div class="badge">算数 22</div>
+    <h1>⚖️ 平均（へいきん）— ならして 考える</h1>
+    <div class="sub">Média — ブロックを ならす ところから。さいごは「あと 何点 いる？」</div>
+  </div>
+
+  <!-- ===== 0. 道すじ ===== -->
+  <div class="card">
+    <div class="card-title">🗺️ きょうの 道すじ</div>
+    <p>「あと 何点 いる？」が とけるように、いちばん はじめの「ならす」から やりなおす。</p>
+    <div class="steps">
+      <div class="step-box"><span class="n">1</span><div>ブロックで <b>ならす</b>（同じ 高さに する）</div></div>
+      <div class="step-box"><span class="n">2</span><div>ならすのを <b>わり算</b>で 出す（合計 ÷ 個数）</div></div>
+      <div class="step-box"><span class="n">3</span><div><b>逆に</b> 考える（合計 ＝ 平均 × 回数 → あと 何点？）</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 1. ならす ===== -->
+  <div class="card">
+    <div class="card-title">🧱 平均 ＝ ならす（同じ 高さに する）</div>
+    <p>高さの ちがう ブロックの 山が 3つ ある。高い 山から 低い 山へ ブロックを 1こずつ うつして、<b>ぜんぶ 同じ 高さ</b>に する。これを <b>ならす</b> と いう。</p>
+    <div class="tip"><b>💡</b> ならして そろった 高さ が <b>平均（へいきん）</b>。<br>ブロックは うつす だけ。すてたり、足したり しない。</div>
+
+    <div class="fig-host">
+      <svg class="fig-svg" id="p1-svg" style="max-width:280px"></svg>
+      <div class="pile-lab" id="p1-lab"></div>
+      <div class="row-btns"><button class="act-btn" id="p1-auto">おまかせで 1こ</button><button class="act-btn ghost" id="p1-reset">はじめから</button></div>
+    </div>
+
+    <div class="sec-label try">✋ やってみよう</div>
+    <div id="a1-list"></div>
+
+    <div class="sec-label prob">📝 もんだい</div>
+    <p style="margin-top:8px">こんどは 山が 4つ。じぶんで タップして ならしてみよう。</p>
+    <div class="fig-host">
+      <svg class="fig-svg" id="p2-svg" style="max-width:340px"></svg>
+      <div class="pile-lab" id="p2-lab"></div>
+      <div class="row-btns"><button class="act-btn" id="p2-auto">おまかせで 1こ</button><button class="act-btn ghost" id="p2-reset">はじめから</button></div>
+    </div>
+    <div id="a2-list"></div>
+  </div>
+
+  <!-- ===== 2. 合計 ÷ 個数 ===== -->
+  <div class="card">
+    <div class="card-title">➗ 平均 ＝ 合計 ÷ 個数（なぜ わる？）</div>
+    <p>ブロックを 1こずつ 動かすのは 大変。<b>いっぺんに</b> ならす やり方が ある。</p>
+    <div class="fig-host"><svg class="fig-svg" id="gather-svg" viewBox="0 0 350 162" style="max-width:420px"></svg></div>
+    <div class="steps">
+      <div class="step-box"><span class="n">1</span><div>もとの 山は 5・1・3</div></div>
+      <div class="step-box"><span class="n">2</span><div>ぜんぶ 1つに <b>まとめる</b> → <span class="f">5 ＋ 1 ＋ 3 ＝ 9こ</span><br>まとめた 数を <b>合計（ごうけい）</b> と いう</div></div>
+      <div class="step-box"><span class="n">3</span><div>3つの 山に <b>同じ 数ずつ 分ける</b> → <span class="f">9 ÷ 3 ＝ 3こ</span><br>これが 平均。ならした 高さと 同じ！</div></div>
+    </div>
+    <div class="equation">平均 ＝ 合計 ÷ <ruby>個数<rt>こすう</rt></ruby></div>
+    <div class="tip"><b>💡 なぜ わり算？</b> ならす ＝ いったん ぜんぶ まとめて、同じ 数ずつ 分けなおす こと。「同じ 数ずつ 分ける」は わり算。</div>
+    <div class="callout-orange"><b>⚠️ 気をつけて</b> 個数は「いくつの 数を ならすか」。<b>0点の 日も 1日</b> に 数える。</div>
+
+    <div class="sec-label try">✋ やってみよう</div>
+    <div id="b1-list"></div>
+    <div class="sec-label prob">📝 もんだい</div>
+    <div id="b2-list"></div>
+  </div>
+
+  <!-- ===== 3. 逆に 考える ===== -->
+  <div class="card">
+    <div class="card-title">🔁 逆に 考える：合計 ＝ 平均 × 回数</div>
+    <p>こんどは 逆。<b>平均が わかって いて、合計を 知りたい</b> とき。</p>
+    <div class="steps">
+      <div class="step-box"><span class="n">1</span><div>平均が わかる ＝ <b>ならした あとの 高さ</b>が わかる</div></div>
+      <div class="step-box"><span class="n">2</span><div>ならした 山は、どれも 同じ 高さで <b>回数の ぶんだけ</b> ならぶ</div></div>
+      <div class="step-box"><span class="n">3</span><div>だから ぜんぶ ＝ 高さ × 本数（<b>かけ算</b>）</div></div>
+    </div>
+    <div class="fig-host">
+      <div class="fig-cap">サッカー 4試合、平均 3ゴール → ならすと 3・3・3・3</div>
+      <svg class="fig-svg" id="flat-svg" style="max-width:320px"></svg>
+    </div>
+    <div class="equation small">3 × 4本 ＝ 12ゴール</div>
+    <div class="equation">合計 ＝ 平均 × 回数</div>
+    <div class="tip"><b>💡</b> わり算の 逆は かけ算。<br>平均 ＝ 合計 ÷ 回数 だから、合計 ＝ 平均 × 回数。</div>
+    <div class="callout-orange"><b>⚠️ よくある まちがい</b> 平均 ＋ 回数 に して しまう。3 ＋ 4 ＝ 7 では ない。<br>3 の 山が 4本 → <b>3 × 4 ＝ 12</b>。</div>
+
+    <div class="sec-label try">✋ やってみよう</div>
+    <div id="c1-list"></div>
+    <div class="sec-label prob">📝 もんだい</div>
+    <div id="c2-list"></div>
+  </div>
+
+  <!-- ===== 4. あと 何点？ ===== -->
+  <div class="card">
+    <div class="card-title">🎯 あと 何点 いる？</div>
+    <p>「平均を ◯点に したい。あと 何点 いる？」は、<b>2つの 合計の ちがい</b>で 出せる。</p>
+    <div class="steps">
+      <div class="step-box"><span class="n">1</span><div><b>ほしい 合計</b> ＝ 平均 × 回数</div></div>
+      <div class="step-box"><span class="n">2</span><div><b>もう ある 合計</b> ＝ これまでの 点を 足す</div></div>
+      <div class="step-box"><span class="n">3</span><div><b>あと いる 点</b> ＝ ① − ②</div></div>
+    </div>
+    <div class="callout-green">
+      <b>例</b> 1回目は 7点。2回の 平均を 8点に したい。<br>
+      ① ほしい 合計：8 × 2 ＝ 16<br>
+      ② もう ある 合計：7<br>
+      ③ あと いる 点：16 − 7 ＝ <b>9点</b>
+    </div>
+
+    <div class="sec-label try">✋ やってみよう</div>
+    <div id="d1-list"></div>
+    <div class="sec-label prob">📝 もんだい</div>
+    <div id="d2-list"></div>
+
+    <div class="sub-title">📏 もう1つの やり方：線で ならす</div>
+    <p>平均の 線を 引く。線より 上に <b>はみ出した ぶん</b>（みどり）で、線より 下の <b>すきま</b>（オレンジ）を うめれば、ぴったり ならせる。</p>
+    <div class="fig-host">
+      <svg class="fig-svg" id="bar-svg" viewBox="0 0 340 240" style="max-width:380px"></svg>
+      <div class="legend">
+        <span><span class="sw" style="background:#5dade2"></span>とった 点</span>
+        <span><span class="sw" style="background:#58d68d"></span>はみ出し</span>
+        <span><span class="sw" style="background:#fdebd0;border:2px dashed #e67e22"></span>すきま</span>
+        <span><span class="sw" style="background:#e74c3c;height:4px;vertical-align:3px"></span>めざす 平均（70点）</span>
+      </div>
+      <div class="slider-row">3回目 <input type="range" id="bar-x" min="0" max="100" step="5" value="50"><span class="val" id="bar-xv">50点</span></div>
+      <div class="bar-stat" id="bar-stat"></div>
+    </div>
+    <div id="d3-list"></div>
+
+    <div class="sec-label boss">🏆 さいごの もんだい</div>
+    <div class="tip"><b>💡</b> ①②③ の やり方でも、線の やり方でも いい。</div>
+    <div id="d4-list"></div>
+  </div>
+
+  <!-- ===== まとめ・ことば ===== -->
+  <div class="card">
+    <div class="card-title">📚 ことば と まとめ</div>
+    <div class="equation small">平均 ＝ 合計 ÷ 個数</div>
+    <div class="equation small">合計 ＝ 平均 × 回数</div>
+    <div class="equation small">あと いる 点 ＝ ほしい 合計 − もう ある 合計</div>
+    <div class="vocab">
+      <span class="vocab-chip"><span class="pt">média</span> 平均（へいきん）</span>
+      <span class="vocab-chip"><span class="pt">total / soma</span> 合計（ごうけい）</span>
+      <span class="vocab-chip"><span class="pt">distribuir igualmente</span> ならす</span>
+      <span class="vocab-chip"><span class="pt">número de vezes</span> 回数（かいすう）</span>
+      <span class="vocab-chip"><span class="pt">dividir</span> わる（÷）</span>
+      <span class="vocab-chip"><span class="pt">multiplicar</span> かける（×）</span>
+    </div>
+    <div class="result-box" id="result-box">
+      <div class="score" id="result-score"></div>
+      <div class="msg" id="result-msg"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzMtLhBPLYJyCAL_SS4TDoRKw4YKGLvl78YkR6KgAPsoj1-L9GdzMBbiqnKePxO8XNZ/exec';
+const LESSON_ID = 'lesson_22_heikin';
+const tracking = {};
+let TOTAL_Q = 0;   // 問題を つくるたびに 数える
+let submitted = false;
+let qNo = 0;
+
+function record(id, ok, detail) {
+  if (!tracking[id]) tracking[id] = { attempts: 0, correct: false, result: '', answer: '', wrong_answers: [] };
+  const t = tracking[id];
+  if (t.correct) return t;
+  t.attempts++;
+  t.answer = String(detail.answer);
+  if (ok) {
+    t.correct = true;
+    t.result = t.attempts === 1 ? 'first' : 'retry';
+  } else {
+    t.result = 'wrong';
+    t.wrong_answers.push(String(detail.answer));
+  }
+  Object.assign(t, { target: detail.target });
+  maybeFinish();
+  return t;
+}
+
+function maybeFinish() {
+  const n = Object.values(tracking).filter(t => t.correct).length;
+  if (n >= TOTAL_Q) { showResult(); sendToSheet(); }
+}
+
+/* ---- 選ぶ問題（共通） ---- */
+const CHOICE_QS = {};
+function renderChoice(hostId, q) {
+  CHOICE_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="choice-row" id="' + q.id + '-btns">' +
+    q.options.map((o, i) => '<button class="choice-btn small" onclick="choiceCheck(\'' + q.id + '\',' + i + ',this)">' + o + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function choiceCheck(id, i, btn) {
+  const q = CHOICE_QS[id];
+  if (tracking[id] && tracking[id].correct) return;
+  const ok = i === q.answer;
+  record(id, ok, { answer: q.options[i], target: q.options[q.answer] });
+  const fb = document.getElementById(id + '-fb');
+  if (ok) {
+    btn.className = 'choice-btn small correct';
+    document.querySelectorAll('#' + id + '-btns button').forEach(x => x.disabled = true);
+    fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok;
+  } else {
+    btn.className = 'choice-btn small wrong';
+    fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => { btn.className = 'choice-btn small'; }, 1200);
+  }
+}
+
+/* ---- じゅんばんに ならべる（共通） ---- */
+const ORDER_QS = {}, orderState = {};
+function renderOrder(hostId, q) {
+  ORDER_QS[q.id] = q; orderState[q.id] = []; TOTAL_Q++;
+  const shown = q.shuffle.map(k => [k, q.items[k]]);
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="order-col" id="' + q.id + '-row">' +
+    shown.map(([k, s]) => '<button class="order-btn" id="' + q.id + '-b' + k + '" onclick="orderPick(\'' + q.id + '\',' + k + ')">' + s + '</button>').join('') +
+    '</div><div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function orderPick(id, k) {
+  const q = ORDER_QS[id], seq = orderState[id];
+  if ((tracking[id] && tracking[id].correct) || seq.includes(k) || seq.length === q.items.length) return;
+  seq.push(k);
+  const b = document.getElementById(id + '-b' + k);
+  b.classList.add('picked'); b.insertAdjacentHTML('afterbegin', '<span class="badge-n">' + seq.length + '</span>');
+  if (seq.length < q.items.length) return;
+  const ok = seq.every((v, i) => v === i);
+  record(id, ok, { answer: seq.join(','), target: q.items.map((_, i) => i).join(',') });
+  const row = document.getElementById(id + '-row'), fb = document.getElementById(id + '-fb');
+  if (ok) { row.classList.add('correct'); fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    row.classList.add('wrong'); fb.className = 'feedback wrong'; fb.textContent = '❌ ' + q.hint;
+    setTimeout(() => {
+      orderState[id] = []; row.classList.remove('wrong');
+      q.items.forEach((s, j) => { const x = document.getElementById(id + '-b' + j); x.className = 'order-btn'; x.innerHTML = s; });
+      fb.textContent = '';
+    }, 2000);
+  }
+}
+
+function sendToSheet() {
+  if (submitted) return;
+  submitted = true;
+  const answers = {};
+  for (const [id, t] of Object.entries(tracking)) {
+    answers[id] = {
+      answer: t.answer, target: t.target, attempts: t.attempts,
+      result: t.result, wrong_answers: t.wrong_answers
+    };
+  }
+  fetch(GAS_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      lesson: LESSON_ID,
+      timestamp: new Date().toISOString(),
+      answers: answers
+    })
+  }).catch(() => {});
+}
+
+/* ---- 数を 入れる問題（共通） ---- */
+const INPUT_QS = {};
+function parseDec(raw) {
+  let s = raw.trim()
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+    .replace(/[,，．、]/g, '.')
+    .replace(/[^0-9.]/g, '');
+  return /^\d*\.?\d+$/.test(s) ? parseFloat(s) : null;
+}
+function renderInput(hostId, q) {
+  INPUT_QS[q.id] = q; TOTAL_Q++;
+  document.getElementById(hostId).insertAdjacentHTML('beforeend',
+    '<div class="practice-q"><div class="q-num">' + (++qNo) + '</div>' +
+    '<div class="q-text">' + q.text + '</div>' +
+    '<div class="answer-row"><input id="' + q.id + '" inputmode="decimal" autocomplete="off">' +
+    (q.unit ? '<span class="unit">' + q.unit + '</span>' : '') +
+    '<button class="check-btn" onclick="inputCheck(\'' + q.id + '\')">こたえる</button></div>' +
+    '<div class="feedback" id="' + q.id + '-fb"></div></div>');
+}
+function inputCheck(id) {
+  const q = INPUT_QS[id], input = document.getElementById(id), fb = document.getElementById(id + '-fb');
+  if (!input.value.trim()) return;
+  const got = parseDec(input.value);
+  if (got === null) { fb.className = 'feedback wrong'; fb.textContent = '数で 書いてね。'; return; }
+  const ok = Math.abs(got - q.answer) < 1e-9;
+  record(id, ok, { answer: got, target: q.answer });
+  if (ok) { input.className = 'correct'; input.disabled = true; fb.className = 'feedback correct'; fb.textContent = '⭕ 正解！ ' + q.ok; }
+  else {
+    input.className = 'wrong'; fb.className = 'feedback wrong';
+    fb.textContent = '❌ ' + got + ' じゃない。' + ((q.traps && q.traps[String(got)]) || q.hint);
+    setTimeout(() => { input.value = ''; input.className = ''; }, 1600);
+  }
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.matches('.practice-q input') && INPUT_QS[e.target.id]) inputCheck(e.target.id);
+});
+
+
+const PCOL = ['#5dade2', '#f5b041', '#58d68d', '#ec7063'];
+
+/* ---- ブロックの 山（タップで 1こ うつす） ---- */
+function makePiles(pre, start) {
+  const svg = document.getElementById(pre + '-svg'), lab = document.getElementById(pre + '-lab');
+  const n = start.length, total = start.reduce((a, b) => a + b, 0), avg = total / n, maxH = Math.max(...start);
+  const BW = 46, BH = 22, GAP = 26, PX = 20, TOP = 12, BASE = TOP + maxH * BH + 4;
+  const W = PX * 2 + n * BW + (n - 1) * GAP, H = BASE + 30;
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  let st = [], sel = null;
+  function reset() { st = start.map((v, i) => Array(v).fill(i)); sel = null; draw(); }
+  function draw() {
+    const h = st.map(a => a.length), done = h.every(v => v === h[0]);
+    let s = '';
+    for (let i = 0; i < n; i++) {
+      const x = PX + i * (BW + GAP);
+      if (sel === i) s += '<rect x="' + (x - 6) + '" y="' + (TOP - 8) + '" width="' + (BW + 12) + '" height="' + (BASE - TOP + 10) + '" rx="8" fill="#fff3d6" stroke="#f5b041" stroke-width="2"/>';
+      st[i].forEach((c, k) => {
+        s += '<rect x="' + (x + 2) + '" y="' + (BASE - (k + 1) * BH + 2) + '" width="' + (BW - 4) + '" height="' + (BH - 3) + '" rx="4" fill="' + PCOL[c] + '"/>';
+      });
+      s += '<text x="' + (x + BW / 2) + '" y="' + (BASE + 23) + '" text-anchor="middle" font-size="17" font-weight="900" fill="#2c3e50">' + h[i] + '</text>';
+    }
+    s += '<line x1="8" y1="' + (BASE + 1) + '" x2="' + (W - 8) + '" y2="' + (BASE + 1) + '" stroke="#2c3e50" stroke-width="3"/>';
+    if (done) {
+      const y = BASE - avg * BH + 1;
+      s += '<line x1="8" y1="' + y + '" x2="' + (W - 8) + '" y2="' + y + '" stroke="#e74c3c" stroke-width="2.5" stroke-dasharray="7 5"/>';
+    }
+    for (let i = 0; i < n; i++) {
+      const x = PX + i * (BW + GAP);
+      s += '<rect data-i="' + i + '" x="' + (x - 8) + '" y="0" width="' + (BW + 16) + '" height="' + H + '" fill="transparent" style="cursor:pointer"/>';
+    }
+    svg.innerHTML = s;
+    if (done) lab.innerHTML = '🎉 そろった！ どの 山も <b>' + avg + 'こ</b>。これが 平均（へいきん）。<br>ぜんぶの 数は ' + total + 'こ の まま。';
+    else if (sel === null) lab.innerHTML = '高さ：' + h.join('・') + '（ぜんぶで ' + total + 'こ）<br>高い 山を タップ → 低い 山を タップ で 1こ うつる';
+    else lab.innerHTML = (sel + 1) + '番目の 山を えらんだ。<br>うつす 先の 山を タップ';
+    lab.classList.toggle('done', done);
+  }
+  svg.addEventListener('click', e => {
+    const t = e.target.closest('[data-i]'); if (!t) return;
+    const i = +t.dataset.i;
+    if (sel === null) { if (st[i].length) sel = i; }
+    else if (sel === i) sel = null;
+    else { st[i].push(st[sel].pop()); sel = null; }
+    draw();
+  });
+  document.getElementById(pre + '-auto').addEventListener('click', () => {
+    const h = st.map(a => a.length), mx = h.indexOf(Math.max(...h)), mn = h.indexOf(Math.min(...h));
+    if (h[mx] > h[mn]) st[mn].push(st[mx].pop());
+    sel = null; draw();
+  });
+  document.getElementById(pre + '-reset').addEventListener('click', reset);
+  reset();
+}
+
+/* ============ 1. ならす ============ */
+makePiles('p1', [5, 1, 3]);
+renderInput('a1-list', { id: 'a_pile1', text: '上の 山（5・1・3）を ならすと、1つの 山は 何こ？', answer: 3, unit: 'こ',
+  ok: '5 から 2こ を 1 の 山に うつすと 3・3・3。うつした だけ なので、ぜんぶの 数は 9こ の まま。',
+  hint: '図の 高い 山を タップ → 低い 山を タップ。どの 山も 同じ 高さに なるまで。',
+  traps: { '9': '9 は ぜんぶの 数。3つの 山を 同じ 高さに すると？', '5': '5 は いちばん 高い 山。ならすと 低く なるよ。', '1': '1 は いちばん 低い 山。ならすと 高く なるよ。' } });
+
+makePiles('p2', [6, 2, 3, 5]);
+renderInput('a2-list', { id: 'a_pile2', text: '4つの 山（6・2・3・5）を ならすと、1つの 山は 何こ？', answer: 4, unit: 'こ',
+  ok: '6 から 2こ を 2 の 山へ、5 から 1こ を 3 の 山へ → 4・4・4・4。多い ぶん（2 ＋ 1 ＝ 3）と 足りない ぶん（2 ＋ 1 ＝ 3）が 同じ だから、ぴったり そろう。',
+  hint: '高い 山（6 と 5）から、低い 山（2 と 3）へ うつそう。',
+  traps: { '16': '16 は ぜんぶの 数（合計）。4つの 山を 同じ 高さに すると？' } });
+renderChoice('a2-list', { id: 'a_keep', text: 'ならす とき、ブロックの ぜんぶの 数は どう なる？', options: ['ふえる', 'へる', 'かわらない'], answer: 2,
+  ok: '山から 山へ うつす だけで、すてても 足しても いない。だから ぜんぶの 数（合計）は かわらない。これが 次の「わり算」の ひみつ。',
+  hint: 'うつした とき、ブロックは どこかに 消えた？ ふえた？' });
+
+/* ============ 2. 合計 ÷ 個数 ============ */
+(function () {
+  const svg = document.getElementById('gather-svg');
+  const BW = 24, BH = 13, BASE = 134;
+  const blk = (x, k, c) => '<rect x="' + x + '" y="' + (BASE - (k + 1) * BH + 1) + '" width="' + (BW - 2) + '" height="' + (BH - 2) + '" rx="3" fill="' + PCOL[c] + '"/>';
+  const arrow = (x1, x2, y, t) => '<line x1="' + x1 + '" y1="' + y + '" x2="' + (x2 - 8) + '" y2="' + y + '" stroke="#7f8c8d" stroke-width="3"/>' +
+    '<polygon points="' + x2 + ',' + y + ' ' + (x2 - 10) + ',' + (y - 6) + ' ' + (x2 - 10) + ',' + (y + 6) + '" fill="#7f8c8d"/>' +
+    '<text x="' + ((x1 + x2) / 2) + '" y="' + (y - 10) + '" text-anchor="middle" font-size="13" font-weight="900" fill="#555">' + t + '</text>';
+  const base = (x1, x2) => '<line x1="' + x1 + '" y1="' + (BASE + 1) + '" x2="' + x2 + '" y2="' + (BASE + 1) + '" stroke="#2c3e50" stroke-width="2.5"/>';
+  const lab = (x, t) => '<text x="' + x + '" y="' + (BASE + 22) + '" text-anchor="middle" font-size="15" font-weight="900" fill="#2c3e50">' + t + '</text>';
+  let s = '';
+  [5, 1, 3].forEach((v, i) => { for (let k = 0; k < v; k++) s += blk(14 + i * (BW + 6), k, i); });
+  s += base(8, 104) + lab(56, '① 5・1・3');
+  s += arrow(108, 156, 86, 'まとめる');
+  const seq = [0, 0, 0, 0, 0, 1, 2, 2, 2];
+  seq.forEach((c, k) => { s += blk(163, k, c); });
+  s += base(156, 192) + lab(174, '② 9こ');
+  s += arrow(196, 248, 86, '分ける');
+  for (let j = 0; j < 3; j++) for (let k = 0; k < 3; k++) s += blk(254 + j * (BW + 6), k, seq[j * 3 + k]);
+  s += base(248, 344) + lab(296, '③ 3こずつ');
+  svg.innerHTML = s;
+})();
+renderInput('b1-list', { id: 'b_sum', text: '4・2・6 を ならしたい。まず ぜんぶ まとめると（合計）何こ？', answer: 12, unit: 'こ',
+  ok: '4 ＋ 2 ＋ 6 ＝ 12。これが ②の「まとめる」。', hint: '3つの 数を ぜんぶ 足そう。4 ＋ 2 ＋ 6。' });
+renderInput('b2-list', { id: 'b_avg', text: '合計 12こ を 3つの 山に 同じ 数ずつ 分けると、1つの 山は 何こ？（これが 4・2・6 の 平均）', answer: 4, unit: 'こ',
+  ok: '12 ÷ 3 ＝ 4。ブロックで ならしても、6 から 2こ を 2 に うつして 4・4・4。同じ 答えに なる。',
+  hint: '同じ 数ずつ 分けるのは わり算。12 ÷ 3。',
+  traps: { '36': '12 × 3 だと ふえて しまう。分けるのは わり算 ÷。', '9': '12 − 3 に なってる。同じ 数ずつ 分けるのは わり算 ÷。', '15': '12 ＋ 3 に なってる。分けるのは わり算 ÷。' } });
+renderInput('b2-list', { id: 'b_test', text: 'テストが 80点・90点・70点。3回の 平均は 何点？', answer: 80, unit: '点',
+  ok: '合計 240 ÷ 3回 ＝ 80点。ならして 見ても、90 から 10点 を 70 に うつすと 80・80・80。',
+  hint: '① まず 合計（3つ 足す）→ ② 3回で わる。',
+  traps: { '240': '240 は 合計。3回で 分けると？' } });
+renderInput('b2-list', { id: 'b_zero', text: 'サッカーで 3試合。ゴールは 2・0・4 だった。1試合の 平均は 何ゴール？', answer: 2, unit: 'ゴール',
+  ok: '2 ＋ 0 ＋ 4 ＝ 6、6 ÷ 3試合 ＝ 2ゴール。0ゴールの 試合も ちゃんと 1試合。ならすと 4 から 2 を 0 に うつして 2・2・2。',
+  hint: '0 の 試合も 数に 入れる。合計 ÷ 3試合。',
+  traps: { '3': '6 ÷ 2 に したかな？ 0ゴールの 試合も 1試合。3試合で わろう。', '6': '6 は 合計。3試合で 分けると？' } });
+
+/* ============ 3. 逆に 考える ============ */
+(function () {
+  const svg = document.getElementById('flat-svg');
+  const BW = 40, BH = 22, GAP = 16, PX = 16, TOP = 14, BASE = TOP + 3 * BH + 4, W = 300, H = BASE + 28;
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  let s = '';
+  for (let i = 0; i < 4; i++) {
+    const x = PX + i * (BW + GAP);
+    for (let k = 0; k < 3; k++) s += '<rect x="' + (x + 2) + '" y="' + (BASE - (k + 1) * BH + 2) + '" width="' + (BW - 4) + '" height="' + (BH - 3) + '" rx="4" fill="' + PCOL[i] + '"/>';
+    s += '<text x="' + (x + BW / 2) + '" y="' + (BASE + 21) + '" text-anchor="middle" font-size="15" font-weight="900" fill="#2c3e50">3</text>';
+  }
+  const y = BASE - 3 * BH + 1, xe = PX + 4 * BW + 3 * GAP + 6;
+  s += '<line x1="8" y1="' + (BASE + 1) + '" x2="' + xe + '" y2="' + (BASE + 1) + '" stroke="#2c3e50" stroke-width="3"/>';
+  s += '<line x1="8" y1="' + y + '" x2="' + xe + '" y2="' + y + '" stroke="#e74c3c" stroke-width="2.5" stroke-dasharray="7 5"/>';
+  s += '<text x="' + (xe + 6) + '" y="' + (y + 5) + '" font-size="14" font-weight="900" fill="#e74c3c">平均 3</text>';
+  s += '<text x="' + (xe + 6) + '" y="' + (BASE - 10) + '" font-size="14" font-weight="900" fill="#2c3e50">× 4本</text>';
+  svg.innerHTML = s;
+})();
+renderChoice('c1-list', { id: 'c_shiki', text: '平均 5点の テストが 4回。4回の 合計を 出す 式は？', options: ['5 ＋ 4', '5 × 4', '5 ÷ 4'], answer: 1,
+  ok: '5点の 山が 4本 ならぶ から 5 × 4 ＝ 20点。5 ＋ 5 ＋ 5 ＋ 5 と 同じ こと。',
+  hint: '5点の 山が 4本 ならぶ。同じ 数が 何本も ある ときは？' });
+renderInput('c2-list', { id: 'c_two', text: '2回の テストの 平均が 6点。2回の 合計は 何点？', answer: 12, unit: '点',
+  ok: 'ならすと 6・6。ぜんぶで 6 × 2 ＝ 12点。',
+  hint: 'ならすと 6点の 山が 2本。',
+  traps: { '8': '6 ＋ 2 に なってる。6点の 山が 2本 → かけ算。', '3': '6 ÷ 2 は 逆。ならした 山を ぜんぶ 合わせると？', '6': '6 は 1回ぶん（平均）。2回 ぜんぶでは？' } });
+renderInput('c2-list', { id: 'c_four', text: '4回の テストの 平均が 75点。4回の 合計は 何点？', answer: 300, unit: '点',
+  ok: '75点の 山が 4本 → 75 × 4 ＝ 300点。75 × 2 ＝ 150、それが 2つで 300。',
+  hint: '75 × 4。むずかしければ 75 × 2 ＝ 150 を 2つ 分。',
+  traps: { '79': '75 ＋ 4 に なってる。75点の 山が 4本 → かけ算。', '18.75': '75 ÷ 4 は 逆。ならした 山を ぜんぶ 合わせると？', '75': '75 は 1回ぶん（平均）。4回 ぜんぶでは？' } });
+
+/* ============ 4. あと 何点？ ============ */
+renderInput('d1-list', { id: 'd_two', text: '1回目は 4点。2回の 平均を 5点に したい。2回目は 何点 いる？', answer: 6, unit: '点',
+  ok: '① 5 × 2 ＝ 10　② 4　③ 10 − 4 ＝ 6点。線で 見ると、4 は 平均より 1 低い。その 1 を 2回目が 多く とって うめる → 5 ＋ 1 ＝ 6。',
+  hint: '① ほしい 合計 5 × 2 ＝ ？　② もう 4点 ある　③ 引き算。',
+  traps: { '5': '5 は 平均。2回の 合計を 10 に するには？', '1': '5 − 4 に なってる。① まず ほしい 合計（5 × 2）。', '10': '10 は ほしい 合計。もう 4点 ある。' } });
+renderInput('d2-list', { id: 'd_three', text: '2回の テストは 6点と 9点。3回の 平均を 8点に するには、3回目は 何点？', answer: 9, unit: '点',
+  ok: '① 8 × 3 ＝ 24　② 6 ＋ 9 ＝ 15　③ 24 − 15 ＝ 9点。',
+  hint: '① 8 × 3　② 6 ＋ 9　③ ① − ②。',
+  traps: { '8': '8 は 平均。① まず 3回の 合計（8 × 3）。', '24': '24 は ほしい 合計。もう 6 と 9 が ある。', '15': '15 は もう ある 合計。ほしい 合計 24 との ちがいは？' } });
+
+/* ---- 線で ならす（スライダー） ---- */
+(function () {
+  const svg = document.getElementById('bar-svg'), xi = document.getElementById('bar-x');
+  const T = 70, BASE = 208, K = 1.6, XS = [70, 160, 250], BW = 60;
+  function draw() {
+    const x = +xi.value, vals = [70, 60, x];
+    let s = '';
+    const ty = BASE - T * K;
+    vals.forEach((v, i) => {
+      const top = BASE - v * K, bx = XS[i], col = i === 2 ? '#a569bd' : '#5dade2';
+      if (v >= T) {
+        s += '<rect x="' + bx + '" y="' + ty + '" width="' + BW + '" height="' + (BASE - ty) + '" fill="' + col + '"/>';
+        if (v > T) s += '<rect x="' + bx + '" y="' + top + '" width="' + BW + '" height="' + (ty - top) + '" fill="#58d68d"/>';
+      } else {
+        if (v > 0) s += '<rect x="' + bx + '" y="' + top + '" width="' + BW + '" height="' + (BASE - top) + '" fill="' + col + '"/>';
+        s += '<rect x="' + (bx + 1.5) + '" y="' + ty + '" width="' + (BW - 3) + '" height="' + (top - ty) + '" fill="#fdebd0" stroke="#e67e22" stroke-width="2" stroke-dasharray="5 4"/>';
+      }
+      s += '<text x="' + (bx + BW / 2) + '" y="' + (Math.min(top, ty) - 7) + '" text-anchor="middle" font-size="16" font-weight="900" fill="#2c3e50">' + v + '点</text>';
+      s += '<text x="' + (bx + BW / 2) + '" y="' + (BASE + 22) + '" text-anchor="middle" font-size="14" font-weight="900" fill="' + (i === 2 ? '#8e44ad' : '#555') + '">' + (i + 1) + '回目</text>';
+    });
+    s += '<line x1="10" y1="' + (BASE + 1) + '" x2="330" y2="' + (BASE + 1) + '" stroke="#2c3e50" stroke-width="3"/>';
+    s += '<line x1="10" y1="' + ty + '" x2="330" y2="' + ty + '" stroke="#e74c3c" stroke-width="2.5" stroke-dasharray="7 5"/>';
+    s += '<text x="8" y="' + (ty + 18) + '" font-size="13" font-weight="900" fill="#e74c3c">70</text>';
+    svg.innerHTML = s;
+    const total = 130 + x, avg = total / 3;
+    const extra = vals.reduce((a, v) => a + Math.max(0, v - T), 0), gap = vals.reduce((a, v) => a + Math.max(0, T - v), 0);
+    const avgTxt = Number.isInteger(avg) ? String(avg) : '約 ' + (Math.round(avg * 10) / 10);
+    document.getElementById('bar-xv').textContent = x + '点';
+    document.getElementById('bar-stat').innerHTML =
+      'はみ出し <b style="color:#1e8449">' + extra + '点</b> ／ すきま <b style="color:#e67e22">' + gap + '点</b>　→　' +
+      (extra === gap ? '<span class="ok">🎉 ぴったり 同じ！ ならすと 70点</span>' : extra < gap ? 'すきまが まだ 大きい' : 'はみ出しの ほうが 大きい') +
+      '<br>（平均 ＝ ' + total + ' ÷ 3 ＝ ' + avgTxt + '点）';
+  }
+  xi.addEventListener('input', draw);
+  draw();
+})();
+renderInput('d3-list', { id: 'd_slider', text: 'スライダーで 3回目を 動かそう。1回目 70点・2回目 60点。3回の 平均を ちょうど 70点に するには、3回目は 何点？', answer: 80, unit: '点',
+  ok: '60点の すきま 10 を、3回目の はみ出し 10 で うめる → 70 ＋ 10 ＝ 80点。式でも ① 70 × 3 ＝ 210　② 70 ＋ 60 ＝ 130　③ 210 − 130 ＝ 80。',
+  hint: '2回目の 60点は 線より 10 低い。3回目は 線より 10 高く すれば うめられる。',
+  traps: { '70': '70点 だと、2回目の すきま 10 が うまらない。', '10': '10 は すきまの 大きさ。線（70）より 10 高いと 何点？' } });
+
+renderInput('d4-list', { id: 'd_final', text: '3回の テストは 70点・80点・60点 だった。4回の 平均を 75点に するには、4回目は 何点？', answer: 90, unit: '点',
+  ok: '① 75 × 4 ＝ 300　② 70 ＋ 80 ＋ 60 ＝ 210　③ 300 − 210 ＝ 90点。線で 見ると、70（−5）と 80（＋5）で うち消しあい、60 の すきま 15 が のこる。4回目は 75 ＋ 15 ＝ 90点。',
+  hint: '① 75 × 4　② 70 ＋ 80 ＋ 60　③ ① − ②。',
+  traps: { '75': '75 は 平均。① まず 4回の 合計（75 × 4）。', '300': '300 は ほしい 合計。もう 3回ぶん とって ある。', '210': '210 は もう ある 合計。ほしい 合計 300 との ちがいは？', '15': '15 は 足りない ぶん（すきま）。平均 75 に 足すと？', '85': '75 より 10 高い？ すきまを 数えなおそう。70 は −5、80 は ＋5、60 は −15。' } });
+
+/* ---- 結果 ---- */
+function showResult() {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+  const firstCount = Object.values(tracking).filter(t => t.result === 'first').length;
+  document.getElementById('result-score').textContent = firstCount + ' / ' + TOTAL_Q + ' 一発クリア';
+  const msg = document.getElementById('result-msg');
+  if (firstCount === TOTAL_Q) msg.textContent = 'Perfeito! 💯 ならす・わる・かける が つながった！';
+  else if (firstCount >= TOTAL_Q - 3) msg.textContent = 'Muito bom! 平均の しくみが 見えてきた。';
+  else msg.textContent = 'ブロックの 図を もう1回 動かしてから、①②③ を 見なおそう。';
+  box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+<script src="game.js"></script>
+</body>
+</html>
